@@ -38,11 +38,11 @@ var GE = (function(GE){
 		}
 	};
 
-	var WorldWrapComponent = GE.Comp.WorldWrapComponent = function WorldWrapComponent (roomWidth, roomHeight) {
-		this.ax = 0;
-		this.ay = 0;
-		this.bx = roomWidth - this.ax;
-		this.by = roomHeight - this.ay;
+	var WorldWrapComponent = GE.Comp.WorldWrapComponent = function WorldWrapComponent (bounds) {
+		this.ax = bounds[0];
+		this.ay = bounds[1];
+		this.bx = bounds[2];
+		this.by = bounds[3];
 	};
 
 	WorldWrapComponent.prototype = new GE.GameComponent();
