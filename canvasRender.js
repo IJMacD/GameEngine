@@ -81,5 +81,23 @@ var GE = (function(GE){
 		}, layer);
 	};
 
+
+	function SpriteRenderingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	}
+	GEC.SpriteRenderingComponent = SpriteRenderingComponent;
+	SpriteRenderingComponent.prototype = new GameComponent();
+	SpriteRenderingComponent.prototype.update = function(parent, delta) {
+		this.renderSystem.push(function(context){
+			var x = parent.position.x,
+				y = parent.position.y,
+				w = parent.sprite.width,
+				h = parent.sprite.height;
+			context.translate(x,y);
+			context.rotate(parent.rotation);
+			context.drawImage(parent.sprite,-w/2,-h/2);
+		});
+	};
+
 	return GE;
 }(GE || {}));
