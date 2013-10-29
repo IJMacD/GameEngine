@@ -1,3 +1,10 @@
+(function(){
+	// Pre-load assets
+	var img = new Image();
+	img.src = "img/chest.gif";
+	img.src = "img/buoyOn.png";
+	img.src = "img/buoyOff.png";
+}());
 $(function() {
 	var GameObject = GE.GameObject,
 		GameComponent = GE.GameComponent,
@@ -46,22 +53,30 @@ $(function() {
 
 	GE.DEBUG = true;
 
-	function RedBallRenderingComponent(){}
+	function RedBallRenderingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	}
 	RedBallRenderingComponent.prototype = new GameComponent();
 	RedBallRenderingComponent.prototype.update = function(parent, delta) {
-		renderSystem.push(function(context){
+		this.renderSystem.push(function(context){
 			context.fillStyle = "#ff0000";
 			context.beginPath();
 			context.arc(parent.position.x,parent.position.y,10,0,Math.PI*2,false);
 			context.fill();
 		});
 	};
-	function RedBoxRenderingComponent(){}
+	function RedBoxRenderingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	}
 	RedBoxRenderingComponent.prototype = new GameComponent();
 	RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-		renderSystem.push(function(context){
+		this.renderSystem.push(function(context){
+			var x = parent.position.x,
+				y = parent.position.y;
 			context.fillStyle = "#ff0000";
-			context.fillRect(parent.position.x-10,parent.position.y-10,20,20);
+			context.translate(x,y);
+			context.rotate(parent.rotation);
+			context.fillRect(-10,-10,20,20);
 		});
 	};
 
@@ -78,16 +93,36 @@ $(function() {
 
 	gameRoot.addObject(sun);
 
+	var chestImg = new Image();
+	chestImg.src = "img/chest.gif";
+	var buoyOnImg = new Image();
+	buoyOnImg.src = "img/buoy.png";
+	var buoyOffImg = new Image();
+	buoyOffImg.src = "img/buoyOff.png";
+
 	for(var i = 0; i < 10; i++){
 		redBall = new GameObject();
 		redBall.setPosition(Math.random()*canvasWidth-canvasWidth/2,Math.random()*canvasHeight-canvasHeight/2);
 		redBall.setVelocity(Math.random()*0.5-0.25,Math.random()*0.5-0.25);
 
-		redBall.addComponent(new GEC.PointGravityComponent(sun));
 		redBall.addComponent(new GEC.MoveComponent());
-		// redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+		redBall.addComponent(new GEC.PointGravityComponent(sun));
+		redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
+		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
-		redBall.addComponent(new RedBoxRenderingComponent());
+		if(Math.random() < 0.2){
+			redBall.sprite = chestImg;
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
+		}
+		else if(Math.random() < 0.4){
+			redBall.sprite = buoyOffImg;
+			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
+		}
+		else {
+			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
+		}
 
 		gameRoot.addObject(redBall);
 	}
