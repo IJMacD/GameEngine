@@ -1,5 +1,9 @@
 var GE = (function(GE){
 
+	GE.Comp = GE.Comp || {};
+
+	var GEC = GE.Comp;
+
 	// Exported at end.
 
 	function GameObject(x, y){
@@ -165,6 +169,13 @@ var GE = (function(GE){
 	GameComponent.prototype.toHTML = function() {
 		return this.name;
 	};
+	GameComponent.create = function(constructor, properties){
+		constructor.prototype = new GameComponent();
+		for(prop in properties){
+			constructor.prototype[prop] = properties[prop];
+		}
+		GEC[constructor.name] = constructor;
+	}
 
 	GE.GameObject = GameObject;
 	GE.GameComponent = GameComponent;
