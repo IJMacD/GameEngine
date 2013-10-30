@@ -74,5 +74,21 @@ var GE = (function(GE){
 		}
 	};
 
+	GameComponent.create(function FollowComponent(object) {
+		this.target = object;
+	}, {
+		update: function(parent, delta) {
+			parent.position.set(this.target.position);
+		}
+	});
+
+	GameComponent.create(function CounterRotationComponent(object) {
+		this.target = object;
+	}, {
+		update: function(parent, delta) {
+			parent.rotation = -this.target.rotation;
+		}
+	});
+
 	return GE;
 }(GE || {}));
