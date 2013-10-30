@@ -33,6 +33,11 @@ var GE = (function(GE){
 		this.width = width;
 		this.height = height;
 	}
+	CameraSystem.prototype.setScale = function(scaleX, scaleY){
+		scaleY = scaleY || scaleX;
+		this.scaleX = scaleX;
+		this.scaleY = scaleY;
+	}
 	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
 		if(objectManager instanceof GE.GameObjectManager)
 			this.pruneList.push(objectManager);

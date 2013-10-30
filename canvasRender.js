@@ -5,9 +5,10 @@ var GE = (function(GE){
 	var GameComponent = GE.GameComponent,
 		GEC = GE.Comp;
 
-	function RenderSystem(context, bounds, cameraSystem){
+	function RenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
 		this.context = context;
-		this.bounds = bounds;
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
 		this.maxLayer = 1;
@@ -23,7 +24,8 @@ var GE = (function(GE){
 		this.renderQueue[layer].push(renderable);
 	};
 	RenderSystem.prototype.update = function(delta) {
-		this.context.clearRect(this.bounds[0],this.bounds[1],this.bounds[2],this.bounds[3]);
+		this.context.fillStyle = "#ffffff";
+		this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
 
 		this.context.save();
 
@@ -39,8 +41,6 @@ var GE = (function(GE){
 		this.context.rotate(this.cameraSystem.rotation);
 		this.context.translate(-p.x,-p.y);
 
-		this.context.strokeRect(-this.bounds[2]/2,-this.bounds[3]/2,this.bounds[2],this.bounds[3]);
-
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 			for(var j = 0, n = this.renderQueue[i] && this.renderQueue[i].length; j < n; j++){
 				this.context.save();
@@ -53,8 +53,9 @@ var GE = (function(GE){
 
 		this.renderQueue = [];
 	};
-	RenderSystem.prototype.setBounds = function(bounds){
-		this.bounds = bounds;
+	RenderSystem.prototype.setCanvasSize = function(width, height){
+		this.canvasWidth = width;
+		this.canvasHeight = height;
 	}
 	function drawPath(context, path){
 		var i = 2,
