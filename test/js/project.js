@@ -152,6 +152,11 @@ $(function() {
 		}
 
 		gameRoot.addObject(redBall);
+
+		if(i == 0){
+			cameraSystem2.addComponent(new GEC.FollowComponent(redBall));
+			cameraSystem2.addComponent(new GEC.CounterRotationComponent(redBall));
+		}
 	}
 
 
