@@ -96,10 +96,10 @@ $(function() {
 
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.RenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
-	cameraSystem.setScale(0.66666);
+	cameraSystem.setScale(1);
 	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
 	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
-	cameraSystem2.setScale(2.3333);
+	cameraSystem2.setScale(0.05);
 
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
@@ -122,7 +122,7 @@ $(function() {
 	for(var i = 0; i < 10; i++){
 		redBall = new GameObject();
 		redBall.setPosition(Math.random()*canvasWidth-canvasWidth/2,Math.random()*canvasHeight-canvasHeight/2);
-		redBall.setVelocity(Math.random()*0.5-0.25,Math.random()*0.5-0.25);
+		redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
 
 		redBall.addComponent(new GEC.MoveComponent());
 		redBall.addComponent(new GEC.PointGravityComponent(sun));
@@ -130,6 +130,7 @@ $(function() {
 		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
 		var r = Math.random();
 		if(r < 0.2){
 			redBall.sprite = chestImg;
@@ -152,11 +153,6 @@ $(function() {
 		}
 
 		gameRoot.addObject(redBall);
-
-		if(i == 0){
-			cameraSystem2.addComponent(new GEC.FollowComponent(redBall));
-			cameraSystem2.addComponent(new GEC.CounterRotationComponent(redBall));
-		}
 	}
 
 
