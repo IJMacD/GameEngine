@@ -10,13 +10,19 @@ $(function() {
 		GameComponent = GE.GameComponent,
 		GEC = GE.Comp,
 
-		canvas = $('canvas'),
+		canvas = $('#surface'),
 		context = canvas[0].getContext("2d"),
+		canvas2 = $('#surface2'),
+		context2 = canvas2[0].getContext("2d"),
 		canvasWidth = canvas.width(),
 		canvasHeight = canvas.height(),
+		canvas2Width = canvas2.width(),
+		canvas2Height = canvas2.height(),
 		gameRoot = new GE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
+		cameraSystem2,
+		renderSystem2,
 		redBall,
 		sun,
 		lastTime = 0;
@@ -28,11 +34,19 @@ $(function() {
 		// canvasHeight = height||canvas.height();
 		canvas[0].width = canvasWidth;
 		canvas[0].height = canvasHeight;
+		canvas2[0].width = canvas2Width;
+		canvas2[0].height = canvas2Height;
 		if(cameraSystem){
 			cameraSystem.setScreenSize(canvasWidth, canvasHeight);
 		}
+		if(cameraSystem2){
+			cameraSystem2.setScreenSize(canvas2Width, canvas2Height);
+		}
 		if(renderSystem){
-			renderSystem.setBounds([0,0,canvasWidth,canvasHeight]);
+			renderSystem.setCanvasSize(canvasWidth,canvasHeight);
+		}
+		if(renderSystem2){
+			renderSystem2.setCanvasSize(canvas2Width,canvas2Height);
 		}
 	}
 
@@ -81,7 +95,11 @@ $(function() {
 	};
 
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
-	renderSystem = new GE.RenderSystem(context, [0, 0, canvasWidth, canvasHeight], cameraSystem);
+	renderSystem = new GE.RenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
+	cameraSystem.setScale(0.66666);
+	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
+	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
+	cameraSystem2.setScale(2.3333);
 
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
@@ -90,6 +108,7 @@ $(function() {
 	sun.mass = 5;
 	sun.setPosition(0,0);
 	sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+	sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
 
 	gameRoot.addObject(sun);
 
@@ -115,17 +134,21 @@ $(function() {
 		if(r < 0.2){
 			redBall.sprite = chestImg;
 			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
 		}
 		else if(r < 0.4){
 			redBall.sprite = buoyOffImg;
 			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
 			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
 		}
 		else if(r < 0.5) {
 			redBall.addComponent(new RedBallRenderingComponent(renderSystem));
+			redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
 		}
 		else {
 			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
+			redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
 		}
 
 		gameRoot.addObject(redBall);
@@ -134,6 +157,8 @@ $(function() {
 
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
+	gameRoot.addObject(cameraSystem2);
+	gameRoot.addObject(renderSystem2);
 
 	function loop(time){
 		requestAnimationFrame(loop);
