@@ -2,7 +2,7 @@
 	// Pre-load assets
 	var img = new Image();
 	img.src = "img/chest.gif";
-	img.src = "img/buoyOn.png";
+	img.src = "img/buoy.png";
 	img.src = "img/buoyOff.png";
 }());
 $(function() {
@@ -107,18 +107,22 @@ $(function() {
 
 		redBall.addComponent(new GEC.MoveComponent());
 		redBall.addComponent(new GEC.PointGravityComponent(sun));
-		redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+		//redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
-		if(Math.random() < 0.2){
+		var r = Math.random();
+		if(r < 0.2){
 			redBall.sprite = chestImg;
 			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
 		}
-		else if(Math.random() < 0.4){
+		else if(r < 0.4){
 			redBall.sprite = buoyOffImg;
 			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
 			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
+		}
+		else if(r < 0.5) {
+			redBall.addComponent(new RedBallRenderingComponent(renderSystem));
 		}
 		else {
 			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
@@ -133,7 +137,7 @@ $(function() {
 
 	function loop(time){
 		requestAnimationFrame(loop);
-		gameRoot.update(time - lastTime);
+		gameRoot.update(Math.min(time - lastTime,100));
 		lastTime = time;
 	}
 	loop(0);
