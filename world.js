@@ -14,8 +14,8 @@ var GE = (function(GE){
 	WorldBounceComponent.prototype = new GE.GameComponent();
 
 	WorldBounceComponent.prototype.update = function(parent, delta) {
-		var coef = 0.9,
-			friction = 0.9;
+		var coef = 0.3,
+			friction = 0.3;
 		if(parent.position.x < this.bx1){
 			parent.position.x = this.bx1;
 			parent.velocity.x = -parent.velocity.x*coef;

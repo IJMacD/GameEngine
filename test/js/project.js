@@ -1,10 +1,3 @@
-(function(){
-	// Pre-load assets
-	var img = new Image();
-	img.src = "img/chest.gif";
-	img.src = "img/buoy.png";
-	img.src = "img/buoyOff.png";
-}());
 $(function() {
 	var GameObject = GE.GameObject,
 		GameComponent = GE.GameComponent,
@@ -23,8 +16,10 @@ $(function() {
 		renderSystem,
 		cameraSystem2,
 		renderSystem2,
-		redBall,
-		sun,
+		particle,
+		particleCount = 100,
+		particleSep = 50,
+		particles = [],
 		lastTime = 0;
 
 	function initCanvas(width,height){
@@ -67,30 +62,16 @@ $(function() {
 
 	GE.DEBUG = true;
 
-	function RedBallRenderingComponent(renderSystem){
+	function ParticleRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 	}
-	RedBallRenderingComponent.prototype = new GameComponent();
-	RedBallRenderingComponent.prototype.update = function(parent, delta) {
+	ParticleRenderingComponent.prototype = new GameComponent();
+	ParticleRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			context.fillStyle = "#ff0000";
+			context.fillStyle = "#000000";
 			context.beginPath();
-			context.arc(parent.position.x,parent.position.y,10,0,Math.PI*2,false);
+			context.arc(parent.position.x,parent.position.y,2,0,Math.PI*2,false);
 			context.fill();
-		});
-	};
-	function RedBoxRenderingComponent(renderSystem){
-		this.renderSystem = renderSystem;
-	}
-	RedBoxRenderingComponent.prototype = new GameComponent();
-	RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-		this.renderSystem.push(function(context){
-			var x = parent.position.x,
-				y = parent.position.y;
-			context.fillStyle = "#ff0000";
-			context.translate(x,y);
-			context.rotate(parent.rotation);
-			context.fillRect(-10,-10,20,20);
 		});
 	};
 
@@ -101,65 +82,45 @@ $(function() {
 	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
 	cameraSystem2.setScale(0.05);
 
-	// cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
+	var boxSize = Math.floor(Math.sqrt(particleCount)),
+		offsetX = - boxSize * particleSep / 2,
+		offsetY = - boxSize * particleSep / 2;
+	for(var i = 0; i < boxSize; i++){
+		for(var j = 0; j < boxSize; j++){
+			var x = j * particleSep + offsetX,
+				y = i * particleSep + offsetY,
+				vec = new Vector2(- x, - y),
+				vecNorm = vec.normal();
+			vecNorm.scale(vec.magnitude()*0.0001);
+			particle = new GameObject();
+			particle.setPosition(x,y);
+			particle.setVelocity(vecNorm);
+			particle.mass = 0.01;
 
+			particle.addComponent(new GEC.MoveComponent());
+			for(var k = 0; k < i*boxSize + j; k++){
+				particles[k].addComponent(new GEC.PointGravityComponent(particle));
+				particle.addComponent(new GEC.PointGravityComponent(particles[k]));
+			}
+			particle.addComponent(new GEC.WorldBounceComponent(2,2,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+			
+			if(i == 0 && j == 0){
+				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+			}
+			
+			particle.addComponent(new ParticleRenderingComponent(renderSystem));
+			particle.addComponent(new ParticleRenderingComponent(renderSystem2));
 
-	sun = new GameObject();
-	sun.mass = 5;
-	sun.setPosition(0,0);
-	sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
-	sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
-
-	gameRoot.addObject(sun);
-
-	var chestImg = new Image();
-	chestImg.src = "img/chest.gif";
-	var buoyOnImg = new Image();
-	buoyOnImg.src = "img/buoy.png";
-	var buoyOffImg = new Image();
-	buoyOffImg.src = "img/buoyOff.png";
-
-	for(var i = 0; i < 10; i++){
-		redBall = new GameObject();
-		redBall.setPosition(Math.random()*canvasWidth-canvasWidth/2,Math.random()*canvasHeight-canvasHeight/2);
-		redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
-
-		redBall.addComponent(new GEC.MoveComponent());
-		redBall.addComponent(new GEC.PointGravityComponent(sun));
-		//redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
-		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
-		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
-		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
-		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
-		var r = Math.random();
-		if(r < 0.2){
-			redBall.sprite = chestImg;
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
+			gameRoot.addObject(particle);
+			particles.push(particle);
 		}
-		else if(r < 0.4){
-			redBall.sprite = buoyOffImg;
-			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
-		}
-		else if(r < 0.5) {
-			redBall.addComponent(new RedBallRenderingComponent(renderSystem));
-			redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
-		}
-		else {
-			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
-			redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
-		}
-
-		gameRoot.addObject(redBall);
 	}
 
 
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
-	gameRoot.addObject(cameraSystem2);
-	gameRoot.addObject(renderSystem2);
+	// gameRoot.addObject(cameraSystem2);
+	// gameRoot.addObject(renderSystem2);
 
 	function loop(time){
 		requestAnimationFrame(loop);
