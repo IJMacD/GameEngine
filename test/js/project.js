@@ -176,7 +176,7 @@ $(function() {
 
 
 	sun = new GameObject();
-	sun.mass = 5;
+	sun.mass = 0.1;
 	sun.setPosition(0,0);
 	//sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
 	sun.addComponent(new RedBoxRenderingComponent(renderSystem));
@@ -186,7 +186,7 @@ $(function() {
 	for(var i = 0; i < 10; i++){
 		redBall = new GameObject();
 		redBall.setPosition(Math.random()*200-100,Math.random()*200-100);
-		redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
+		redBall.setVelocity(Math.random()*0.2-0.1,Math.random()*0.2-0.1);
 
 		redBall.addComponent(new GEC.MoveComponent());
 		redBall.addComponent(new GEC.PointGravityComponent(sun));

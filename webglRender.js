@@ -25,7 +25,7 @@ var GE = (function(GE){
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(this.pMatrix, 173*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+        mat4.perspective(this.pMatrix, 160*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 
