@@ -1,31 +1,18 @@
-(function(){
-	// Pre-load assets
-	var img = new Image();
-	img.src = "img/chest.gif";
-	img.src = "img/buoy.png";
-	img.src = "img/buoyOff.png";
-}());
 $(function() {
 	var GameObject = GE.GameObject,
 		GameComponent = GE.GameComponent,
 		GEC = GE.Comp,
 
 		canvas = $('#surface'),
-		context = canvas[0].getContext("2d"),
-		canvas2 = $('#surface2'),
-		context2 = canvas2[0].getContext("2d"),
+		context = canvas[0].getContext("experimental-webgl"),
+		gl = context,
 		canvasWidth = canvas.width(),
 		canvasHeight = canvas.height(),
-		canvas2Width = canvas2.width(),
-		canvas2Height = canvas2.height(),
 		gameRoot = new GE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
-		cameraSystem2,
-		renderSystem2,
 		redBall,
 		sun,
-		sun2,
 		lastTime = 0;
 
 	function initCanvas(width,height){
@@ -35,23 +22,86 @@ $(function() {
 		// canvasHeight = height||canvas.height();
 		canvas[0].width = canvasWidth;
 		canvas[0].height = canvasHeight;
-		canvas2[0].width = canvas2Width;
-		canvas2[0].height = canvas2Height;
-		if(cameraSystem){
-			cameraSystem.setScreenSize(canvasWidth, canvasHeight);
-		}
-		if(cameraSystem2){
-			cameraSystem2.setScreenSize(canvas2Width, canvas2Height);
-		}
-		if(renderSystem){
-			renderSystem.setCanvasSize(canvasWidth,canvasHeight);
-		}
-		if(renderSystem2){
-			renderSystem2.setCanvasSize(canvas2Width,canvas2Height);
-		}
+		gl.viewportWidth = canvasWidth;
+		gl.viewportHeight = canvasHeight,
+		cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
+		renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
 	}
 
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+
+    var shaderProgram;
+
+    function initShaders() {
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+
+        gl.useProgram(shaderProgram);
+
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    }
+
+    var mvMatrix = mat4.create();
+    var pMatrix = mat4.create();
+
+    function setMatrixUniforms() {
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+    }
+
+
 	initCanvas();
+	
+    initShaders();
+
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
 
 	$('#fullscr-btn').on("click", function(){
 		canvas[0].webkitRequestFullscreen();
@@ -68,107 +118,94 @@ $(function() {
 
 	GE.DEBUG = true;
 
-	function RedBallRenderingComponent(renderSystem){
+	function RedTriangleRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
+		this.buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        var vertices = [
+             0.0,  1.0,  0.0,
+            -1.0, -1.0,  0.0,
+             1.0, -1.0,  0.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        this.buffer.itemSize = 3;
+        this.buffer.numItems = 3;
 	}
-	RedBallRenderingComponent.prototype = new GameComponent();
-	RedBallRenderingComponent.prototype.update = function(parent, delta) {
-		this.renderSystem.push(function(context){
-			context.fillStyle = "#ff0000";
-			context.beginPath();
-			context.arc(parent.position.x,parent.position.y,10,0,Math.PI*2,false);
-			context.fill();
+	RedTriangleRenderingComponent.prototype = new GameComponent();
+	RedTriangleRenderingComponent.prototype.update = function(parent, delta) {
+		var buff = this.buffer;
+		this.renderSystem.push(function(gl,mvMatrix){
+	        mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -7.0]);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, buff);
+	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buff.itemSize, gl.FLOAT, false, 0, 0);
+	        setMatrixUniforms();
+	        gl.drawArrays(gl.TRIANGLES, 0, buff.numItems);
 		});
 	};
 	function RedBoxRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
+        this.buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        vertices = [
+             1.0,  1.0,  0.0,
+            -1.0,  1.0,  0.0,
+             1.0, -1.0,  0.0,
+            -1.0, -1.0,  0.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        this.buffer.itemSize = 3;
+        this.buffer.numItems = 4;
 	}
 	RedBoxRenderingComponent.prototype = new GameComponent();
 	RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-		this.renderSystem.push(function(context){
-			var x = parent.position.x,
-				y = parent.position.y;
-			context.fillStyle = "#ff0000";
-			context.translate(x,y);
-			context.rotate(parent.rotation);
-			context.fillRect(-10,-10,20,20);
+		var buff = this.buffer;
+		this.renderSystem.push(function(gl,mvMatrix){
+	        mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -7.0]);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, buff);
+	        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buff.itemSize, gl.FLOAT, false, 0, 0);
+	        setMatrixUniforms();
+	        gl.drawArrays(gl.TRIANGLE_STRIP, 0, buff.numItems);
 		});
 	};
 
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
-	renderSystem = new GE.RenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
+	renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, mvMatrix, pMatrix);
 	cameraSystem.setScale(0.5);
-	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
-	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
-	cameraSystem2.setScale(5);
-
-	renderSystemManager = new GE.RenderSystemManager();
-	renderSystemManager.addObject(renderSystem);
-	renderSystemManager.addObject(renderSystem2);
 
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
 
 	sun = new GameObject();
 	sun.mass = 5;
-	sun.setPosition(-canvasWidth/6,0);
-	sun.addComponent({update:function(p){renderSystemManager.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
-
-	sun2 = new GameObject();
-	sun2.mass = 5;
-	sun2.setPosition(canvasWidth/6,0);
-	sun2.addComponent({update:function(p){renderSystemManager.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+	sun.setPosition(0,0);
+	//sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+	sun.addComponent(new RedBoxRenderingComponent(renderSystem));
 
 	gameRoot.addObject(sun);
-	gameRoot.addObject(sun2);
-
-	var chestImg = new Image();
-	chestImg.src = "img/chest.gif";
-	var buoyOnImg = new Image();
-	buoyOnImg.src = "img/buoy.png";
-	var buoyOffImg = new Image();
-	buoyOffImg.src = "img/buoyOff.png";
 
 	for(var i = 0; i < 10; i++){
 		redBall = new GameObject();
-		redBall.setPosition(Math.random()*canvasWidth-canvasWidth/2,Math.random()*canvasHeight-canvasHeight/2);
+		redBall.setPosition(Math.random()*200-100,Math.random()*200-100);
 		redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
 
 		redBall.addComponent(new GEC.MoveComponent());
 		redBall.addComponent(new GEC.PointGravityComponent(sun));
-		redBall.addComponent(new GEC.PointGravityComponent(sun2));
-		//redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
-		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
-		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystemManager));
 		var r = Math.random();
-		if(r < 0.2){
-			redBall.sprite = chestImg;
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystemManager));
-		}
-		else if(r < 0.4){
-			redBall.sprite = buoyOffImg;
-			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystemManager));
-		}
-		else if(r < 0.5) {
-			redBall.addComponent(new RedBallRenderingComponent(renderSystemManager));
+		if(r < 0.5) {
+			redBall.addComponent(new RedTriangleRenderingComponent(renderSystem));
 		}
 		else {
-			redBall.addComponent(new RedBoxRenderingComponent(renderSystemManager));
+			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
 		}
 
 		gameRoot.addObject(redBall);
-
-		if(i == 0){
-			cameraSystem2.addComponent(new GEC.FollowComponent(redBall));
-		}
 	}
 
 
 	gameRoot.addObject(cameraSystem);
-	gameRoot.addObject(cameraSystem2);
-	gameRoot.addObject(renderSystemManager);
+	gameRoot.addObject(renderSystem);
+
 
 	function loop(time){
 		requestAnimationFrame(loop);

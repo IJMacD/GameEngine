@@ -59,7 +59,6 @@
 
     <div id="wrap">
       <canvas id="surface"></canvas>
-      <canvas id="surface2"></canvas>
     </div>
 
     <footer>
@@ -73,6 +72,26 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="js/gl-matrix.js"></script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        void main(void) {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    </script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+        attribute vec3 aVertexPosition;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        void main(void) {
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        }
+    </script>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/underscore-min.js"></script>
@@ -80,7 +99,7 @@
     <script src="../core.js"></script>
     <script src="../basic.js"></script>
     <script src="../camera.js"></script>
-    <script src="../canvasRender.js"></script>
+    <script src="../webglRender.js"></script>
     <script src="../world.js"></script>
     <script src="../debug.js"></script>
     <script src="js/project.js"></script>

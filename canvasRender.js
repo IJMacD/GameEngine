@@ -6,7 +6,7 @@ var GE = (function(GE){
 		GameObjectManager = GE.GameObjectManager,
 		GEC = GE.Comp;
 
-	function RenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
+	function CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
 		this.context = context;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
@@ -14,9 +14,9 @@ var GE = (function(GE){
 		this.renderQueue = [];
 		this.maxLayer = 1;
 	}
-	GE.RenderSystem = RenderSystem;
-	RenderSystem.prototype = new GE.GameObject();
-	RenderSystem.prototype.push = function(renderable, layer){
+	GE.CanvasRenderSystem = CanvasRenderSystem;
+	CanvasRenderSystem.prototype = new GE.GameObject();
+	CanvasRenderSystem.prototype.push = function(renderable, layer){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
@@ -24,7 +24,7 @@ var GE = (function(GE){
 		}
 		this.renderQueue[layer].push(renderable);
 	};
-	RenderSystem.prototype.update = function(delta) {
+	CanvasRenderSystem.prototype.update = function(delta) {
 		this.context.fillStyle = "#ffffff";
 		this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
 
@@ -54,7 +54,7 @@ var GE = (function(GE){
 
 		this.renderQueue = [];
 	};
-	RenderSystem.prototype.setCanvasSize = function(width, height){
+	CanvasRenderSystem.prototype.setCanvasSize = function(width, height){
 		this.canvasWidth = width;
 		this.canvasHeight = height;
 	}
@@ -73,7 +73,7 @@ var GE = (function(GE){
 		}
 	}
 	// Convenience
-	RenderSystem.prototype.strokePath = function(path, style, layer) {
+	CanvasRenderSystem.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
 		this.push(function(context){
@@ -84,12 +84,12 @@ var GE = (function(GE){
 	};
 
 
-	function SpriteRenderingComponent(renderSystem){
+	function CanvasSpriteRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 	}
-	GEC.SpriteRenderingComponent = SpriteRenderingComponent;
-	SpriteRenderingComponent.prototype = new GameComponent();
-	SpriteRenderingComponent.prototype.update = function(parent, delta) {
+	GEC.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
+	CanvasSpriteRenderingComponent.prototype = new GameComponent();
+	CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
 			var x = parent.position.x,
 				y = parent.position.y,
@@ -101,16 +101,16 @@ var GE = (function(GE){
 		});
 	};
 
-	function RenderSystemManager(){}
-	GE.RenderSystemManager = RenderSystemManager;
-	RenderSystemManager.prototype = new GameObjectManager();
-	RenderSystemManager.prototype.push = function(renderable, layer){
+	function CanvasRenderSystemManager(){}
+	GE.CanvasRenderSystemManager = CanvasRenderSystemManager;
+	CanvasRenderSystemManager.prototype = new GameObjectManager();
+	CanvasRenderSystemManager.prototype.push = function(renderable, layer){
 		for (var i = this.objects.length - 1; i >= 0; i--) {
 			this.objects[i].push(renderable, layer);
 		};
 	}
 	// Convenience
-	RenderSystemManager.prototype.strokePath = function(path, style, layer) {
+	CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
 		this.push(function(context){
