@@ -25,6 +25,7 @@ $(function() {
 		renderSystem2,
 		redBall,
 		sun,
+		sun2,
 		lastTime = 0;
 
 	function initCanvas(width,height){
@@ -96,10 +97,11 @@ $(function() {
 
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.RenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
-	cameraSystem.setScale(1);
+	cameraSystem.setScale(0.5);
 	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
 	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
-	cameraSystem2.setScale(0.05);
+	cameraSystem2.setScale(5);
+
 	renderSystemManager = new GE.RenderSystemManager();
 	renderSystemManager.addObject(renderSystem);
 	renderSystemManager.addObject(renderSystem2);
@@ -109,10 +111,16 @@ $(function() {
 
 	sun = new GameObject();
 	sun.mass = 5;
-	sun.setPosition(0,0);
-
+	sun.setPosition(-canvasWidth/6,0);
 	sun.addComponent({update:function(p){renderSystemManager.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+
+	sun2 = new GameObject();
+	sun2.mass = 5;
+	sun2.setPosition(canvasWidth/6,0);
+	sun2.addComponent({update:function(p){renderSystemManager.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+
 	gameRoot.addObject(sun);
+	gameRoot.addObject(sun2);
 
 	var chestImg = new Image();
 	chestImg.src = "img/chest.gif";
@@ -128,6 +136,7 @@ $(function() {
 
 		redBall.addComponent(new GEC.MoveComponent());
 		redBall.addComponent(new GEC.PointGravityComponent(sun));
+		redBall.addComponent(new GEC.PointGravityComponent(sun2));
 		//redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
