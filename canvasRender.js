@@ -3,6 +3,7 @@ var GE = (function(GE){
 	GE.Comp = GE.Comp || {};
 
 	var GameComponent = GE.GameComponent,
+		GameObjectManager = GE.GameObjectManager,
 		GEC = GE.Comp;
 
 	function RenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
@@ -98,6 +99,25 @@ var GE = (function(GE){
 			context.rotate(parent.rotation);
 			context.drawImage(parent.sprite,-w/2,-h/2);
 		});
+	};
+
+	function RenderSystemManager(){}
+	GE.RenderSystemManager = RenderSystemManager;
+	RenderSystemManager.prototype = new GameObjectManager();
+	RenderSystemManager.prototype.push = function(renderable, layer){
+		for (var i = this.objects.length - 1; i >= 0; i--) {
+			this.objects[i].push(renderable, layer);
+		};
+	}
+	// Convenience
+	RenderSystemManager.prototype.strokePath = function(path, style, layer) {
+		if(typeof style == "undefined")
+			style = '#000';
+		this.push(function(context){
+			context.strokeStyle = style;
+			drawPath.call(this, context, path);
+			context.stroke();
+		}, layer);
 	};
 
 	return GE;
