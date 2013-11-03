@@ -100,6 +100,9 @@ $(function() {
 	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
 	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
 	cameraSystem2.setScale(0.05);
+	renderSystemManager = new GE.RenderSystemManager();
+	renderSystemManager.addObject(renderSystem);
+	renderSystemManager.addObject(renderSystem2);
 
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
@@ -107,9 +110,8 @@ $(function() {
 	sun = new GameObject();
 	sun.mass = 5;
 	sun.setPosition(0,0);
-	sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
-	sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
 
+	sun.addComponent({update:function(p){renderSystemManager.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
 	gameRoot.addObject(sun);
 
 	var chestImg = new Image();
@@ -129,37 +131,35 @@ $(function() {
 		//redBall.addComponent(new GEC.WorldBounceComponent(20,20,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 		redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 		// redBall.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
-		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
-		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
+		redBall.addComponent(new GEC.DebugDrawPathComponent(renderSystemManager));
 		var r = Math.random();
 		if(r < 0.2){
 			redBall.sprite = chestImg;
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystemManager));
 		}
 		else if(r < 0.4){
 			redBall.sprite = buoyOffImg;
 			redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
-			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystem2));
+			redBall.addComponent(new GEC.SpriteRenderingComponent(renderSystemManager));
 		}
 		else if(r < 0.5) {
-			redBall.addComponent(new RedBallRenderingComponent(renderSystem));
-			redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
+			redBall.addComponent(new RedBallRenderingComponent(renderSystemManager));
 		}
 		else {
-			redBall.addComponent(new RedBoxRenderingComponent(renderSystem));
-			redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
+			redBall.addComponent(new RedBoxRenderingComponent(renderSystemManager));
 		}
 
 		gameRoot.addObject(redBall);
+
+		if(i == 0){
+			cameraSystem2.addComponent(new GEC.FollowComponent(redBall));
+		}
 	}
 
 
 	gameRoot.addObject(cameraSystem);
-	gameRoot.addObject(renderSystem);
 	gameRoot.addObject(cameraSystem2);
-	gameRoot.addObject(renderSystem2);
+	gameRoot.addObject(renderSystemManager);
 
 	function loop(time){
 		requestAnimationFrame(loop);
