@@ -28,7 +28,7 @@ var GE = (function(GE){
 
         mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
 
-        mat4.translate(this.pMatrix, this.pMatrix, [-this.cameraSystem.position.x, -this.cameraSystem.position.y, 20]);
+        mat4.translate(this.pMatrix, this.pMatrix, [-this.cameraSystem.position.x, -this.cameraSystem.position.y, 90]);
 
         gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
 

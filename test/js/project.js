@@ -83,16 +83,38 @@ $(function() {
         shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-        shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-        gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     }
 
+    var chestTexture;
+    function initTextures() {
+        chestTexture = gl.createTexture();
+        chestTexture.image = new Image();
+        chestTexture.image.onload = function() {
+            handleLoadedTexture(chestTexture)
+        }
+
+        chestTexture.image.src = "img/chest.gif";
+    }
+
+    function handleLoadedTexture(texture) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
     initCanvas();
     
     initShaders();
+
+    initTextures();
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -112,76 +134,7 @@ $(function() {
 
     GE.DEBUG = true;
 
-    function RedPyramidRenderingComponent(renderSystem){
-        this.renderSystem = renderSystem;
-        this.vertexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        var vertices = [
-            // Front face
-             0.0,  1.0,  0.0,   // A
-            -1.0, -1.0,  1.0,   // B
-             1.0, -1.0,  1.0,   // C
-            // Right face
-             0.0,  1.0,  0.0,   // A
-             1.0, -1.0,  1.0,   // C
-             0.0, -1.0, -1.0,   // D
-            // Left face
-             0.0,  1.0,  0.0,   // A
-            -1.0, -1.0,  1.0,   // B
-             0.0, -1.0, -1.0,   // D
-            // Bottom face
-            -1.0, -1.0,  1.0,   // B
-             1.0, -1.0,  1.0,   // C
-             0.0, -1.0, -1.0    // D
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        this.vertexBuffer.itemSize = 3;
-        this.vertexBuffer.numItems = 12;
-
-        this.colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-        var colors = [
-            // Front face
-            1.0, 0.0, 0.0, 1.0,     // A
-            0.0, 1.0, 0.0, 1.0,     // B
-            0.0, 0.0, 1.0, 1.0,     // C
-            // Right face
-            1.0, 0.0, 0.0, 1.0,     // A
-            0.0, 0.0, 1.0, 1.0,     // C
-            0.5, 0.5, 0.5, 1.0,     // D
-            // Left face
-            1.0, 0.0, 0.0, 1.0,     // A
-            0.0, 1.0, 0.0, 1.0,     // B
-            0.5, 0.5, 0.5, 1.0,     // D
-            // Bottom face
-            0.0, 1.0, 0.0, 1.0,     // B
-            0.0, 0.0, 1.0, 1.0,     // C
-            0.5, 0.5, 0.5, 1.0      // D
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        this.colorBuffer.itemSize = 4;
-        this.colorBuffer.numItems = 12;
-    }
-    RedPyramidRenderingComponent.prototype = new GameComponent();
-    RedPyramidRenderingComponent.prototype.update = function(parent, delta) {
-        var vBuff = this.vertexBuffer,
-            cBuff = this.colorBuffer;
-        this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
-
-            mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
-            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
-
-            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-            gl.drawArrays(gl.TRIANGLES, 0, vBuff.numItems);
-        });
-    };
-    function RedCubeRenderingComponent(renderSystem){
+    function ChestRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
         this.vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -226,26 +179,48 @@ $(function() {
         this.vertexBuffer.itemSize = 3;
         this.vertexBuffer.numItems = 24;
 
-        this.colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-        var colors = [
-          [1.0, 0.0, 0.0, 1.0],     // Front face
-          [1.0, 1.0, 0.0, 1.0],     // Back face
-          [0.0, 1.0, 0.0, 1.0],     // Top face
-          [1.0, 0.5, 0.5, 1.0],     // Bottom face
-          [1.0, 0.0, 1.0, 1.0],     // Right face
-          [0.0, 0.0, 1.0, 1.0],     // Left face
+        this.textureBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+        var textureCoords = [
+          // Front face
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+
+          // Back face
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+
+          // Top face
+          0.0, 1.0,
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+
+          // Bottom face
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+          1.0, 0.0,
+
+          // Right face
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+
+          // Left face
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
         ];
-        var unpackedColors = [];
-        for (var i in colors) {
-          var color = colors[i];
-          for (var j=0; j < 4; j++) {
-            unpackedColors = unpackedColors.concat(color);
-          }
-        }
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
-        this.colorBuffer.itemSize = 4;
-        this.colorBuffer.numItems = 24;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        this.textureBuffer.itemSize = 2;
+        this.textureBuffer.numItems = 24;
 
         this.vertexIndexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
@@ -261,10 +236,10 @@ $(function() {
         this.vertexIndexBuffer.itemSize = 1;
         this.vertexIndexBuffer.numItems = 36;
     }
-    RedCubeRenderingComponent.prototype = new GameComponent();
-    RedCubeRenderingComponent.prototype.update = function(parent, delta) {
+    ChestRenderingComponent.prototype = new GameComponent();
+    ChestRenderingComponent.prototype.update = function(parent, delta) {
         var vBuff = this.vertexBuffer,
-            cBuff = this.colorBuffer,
+            tBuff = this.textureBuffer,
             iBuff = this.vertexIndexBuffer;
         this.renderSystem.push(function(gl,mvMatrix){
             mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
@@ -274,8 +249,12 @@ $(function() {
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
-            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tBuff);
+            gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, tBuff.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, chestTexture);
+            gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
 
@@ -295,7 +274,8 @@ $(function() {
     sun.mass = 0.1;
     sun.setPosition(0,0);
     //sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
-    sun.addComponent(new RedCubeRenderingComponent(renderSystem));
+    sun.addComponent(new ChestRenderingComponent(renderSystem));
+    sun.addComponent(new GEC.RotationComponent(0.001));
 
     gameRoot.addObject(sun);
 
@@ -307,13 +287,7 @@ $(function() {
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
         redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
-        var r = Math.random();
-        if(r < 0.5) {
-            redBall.addComponent(new RedPyramidRenderingComponent(renderSystem));
-        }
-        else {
-            redBall.addComponent(new RedCubeRenderingComponent(renderSystem));
-        }
+        redBall.addComponent(new ChestRenderingComponent(renderSystem));
 
         if(i == 0){
             // cameraSystem.addComponent(new GEC.FollowComponent(redBall));
