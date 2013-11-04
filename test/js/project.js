@@ -83,6 +83,9 @@ $(function() {
         shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
+        shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+        gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     }
@@ -120,32 +123,49 @@ $(function() {
 
     function RedTriangleRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
-        this.buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        this.vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         var vertices = [
              0.0,  1.0,  0.0,
             -1.0, -1.0,  0.0,
              1.0, -1.0,  0.0
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        this.buffer.itemSize = 3;
-        this.buffer.numItems = 3;
+        this.vertexBuffer.itemSize = 3;
+        this.vertexBuffer.numItems = 3;
+
+        this.colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+        var colors = [
+            1.0, 0.5, 0.0, 1.0,
+            0.0, 1.0, 0.5, 1.0,
+            0.5, 0.0, 1.0, 1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        this.colorBuffer.itemSize = 4;
+        this.colorBuffer.numItems = 3;
     }
     RedTriangleRenderingComponent.prototype = new GameComponent();
     RedTriangleRenderingComponent.prototype.update = function(parent, delta) {
-        var buff = this.buffer;
+        var vBuff = this.vertexBuffer,
+            cBuff = this.colorBuffer;
         this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -7.0]);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buff);
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buff.itemSize, gl.FLOAT, false, 0, 0);
+            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
+
             setMatrixUniforms();
-            gl.drawArrays(gl.TRIANGLES, 0, buff.numItems);
+            gl.drawArrays(gl.TRIANGLES, 0, vBuff.numItems);
         });
     };
     function RedBoxRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
-        this.buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        this.vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         vertices = [
              1.0,  1.0,  0.0,
             -1.0,  1.0,  0.0,
@@ -153,18 +173,34 @@ $(function() {
             -1.0, -1.0,  0.0
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        this.buffer.itemSize = 3;
-        this.buffer.numItems = 4;
+        this.vertexBuffer.itemSize = 3;
+        this.vertexBuffer.numItems = 4;
+
+        this.colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+        colors = []
+        for (var i=0; i < 4; i++) {
+          colors = colors.concat([1.0, 0.0, 0.0, 1.0]);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        this.colorBuffer.itemSize = 4;
+        this.colorBuffer.numItems = 4;
     }
     RedBoxRenderingComponent.prototype = new GameComponent();
     RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-        var buff = this.buffer;
+        var vBuff = this.vertexBuffer,
+            cBuff = this.colorBuffer;
         this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -7.0]);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buff);
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buff.itemSize, gl.FLOAT, false, 0, 0);
+            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
+
             setMatrixUniforms();
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, buff.numItems);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, vBuff.numItems);
         });
     };
 
@@ -186,7 +222,7 @@ $(function() {
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
         redBall.setPosition(Math.random()*200-100,Math.random()*200-100);
-        redBall.setVelocity(Math.random()*0.2-0.1,Math.random()*0.2-0.1);
+        redBall.setVelocity(Math.random()*0.1-0.05,Math.random()*0.1-0.05);
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
