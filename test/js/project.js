@@ -322,7 +322,7 @@ $(function() {
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem);
     cameraSystem.setScale(1.0);
-    cameraSystem.position[2] = 600;
+    cameraSystem.setPosition(0,0,600);
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
@@ -346,7 +346,7 @@ $(function() {
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
         redBall.setPosition(Math.random()*200-100,Math.random()*200-100,Math.random()*50-25);
-        redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15,Math.random()*0.1-0.05);
+        redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15,Math.random()*0.3-0.15);
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
@@ -371,9 +371,9 @@ $(function() {
         }
 
 
-        if(i == 0){
-            cameraSystem.addComponent(new GEC.FollowComponent(redBall));
-        }
+        // if(i == 0){
+        //     cameraSystem.addComponent(new GEC.FollowAtDistanceComponent(redBall,[0,0,600]));
+        // }
 
         gameRoot.addObject(redBall);
     }

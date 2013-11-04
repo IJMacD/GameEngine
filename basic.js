@@ -74,7 +74,15 @@ var GE = (function(GE){
 		this.target = object;
 	}, {
 		update: function(parent, delta) {
-			vec2.copy(parent.position, this.target.position);
+			vec3.copy(parent.position, this.target.position);
+		}
+	});
+	GameComponent.create(function FollowAtDistanceComponent(object, distance) {
+		this.target = object;
+		this.distance = distance;
+	}, {
+		update: function(parent, delta) {
+			vec3.add(parent.position, this.target.position, this.distance);
 		}
 	});
 
