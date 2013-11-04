@@ -90,15 +90,6 @@ $(function() {
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     }
 
-    var mvMatrix = mat4.create();
-    var pMatrix = mat4.create();
-
-    function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-    }
-
-
     initCanvas();
     
     initShaders();
@@ -152,13 +143,15 @@ $(function() {
         this.renderSystem.push(function(gl,mvMatrix){
             mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
 
+            mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [0, 0, 1]);
+
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
             gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
 
-            setMatrixUniforms();
+            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
             gl.drawArrays(gl.TRIANGLES, 0, vBuff.numItems);
         });
     };
@@ -193,19 +186,21 @@ $(function() {
         this.renderSystem.push(function(gl,mvMatrix){
             mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
 
+            mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [0, 0, 1]);
+
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuff);
             gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cBuff.itemSize, gl.FLOAT, false, 0, 0);
 
-            setMatrixUniforms();
+            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, vBuff.numItems);
         });
     };
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
-    renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, mvMatrix, pMatrix);
+    renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem.setScale(0.5);
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));

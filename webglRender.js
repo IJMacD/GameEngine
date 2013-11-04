@@ -6,13 +6,14 @@ var GE = (function(GE){
 		GameObjectManager = GE.GameObjectManager,
 		GEC = GE.Comp;
 
-	function WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, mvMatrix, pMatrix){
+	function WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram){
 		this.context = context;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
-		this.mvMatrix = mvMatrix;
-		this.pMatrix = pMatrix;
+		this.shaderProgram = shaderProgram;
+		this.mvMatrix = mat4.create();
+		this.pMatrix = mat4.create();
 		this.renderQueue = [];
 	}
 	GE.WebGLRenderSystem = WebGLRenderSystem;
@@ -26,6 +27,7 @@ var GE = (function(GE){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 200.0);
+        gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 
