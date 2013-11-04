@@ -15,6 +15,7 @@ var GE = (function(GE){
         this.mvMatrix = mat4.create();
         this.pMatrix = mat4.create();
         this.renderQueue = [];
+        this.spareVector = vec3.create();
     }
     GE.WebGLRenderSystem = WebGLRenderSystem;
     WebGLRenderSystem.prototype = new GE.GameObject();
@@ -28,7 +29,7 @@ var GE = (function(GE){
 
         mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 1000.0);
 
-        mat4.translate(this.pMatrix, this.pMatrix, [-this.cameraSystem.position.x, -this.cameraSystem.position.y, -600]);
+        mat4.translate(this.pMatrix, this.pMatrix, vec3.negate(this.spareVector, this.cameraSystem.position));
 
         gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
 

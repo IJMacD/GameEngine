@@ -7,33 +7,29 @@ var GE = (function(GE){
 
 	GameComponent.create(function GravityComponent(){},{
 		update: function(parent, delta) {
-			if(typeof parent.velocity.y == "undefined")
-				parent.velocity.y = 0;
-			parent.velocity.y -= 0.0001*delta;
+			if(typeof parent.velocity[1] == "undefined")
+				parent.velocity[1] = 0;
+			parent.velocity[1] -= 0.0001*delta;
 		}
 	});
 
 	GameComponent.create(function PointGravityComponent (target) {
 		this.target = target;
-		this.vector = new Vector2();
+		this.vector = vec3.create();
 	}, {
 		update: function(parent, delta) {
-			var vec = this.vector.set(this.target.position).subtract(parent.position),
-				scalar = Math.min(this.target.mass*delta/vec.magnitude2(),0.1);
-			vec.normalise();
-			vec.scale(scalar);
-			parent.velocity.add(vec);
+			vec3.subtract(this.vector, this.target.position, parent.position);
+			var scale = Math.min(this.target.mass*delta/vec3.squaredLength(this.vector),0.1);
+			vec3.normalize(this.vector, this.vector);
+			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
 		}
 	});
 
-	function MoveComponent () {
-		this.delta = new Vector2();
-	};
+	function MoveComponent () {};
 	GEC.MoveComponent = MoveComponent;
 	MoveComponent.prototype = new GameComponent();
 	MoveComponent.prototype.update = function(parent, delta) {
-		this.delta.set(parent.velocity).scale(delta);
-		parent.position.add(this.delta);
+		vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
 	};
 
 
@@ -42,7 +38,7 @@ var GE = (function(GE){
 	RandomMotionComponent.prototype = new GameComponent();
 	RandomMotionComponent.prototype.update = function(parent, delta) {
 		if(Math.random()<0.001)
-			parent.velocity.set(Math.random()-0.5, Math.random()-0.5);
+			vec3.random(parent.velocity, Math.random());
 	};
 
 
@@ -78,7 +74,7 @@ var GE = (function(GE){
 		this.target = object;
 	}, {
 		update: function(parent, delta) {
-			parent.position.set(this.target.position);
+			vec2.copy(parent.position, this.target.position);
 		}
 	});
 

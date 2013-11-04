@@ -16,25 +16,25 @@ var GE = (function(GE){
 	WorldBounceComponent.prototype.update = function(parent, delta) {
 		var coef = 0.9,
 			friction = 0.9;
-		if(parent.position.x < this.bx1){
-			parent.position.x = this.bx1;
-			parent.velocity.x = -parent.velocity.x*coef;
-			parent.velocity.y = parent.velocity.y*friction;
+		if(parent.position[0] < this.bx1){
+			parent.position[0] = this.bx1;
+			parent.velocity[0] = -parent.velocity[0]*coef;
+			parent.velocity[1] = parent.velocity[1]*friction;
 		}
-		else if(parent.position.x > this.bx2){
-			parent.position.x = this.bx2;
-			parent.velocity.x = -parent.velocity.x*coef;
-			parent.velocity.y = parent.velocity.y*friction;
+		else if(parent.position[0] > this.bx2){
+			parent.position[0] = this.bx2;
+			parent.velocity[0] = -parent.velocity[0]*coef;
+			parent.velocity[1] = parent.velocity[1]*friction;
 		}
-		if(parent.position.y < this.by1){
-			parent.position.y = this.by1;
-			parent.velocity.y = -parent.velocity.y*coef;
-			parent.velocity.x = parent.velocity.x*friction;
+		if(parent.position[1] < this.by1){
+			parent.position[1] = this.by1;
+			parent.velocity[1] = -parent.velocity[1]*coef;
+			parent.velocity[0] = parent.velocity[0]*friction;
 		}
-		else if(parent.position.y > this.by2){
-			parent.position.y = this.by2;
-			parent.velocity.y = -parent.velocity.y*coef;
-			parent.velocity.x = parent.velocity.x*friction;
+		else if(parent.position[1] > this.by2){
+			parent.position[1] = this.by2;
+			parent.velocity[1] = -parent.velocity[1]*coef;
+			parent.velocity[0] = parent.velocity[0]*friction;
 		}
 	};
 
@@ -48,17 +48,17 @@ var GE = (function(GE){
 	WorldWrapComponent.prototype = new GE.GameComponent();
 
 	WorldWrapComponent.prototype.update = function(parent, delta) {
-		if(parent.position.x < this.ax){
-			parent.position.x = this.bx;
+		if(parent.position[0] < this.ax){
+			parent.position[0] = this.bx;
 		}
-		else if(parent.position.x > this.bx){
-			parent.position.x = this.ax;
+		else if(parent.position[0] > this.bx){
+			parent.position[0] = this.ax;
 		}
-		if(parent.position.y < this.ay){
-			parent.position.y = this.by;
+		if(parent.position[1] < this.ay){
+			parent.position[1] = this.by;
 		}
-		else if(parent.position.y > this.by){
-			parent.position.y = this.ay;
+		else if(parent.position[1] > this.by){
+			parent.position[1] = this.ay;
 		}
 	};
 

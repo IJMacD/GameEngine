@@ -41,7 +41,7 @@ var GE = (function(GE){
 		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
 		this.context.rotate(this.cameraSystem.rotation);
 		this.context.scale(1, -1);
-		this.context.translate(-p.x,-p.y);
+		this.context.translate(-p[0],-p[1]);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 			for(var j = 0, n = this.renderQueue[i] && this.renderQueue[i].length; j < n; j++){
@@ -92,8 +92,8 @@ var GE = (function(GE){
 	CanvasSpriteRenderingComponent.prototype = new GameComponent();
 	CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			var x = parent.position.x,
-				y = parent.position.y,
+			var x = parent.position[0],
+				y = parent.position[1],
 				w = parent.sprite.width,
 				h = parent.sprite.height;
 			context.translate(x,y);

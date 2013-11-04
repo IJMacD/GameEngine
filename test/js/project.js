@@ -166,7 +166,7 @@ $(function() {
             this.renderSystem.push(function(context){
                     context.fillStyle = "#ff0000";
                     context.beginPath();
-                    context.arc(parent.position.x,parent.position.y,10,0,Math.PI*2,false);
+                    context.arc(parent.position[0],parent.position[1],10,0,Math.PI*2,false);
                     context.fill();
             });
     };
@@ -175,14 +175,14 @@ $(function() {
     }
     RedBoxRenderingComponent.prototype = new GameComponent();
     RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-            this.renderSystem.push(function(context){
-                    var x = parent.position.x,
-                            y = parent.position.y;
-                    context.fillStyle = "#ff0000";
-                    context.translate(x,y);
-                    context.rotate(parent.rotation);
-                    context.fillRect(-10,-10,20,20);
-            });
+        this.renderSystem.push(function(context){
+            var x = parent.position[0],
+                y = parent.position[1];
+            context.fillStyle = "#ff0000";
+            context.translate(x,y);
+            context.rotate(parent.rotation);
+            context.fillRect(-10,-10,20,20);
+        });
     };
 
     function ChestRenderingComponent(renderSystem){
@@ -295,7 +295,7 @@ $(function() {
             iBuff = this.vertexIndexBuffer,
             texture = parent.texture || this.texture;
         this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, 0.0]);
+            mat4.translate(mvMatrix, mvMatrix, [parent.position[0], parent.position[1], parent.position[2]]);
 
             mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
 
@@ -322,14 +322,14 @@ $(function() {
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem);
     cameraSystem.setScale(1.0);
+    cameraSystem.position[2] = 600;
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
 
     sun = new GameObject();
     sun.mass = 1;
-    sun.setPosition(0,0);
-    sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+    sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position[0],p.position[1],2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new ChestRenderingComponent(renderSystem));
     sun.addComponent(new GEC.RotationComponent(0.001));
     sun.texture = sunTexture;
@@ -345,8 +345,8 @@ $(function() {
 
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
-        redBall.setPosition(Math.random()*200-100,Math.random()*200-100);
-        redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
+        redBall.setPosition(Math.random()*200-100,Math.random()*200-100,Math.random()*50-25);
+        redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15,Math.random()*0.1-0.05);
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));

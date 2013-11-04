@@ -6,10 +6,10 @@ var GE = (function(GE){
 
 	// Exported at end.
 
-	function GameObject(x, y){
+	function GameObject(){
 		this.components = [];
-		this.position = new Vector2(x, y);
-		this.velocity = new Vector2();
+		this.position = vec3.create();
+		this.velocity = vec3.create();
 		this.rotation = 0;
 		this.toBeRemoved = [];
 		this.life = 1;
@@ -40,12 +40,12 @@ var GE = (function(GE){
 			}
 			return this;
 		},
-		setPosition: function(x,y) {
-			this.position.set(x,y);
+		setPosition: function(x,y,z) {
+			vec3.set(this.position, x, y, z);
 			return this;
 		},
-		setVelocity: function(vx,vy) {
-			this.velocity.set(vx, vy);
+		setVelocity: function(vx,vy,vz) {
+			vec3.set(this.velocity, vx, vy, vz);
 			return this;
 		},
 		setRotation: function(th) {
