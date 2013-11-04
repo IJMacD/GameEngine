@@ -22,13 +22,9 @@ hr {
 }
 #surface {
   height: 100%;
-  width: 100%;
+  width: 50%;
 }
 #surface2 {
-  border: 1px solid #999;
-  height: 33%;
-  position: absolute;
-  right: 10%;
-  top: 10%;
-  width: 33%;
+  height: 100%;
+  width: 49%;
 }

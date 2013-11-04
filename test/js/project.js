@@ -1,3 +1,10 @@
+(function(){
+        // Pre-load assets
+        var img = new Image();
+        img.src = "img/chest.gif";
+        img.src = "img/buoy.png";
+        img.src = "img/buoyOff.png";
+}());
 $(function() {
     var GameObject = GE.GameObject,
         GameComponent = GE.GameComponent,
@@ -8,9 +15,14 @@ $(function() {
         gl = context,
         canvasWidth = canvas.width(),
         canvasHeight = canvas.height(),
+        canvas2 = $('#surface2'),
+        context2 = canvas2[0].getContext("2d"),
+        canvas2Width = canvas2.width(),
+        canvas2Height = canvas2.height(),
         gameRoot = new GE.GameObjectManager(),
         cameraSystem,
         renderSystem,
+        renderSystem2,
         redBall,
         sun,
         lastTime = 0;
@@ -24,8 +36,11 @@ $(function() {
         canvas[0].height = canvasHeight;
         gl.viewportWidth = canvasWidth;
         gl.viewportHeight = canvasHeight,
+        canvas2[0].width = canvas2Width;
+        canvas2[0].height = canvas2Height;
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
+        renderSystem2 && renderSystem2.setCanvasSize(canvas2Width, canvas2Height);
     }
 
     function getShader(gl, id) {
@@ -136,6 +151,33 @@ $(function() {
 
     GE.DEBUG = true;
 
+    function RedBallRenderingComponent(renderSystem){
+            this.renderSystem = renderSystem;
+    }
+    RedBallRenderingComponent.prototype = new GameComponent();
+    RedBallRenderingComponent.prototype.update = function(parent, delta) {
+            this.renderSystem.push(function(context){
+                    context.fillStyle = "#ff0000";
+                    context.beginPath();
+                    context.arc(parent.position.x,parent.position.y,10,0,Math.PI*2,false);
+                    context.fill();
+            });
+    };
+    function RedBoxRenderingComponent(renderSystem){
+            this.renderSystem = renderSystem;
+    }
+    RedBoxRenderingComponent.prototype = new GameComponent();
+    RedBoxRenderingComponent.prototype.update = function(parent, delta) {
+            this.renderSystem.push(function(context){
+                    var x = parent.position.x,
+                            y = parent.position.y;
+                    context.fillStyle = "#ff0000";
+                    context.translate(x,y);
+                    context.rotate(parent.rotation);
+                    context.fillRect(-10,-10,20,20);
+            });
+    };
+
     function ChestRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
         this.vertexBuffer = gl.createBuffer();
@@ -244,9 +286,11 @@ $(function() {
             tBuff = this.textureBuffer,
             iBuff = this.vertexIndexBuffer;
         this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -120.0]);
+            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -600.0]);
 
             mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
+
+            mat4.scale(mvMatrix, mvMatrix, [10,10,10]);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
@@ -267,29 +311,55 @@ $(function() {
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
-    cameraSystem.setScale(0.5);
+    renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem);
+    cameraSystem.setScale(1.0);
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
 
     sun = new GameObject();
-    sun.mass = 0.1;
+    sun.mass = 1;
     sun.setPosition(0,0);
-    //sun.addComponent({update:function(p){renderSystem.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
+    sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new ChestRenderingComponent(renderSystem));
     sun.addComponent(new GEC.RotationComponent(0.001));
 
     gameRoot.addObject(sun);
 
+    var chestImg = new Image();
+    chestImg.src = "img/chest.gif";
+    var buoyOnImg = new Image();
+    buoyOnImg.src = "img/buoy.png";
+    var buoyOffImg = new Image();
+    buoyOffImg.src = "img/buoyOff.png";
+
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
         redBall.setPosition(Math.random()*200-100,Math.random()*200-100);
-        redBall.setVelocity(Math.random()*0.1-0.05,Math.random()*0.1-0.05);
+        redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15);
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
         redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
         redBall.addComponent(new ChestRenderingComponent(renderSystem));
+
+        var r = Math.random();
+        if(r < 0.2){
+                redBall.sprite = chestImg;
+                redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+        }
+        else if(r < 0.4){
+                redBall.sprite = buoyOffImg;
+                redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
+                redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+        }
+        else if(r < 0.5) {
+                redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
+        }
+        else {
+                redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
+        }
+
 
         if(i == 0){
             // cameraSystem.addComponent(new GEC.FollowComponent(redBall));
@@ -301,6 +371,7 @@ $(function() {
 
     gameRoot.addObject(cameraSystem);
     gameRoot.addObject(renderSystem);
+    gameRoot.addObject(renderSystem2);
 
 
     function loop(time){
