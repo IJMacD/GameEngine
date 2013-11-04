@@ -105,15 +105,22 @@ $(function() {
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     }
 
-    var chestTexture;
+    var chestTexture,
+        sunTexture;
     function initTextures() {
         chestTexture = gl.createTexture();
         chestTexture.image = new Image();
         chestTexture.image.onload = function() {
             handleLoadedTexture(chestTexture)
         }
-
         chestTexture.image.src = "img/chest.gif";
+
+        sunTexture = gl.createTexture();
+        sunTexture.image = new Image();
+        sunTexture.image.onload = function() {
+            handleLoadedTexture(sunTexture)
+        }
+        sunTexture.image.src = "img/sun.jpg";
     }
 
     function handleLoadedTexture(texture) {
@@ -180,6 +187,7 @@ $(function() {
 
     function ChestRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
+        this.texture = chestTexture;
         this.vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         var vertices = [
@@ -284,9 +292,10 @@ $(function() {
     ChestRenderingComponent.prototype.update = function(parent, delta) {
         var vBuff = this.vertexBuffer,
             tBuff = this.textureBuffer,
-            iBuff = this.vertexIndexBuffer;
+            iBuff = this.vertexIndexBuffer,
+            texture = parent.texture || this.texture;
         this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, -600.0]);
+            mat4.translate(mvMatrix, mvMatrix, [parent.position.x, parent.position.y, 0.0]);
 
             mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
 
@@ -299,7 +308,7 @@ $(function() {
             gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, tBuff.itemSize, gl.FLOAT, false, 0, 0);
 
             gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, chestTexture);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
@@ -323,6 +332,7 @@ $(function() {
     sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position.x,p.position.y,2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new ChestRenderingComponent(renderSystem));
     sun.addComponent(new GEC.RotationComponent(0.001));
+    sun.texture = sunTexture;
 
     gameRoot.addObject(sun);
 
@@ -362,7 +372,7 @@ $(function() {
 
 
         if(i == 0){
-            // cameraSystem.addComponent(new GEC.FollowComponent(redBall));
+            cameraSystem.addComponent(new GEC.FollowComponent(redBall));
         }
 
         gameRoot.addObject(redBall);

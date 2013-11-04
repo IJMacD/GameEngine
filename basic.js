@@ -9,7 +9,7 @@ var GE = (function(GE){
 		update: function(parent, delta) {
 			if(typeof parent.velocity.y == "undefined")
 				parent.velocity.y = 0;
-			parent.velocity.y += 0.0001*delta;
+			parent.velocity.y -= 0.0001*delta;
 		}
 	});
 
