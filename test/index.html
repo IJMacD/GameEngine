@@ -58,8 +58,10 @@
     </div>
 
     <div id="wrap">
-      <canvas id="surface"></canvas>
-      <canvas id="surface2"></canvas>
+      <div class="row">
+        <div class="col-md-6"><canvas id="surface"></canvas></div>
+        <div class="col-md-6"><canvas id="surface2"></canvas></div>
+      </div>
     </div>
 
     <footer>
@@ -73,7 +75,6 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="js/gl-matrix.js"></script>
 
     <script id="shader-fs" type="x-shader/x-fragment">
       precision mediump float;
@@ -102,6 +103,7 @@
       }
     </script>
     <script src="js/jquery.js"></script>
+    <script src="js/gl-matrix.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/underscore-min.js"></script>
     <script src="../vector.js"></script>

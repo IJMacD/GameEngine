@@ -153,6 +153,8 @@ $(function() {
     $(window).on("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
+        canvas2Width = canvas2.width();
+        canvas2Height = canvas2.height();
         initCanvas();
     });
 
