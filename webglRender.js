@@ -199,5 +199,48 @@ var GE = (function(GE){
         return new GEC.PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexIndices);
     }
 
+    GEC.PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands, longitudeBands){
+        var vertexPositionData = [];
+        var textureCoordData = [];
+        for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+          var theta = latNumber * Math.PI / latitudeBands;
+          var sinTheta = Math.sin(theta);
+          var cosTheta = Math.cos(theta);
+
+          for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+            var phi = longNumber * 2 * Math.PI / longitudeBands;
+            var sinPhi = Math.sin(phi);
+            var cosPhi = Math.cos(phi);
+
+            var x = cosPhi * sinTheta;
+            var y = cosTheta;
+            var z = sinPhi * sinTheta;
+            var u = 1 - (longNumber / longitudeBands);
+            var v = 1 - (latNumber / latitudeBands);
+
+            textureCoordData.push(u);
+            textureCoordData.push(v);
+            vertexPositionData.push(x);
+            vertexPositionData.push(y);
+            vertexPositionData.push(z);
+          }
+        }
+        var indexData = [];
+        for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
+          for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
+            var first = (latNumber * (longitudeBands + 1)) + longNumber;
+            var second = first + longitudeBands + 1;
+            indexData.push(first);
+            indexData.push(second);
+            indexData.push(first + 1);
+
+            indexData.push(second);
+            indexData.push(second + 1);
+            indexData.push(first + 1);
+          }
+        }
+        return new GEC.PolyShapeRenderingComponent(renderSystem, vertexPositionData, textureCoordData, indexData);
+    }
+
     return GE;
 }(GE || {}));

@@ -120,7 +120,7 @@ $(function() {
         sunTexture.image.onload = function() {
             handleLoadedTexture(sunTexture)
         }
-        sunTexture.image.src = "img/sun.jpg";
+        sunTexture.image.src = "img/sun-mercator.jpg";
     }
 
     function handleLoadedTexture(texture) {
@@ -195,15 +195,13 @@ $(function() {
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
-    var cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem);
-
     sun = new GameObject();
     sun.mass = 1;
     sun.size = vec3.fromValues(15,15,15);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position[0],p.position[1],2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(cubeRenderer);
+    sun.addComponent(GEC.PolyShapeRenderingComponent.createSphere(renderSystem, 30, 30));
     sun.texture = sunTexture;
 
     gameRoot.addObject(sun);
@@ -214,6 +212,8 @@ $(function() {
     buoyOnImg.src = "img/buoy.png";
     var buoyOffImg = new Image();
     buoyOffImg.src = "img/buoyOff.png";
+
+    var cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem);
 
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
