@@ -27,7 +27,7 @@ var GE = (function(GE){
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 1000.0);
+        mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 2000.0);
 
         mat4.translate(this.pMatrix, this.pMatrix, vec3.negate(this.spareVector, this.cameraSystem.position));
 
@@ -47,13 +47,152 @@ var GE = (function(GE){
         this.canvasHeight = height;
     }
 
-    function RenderSystemManager(){}
-    GE.RenderSystemManager = RenderSystemManager;
-    RenderSystemManager.prototype = new GameObjectManager();
-    RenderSystemManager.prototype.push = function(renderable){
+    function WebGLRenderSystemManager(){}
+    GE.RenderSystemManager = WebGLRenderSystemManager;
+    WebGLRenderSystemManager.prototype = new GameObjectManager();
+    WebGLRenderSystemManager.prototype.push = function(renderable){
         for (var i = this.objects.length - 1; i >= 0; i--) {
             this.objects[i].push(renderable);
         };
+    }
+
+    GameComponent.create(function PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexIndices){
+        var gl = renderSystem.context;
+        this.renderSystem = renderSystem;
+
+        this.vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        this.vertexBuffer.itemSize = 3;
+        this.vertexBuffer.numItems = Math.floor(vertices.length / this.vertexBuffer.itemSize);
+
+        this.textureBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        this.textureBuffer.itemSize = 2;
+        this.textureBuffer.numItems = Math.floor(textureCoords.length / this.textureBuffer.itemSize);
+
+        this.vertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), gl.STATIC_DRAW);
+        this.vertexIndexBuffer.itemSize = 1;
+        this.vertexIndexBuffer.numItems = vertexIndices.length;
+    }, {
+        update: function (parent, delta){
+            var vBuff = this.vertexBuffer,
+                tBuff = this.textureBuffer,
+                iBuff = this.vertexIndexBuffer,
+                shaderProgram = this.renderSystem.shaderProgram,
+                texture = parent.texture || this.texture;
+            this.renderSystem.push(function(gl,mvMatrix){
+                mat4.translate(mvMatrix, mvMatrix, parent.position);
+
+                mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
+
+                mat4.scale(mvMatrix, mvMatrix, [10,10,10]);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, tBuff);
+                gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, tBuff.itemSize, gl.FLOAT, false, 0, 0);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
+
+                gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+                gl.drawElements(gl.TRIANGLES, iBuff.numItems, gl.UNSIGNED_SHORT, 0);
+            });
+        }
+    });
+
+    GEC.PolyShapeRenderingComponent.createCube = function (renderSystem){
+        var vertices = [
+            // Front face
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+             1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+
+            // Back face
+            -1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0, -1.0, -1.0,
+
+            // Top face
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+
+            // Bottom face
+            -1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0,  1.0,
+            -1.0, -1.0,  1.0,
+
+            // Right face
+             1.0, -1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0,  1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Left face
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            -1.0,  1.0, -1.0,
+        ],
+        textureCoords = [
+            // Front face
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+
+            // Back face
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            0.0, 0.0,
+
+            // Top face
+            0.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+
+            // Bottom face
+            1.0, 1.0,
+            0.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0,
+
+            // Right face
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            0.0, 0.0,
+
+            // Left face
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+        ],
+        vertexIndices = [
+            0, 1, 2,      0, 2, 3,    // Front face
+            4, 5, 6,      4, 6, 7,    // Back face
+            8, 9, 10,     8, 10, 11,  // Top face
+            12, 13, 14,   12, 14, 15, // Bottom face
+            16, 17, 18,   16, 18, 19, // Right face
+            20, 21, 22,   20, 22, 23  // Left face
+        ];
+        return new GEC.PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexIndices);
     }
 
     return GE;

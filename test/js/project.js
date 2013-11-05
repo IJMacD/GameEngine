@@ -187,139 +187,6 @@ $(function() {
         });
     };
 
-    function ChestRenderingComponent(renderSystem){
-        this.renderSystem = renderSystem;
-        this.texture = chestTexture;
-        this.vertexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        var vertices = [
-          // Front face
-          -1.0, -1.0,  1.0,
-           1.0, -1.0,  1.0,
-           1.0,  1.0,  1.0,
-          -1.0,  1.0,  1.0,
-
-          // Back face
-          -1.0, -1.0, -1.0,
-          -1.0,  1.0, -1.0,
-           1.0,  1.0, -1.0,
-           1.0, -1.0, -1.0,
-
-          // Top face
-          -1.0,  1.0, -1.0,
-          -1.0,  1.0,  1.0,
-           1.0,  1.0,  1.0,
-           1.0,  1.0, -1.0,
-
-          // Bottom face
-          -1.0, -1.0, -1.0,
-           1.0, -1.0, -1.0,
-           1.0, -1.0,  1.0,
-          -1.0, -1.0,  1.0,
-
-          // Right face
-           1.0, -1.0, -1.0,
-           1.0,  1.0, -1.0,
-           1.0,  1.0,  1.0,
-           1.0, -1.0,  1.0,
-
-          // Left face
-          -1.0, -1.0, -1.0,
-          -1.0, -1.0,  1.0,
-          -1.0,  1.0,  1.0,
-          -1.0,  1.0, -1.0,
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        this.vertexBuffer.itemSize = 3;
-        this.vertexBuffer.numItems = 24;
-
-        this.textureBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
-        var textureCoords = [
-          // Front face
-          0.0, 0.0,
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-
-          // Back face
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
-
-          // Top face
-          0.0, 1.0,
-          0.0, 0.0,
-          1.0, 0.0,
-          1.0, 1.0,
-
-          // Bottom face
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
-          1.0, 0.0,
-
-          // Right face
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
-
-          // Left face
-          0.0, 0.0,
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-        this.textureBuffer.itemSize = 2;
-        this.textureBuffer.numItems = 24;
-
-        this.vertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
-        var cubeVertexIndices = [
-          0, 1, 2,      0, 2, 3,    // Front face
-          4, 5, 6,      4, 6, 7,    // Back face
-          8, 9, 10,     8, 10, 11,  // Top face
-          12, 13, 14,   12, 14, 15, // Bottom face
-          16, 17, 18,   16, 18, 19, // Right face
-          20, 21, 22,   20, 22, 23  // Left face
-        ]
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-        this.vertexIndexBuffer.itemSize = 1;
-        this.vertexIndexBuffer.numItems = 36;
-    }
-    ChestRenderingComponent.prototype = new GameComponent();
-    ChestRenderingComponent.prototype.update = function(parent, delta) {
-        var vBuff = this.vertexBuffer,
-            tBuff = this.textureBuffer,
-            iBuff = this.vertexIndexBuffer,
-            texture = parent.texture || this.texture;
-        this.renderSystem.push(function(gl,mvMatrix){
-            mat4.translate(mvMatrix, mvMatrix, [parent.position[0], parent.position[1], parent.position[2]]);
-
-            mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
-
-            mat4.scale(mvMatrix, mvMatrix, [10,10,10]);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, tBuff);
-            gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, tBuff.itemSize, gl.FLOAT, false, 0, 0);
-
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
-
-            gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-            gl.drawElements(gl.TRIANGLES, iBuff.numItems, gl.UNSIGNED_SHORT, 0);
-        });
-    };
-
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem);
@@ -328,12 +195,13 @@ $(function() {
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
+    var cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem);
 
     sun = new GameObject();
     sun.mass = 1;
     sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position[0],p.position[1],2,0,Math.PI*2);c.fill();})}});
-    sun.addComponent(new ChestRenderingComponent(renderSystem));
     sun.addComponent(new GEC.RotationComponent(0.001));
+    sun.addComponent(cubeRenderer);
     sun.texture = sunTexture;
 
     gameRoot.addObject(sun);
@@ -353,23 +221,24 @@ $(function() {
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
         redBall.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
-        redBall.addComponent(new ChestRenderingComponent(renderSystem));
+        redBall.addComponent(cubeRenderer);
+        redBall.texture = chestTexture;
 
         var r = Math.random();
         if(r < 0.2){
-                redBall.sprite = chestImg;
-                redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.sprite = chestImg;
+            redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
         }
         else if(r < 0.4){
-                redBall.sprite = buoyOffImg;
-                redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-                redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.sprite = buoyOffImg;
+            redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
+            redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
         }
         else if(r < 0.5) {
-                redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
+            redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
         }
         else {
-                redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
+            redBall.addComponent(new RedBoxRenderingComponent(renderSystem2));
         }
 
 
