@@ -199,6 +199,8 @@ $(function() {
 
     sun = new GameObject();
     sun.mass = 1;
+    sun.size = vec3.fromValues(15,15,15);
+    sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position[0],p.position[1],2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new GEC.RotationComponent(0.001));
     sun.addComponent(cubeRenderer);
@@ -217,6 +219,8 @@ $(function() {
         redBall = new GameObject();
         redBall.setPosition(Math.random()*200-100,Math.random()*200-100,Math.random()*50-25);
         redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15,Math.random()*0.3-0.15);
+        redBall.size = vec3.fromValues(10,10,10);
+        redBall.rotationAxis = vec3.fromValues(1,1,1);
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));

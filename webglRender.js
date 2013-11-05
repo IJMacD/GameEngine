@@ -87,9 +87,13 @@ var GE = (function(GE){
             this.renderSystem.push(function(gl,mvMatrix){
                 mat4.translate(mvMatrix, mvMatrix, parent.position);
 
-                mat4.rotate(mvMatrix, mvMatrix, parent.rotation, [1, 1, 1]);
+                if(parent.rotation && parent.rotationAxis){
+                    mat4.rotate(mvMatrix, mvMatrix, parent.rotation, parent.rotationAxis);
+                }
 
-                mat4.scale(mvMatrix, mvMatrix, [10,10,10]);
+                if(parent.size){
+                    mat4.scale(mvMatrix, mvMatrix, parent.size);
+                }
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);
