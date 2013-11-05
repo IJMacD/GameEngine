@@ -23,13 +23,19 @@ var GE = (function(GE){
         this.renderQueue.push(renderable);
     };
     WebGLRenderSystem.prototype.update = function(delta) {
-        var gl = this.context;
+        var gl = this.context,
+            cam = this.cameraSystem;
+
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 2000.0);
 
-        mat4.translate(this.pMatrix, this.pMatrix, vec3.negate(this.spareVector, this.cameraSystem.position));
+        mat4.translate(this.pMatrix, this.pMatrix, vec3.negate(this.spareVector, cam.position));
+
+        if(cam.rotation && cam.rotationAxis){
+            mat4.rotate(this.pMatrix, this.pMatrix, cam.rotation, cam.rotationAxis);
+        }
 
         gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
 
