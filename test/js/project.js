@@ -179,8 +179,8 @@ $(function() {
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem.setScale(1.0);
-    cameraSystem.setPosition(0,0,800);
-    cameraSystem.rotation = 10*Math.PI/180;
+    cameraSystem.setPosition(0,-100,800);
+    cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
 
     sun = new GameObject();
