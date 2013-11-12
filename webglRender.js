@@ -28,7 +28,7 @@ var GE = (function(GE){
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 2000.0);
+        mat4.perspective(this.pMatrix, 45*Math.PI/180, gl.viewportWidth / gl.viewportHeight, 0.1, 10000.0);
 
         mat4.translate(this.pMatrix, this.pMatrix, vec3.negate(this.spareVector, cam.position));
 

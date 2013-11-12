@@ -25,6 +25,7 @@ $(function() {
         renderSystem,
         planet,
         sun,
+        cameraDistance,
         lastTime = 0;
 
     function initCanvas(width,height){
@@ -168,12 +169,18 @@ $(function() {
         initCanvas();
     });
 
+    $(window).on("mousewheel", function(e){
+        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 3000);
+        cameraSystem.setPosition(0,-100,cameraDistance);
+    })
+
     GE.DEBUG = true;
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem.setScale(1.0);
-    cameraSystem.setPosition(0,-100,800);
+    cameraDistance = 800;
+    cameraSystem.setPosition(0,-100,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
 
