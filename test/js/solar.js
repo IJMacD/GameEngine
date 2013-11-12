@@ -205,8 +205,8 @@ $(function() {
     gameRoot.addObject(sun);
     for(var i = 0; i < 8; i++){
         planet = new GameObject();
-        planet.setPosition((i+3) * 50, 0, 0);
-        planet.setVelocity(0, 0.01 * Math.pow(i+3,-0.8), 0.06);
+        planet.setPosition((i+1.5) * 50, 0, 0);
+        planet.setVelocity(0, 0, 0.14 / Math.pow(i+1.5,0.5));
         planet.size = vec3.fromValues(sizes[i],sizes[i],sizes[i]);
         planet.rotationAxis = vec3.fromValues(0,1,0);
 
