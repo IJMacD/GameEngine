@@ -12,7 +12,6 @@ var GE = (function(GE){
 		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
-		this.maxLayer = 1;
 	}
 	GE.CanvasRenderSystem = CanvasRenderSystem;
 	CanvasRenderSystem.prototype = new GE.GameObject();
@@ -20,7 +19,6 @@ var GE = (function(GE){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
-			this.maxLayer = Math.max(this.maxLayer, layer);
 		}
 		this.renderQueue[layer].push(renderable);
 	};

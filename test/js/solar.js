@@ -17,12 +17,18 @@ $(function() {
 
         canvas = $('#surface'),
         context = canvas[0].getContext("experimental-webgl"),
+        canvas2 = $('#surface2'),
+        context2 = canvas2[0].getContext("2d"),
         gl = context,
         canvasWidth = canvas.width(),
         canvasHeight = canvas.height(),
+        canvas2Width = canvas2.width(),
+        canvas2Height = canvas2.height(),
         gameRoot = new GE.GameObjectManager(),
         cameraSystem,
         renderSystem,
+        renderSystem2,
+        cameraSystem2,
         planet,
         sun,
         cameraDistance,
@@ -35,6 +41,9 @@ $(function() {
         gl.viewportHeight = canvasHeight,
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
+        canvas2[0].width = canvas2Width;
+        canvas2[0].height = canvas2Height;
+        renderSystem2 && renderSystem2.setCanvasSize(canvas2Width, canvas2Height);
     }
 
     function getShader(gl, id) {
@@ -159,11 +168,28 @@ $(function() {
         initCanvas();
     }
 
+    function toggleDebug(){
+        GE.DEBUG = !GE.DEBUG;
+        debugBtn.toggleClass("active", GE.DEBUG);
+        if(GE.DEBUG){
+            gameRoot.addObject(renderSystem2);
+            canvas2.show();
+        }
+        else {
+            gameRoot.removeObject(renderSystem2);
+            canvas2.hide();
+        }
+    }
+
     $('#fullscr-btn').on("click", goFullscreen);
+
+    var debugBtn = $('#debug-btn').on("click", toggleDebug);
 
     $(window).on("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
+        canvas2Width = canvas2.width();
+        canvas2Height = canvas2.height();
         initCanvas();
     }).on("mousewheel", function(e){
         cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
@@ -175,15 +201,30 @@ $(function() {
         }
     });
 
-    GE.DEBUG = true;
-
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
+    cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
+    renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
     cameraSystem.setScale(1.0);
     cameraDistance = 800;
     cameraSystem.setPosition(0,-100,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
+    cameraSystem2.setScale(0.5);
+    cameraSystem2.rotationAxis = [1,0,0];
+
+    function DotRenderingComponent(renderSystem){
+            this.renderSystem = renderSystem;
+    }
+    DotRenderingComponent.prototype = new GameComponent();
+    DotRenderingComponent.prototype.update = function(parent, delta) {
+            this.renderSystem.push(function(context){
+                    context.fillStyle = "#000000";
+                    context.beginPath();
+                    context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
+                    context.fill();
+            });
+    };
 
     sun = new GameObject();
 
@@ -191,13 +232,15 @@ $(function() {
         cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        sizes = [4,8,10,6,20,18,16,16];
+        sizes = [4,8,10,6,20,18,16,16],
+        dotRenderer = new DotRenderingComponent(renderSystem2);
 
     sun.mass = 1;
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(0.001));
     sun.addComponent(sphereRenderer);
+    sun.addComponent(dotRenderer);
     sun.texture = textures[0];
 
     // sphereRenderer.lighting = true;
@@ -220,6 +263,9 @@ $(function() {
         // planet.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 
         planet.addComponent(sphereRenderer);
+
+        planet.addComponent(dotRenderer);
+        planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
 
         gameRoot.addObject(planet);
     }
