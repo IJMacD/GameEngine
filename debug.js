@@ -16,7 +16,7 @@ var GE = (function(GE){
 		if(object instanceof GE.GameObject)
 			this.relativeTo = object.position;
 		else
-			this.relativeTo = new Vector2();
+			this.relativeTo = vec2.create();
 	}
 	GEC.DebugDrawPathComponent = DebugDrawPathComponent;
 	DebugDrawPathComponent.prototype = new GameComponent();
@@ -24,36 +24,36 @@ var GE = (function(GE){
 		if(GE.DEBUG){
 			// Draw Path
 			var skip = this.pathIndex % this.pathSize,
-				path = [parent.position.x, parent.position.y];
+				path = [parent.position[0], parent.position[1]];
 			if(this.pathIndex > this.pathSize){
 				for(var i = this.pathSize-1;i>=0;i--){
 					var index = (i + skip + this.pathSize) % this.pathSize;
-					path.push(this.path[index][0]+this.relativeTo.x,this.path[index][1]+this.relativeTo.y);
+					path.push(this.path[index][0]+this.relativeTo[0],this.path[index][1]+this.relativeTo[1]);
 				}
 			}else{
 				for(var i = this.pathIndex-1;i>=0;i--){
-					path.push(this.path[i][0]+this.relativeTo.x,this.path[i][1]+this.relativeTo.y);
+					path.push(this.path[i][0]+this.relativeTo[0],this.path[i][1]+this.relativeTo[1]);
 				}
 			}
-			if(this.relativeTo.x)
+			if(this.relativeTo[0])
 				this.renderSystem.strokePath(path,"#CCF",0);
 			else
 				this.renderSystem.strokePath(path,"#CCC",0);
 			this.pathIndex++;
-			this.path[skip] = [parent.position.x-this.relativeTo.x,parent.position.y-this.relativeTo.y];
+			this.path[skip] = [parent.position[0]-this.relativeTo[0],parent.position[1]-this.relativeTo[1]];
 
 			// Draw Velocity
-			this.renderSystem.strokePath([parent.position.x, parent.position.y,
-				parent.position.x+parent.velocity.x*100, parent.position.y+parent.velocity.y*100],
+			this.renderSystem.strokePath([parent.position[0], parent.position[1],
+				parent.position[0]+parent.velocity[0]*100, parent.position[1]+parent.velocity[1]*100],
 				"rgba(0,128,255,0.7)",0);
 
 			// Draw Acceleration
-			var ax = (parent.velocity.x - this.lastVx)/delta,
-				ay = (parent.velocity.y - this.lastVy)/delta;
-			this.lastVx = parent.velocity.x;
-			this.lastVy = parent.velocity.y;
-			this.renderSystem.strokePath([parent.position.x, parent.position.y,
-				parent.position.x+ax*4e5, parent.position.y+ay*4e5],
+			var ax = (parent.velocity[0] - this.lastVx)/delta,
+				ay = (parent.velocity[1] - this.lastVy)/delta;
+			this.lastVx = parent.velocity[0];
+			this.lastVy = parent.velocity[1];
+			this.renderSystem.strokePath([parent.position[0], parent.position[1],
+				parent.position.x+ax*4e5, parent.position[1]+ay*4e5],
 				"rgba(0,255,0,0.7)",0);
 		}else{
 			this.pathIndex = 0;

@@ -32,14 +32,16 @@ var GE = (function(GE){
 
 		var m = this.cameraSystem.getTransformMatrix().values,
 			p = this.cameraSystem.position,
-			q = this.cameraSystem.width / 2,
-			r = this.cameraSystem.height / 2;
+			q = this.canvasWidth / 2,
+			r = this.canvasHeight / 2;
 		// this.context.setTransform(m[0][0],m[1][0],m[0][1],m[1][1],-p.x,-p.y);
 
 		this.context.translate(q,r);
 		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
 		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
-		this.context.rotate(this.cameraSystem.rotation);
+		if(this.cameraSystem.rotationAxis[2] == 1){
+			this.context.rotate(this.cameraSystem.rotation);
+		}
 		this.context.scale(1, -1);
 		this.context.translate(-p[0],-p[1]);
 
