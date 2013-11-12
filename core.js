@@ -14,6 +14,8 @@ var GE = (function(GE){
 		this.toBeRemoved = [];
 		this.life = 1;
 		this.team = 0;
+
+		this.components.remove = arrayRemoveItem;
 	};
 
 	GameObject.prototype = {
@@ -73,7 +75,8 @@ var GE = (function(GE){
 					}
 				}
 			}
-			this.toBeRemoved = [];
+			this.toBeRemoved.length = 0;
+
 			l = this.components.length;
 			for(i=0;i<l;i++){
 				this.components[i].update(this, delta);
@@ -98,10 +101,10 @@ var GE = (function(GE){
 
 		this.objects = [];
 		this.objectsToBeRemoved = [];
+
+		this.objects.remove = arrayRemoveItem;
 	};
 
-	// GameObjectManager.prototype = Object.create(GameObject);
-	// GameObjectManager.prototype = Object.create(GameObject.prototype);
 	GameObjectManager.prototype = new GameObject();
 
 
@@ -143,7 +146,7 @@ var GE = (function(GE){
 				}
 			}
 		}
-		this.toBeRemoved = [];
+		this.objectsToBeRemoved.length = 0;
 	};
 	GameObjectManager.prototype.toHTML = function() {
 		var html = this.name;
@@ -176,6 +179,12 @@ var GE = (function(GE){
 		}
 		GEC[constructor.name] = constructor;
 	}
+
+	function arrayRemoveItem(from, to) {
+		var rest = this.slice((to || from) + 1 || this.length);
+		this.length = from < 0 ? this.length + from : from;
+		return this.push.apply(this, rest);
+	};
 
 	GE.GameObject = GameObject;
 	GE.GameComponent = GameComponent;
