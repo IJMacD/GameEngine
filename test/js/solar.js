@@ -189,21 +189,23 @@ $(function() {
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(cubeRenderer);
+    sun.addComponent(sphereRenderer);
     sun.texture = textures[0];
 
-    sphereRenderer.lighting = true;
-    //cubeRenderer.lighting = true;
+    // sphereRenderer.lighting = true;
+    // cubeRenderer.lighting = true;
 
     gameRoot.addObject(sun);
     for(var i = 0; i < 8; i++){
         planet = new GameObject();
-        planet.setPosition((i+1) * 50, 0, 0);
-        planet.setVelocity(0, 0.01 * Math.pow(i+1,-0.8), 0.06);
+        planet.setPosition((i+3) * 50, 0, 0);
+        planet.setVelocity(0, 0.01 * Math.pow(i+3,-0.8), 0.06);
         planet.size = vec3.fromValues(sizes[i],sizes[i],sizes[i]);
         planet.rotationAxis = vec3.fromValues(0,1,0);
 
         planet.texture = textures[i+1];
+
+        planet.lighting = true;
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);

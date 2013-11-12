@@ -93,7 +93,7 @@ var GE = (function(GE){
                 tBuff = this.textureBuffer,
                 nBuff = this.vertexNormalBuffer,
                 iBuff = this.vertexIndexBuffer,
-                lighting = this.lighting,
+                lighting = this.lighting || parent.lighting,
                 shaderProgram = this.renderSystem.shaderProgram,
                 texture = parent.texture || this.texture;
             this.renderSystem.push(function(gl,mvMatrix){
