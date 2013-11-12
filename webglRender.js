@@ -103,16 +103,15 @@ var GE = (function(GE){
                     mat4.rotate(mvMatrix, mvMatrix, parent.rotation, parent.rotationAxis);
                 }
 
-                if(parent.size){
-                    mat4.scale(mvMatrix, mvMatrix, parent.size);
-                }
-
                 var normalMatrix = mat3.create();
-                //mat4.invert(normalMatrix, mvMatrix);
                 mat3.fromMat4(normalMatrix, mvMatrix);
                 mat3.invert(normalMatrix, normalMatrix);
                 mat3.transpose(normalMatrix, normalMatrix);
-                gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, [1,0,0,0,1,0,0,0,1]);
+                gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+
+                if(parent.size){
+                    mat4.scale(mvMatrix, mvMatrix, parent.size);
+                }
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vBuff.itemSize, gl.FLOAT, false, 0, 0);

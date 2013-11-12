@@ -260,7 +260,7 @@ $(function() {
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
-        // planet.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
+        planet.addComponent(new GEC.RotationComponent((Math.random()-0.5)*0.002));
 
         planet.addComponent(sphereRenderer);
 
