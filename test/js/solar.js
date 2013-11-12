@@ -28,11 +28,7 @@ $(function() {
         cameraDistance,
         lastTime = 0;
 
-    function initCanvas(width,height){
-        // canvas.removeAttr("width");
-        // canvas.removeAttr("height");
-        // canvasWidth = width||canvas.width();
-        // canvasHeight = height||canvas.height();
+    function initCanvas(){
         canvas[0].width = canvasWidth;
         canvas[0].height = canvasHeight;
         gl.viewportWidth = canvasWidth;
@@ -156,23 +152,28 @@ $(function() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-    $('#fullscr-btn').on("click", function(){
+    function goFullscreen(){
         canvas[0].webkitRequestFullscreen();
         canvasWidth = window.innerWidth;
         canvasHeight = window.innerHeight;
         initCanvas();
-    });
+    }
+
+    $('#fullscr-btn').on("click", goFullscreen);
 
     $(window).on("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
         initCanvas();
-    });
-
-    $(window).on("mousewheel", function(e){
-        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 3000);
+    }).on("mousewheel", function(e){
+        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
         cameraSystem.setPosition(0,-100,cameraDistance);
-    })
+    }).on("keyup", function(e){
+        if(e.which == 122){
+            goFullscreen();
+            e.preventDefault();
+        }
+    });
 
     GE.DEBUG = true;
 
