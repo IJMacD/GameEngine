@@ -1,3 +1,15 @@
+(function(){
+    var img = new Image();
+    img.src = "img/sun-mercator.jpg";
+    img.src = "img/mercury.jpg";
+    img.src = "img/venus.jpg";
+    img.src = "img/earth.jpg";
+    img.src = "img/mars.jpg";
+    img.src = "img/jupiter.jpg";
+    img.src = "img/saturn.jpg";
+    img.src = "img/uranus.jpg";
+    img.src = "img/neptune.jpg";
+}());
 $(function() {
     var GameObject = GE.GameObject,
         GameComponent = GE.GameComponent,
@@ -83,11 +95,20 @@ $(function() {
         shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
+        shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+        gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+
         shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+        shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
+        shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
+        shaderProgram.pointLightingLocationUniform = gl.getUniformLocation(shaderProgram, "uPointLightingLocation");
+        shaderProgram.pointLightingColorUniform = gl.getUniformLocation(shaderProgram, "uPointLightingColor");
     }
 
     var textures = [],
@@ -149,33 +170,6 @@ $(function() {
 
     GE.DEBUG = true;
 
-    function RedBallRenderingComponent(renderSystem){
-            this.renderSystem = renderSystem;
-    }
-    RedBallRenderingComponent.prototype = new GameComponent();
-    RedBallRenderingComponent.prototype.update = function(parent, delta) {
-            this.renderSystem.push(function(context){
-                    context.fillStyle = "#ff0000";
-                    context.beginPath();
-                    context.arc(parent.position[0],parent.position[1],10,0,Math.PI*2,false);
-                    context.fill();
-            });
-    };
-    function RedBoxRenderingComponent(renderSystem){
-            this.renderSystem = renderSystem;
-    }
-    RedBoxRenderingComponent.prototype = new GameComponent();
-    RedBoxRenderingComponent.prototype.update = function(parent, delta) {
-        this.renderSystem.push(function(context){
-            var x = parent.position[0],
-                y = parent.position[1];
-            context.fillStyle = "#ff0000";
-            context.translate(x,y);
-            context.rotate(parent.rotation);
-            context.fillRect(-10,-10,20,20);
-        });
-    };
-
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem.setScale(1.0);
@@ -186,6 +180,7 @@ $(function() {
     sun = new GameObject();
 
     var sphereRenderer = GEC.PolyShapeRenderingComponent.createSphere(renderSystem,30,30),
+        cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
         sizes = [4,8,10,6,20,18,16,16];
@@ -194,8 +189,11 @@ $(function() {
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(sphereRenderer);
+    sun.addComponent(cubeRenderer);
     sun.texture = textures[0];
+
+    sphereRenderer.lighting = true;
+    //cubeRenderer.lighting = true;
 
     gameRoot.addObject(sun);
     for(var i = 0; i < 8; i++){
@@ -209,7 +207,7 @@ $(function() {
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
-        planet.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
+        // planet.addComponent(new GEC.RotationComponent(Math.random()*0.002 - 0.001));
 
         planet.addComponent(sphereRenderer);
 
