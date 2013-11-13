@@ -195,9 +195,18 @@ $(function() {
         cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
         cameraSystem.setPosition(0,-100,cameraDistance);
     }).on("keyup", function(e){
-        if(e.which == 122){
+        if(e.which == 122){ // F11
             goFullscreen();
             e.preventDefault();
+        }
+    }).on("keydown", function(e){
+        if(e.which == 38){ // UP
+        cameraDistance = Math.min(Math.max(cameraDistance - 50, 300), 6000);
+            cameraSystem.setPosition(0,-100,cameraDistance);
+        }
+        else if(e.which == 40){ // DOWN
+        cameraDistance = Math.min(Math.max(cameraDistance + 50, 300), 6000);
+            cameraSystem.setPosition(0,-100,cameraDistance);
         }
     });
 
@@ -210,20 +219,22 @@ $(function() {
     cameraSystem.setPosition(0,-100,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
-    cameraSystem2.setScale(0.5);
+    cameraSystem2.setScale(0.33);
     cameraSystem2.rotationAxis = [1,0,0];
 
-    function DotRenderingComponent(renderSystem){
-            this.renderSystem = renderSystem;
+    function DotRenderingComponent(renderSystem, color){
+        this.renderSystem = renderSystem;
+        this.color = color || "#000";
     }
     DotRenderingComponent.prototype = new GameComponent();
     DotRenderingComponent.prototype.update = function(parent, delta) {
-            this.renderSystem.push(function(context){
-                    context.fillStyle = "#000000";
-                    context.beginPath();
-                    context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
-                    context.fill();
-            });
+        var color = this.color;
+        this.renderSystem.push(function(context){
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
+            context.fill();
+        });
     };
 
     sun = new GameObject();
@@ -242,6 +253,8 @@ $(function() {
     sun.addComponent(sphereRenderer);
     sun.addComponent(dotRenderer);
     sun.texture = textures[0];
+
+    cameraSystem.addComponent(new DotRenderingComponent(renderSystem2,"#f00"));
 
     // sphereRenderer.lighting = true;
     // cubeRenderer.lighting = true;
