@@ -1,4 +1,5 @@
 var GE = (function(GE){
+	"GravityComponent:nomunge, PointGravityComponent: nomunge";
 
 	GE.Comp = GE.Comp || {};
 

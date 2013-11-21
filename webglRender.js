@@ -1,4 +1,5 @@
 var GE = (function(GE){
+    "PolyShapeRenderingComponent:nomunge";
 
     GE.Comp = GE.Comp || {};
 
