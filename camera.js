@@ -26,6 +26,7 @@ var GE = (function(GE){
 		// this.worldVec = new Vector2();
 		// this.screenVec = new Vector2();
 		// this.pruneVec = new Vector2();
+		this.transformMatrix = mat4.create();
 	}
 	GE.CameraSystem = CameraSystem;
 	CameraSystem.prototype = new GE.GameObject();
@@ -61,10 +62,10 @@ var GE = (function(GE){
 		return v;
 	};
 	CameraSystem.prototype.getTransformMatrix = function(){
-		var m = new Matrix(this.shearMatrix);
-		m.multiplyBy(this.scaleMatrix);
-		m.multiplyBy(this.rotMat);
-		return m;
+		// var m = new Matrix(this.shearMatrix);
+		// m.multiplyBy(this.scaleMatrix);
+		// m.multiplyBy(this.rotMat);
+		return this.transformMatrix;
 	};
 	CameraSystem.prototype.update = function(delta) {
 		GE.GameObject.prototype.update.call(this, delta);
