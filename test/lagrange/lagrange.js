@@ -65,7 +65,7 @@ $(function() {
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
-    cameraSystem.setScale(1.0);
+    cameraSystem.setScale(0.2);
     cameraDistance = 0;
     cameraSystem.setPosition(0,0,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
@@ -81,7 +81,7 @@ $(function() {
         this.renderSystem.push(function(context){
             context.fillStyle = color;
             context.beginPath();
-            context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
+            context.arc(parent.position[0],-parent.position[2],10,0,Math.PI*2,false);
             context.fill();
         });
     };
@@ -103,14 +103,14 @@ $(function() {
 
     gameRoot.addObject(sun);
 
-    var r = 275,
+    var r = 1300,
         G = 1.0,
         M = sun.mass,
         v = Math.sqrt((G * M) / r);
 
         planet = new GameObject();
         planet.setPosition(r, 0, 0);
-        planet.setVelocity(0, 0, -v);
+        planet.setVelocity(0, 0, v);
         planet.rotationAxis = vec3.fromValues(0,1,0);
         planet.mass = 1;
 
