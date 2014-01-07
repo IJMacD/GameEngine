@@ -34,14 +34,6 @@ $(function() {
     function toggleDebug(){
         GE.DEBUG = !GE.DEBUG;
         debugBtn.toggleClass("active", GE.DEBUG);
-        if(GE.DEBUG){
-            gameRoot.addObject(renderSystem2);
-            canvas2.show();
-        }
-        else {
-            gameRoot.removeObject(renderSystem2);
-            canvas2.hide();
-        }
     }
 
     $('#fullscr-btn').on("click", goFullscreen);
@@ -74,8 +66,8 @@ $(function() {
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
     cameraSystem.setScale(1.0);
-    cameraDistance = 800;
-    cameraSystem.setPosition(0,-100,cameraDistance);
+    cameraDistance = 0;
+    cameraSystem.setPosition(0,0,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
 
@@ -98,10 +90,9 @@ $(function() {
 
     var moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        sizes = [4,8,10,6,20,18,16,16],
         dotRenderer = new DotRenderingComponent(renderSystem);
 
-    sun.mass = 1;
+    sun.mass = 1000;
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(0.001));
@@ -111,20 +102,25 @@ $(function() {
     // cubeRenderer.lighting = true;
 
     gameRoot.addObject(sun);
-    for(var i = 0; i < 8; i++){
+
+    var r = 275,
+        G = 1.0,
+        M = sun.mass,
+        v = Math.sqrt((G * M) / r);
+
         planet = new GameObject();
-        planet.setPosition((i+1.5) * 50, 0, 0);
-        planet.setVelocity(0, 0, 0.14 / Math.pow(i+1.5,0.5));
-        planet.size = vec3.fromValues(sizes[i],sizes[i],sizes[i]);
+        planet.setPosition(r, 0, 0);
+        planet.setVelocity(0, 0, -v);
         planet.rotationAxis = vec3.fromValues(0,1,0);
+        planet.mass = 1;
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
         planet.addComponent(dotRenderer);
-        //planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+        planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
 
         gameRoot.addObject(planet);
-    }
+
 
 
     gameRoot.addObject(cameraSystem);
