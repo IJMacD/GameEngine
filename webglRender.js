@@ -96,7 +96,7 @@ var GE = (function(GE){
                 iBuff = this.vertexIndexBuffer,
                 lighting = this.lighting || parent.lighting,
                 shaderProgram = this.renderSystem.shaderProgram,
-                texture = parent.texture || this.texture;
+                texture =  this.texture || parent.texture;
             this.renderSystem.push(function(gl,mvMatrix){
                 mat4.translate(mvMatrix, mvMatrix, parent.position);
 

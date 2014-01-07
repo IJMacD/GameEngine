@@ -9,6 +9,7 @@
     img.src = "img/saturn.jpg";
     img.src = "img/uranus.jpg";
     img.src = "img/neptune.jpg";
+    img.src = "img/saturn-rings.png";
 }());
 $(function() {
     var GameObject = GE.GameObject,
@@ -38,7 +39,7 @@ $(function() {
         canvas[0].width = canvasWidth;
         canvas[0].height = canvasHeight;
         gl.viewportWidth = canvasWidth;
-        gl.viewportHeight = canvasHeight,
+        gl.viewportHeight = canvasHeight;
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
         canvas2[0].width = canvas2Width;
@@ -127,7 +128,8 @@ $(function() {
             "img/jupiter.jpg",
             "img/saturn.jpg",
             "img/uranus.jpg",
-            "img/neptune.jpg"
+            "img/neptune.jpg",
+            "img/saturn-rings.png"
         ];
     function initTextures() {
         $.each(texturePaths, function(i,path){
@@ -160,6 +162,8 @@ $(function() {
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
 
     function goFullscreen(){
         canvas[0].webkitRequestFullscreen();
@@ -276,6 +280,34 @@ $(function() {
         planet.addComponent(new GEC.RotationComponent((Math.random()-0.5)*0.002));
 
         planet.addComponent(sphereRenderer);
+
+        if(i == 5){ // Saturn
+            var vertices = [
+                    -2,  0, -2,
+                    -2,  0,  2,
+                     2,  0, -2,
+                     2,  0,  2
+                ],
+                textureCoords = [
+                     0,  0,
+                     0,  1,
+                     1,  0,
+                     1,  1
+                ],
+                vertexNormals = [
+                     0,  1,  0,
+                     0,  1,  0,
+                     0,  1,  0,
+                     0,  1,  0
+                ],
+                vertexIndices = [
+                    0, 1, 2,
+                    1, 2, 3
+                ],
+                ringsRenderComponent = new GEC.PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices);
+                ringsRenderComponent.texture = textures[9];
+            planet.addComponent(ringsRenderComponent);
+        }
 
         planet.addComponent(dotRenderer);
         planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
