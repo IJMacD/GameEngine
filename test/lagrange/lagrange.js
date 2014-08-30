@@ -45,8 +45,8 @@ $(function() {
         canvasHeight = canvas.height();
         initCanvas();
     }).on("mousewheel", function(e){
-        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
-        cameraSystem.setPosition(0,-100,cameraDistance);
+        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 100), 1000);
+        cameraSystem.setScale(cameraDistance*0.001);
     }).on("keyup", function(e){
         if(e.which == 122){ // F11
             goFullscreen();
@@ -96,7 +96,7 @@ $(function() {
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(dotRenderer);
+    sun.addComponent(new DotRenderingComponent(renderSystem, "#ff0"));
 
     // sphereRenderer.lighting = true;
     // cubeRenderer.lighting = true;
@@ -112,7 +112,7 @@ $(function() {
         planet.setPosition(r, 0, 0);
         planet.setVelocity(0, 0, v);
         planet.rotationAxis = vec3.fromValues(0,1,0);
-        planet.mass = 1;
+        planet.mass = 10;
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
@@ -121,7 +121,23 @@ $(function() {
 
         gameRoot.addObject(planet);
 
+    var l1 = r * (1 - Math.pow(planet.mass / (3 * sun.mass), 1/3)),
+        v1 = l1 * Math.pow(G*(sun.mass+planet.mass)/(r*r*r), 1/2),
+        lagrange;
 
+        lagrange = new GameObject();
+        lagrange.setPosition(l1, 0, 0);
+        lagrange.setVelocity(0, 0, v);
+
+        lagrange.addComponent(moveComponent);
+        lagrange.addComponent(pointGravityComponent);
+        lagrange.addComponent(new GEC.PointGravityComponent(planet));
+        lagrange.addComponent(new DotRenderingComponent(renderSystem, "#f00"));
+
+        gameRoot.addObject(lagrange);
+
+
+    //cameraSystem.addComponent(new GEC.FollowComponent(planet));
 
     gameRoot.addObject(cameraSystem);
     gameRoot.addObject(renderSystem);

@@ -41,7 +41,7 @@ var GE = (function(GE){
 			this.context.rotate(this.cameraSystem.rotation);
 		}
 		this.context.scale(1, -1);
-		this.context.translate(-p[0],-p[1]);
+		this.context.translate(-p[0],+p[2]);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 			for(var j = 0, n = this.renderQueue[i] && this.renderQueue[i].length; j < n; j++){

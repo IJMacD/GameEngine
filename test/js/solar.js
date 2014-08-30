@@ -155,7 +155,7 @@ $(function() {
     }
 
     initCanvas();
-    
+
     initShaders();
 
     initTextures();
