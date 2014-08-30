@@ -16,6 +16,8 @@ $(function() {
 		renderSystem,
 		cameraSystem2,
 		renderSystem2,
+		energySystem,
+		energyMonitorComponent,
 		particle,
 		particleCount = 100,
 		particleSep = 50,
@@ -75,12 +77,39 @@ $(function() {
 		});
 	};
 
+	function EnergySystem(renderSystem){
+		this.renderSystem = renderSystem;
+		this.totalEnergy = 0;
+	}
+	EnergySystem.prototype = new GameObject();
+	EnergySystem.prototype.add = function(energy) {
+		this.totalEnergy += energy;
+	};
+	EnergySystem.prototype.update = function(delta) {
+		var totalEnergy = this.totalEnergy;
+		this.totalEnergy = 0;
+		this.renderSystem.push(function(context){
+			context.fillStyle = "#000000";
+			context.fillText(totalEnergy, 50, 50);
+		});
+	};
+
+	function EnergyMonitorComponent(energySystem){
+		this.energySystem = energySystem;
+	}
+	EnergyMonitorComponent.prototype = new GameComponent();
+	EnergyMonitorComponent.prototype.update = function(parent, delta) {
+		this.energySystem.add(0.5 * parent.mass * parent.velocity.magnitude2());
+	};
+
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.RenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
 	cameraSystem.setScale(1);
 	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
 	renderSystem2 = new GE.RenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
 	cameraSystem2.setScale(0.05);
+	energySystem = new EnergySystem(renderSystem);
+	energyMonitorComponent = new EnergyMonitorComponent(energySystem);
 
 	var boxSize = Math.floor(Math.sqrt(particleCount)),
 		offsetX = - boxSize * particleSep / 2,
@@ -102,12 +131,13 @@ $(function() {
 				particles[k].addComponent(new GEC.PointGravityComponent(particle));
 				particle.addComponent(new GEC.PointGravityComponent(particles[k]));
 			}
-			particle.addComponent(new GEC.WorldBounceComponent(2,2,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
-			
+			//particle.addComponent(new GEC.WorldBounceComponent(2,2,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+			particle.addComponent(energyMonitorComponent);
+
 			if(i == 0 && j == 0){
 				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
 			}
-			
+
 			particle.addComponent(new ParticleRenderingComponent(renderSystem));
 			particle.addComponent(new ParticleRenderingComponent(renderSystem2));
 
@@ -116,7 +146,7 @@ $(function() {
 		}
 	}
 
-
+	gameRoot.addObject(energySystem);
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
 	// gameRoot.addObject(cameraSystem2);

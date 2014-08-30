@@ -19,7 +19,7 @@ var GE = (function(GE){
 	}, {
 		update: function(parent, delta) {
 			var vec = this.vector.set(this.target.position).subtract(parent.position),
-				scalar = Math.min(this.target.mass*delta/vec.magnitude2(),0.1);
+				scalar = this.target.mass*delta/Math.max(vec.magnitude2(),10);
 			vec.normalise();
 			vec.scale(scalar);
 			parent.velocity.add(vec);
