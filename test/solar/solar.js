@@ -188,6 +188,10 @@ $(function() {
     $('#fullscr-btn').on("click", goFullscreen);
 
     var debugBtn = $('#debug-btn').on("click", toggleDebug);
+    var mousedown,
+        cameraPosition = [0,-100,cameraDistance],
+        cameraAngleStart,
+        cameraAngle = 0;
 
     $(window).on("resize", function(){
         canvasWidth = canvas.width();
@@ -195,6 +199,24 @@ $(function() {
         canvas2Width = canvas2.width();
         canvas2Height = canvas2.height();
         initCanvas();
+    }).on("mousedown", function(e){
+      mousedown = {x: e.pageX, y: e.pageY};
+      cameraPosition[2] = cameraDistance;
+      cameraAngleStart = cameraAngle;
+    }).on("mousemove", function(e){
+      var diffX,
+          diffY;
+      if(mousedown){
+        var diffX = mousedown.x - e.pageX,
+            diffY = mousedown.y - e.pageY,
+            cameraAngle = cameraAngleStart - diffY / 1000,
+            newY = -cameraDistance * Math.sin(cameraAngle),
+            newZ = cameraDistance * Math.cos(cameraAngle);
+        cameraSystem.setPosition(0,newY, newZ);
+        cameraSystem.rotation = cameraAngle*12;
+      }
+    }).on("mouseup", function(){
+      mousedown = null;
     }).on("mousewheel", function(e){
         cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
         cameraSystem.setPosition(0,-100,cameraDistance);
@@ -205,12 +227,12 @@ $(function() {
         }
     }).on("keydown", function(e){
         if(e.which == 38){ // UP
-        cameraDistance = Math.min(Math.max(cameraDistance - 50, 300), 6000);
-            cameraSystem.setPosition(0,-100,cameraDistance);
+          cameraDistance = Math.min(Math.max(cameraDistance - 50, 300), 6000);
+          cameraSystem.setPosition(0,-100,cameraDistance);
         }
         else if(e.which == 40){ // DOWN
-        cameraDistance = Math.min(Math.max(cameraDistance + 50, 300), 6000);
-            cameraSystem.setPosition(0,-100,cameraDistance);
+          cameraDistance = Math.min(Math.max(cameraDistance + 50, 300), 6000);
+          cameraSystem.setPosition(0,-100,cameraDistance);
         }
     });
 
