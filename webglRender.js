@@ -17,6 +17,8 @@ var GE = (function(GE){
         this.pMatrix = mat4.create();
         this.renderQueue = [];
         this.spareVector = vec3.create();
+        this.ambientLight = 0.3;
+        this.pointLighting = 1.4;
     };
     GE.WebGLRenderSystem.prototype = new GE.GameObject();
     GE.WebGLRenderSystem.prototype.push = function(renderable){
@@ -129,11 +131,11 @@ var GE = (function(GE){
 
                 gl.uniform1i(shaderProgram.useLightingUniform, lighting);
                 if(lighting){
-                    gl.uniform3f(shaderProgram.ambientColorUniform, 0.1, 0.1, 0.1);
+                    gl.uniform3f(shaderProgram.ambientColorUniform, this.ambientLight, this.ambientLight, this.ambientLight);
 
                     gl.uniform3f(shaderProgram.pointLightingLocationUniform, 0.0, 0.0, 0.0);
 
-                    gl.uniform3f(shaderProgram.pointLightingColorUniform, 1.0, 1.0, 1.0);
+                    gl.uniform3f(shaderProgram.pointLightingColorUniform, this.pointLighting, this.pointLighting, this.pointLighting);
                 }
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
