@@ -26,7 +26,7 @@ var GE = (function(GE){
 		// this.worldVec = new Vector2();
 		// this.screenVec = new Vector2();
 		// this.pruneVec = new Vector2();
-		this.rotationAxis = [0,0,1];
+		this.rotationAxis = [1,0,0];
 		this.transformMatrix = mat4.create();
 	}
 	GE.CameraSystem = CameraSystem;

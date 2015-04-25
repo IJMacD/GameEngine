@@ -7,13 +7,13 @@
   <meta name="author" content="">
   <link rel="shortcut icon" href="../img/favicon.png">
 
-  <title>Game Engine Tests</title>
+  <title>Game Engine Test</title>
 
   <!-- Bootstrap core CSS -->
-  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="../css/bootstrap.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="css/project.css" rel="stylesheet">
+  <link href="../css/project.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
@@ -57,14 +57,9 @@
     </div>
   </div>
 
-  <div id="wrap" class="container">
-    <h1>Game Engine Tests</h1>
-    <ul>
-      <li><a href="solar/solarSystem.html">Solar System</a></li>
-      <li><a href="lagrange/lagrange.html">Lagrange Test</a></li>
-      <li><a href="sprites">Sprite Tests</a></li>
-      <li><a href="particles">Particle Tests</a></li>
-    </ul>
+  <div id="wrap">
+    <canvas id="surface"></canvas>
+    <canvas id="surface2"></canvas>
   </div>
 
   <footer>
@@ -74,5 +69,21 @@
     </div>
   </footer>
 
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="../js/jquery.js"></script>
+  <script src="../js/gl-matrix.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/underscore-min.js"></script>
+  <script src="../../vector.js"></script>
+  <script src="../../core.js"></script>
+  <script src="../../basic.js"></script>
+  <script src="../../camera.js"></script>
+  <script src="../../canvasRender.js"></script>
+  <script src="../../world.js"></script>
+  <script src="../../debug.js"></script>
+  <script src="project.js"></script>
 </body>
 </html>
