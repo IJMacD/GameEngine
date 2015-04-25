@@ -6,25 +6,23 @@ var GE = (function(GE){
 		GameObjectManager = GE.GameObjectManager,
 		GEC = GE.Comp;
 
-	function RenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
+	function CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
 		this.context = context;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
-		this.maxLayer = 1;
 	}
-	GE.RenderSystem = RenderSystem;
-	RenderSystem.prototype = new GE.GameObject();
-	RenderSystem.prototype.push = function(renderable, layer){
+	GE.CanvasRenderSystem = CanvasRenderSystem;
+	CanvasRenderSystem.prototype = new GE.GameObject();
+	CanvasRenderSystem.prototype.push = function(renderable, layer){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
-			this.maxLayer = Math.max(this.maxLayer, layer);
 		}
 		this.renderQueue[layer].push(renderable);
 	};
-	RenderSystem.prototype.update = function(delta) {
+	CanvasRenderSystem.prototype.update = function(delta) {
 		this.context.fillStyle = "#ffffff";
 		this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
 
@@ -32,15 +30,18 @@ var GE = (function(GE){
 
 		var m = this.cameraSystem.getTransformMatrix().values,
 			p = this.cameraSystem.position,
-			q = this.cameraSystem.width / 2,
-			r = this.cameraSystem.height / 2;
+			q = this.canvasWidth / 2,
+			r = this.canvasHeight / 2;
 		// this.context.setTransform(m[0][0],m[1][0],m[0][1],m[1][1],-p.x,-p.y);
 
 		this.context.translate(q,r);
 		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
 		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
-		this.context.rotate(this.cameraSystem.rotation);
-		this.context.translate(-p.x,-p.y);
+		if(this.cameraSystem.rotationAxis[2] == 1){
+			this.context.rotate(this.cameraSystem.rotation);
+		}
+		this.context.scale(1, -1);
+		this.context.translate(-p[0],+p[2]);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
 			for(var j = 0, n = this.renderQueue[i] && this.renderQueue[i].length; j < n; j++){
@@ -54,7 +55,7 @@ var GE = (function(GE){
 
 		this.renderQueue = [];
 	};
-	RenderSystem.prototype.setCanvasSize = function(width, height){
+	CanvasRenderSystem.prototype.setCanvasSize = function(width, height){
 		this.canvasWidth = width;
 		this.canvasHeight = height;
 	}
@@ -73,7 +74,7 @@ var GE = (function(GE){
 		}
 	}
 	// Convenience
-	RenderSystem.prototype.strokePath = function(path, style, layer) {
+	CanvasRenderSystem.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
 		this.push(function(context){
@@ -84,15 +85,15 @@ var GE = (function(GE){
 	};
 
 
-	function SpriteRenderingComponent(renderSystem){
+	function CanvasSpriteRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 	}
-	GEC.SpriteRenderingComponent = SpriteRenderingComponent;
-	SpriteRenderingComponent.prototype = new GameComponent();
-	SpriteRenderingComponent.prototype.update = function(parent, delta) {
+	GEC.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
+	CanvasSpriteRenderingComponent.prototype = new GameComponent();
+	CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			var x = parent.position.x,
-				y = parent.position.y,
+			var x = parent.position[0],
+				y = parent.position[1],
 				w = parent.sprite.width,
 				h = parent.sprite.height;
 			context.translate(x,y);
@@ -101,16 +102,16 @@ var GE = (function(GE){
 		});
 	};
 
-	function RenderSystemManager(){}
-	GE.RenderSystemManager = RenderSystemManager;
-	RenderSystemManager.prototype = new GameObjectManager();
-	RenderSystemManager.prototype.push = function(renderable, layer){
+	function CanvasRenderSystemManager(){}
+	GE.CanvasRenderSystemManager = CanvasRenderSystemManager;
+	CanvasRenderSystemManager.prototype = new GameObjectManager();
+	CanvasRenderSystemManager.prototype.push = function(renderable, layer){
 		for (var i = this.objects.length - 1; i >= 0; i--) {
 			this.objects[i].push(renderable, layer);
 		};
 	}
 	// Convenience
-	RenderSystemManager.prototype.strokePath = function(path, style, layer) {
+	CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
 		this.push(function(context){

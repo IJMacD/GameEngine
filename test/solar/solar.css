@@ -11,9 +11,6 @@ body {
   /* Pad bottom by footer height */
   padding: 50px 0 60px;
 }
-#wrap div{
-  height: 100%;
-}
 
 /* Set the fixed height of the footer here */
 footer {
@@ -27,7 +24,19 @@ hr {
   height: 100%;
   width: 100%;
 }
+#surface:-webkit-full-screen {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+}
 #surface2 {
-  height: 100%;
-  width: 100%;
+  border: 1px solid #999;
+  display: none;
+  height: 50%;
+  position: absolute;
+  right: 5%;
+  top: 10%;
+  width: 25%;
 }
