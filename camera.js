@@ -20,12 +20,13 @@ var GE = (function(GE){
 		this.scaleY = this.scale;
 		this.rotation = 0;
 		// this.angle = 0;
-		// this.rotMat = Matrix.rotationMatrix(this.rotation);
-		// this.scaleMatrix = Matrix.scaleMatrix(this.scaleX, this.scaleY);
-		// this.shearMatrix = Matrix.shearMatrix(this.skewX, this.skewY);
+		this.rotMat = Matrix.rotationMatrix(this.rotation);
+		this.scaleMatrix = Matrix.scaleMatrix(this.scaleX, this.scaleY);
+		this.shearMatrix = Matrix.shearMatrix(this.skewX, this.skewY);
 		// this.worldVec = new Vector2();
 		// this.screenVec = new Vector2();
 		// this.pruneVec = new Vector2();
+		this.rotationAxis = [0,0,1];
 		this.transformMatrix = mat4.create();
 	}
 	GE.CameraSystem = CameraSystem;
