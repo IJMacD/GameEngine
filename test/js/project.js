@@ -90,7 +90,7 @@ $(function() {
 		this.totalEnergy = 0;
 		this.renderSystem.push(function(context){
 			context.fillStyle = "#000000";
-			context.fillText(totalEnergy, 50, 50);
+			context.fillText(totalEnergy.toFixed(6), 50, 50);
 		});
 	};
 
