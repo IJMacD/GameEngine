@@ -10,6 +10,7 @@
     img.src = "img/uranus.jpg";
     img.src = "img/neptune.jpg";
     img.src = "img/saturn-rings.png";
+    img.src = "img/moon.jpg";
 }());
 $(function() {
     var GameObject = GE.GameObject,
@@ -129,7 +130,8 @@ $(function() {
             "img/saturn.jpg",
             "img/uranus.jpg",
             "img/neptune.jpg",
-            "img/saturn-rings.png"
+            "img/saturn-rings.png",
+            "img/moon.jpg"
         ];
     function initTextures() {
         $.each(texturePaths, function(i,path){
@@ -245,7 +247,7 @@ $(function() {
     cameraSystem.setPosition(0,-100,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
-    cameraSystem2.setScale(0.33);
+    cameraSystem2.setScale(0.1);
     cameraSystem2.rotationAxis = [1,0,0];
 
     function DotRenderingComponent(renderSystem, color){
@@ -269,11 +271,19 @@ $(function() {
         cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        sizes = [4,8,10,6,20,18,16,16],
-        dotRenderer = new DotRenderingComponent(renderSystem2);
+        // http://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
+        sizes = [0.383,0.949,1,0.532,11.21,9.45,4.01,3.88],
+        masses = [0.0553,0.815,1,0.107,317.8,95.2,14.5,17.1],
+        distances = [0.387,0.723,1,1.52,5.20,9.58,19.20,30.05],
+        dotRenderer = new DotRenderingComponent(renderSystem2),
+
+        distScale = 80,
+        sizeScale = 5,
+
+        sunSize = scaleSize(109.2);
 
     sun.mass = 1;
-    sun.size = vec3.fromValues(30,30,30);
+    sun.size = vec3.fromValues(sunSize,sunSize,sunSize);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(-0.001));
     sun.addComponent(sphereRenderer);
@@ -285,15 +295,51 @@ $(function() {
     // sphereRenderer.lighting = true;
     // cubeRenderer.lighting = true;
 
+    function posToVelocity(pos){
+      return Math.pow(sun.mass / pos,0.5)
+    }
+
+    function scaleSize(size){
+      return Math.log(size*10) * sizeScale;
+    }
+
+    function scaleDist(dist){
+      //return Math.log(dist*10) * distScale;
+      return dist * distScale;
+    }
+
     gameRoot.addObject(sun);
 
+    var satellite = new GE.GameObject();
+    satellite = new GameObject();
+    var p = scaleDist(distances[2] + 0.00257),
+        v = posToVelocity(p),
+        s = scaleSize(0.25);
+    satellite.setPosition(p, 0, 0);
+    satellite.setVelocity(0, 0, v);
+    satellite.size = vec3.fromValues(s,s,s);
+    satellite.texture = textures[10];
+
+    satellite.addComponent(moveComponent);
+    satellite.addComponent(pointGravityComponent);
+    satellite.addComponent(sphereRenderer);
+
+    satellite.addComponent(dotRenderer);
+    satellite.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
+
+    gameRoot.addObject(satellite);
 
     for(var i = 0; i < 8; i++){
+        var p = scaleDist(distances[i]),
+            v = posToVelocity(p),
+            s = scaleSize(sizes[i]);
+
         planet = new GameObject();
-        planet.setPosition((i+1.5) * 50, 0, 0);
-        planet.setVelocity(0, 0, 0.14 / Math.pow(i+1.5,0.5));
-        planet.size = vec3.fromValues(sizes[i],sizes[i],sizes[i]);
+        planet.setPosition(p, 0, 0);
+        planet.setVelocity(0, 0, v);
+        planet.size = vec3.fromValues(s,s,s);
         planet.rotationAxis = vec3.fromValues(0,1,0);
+        planet.mass = masses[i] * 3e-6 * sun.mass; // Mass of Earth / Mass of Sun = 3.003467 x 10^-6
 
         planet.texture = textures[i+1];
 
@@ -301,7 +347,7 @@ $(function() {
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
-        planet.addComponent(new GEC.RotationComponent((Math.random()-0.5)*0.002));
+        planet.addComponent(new GEC.RotationComponent((Math.random()-0.5)*0.0002));
 
         planet.addComponent(sphereRenderer);
 
@@ -337,8 +383,9 @@ $(function() {
         planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
 
         gameRoot.addObject(planet);
-    }
 
+        satellite.addComponent(new GEC.PointGravityComponent(planet));
+    }
 
     gameRoot.addObject(cameraSystem);
     gameRoot.addObject(renderSystem);
