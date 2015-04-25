@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="img/favicon.png">
+    <link rel="shortcut icon" href="../img/favicon.png">
 
     <title>Game Engine Test</title>
 
@@ -13,7 +13,7 @@
     <link href="../css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="lagrange.css" rel="stylesheet">
+    <link href="solar.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -60,6 +60,7 @@
 
     <div id="wrap">
       <canvas id="surface"></canvas>
+      <canvas id="surface2"></canvas>
     </div>
 
     <footer>
@@ -74,17 +75,61 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 
+    <script id="shader-fs" type="x-shader/x-fragment">
+      precision mediump float;
+
+      varying vec2 vTextureCoord;
+      varying vec3 vLightWeighting;
+
+      uniform sampler2D uSampler;
+
+      void main(void) {
+        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+      }
+    </script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat3 uNMatrix;
+
+    uniform vec3 uAmbientColor;
+
+    uniform vec3 uPointLightingLocation;
+    uniform vec3 uPointLightingColor;
+
+    uniform bool uUseLighting;
+
+    varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
+
+    void main(void) {
+        vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+        gl_Position = uPMatrix * mvPosition;
+        vTextureCoord = aTextureCoord;
+
+        if (!uUseLighting) {
+            vLightWeighting = vec3(1.0, 1.0, 1.0);
+        } else {
+            vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);
+
+            vec3 transformedNormal = uNMatrix * aVertexNormal;
+            // vec3 transformedNormal = aVertexNormal;
+            float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
+            vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;
+        }
+    }
     </script>
     <script src="../js/jquery.js"></script>
+    <script src="../js/gl-matrix.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/underscore-min.js"></script>
-    <script src="../../gl-matrix.js"></script>
-    <script src="../../core.js"></script>
-    <script src="../../basic.js"></script>
-    <script src="../../canvasRender.js"></script>
-    <script src="../../camera.js"></script>
-    <script src="../../debug.js"></script>
-    <script src="../../vector.js"></script>
-    <script src="lagrange.js"></script>
+    <script src="../../build/ge.min.js"></script>
+    <script src="solar.js"></script>
   </body>
 </html>

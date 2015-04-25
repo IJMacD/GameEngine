@@ -253,7 +253,7 @@ $(function() {
     sun.mass = 1;
     sun.size = vec3.fromValues(30,30,30);
     sun.rotationAxis = vec3.fromValues(0,1,0);
-    sun.addComponent(new GEC.RotationComponent(0.001));
+    sun.addComponent(new GEC.RotationComponent(-0.001));
     sun.addComponent(sphereRenderer);
     sun.addComponent(dotRenderer);
     sun.texture = textures[0];
@@ -264,6 +264,8 @@ $(function() {
     // cubeRenderer.lighting = true;
 
     gameRoot.addObject(sun);
+
+
     for(var i = 0; i < 8; i++){
         planet = new GameObject();
         planet.setPosition((i+1.5) * 50, 0, 0);
