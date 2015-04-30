@@ -201,27 +201,6 @@ $(function() {
         canvas2Width = canvas2.width();
         canvas2Height = canvas2.height();
         initCanvas();
-    }).on("mousedown", function(e){
-      mousedown = {x: e.pageX, y: e.pageY};
-      cameraPosition[2] = cameraDistance;
-      cameraAngleStart = cameraAngle;
-    }).on("mousemove", function(e){
-      var diffX,
-          diffY;
-      if(mousedown){
-        var diffX = mousedown.x - e.pageX,
-            diffY = mousedown.y - e.pageY,
-            cameraAngle = cameraAngleStart - diffY / 1000,
-            newY = -cameraDistance * Math.sin(cameraAngle),
-            newZ = cameraDistance * Math.cos(cameraAngle);
-        cameraSystem.setPosition(0,newY, newZ);
-        cameraSystem.rotation = cameraAngle*12;
-      }
-    }).on("mouseup", function(){
-      mousedown = null;
-    }).on("mousewheel", function(e){
-        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
-        cameraSystem.setPosition(0,-100,cameraDistance);
     }).on("keyup", function(e){
         if(e.which == 122){ // F11
             goFullscreen();
@@ -237,6 +216,30 @@ $(function() {
           cameraSystem.setPosition(0,-100,cameraDistance);
         }
     });
+
+    canvas.on("mousedown", function(e){
+      mousedown = {x: e.pageX, y: e.pageY};
+      cameraPosition[2] = cameraDistance;
+      cameraAngleStart = cameraAngle;
+    }).on("mousemove", function(e){
+      var diffX,
+          diffY;
+      if(mousedown){
+        var diffX = mousedown.x - e.pageX,
+            diffY = mousedown.y - e.pageY,
+            newY, newZ;
+        cameraAngle = cameraAngleStart - diffY / 1000;
+        newY = -cameraDistance * Math.sin(cameraAngle);
+        newZ = cameraDistance * Math.cos(cameraAngle);
+        cameraSystem.setPosition(0,newY, newZ);
+        cameraSystem.rotation = cameraAngle*12;
+      }
+    }).on("mouseup", function(){
+      mousedown = null;
+    }).on("mousewheel", function(e){
+        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
+        cameraSystem.setPosition(0,-100,cameraDistance);
+    })
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
@@ -271,11 +274,11 @@ $(function() {
         cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
+        dotRenderer = new DotRenderingComponent(renderSystem2),
         // http://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
         sizes = [0.383,0.949,1,0.532,11.21,9.45,4.01,3.88],
         masses = [0.0553,0.815,1,0.107,317.8,95.2,14.5,17.1],
         distances = [0.387,0.723,1,1.52,5.20,9.58,19.20,30.05],
-        dotRenderer = new DotRenderingComponent(renderSystem2),
 
         distScale = 80,
         sizeScale = 5,
