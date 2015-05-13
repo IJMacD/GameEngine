@@ -23,9 +23,9 @@ var GE = (function(GE){
 	DebugDrawPathComponent.prototype.update = function(parent, delta) {
 		if(GE.DEBUG){
 			var px = parent.position[0],
-				py = -parent.position[2],
+				py = parent.position[1],
 				vx = parent.velocity[0],
-				vy = -parent.velocity[2],
+				vy = parent.velocity[1],
 				ax = (vx - this.lastVx)/delta,
 				ay = (vy - this.lastVy)/delta,
 				rx = this.relativeTo[0],
