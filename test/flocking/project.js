@@ -8,13 +8,21 @@ $(function() {
 		canvasWidth = canvas.width(),
 		canvasHeight = canvas.height(),
 		gameRoot = new GE.GameObjectManager(),
+		flock = new GE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
 		particle,
-		particleCount = 100,
+		particleCount = 20,
 		particleSep = 50,
 		particles = [],
-		lastTime = 0;
+		lastTime = 0,
+
+		NEIGHBOUR_RADIUS = 55,
+		SEPARATION_RADIUS = 20,
+		MAX_SPEED = 0.001,
+		COHESION_WEIGHT = 0.000001,
+		ALIGN_WEIGHT = 0.0001,
+		SEPARATION_WEIGHT = 0.01;
 
 	function initCanvas(width,height){
 		// canvas.removeAttr("width");
@@ -61,6 +69,58 @@ $(function() {
 		});
 	};
 
+
+	function FlockingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+		this.separation = vec3.create();
+		this.align = vec3.create();
+		this.cohesion = vec3.create();
+		this.spare = vec3.create();
+	}
+	FlockingComponent.prototype = new GameComponent();
+	FlockingComponent.prototype.update = function(parent, delta) {
+		vec3.set(this.cohesion, 0, 0, 0);
+		vec3.set(this.align, 0, 0, 0);
+		vec3.set(this.separation, 0, 0, 0);
+		vec3.set(this.spare, 0, 0, 0);
+
+		var count = 0,
+				self = this;
+
+		particles.forEach(function(other){
+			var dist = vec3.dist(other.position, parent.position);
+			if(dist > 0 && dist < NEIGHBOUR_RADIUS){
+				vec3.add(self.cohesion, self.cohesion, other.position);
+				vec3.add(self.align, self.align, other.velocity);
+
+				if(dist < SEPARATION_RADIUS){
+					vec3.subtract(self.spare, parent.position, other.position);
+					vec3.normalize(self.spare, self.spare);
+					vec3.scale(self.spare, self.spare, 1 / dist);
+					vec3.add(self.separation, self.separation, self.spare);
+				}
+
+				count++;
+			}
+		});
+
+		if(count > 0){
+			vec3.scale(this.cohesion, this.cohesion, 1 / count);
+			vec3.subtract(this.cohesion, this.cohesion, parent.position);
+			vec3.scale(this.cohesion, this.cohesion, COHESION_WEIGHT);
+			vec3.add(parent.velocity, parent.velocity, this.cohesion);
+
+			vec3.scale(this.align, this.align, 1 / count);
+			vec3.scale(this.align, this.align, ALIGN_WEIGHT);
+			vec3.add(parent.velocity, parent.velocity, this.align);
+
+			vec3.scale(this.separation, this.separation, 1/ count);
+			vec3.scale(this.separation, this.separation, SEPARATION_WEIGHT);
+			vec3.add(parent.velocity, parent.velocity, this.separation);
+		}
+	};
+
+
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
 	cameraSystem.setScale(1);
@@ -81,7 +141,9 @@ $(function() {
 			particle.mass = 0.01;
 
 			particle.addComponent(new GEC.MoveComponent());
-			//particle.addComponent(new GEC.WorldBounceComponent(2,2,[-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+			particle.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+
+			particle.addComponent(new FlockingComponent());
 
 			if(i == 2 && j == 3){
 				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
@@ -89,11 +151,12 @@ $(function() {
 
 			particle.addComponent(new ParticleRenderingComponent(renderSystem));
 
-			gameRoot.addObject(particle);
+			flock.addObject(particle);
 			particles.push(particle);
 		}
 	}
 
+	gameRoot.addObject(flock);
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
 
