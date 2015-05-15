@@ -12,17 +12,17 @@ $(function() {
 		cameraSystem,
 		renderSystem,
 		particle,
-		particleCount = 20,
+		particleCount = 400,
 		particleSep = 50,
 		particles = [],
 		lastTime = 0,
 
 		NEIGHBOUR_RADIUS = 55,
-		SEPARATION_RADIUS = 20,
-		MAX_SPEED = 0.001,
-		COHESION_WEIGHT = 0.000001,
-		ALIGN_WEIGHT = 0.0001,
-		SEPARATION_WEIGHT = 0.01;
+		SEPARATION_RADIUS = 40,
+		MAX_SPEED = 0.1,
+		COHESION_WEIGHT = 0.0004,
+		ALIGN_WEIGHT = 0.05,
+		SEPARATION_WEIGHT = 0.3;
 
 	function initCanvas(width,height){
 		// canvas.removeAttr("width");
@@ -117,6 +117,11 @@ $(function() {
 			vec3.scale(this.separation, this.separation, 1/ count);
 			vec3.scale(this.separation, this.separation, SEPARATION_WEIGHT);
 			vec3.add(parent.velocity, parent.velocity, this.separation);
+
+			if(vec3.length(parent.velocity) > MAX_SPEED){
+				vec3.normalize(parent.velocity, parent.velocity);
+				vec3.scale(parent.velocity, parent.velocity, MAX_SPEED);
+			}
 		}
 	};
 
@@ -133,7 +138,7 @@ $(function() {
 			var x = j * particleSep + offsetX,
 				y = i * particleSep + offsetY,
 				vecNorm = vec2.fromValues(-y , x),
-				len = vec2.length(vecNorm)*0.000001;
+				len = vec2.length(vecNorm)*0.0001;
 			vec2.scale(vecNorm, vecNorm, len);
 			particle = new GameObject();
 			particle.setPosition(-x,-y,0);
