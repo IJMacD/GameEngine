@@ -77,7 +77,7 @@ var GE = (function(GE){
 			// v = this.cameraSystem.worldToScreen(path[i],path[i+1]);
 			// context.lineTo(v.x,v.y);
 			vec2.set(p_2, path[i], path[i+1]);
-			if(vec2.dist(p_1, p_2) > 50){
+			if(vec2.dist(p_1, p_2) > 300){
 				context.moveTo(path[i],path[i+1]);
 			}else{
 				context.lineTo(path[i],path[i+1]);
@@ -89,6 +89,8 @@ var GE = (function(GE){
 	CanvasRenderSystem.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
+	 	if(typeof layer == "undefined")
+			layer = 0;
 		this.push(function(context){
 			context.strokeStyle = style;
 			drawPath.call(this, context, path);

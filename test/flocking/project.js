@@ -11,8 +11,9 @@ $(function() {
 		flock = new GE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
+		backgroundSystem,
 		particle,
-		particleCount = 400,
+		particleCount = 40,
 		particleSep = 50,
 		particles = [],
 		lastTime = 0,
@@ -21,8 +22,10 @@ $(function() {
 		SEPARATION_RADIUS = 40,
 		MAX_SPEED = 0.1,
 		COHESION_WEIGHT = 0.00025,
-		ALIGN_WEIGHT = 0.015,
+		ALIGN_WEIGHT = 0.035,
 		SEPARATION_WEIGHT = 0.3;
+
+	GE.DEBUG = false;
 
 	function initCanvas(width,height){
 		// canvas.removeAttr("width");
@@ -96,8 +99,8 @@ $(function() {
 		this.renderSystem.push(function(context){
 			var size = parent.size || 10;
 			context.fillStyle = parent.colour || "#000000";
-			context.translate(-parent.position[0], -parent.position[1]);
-			context.rotate(-parent.rotation);
+			context.translate(parent.position[0], parent.position[1]);
+			context.rotate(parent.rotation);
 			context.beginPath();
 			context.moveTo(0,-size);
 			context.lineTo(size/2,size/2);
@@ -169,6 +172,10 @@ $(function() {
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
 	cameraSystem.setScale(1);
+	backgroundSystem = new GE.BackgroundSystem(renderSystem);
+	backgroundSystem.addSurface([20,0,120,0]);
+	backgroundSystem.addSurface([-20,0,-120,0,-220,-100,-220,-120]);
+	backgroundSystem.addSurface([200,0,250,-50,250,-100,200,-150]);
 
 	var boxSize = Math.floor(Math.sqrt(particleCount)),
 		offsetX = - boxSize * particleSep / 2,
@@ -198,6 +205,8 @@ $(function() {
 
 			particle.addComponent(new FlockingComponent());
 
+			particle.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
+
 			//particle.addComponent(new GridSquareRenderingComponent(renderSystem));
 			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
 			particle.addComponent(new ArrowRenderingComponent(renderSystem));
@@ -209,6 +218,7 @@ $(function() {
 	}
 
 	gameRoot.addObject(flock);
+	gameRoot.addObject(backgroundSystem);
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
 
