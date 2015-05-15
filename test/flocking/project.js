@@ -88,6 +88,27 @@ $(function() {
 		});
 	};
 
+	function ArrowRenderingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	}
+	ArrowRenderingComponent.prototype = new GameComponent();
+	ArrowRenderingComponent.prototype.update = function(parent, delta) {
+		this.renderSystem.push(function(context){
+			var size = parent.size || 10;
+			context.fillStyle = parent.colour || "#000000";
+			context.translate(-parent.position[0], -parent.position[1]);
+			context.rotate(-parent.rotation);
+			context.beginPath();
+			context.moveTo(0,-size);
+			context.lineTo(size/2,size/2);
+			context.lineTo(0,0);
+			context.lineTo(-size/2,size/2);
+			context.closePath();
+			context.fill();
+		});
+	};
+
+
 
 	function FlockingComponent(renderSystem){
 		this.renderSystem = renderSystem;
@@ -161,7 +182,7 @@ $(function() {
 			vec2.scale(vecNorm, vecNorm, len);
 			particle = new GameObject();
 			particle.setPosition(-x,-y,0);
-			particle.setVelocity(vecNorm[0], vecNorm[1], x * y);
+			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
 			particle.mass = 0.01;
 
 
@@ -173,10 +194,14 @@ $(function() {
 			particle.addComponent(new GEC.MoveComponent());
 			particle.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2,-1000,1000]));
 
+			particle.addComponent(new GEC.RotateToHeadingComponent());
+
 			particle.addComponent(new FlockingComponent());
 
-			particle.addComponent(new GridSquareRenderingComponent(renderSystem));
+			//particle.addComponent(new GridSquareRenderingComponent(renderSystem));
 			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
+			particle.addComponent(new ArrowRenderingComponent(renderSystem));
+
 
 			flock.addObject(particle);
 			particles.push(particle);

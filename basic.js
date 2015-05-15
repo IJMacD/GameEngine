@@ -45,11 +45,18 @@ var GE = (function(GE){
 
 	function RotationComponent (dth) {
 		this.rotationSpeed = dth;
-	};
+	}
 	GEC.RotationComponent = RotationComponent;
 	RotationComponent.prototype = new GameComponent();
 	RotationComponent.prototype.update = function(parent, delta) {
 		parent.setRotation(parent.rotation + this.rotationSpeed * delta);
+	};
+
+	function RotateToHeadingComponent () {}
+	GEC.RotateToHeadingComponent = RotateToHeadingComponent;
+	RotateToHeadingComponent.prototype = new GameComponent();
+	RotateToHeadingComponent.prototype.update = function(parent, delta) {
+		parent.setRotation(Math.atan2(parent.velocity[0], parent.velocity[1]));
 	};
 
 	function AnimatedSpriteComponent(images, speed){
