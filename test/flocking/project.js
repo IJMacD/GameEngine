@@ -20,8 +20,8 @@ $(function() {
 		NEIGHBOUR_RADIUS = 55,
 		SEPARATION_RADIUS = 40,
 		MAX_SPEED = 0.1,
-		COHESION_WEIGHT = 0.0004,
-		ALIGN_WEIGHT = 0.05,
+		COHESION_WEIGHT = 0.00025,
+		ALIGN_WEIGHT = 0.035,
 		SEPARATION_WEIGHT = 0.3;
 
 	function initCanvas(width,height){
@@ -62,9 +62,28 @@ $(function() {
 	ParticleRenderingComponent.prototype = new GameComponent();
 	ParticleRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			context.fillStyle = "#000000";
+			context.fillStyle = parent.colour || "#000000";
 			context.beginPath();
 			context.arc(parent.position[0],parent.position[1],2,0,Math.PI*2,false);
+			context.fill();
+		});
+	};
+
+
+	function GridSquareRenderingComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	}
+	GridSquareRenderingComponent.prototype = new GameComponent();
+	GridSquareRenderingComponent.prototype.update = function(parent, delta) {
+		this.renderSystem.push(function(context){
+			var size = 10,
+					x = parent.position[0],//Math.floor(parent.position[0]/size)*size,
+					y = parent.position[1],//Math.floor(parent.position[1]/size)*size,
+					w = size,
+					h = size;
+			context.fillStyle = parent.colour || "#000000";
+			context.beginPath();
+			context.rect(x,y,w,h);
 			context.fill();
 		});
 	};
@@ -145,6 +164,12 @@ $(function() {
 			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
 			particle.mass = 0.01;
 
+
+			var r = Math.random()*255,
+					g = Math.random()*255,
+					b = Math.random()*255;
+			particle.colour = "rgba("+r.toFixed()+","+g.toFixed()+","+b.toFixed()+",0.75)";
+
 			particle.addComponent(new GEC.MoveComponent());
 			particle.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
 
@@ -154,7 +179,8 @@ $(function() {
 				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
 			}
 
-			particle.addComponent(new ParticleRenderingComponent(renderSystem));
+			particle.addComponent(new GridSquareRenderingComponent(renderSystem));
+			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
 
 			flock.addObject(particle);
 			particles.push(particle);
