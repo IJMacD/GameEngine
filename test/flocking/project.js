@@ -21,7 +21,7 @@ $(function() {
 		SEPARATION_RADIUS = 40,
 		MAX_SPEED = 0.1,
 		COHESION_WEIGHT = 0.00025,
-		ALIGN_WEIGHT = 0.035,
+		ALIGN_WEIGHT = 0.015,
 		SEPARATION_WEIGHT = 0.3;
 
 	function initCanvas(width,height){
@@ -76,7 +76,7 @@ $(function() {
 	GridSquareRenderingComponent.prototype = new GameComponent();
 	GridSquareRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			var size = 10,
+			var size = Math.pow(10,(parent.position[2] + 1000) / 1000),
 					x = parent.position[0],//Math.floor(parent.position[0]/size)*size,
 					y = parent.position[1],//Math.floor(parent.position[1]/size)*size,
 					w = size,
@@ -161,7 +161,7 @@ $(function() {
 			vec2.scale(vecNorm, vecNorm, len);
 			particle = new GameObject();
 			particle.setPosition(-x,-y,0);
-			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
+			particle.setVelocity(vecNorm[0], vecNorm[1], x * y);
 			particle.mass = 0.01;
 
 
@@ -171,12 +171,12 @@ $(function() {
 			particle.colour = "rgba("+r.toFixed()+","+g.toFixed()+","+b.toFixed()+",0.75)";
 
 			particle.addComponent(new GEC.MoveComponent());
-			particle.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2]));
+			particle.addComponent(new GEC.WorldWrapComponent([-canvasWidth/2,-canvasHeight/2,canvasWidth/2,canvasHeight/2,-1000,1000]));
 
 			particle.addComponent(new FlockingComponent());
 
-			//particle.addComponent(new GridSquareRenderingComponent(renderSystem));
-			particle.addComponent(new ParticleRenderingComponent(renderSystem));
+			particle.addComponent(new GridSquareRenderingComponent(renderSystem));
+			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
 
 			flock.addObject(particle);
 			particles.push(particle);

@@ -43,6 +43,8 @@ var GE = (function(GE){
 		this.ay = bounds[1];
 		this.bx = bounds[2];
 		this.by = bounds[3];
+		this.az = bounds[4];
+		this.bz = bounds[5];
 	};
 
 	WorldWrapComponent.prototype = new GE.GameComponent();
@@ -59,6 +61,12 @@ var GE = (function(GE){
 		}
 		else if(parent.position[1] > this.by){
 			parent.position[1] = this.ay;
+		}
+		if(parent.position[2] < this.az){
+			parent.position[2] = this.bz;
+		}
+		else if(parent.position[2] > this.bz){
+			parent.position[2] = this.az;
 		}
 	};
 
