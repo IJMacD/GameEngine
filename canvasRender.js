@@ -12,6 +12,7 @@ var GE = (function(GE){
 		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
+		this.clearScreen = true;
 	}
 	GE.CanvasRenderSystem = CanvasRenderSystem;
 	CanvasRenderSystem.prototype = new GE.GameObject();
@@ -23,8 +24,10 @@ var GE = (function(GE){
 		this.renderQueue[layer].push(renderable);
 	};
 	CanvasRenderSystem.prototype.update = function(delta) {
-		this.context.fillStyle = "#ffffff";
-		this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
+		if(this.clearScreen){
+			this.context.fillStyle = "#ffffff";
+			this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
+		}
 
 		this.context.save();
 
@@ -62,15 +65,24 @@ var GE = (function(GE){
 	function drawPath(context, path){
 		var i = 2,
 			l = path.length,
-			v;
+			v,
+			p_1 = vec2.create(),
+			p_2 = vec2.create();
 		context.beginPath();
 		// v = this.cameraSystem.worldToScreen(path[0],path[1]);
 		// context.moveTo(v.x,v.y);
+		vec2.set(p_1, path[0], path[1]);
 		context.moveTo(path[0],path[1]);
 		for(;i<l-1;i+=2){
 			// v = this.cameraSystem.worldToScreen(path[i],path[i+1]);
 			// context.lineTo(v.x,v.y);
-			context.lineTo(path[i],path[i+1]);
+			vec2.set(p_2, path[i], path[i+1]);
+			if(vec2.dist(p_1, p_2) > 50){
+				context.moveTo(path[i],path[i+1]);
+			}else{
+				context.lineTo(path[i],path[i+1]);
+			}
+			vec2.copy(p_1, p_2);
 		}
 	}
 	// Convenience
