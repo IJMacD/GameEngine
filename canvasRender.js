@@ -12,6 +12,7 @@ var GE = (function(GE){
 		this.canvasHeight = canvasHeight;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
+		this.clearScreen = true;
 	}
 	GE.CanvasRenderSystem = CanvasRenderSystem;
 	CanvasRenderSystem.prototype = new GE.GameObject();
@@ -23,8 +24,10 @@ var GE = (function(GE){
 		this.renderQueue[layer].push(renderable);
 	};
 	CanvasRenderSystem.prototype.update = function(delta) {
-		this.context.fillStyle = "#ffffff";
-		this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
+		if(this.clearScreen){
+			this.context.fillStyle = "#ffffff";
+			this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
+		}
 
 		this.context.save();
 

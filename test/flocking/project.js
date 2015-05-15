@@ -148,6 +148,7 @@ $(function() {
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
 	renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
 	cameraSystem.setScale(1);
+	renderSystem.clearScreen = false;
 
 	var boxSize = Math.floor(Math.sqrt(particleCount)),
 		offsetX = - boxSize * particleSep / 2,
@@ -179,8 +180,8 @@ $(function() {
 				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
 			}
 
-			particle.addComponent(new GridSquareRenderingComponent(renderSystem));
-			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
+			//particle.addComponent(new GridSquareRenderingComponent(renderSystem));
+			particle.addComponent(new ParticleRenderingComponent(renderSystem));
 
 			flock.addObject(particle);
 			particles.push(particle);
