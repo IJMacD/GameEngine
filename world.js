@@ -2,6 +2,9 @@ var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
 
+	var GameObject = GE.GameObject,
+			GameComponent = GE.GameComponent;
+
 	function WorldSystem(bounds){
 		this.bounds = bounds;
 	}
@@ -17,7 +20,7 @@ var GE = (function(GE){
 	WorldBounceComponent.prototype = new GE.GameComponent();
 
 	WorldBounceComponent.prototype.update = function(parent, delta) {
-		var coef = 0.9,
+		var coef = 0.4,
 				friction = 0.9;
 
 		this.bx1 = this.worldSystem.bounds[0] + this.ax;
@@ -80,6 +83,15 @@ var GE = (function(GE){
 			parent.position[2] = this.az;
 		}
 	};
+
+	GameComponent.create(function DrawBoundsComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	},{
+		update: function(parent, delta){
+			var b = parent.bounds;
+			this.renderSystem.strokePath([b[0], b[1], b[0], b[3], b[2], b[3], b[2], b[1], b[0], b[1]]);
+		}
+	});
 
 	return GE;
 }(GE || {}));

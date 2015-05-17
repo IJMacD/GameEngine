@@ -34,6 +34,8 @@ var GE = (function(GE){
 				path = [px, py];
 
 			// Draw Path
+			// TODO: 1. Check for jumps, don't show
+			// TODO: 2. Don't use strokePath helper -- very inefficient
 			if(this.pathIndex > this.pathSize){
 				for(var i = this.pathSize-1;i>=0;i--){
 					var index = (i + skip + this.pathSize) % this.pathSize;

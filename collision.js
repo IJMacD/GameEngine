@@ -2,18 +2,16 @@ var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
 
-	var GameComponent = GE.GameComponent,
-		GameObjectManager = GE.GameObjectManager,
-		GEC = GE.Comp;
+	var GameObject = GE.GameObject,
+			GameComponent = GE.GameComponent,
+			GameObjectManager = GE.GameObjectManager,
+			GEC = GE.Comp;
 
-	function BackgroundSystem(renderSystem, coords) {
-		this.renderSystem = renderSystem;
+	function BackgroundSystem() {
 		this.surfaces = [];
-		if(coords)
-			this.surfaces.push(coords);
 	}
 	GE.BackgroundSystem = BackgroundSystem;
-	BackgroundSystem.prototype = new GE.GameObject();
+	BackgroundSystem.prototype = new GameObject();
 	BackgroundSystem.prototype.addSurface = function(surface) {
 		this.surfaces.push(surface);
 	};
@@ -22,35 +20,12 @@ var GE = (function(GE){
 			this.surfaces.push(surfaces[i]);
 		}
 	};
+	BackgroundSystem.prototype.clearSurfaces = function(){
+		this.surfaces.length = 0;
+	}
 	BackgroundSystem.prototype.update = function(delta) {
-		var s = this.surfaces,
-			j = 0,
-			m = s.length,
-			i, c, l;
-		for(; j<m; j++){
-			this.renderSystem.strokePath(s[j],"#000");
-		}
-
-		// Draw Normals
-		if(GE.DEBUG){
-			for(j=0; j<m; j++){
-				c = this.surfaces[j];
-				l = c.length;
-				for(i=0;i<l-3;i+=2){
-					var x1 = c[i],
-						y1 = c[i+1],
-						x2 = c[i+2],
-						y2 = c[i+3],
-						dx = x2 - x1,
-						dy = y2 - y1,
-						mx = x1 + dx * 0.5,
-						my = y1 + dy * 0.5,
-						nx = dy / Math.sqrt(dy * dy + dx * dx),
-						ny = -dx / Math.sqrt(dy * dy + dx * dx);
-					this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f');
-				}
-			}
-		}
+		// Background System updates
+		GameObject.prototype.update.call(this, delta);
 	};
 
 	var u = vec2.create(),
@@ -81,7 +56,7 @@ var GE = (function(GE){
 			p_u,
 			//theta,
 			f = 0.95,
-			e = 0.2,
+			e = 0.4,
 			parentX = parent.position[0],
 			parentY = parent.position[1];
 		if(this.lastX &&
@@ -128,6 +103,41 @@ var GE = (function(GE){
 	function cross(a, b){
 		return a[0]*b[1] - a[1]*b[0];
 	}
+
+	GameComponent.create(function DrawSurfacesComponent(renderSystem){
+		this.renderSystem = renderSystem;
+	},{
+		update: function(parent, delta){
+			var s = parent.surfaces,
+				j = 0,
+				m = s.length,
+				i, c, l;
+			for(; j<m; j++){
+				this.renderSystem.strokePath(s[j],"#000");
+			}
+
+			// Draw Normals
+			if(GE.DEBUG){
+				for(j=0; j<m; j++){
+					c = parent.surfaces[j];
+					l = c.length;
+					for(i=0;i<l-3;i+=2){
+						var x1 = c[i],
+							y1 = c[i+1],
+							x2 = c[i+2],
+							y2 = c[i+3],
+							dx = x2 - x1,
+							dy = y2 - y1,
+							mx = x1 + dx * 0.5,
+							my = y1 + dy * 0.5,
+							nx = dy / Math.sqrt(dy * dy + dx * dx),
+							ny = -dx / Math.sqrt(dy * dy + dx * dx);
+						this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f');
+					}
+				}
+			}
+		}
+	})
 
 	return GE;
 }(GE || {}));

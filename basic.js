@@ -56,8 +56,21 @@ var GE = (function(GE){
 	GEC.RotateToHeadingComponent = RotateToHeadingComponent;
 	RotateToHeadingComponent.prototype = new GameComponent();
 	RotateToHeadingComponent.prototype.update = function(parent, delta) {
-		parent.setRotation(Math.atan2(parent.velocity[1], parent.velocity[0]) + Math.PI / 2);
+		parent.targetRotation = Math.atan2(parent.velocity[1], parent.velocity[0]) + Math.PI / 2;
 	};
+
+	GameComponent.create(function RotationInterpolatorComponent() {}, {
+		update: function(parent, delta) {
+			var rotation = parent.rotation,
+					target = parent.targetRotation,
+					diff = target - rotation,
+					speed = 0.01;
+			if(diff > Math.PI){
+				diff -= Math.PI * 2;
+			}
+			parent.rotation = rotation + diff * delta * speed;
+		}
+	});
 
 	function AnimatedSpriteComponent(images, speed){
 		this.images = images;
@@ -94,11 +107,38 @@ var GE = (function(GE){
 		}
 	});
 
+	GameComponent.create(function TrackRotationComponent(object) {
+		this.target = object;
+	}, {
+		update: function(parent, delta) {
+			parent.rotation = this.target.rotation + Math.PI;
+		}
+	});
+
 	GameComponent.create(function CounterRotationComponent(object) {
 		this.target = object;
 	}, {
 		update: function(parent, delta) {
 			parent.rotation = -this.target.rotation;
+		}
+	});
+
+	GameComponent.create(function SwitchComponent(switchObject, switchProperty) {
+		this.components = [];
+		this.object = switchObject;
+		this.prop = switchProperty;
+	}, {
+		addComponent: function(component){
+			this.components.push(component);
+		},
+		update: function(parent, delta) {
+			var i = 0,
+					l = this.components.length;
+			if(this.object[this.prop]){
+				for(;i<l;i++){
+					this.components[i].update(parent, delta);
+				}
+			}
 		}
 	});
 
