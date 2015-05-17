@@ -6,10 +6,9 @@ var GE = (function(GE){
 		GameObjectManager = GE.GameObjectManager,
 		GEC = GE.Comp;
 
-	function CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem){
+	function CanvasRenderSystem(context, cameraSystem){
 		this.context = context;
-		this.canvasWidth = canvasWidth;
-		this.canvasHeight = canvasHeight;
+		this.canvas = context.canvas;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
 		this.clearScreen = true;
@@ -26,16 +25,14 @@ var GE = (function(GE){
 	CanvasRenderSystem.prototype.update = function(delta) {
 		if(this.clearScreen){
 			this.context.fillStyle = "#ffffff";
-			this.context.fillRect(0,0,this.canvasWidth,this.canvasHeight);
+			this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
 		}
 
 		this.context.save();
 
-		var m = this.cameraSystem.getTransformMatrix().values,
-			p = this.cameraSystem.position,
-			q = this.canvasWidth / 2,
-			r = this.canvasHeight / 2;
-		// this.context.setTransform(m[0][0],m[1][0],m[0][1],m[1][1],-p.x,-p.y);
+		var p = this.cameraSystem.position,
+				q = this.canvas.width / 2,
+				r = this.canvas.height / 2;
 
 		this.context.translate(q,r);
 		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
@@ -58,31 +55,14 @@ var GE = (function(GE){
 
 		this.renderQueue = [];
 	};
-	CanvasRenderSystem.prototype.setCanvasSize = function(width, height){
-		this.canvasWidth = width;
-		this.canvasHeight = height;
-	}
+
 	function drawPath(context, path){
 		var i = 2,
-			l = path.length,
-			v,
-			p_1 = vec2.create(),
-			p_2 = vec2.create();
+				l = path.length;
 		context.beginPath();
-		// v = this.cameraSystem.worldToScreen(path[0],path[1]);
-		// context.moveTo(v.x,v.y);
-		vec2.set(p_1, path[0], path[1]);
 		context.moveTo(path[0],path[1]);
 		for(;i<l-1;i+=2){
-			// v = this.cameraSystem.worldToScreen(path[i],path[i+1]);
-			// context.lineTo(v.x,v.y);
-			vec2.set(p_2, path[i], path[i+1]);
-			if(vec2.dist(p_1, p_2) > 300){
-				context.moveTo(path[i],path[i+1]);
-			}else{
-				context.lineTo(path[i],path[i+1]);
-			}
-			vec2.copy(p_1, p_2);
+			context.lineTo(path[i],path[i+1]);
 		}
 	}
 	// Convenience
