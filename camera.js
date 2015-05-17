@@ -5,40 +5,33 @@ var GE = (function(GE){
 	var GameComponent = GE.GameComponent,
 		GEC = GE.Comp;
 
-	function CameraSystem (initX,initY,width,height) {
-		GE.GameObject.apply(this,arguments);
-		this.width = width;
-		this.height = height;
-		this.watchObject = null;
+	function CameraSystem (screen) {
+
 		this.pruneList = [];
 		this.suspendedObjects = [];
-		this.skew = 0;
 		this.skewX = this.skew;
 		this.skeyY = this.skew;
-		this.scale = 1;
 		this.scaleX = this.scale;
 		this.scaleY = this.scale;
 		this.rotation = 0;
-		// this.angle = 0;
-		this.rotMat = Matrix.rotationMatrix(this.rotation);
-		this.scaleMatrix = Matrix.scaleMatrix(this.scaleX, this.scaleY);
-		this.shearMatrix = Matrix.shearMatrix(this.skewX, this.skewY);
-		// this.worldVec = new Vector2();
-		// this.screenVec = new Vector2();
-		// this.pruneVec = new Vector2();
-		this.rotationAxis = [1,0,0];
-		this.transformMatrix = mat4.create();
+		this.rotationAxis = vec3.create();
+		vec3.set(this.rotationAxis, 0, 0, 1);
+
+		this.screen = screen;
 	}
 	GE.CameraSystem = CameraSystem;
 	CameraSystem.prototype = new GE.GameObject();
-	CameraSystem.prototype.setScreenSize = function(width, height){
-		this.width = width;
-		this.height = height;
-	}
+
 	CameraSystem.prototype.setScale = function(scaleX, scaleY){
 		scaleY = scaleY || scaleX;
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
+	}
+	CameraSystem.prototype.setRotation = function(rotation, rotationAxis){
+		this.rotation = rotation;
+		if(rotationAxis && rotationAxis.length == 3){
+			vec3.normalize(this.rotationAxis, rotationAxis);
+		}
 	}
 	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
 		if(objectManager instanceof GE.GameObjectManager)
@@ -54,12 +47,21 @@ var GE = (function(GE){
 		return v;
 	};
 	CameraSystem.prototype.screenToWorld = function(screenX,screenY){
-		var v = this.screenVec.set(screenX, screenY);
-		v.subtract(this.width / 2, this.height / 2);
-		v.leftMultiply(this.rotMat.inverse());
-		v.leftMultiply(this.scaleMatrix.inverse());
-		v.leftMultiply(this.shearMatrix.inverse());
-		v.add(this.position);
+		var v = vec2.create(),
+				rotMat = mat2.create();
+
+		vec2.set(v,
+				screenX - this.screen.width / 2,
+				-screenY + this.screen.height / 2);
+
+		vec2.set(v, v[0] / this.scaleX, v[1] / this.scaleY);
+
+		if(this.rotationAxis[2] == 1){
+			mat2.rotate(rotMat, rotMat, -this.rotation);
+			vec2.transformMat2(v, v, rotMat);
+		}
+
+		vec2.add(v, v, this.position);
 		return v;
 	};
 	CameraSystem.prototype.getTransformMatrix = function(){
