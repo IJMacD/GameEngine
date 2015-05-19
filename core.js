@@ -2,7 +2,8 @@ var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
 
-	var GEC = GE.Comp;
+	var GEC = GE.Comp,
+			instanceCount = 0;
 
 	// Exported at end.
 
@@ -16,6 +17,11 @@ var GE = (function(GE){
 		this.team = 0;
 
 		this.components.remove = arrayRemoveItem;
+
+		if(this.name == "[GameObject]"){
+			this.name = "[GameObject #" + instanceCount + "]";
+		}
+		instanceCount++;
 	};
 
 	GameObject.prototype = {
@@ -84,8 +90,8 @@ var GE = (function(GE){
 		},
 		toHTML: function() {
 			var html = this.name;
-			if(typeof this.position.x == "number")
-				html += " " + this.position;
+			if(typeof this.position[0] == "number")
+				html += " (" + this.position[0].toFixed(2) + "," + this.position[1].toFixed(2) + "," + this.position[2].toFixed(2) + ")";
 			if(this.components.length){
 				html += "<ul>";
 				for(var i=0;i<this.components.length;i++)
@@ -93,11 +99,16 @@ var GE = (function(GE){
 				html += "</ul>";
 			}
 			return html;
-		}
+		},
+		toString: function(){
+			return this.name;
+		},
+		name: "[GameObject]"
 	};
 
 	function GameObjectManager (){
 		GameObject.call(this);
+		this.name = "[GameObjectManager]";
 
 		this.objects = [];
 		this.objectsToBeRemoved = [];
@@ -174,10 +185,12 @@ var GE = (function(GE){
 	};
 	GameComponent.create = function(constructor, properties){
 		constructor.prototype = new GameComponent();
+		constructor.prototype.name = constructor.name;
 		for(prop in properties){
 			constructor.prototype[prop] = properties[prop];
 		}
 		GEC[constructor.name] = constructor;
+		return constructor;
 	}
 
 	function arrayRemoveItem(from, to) {

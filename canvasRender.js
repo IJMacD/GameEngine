@@ -16,6 +16,7 @@ var GE = (function(GE){
 	}
 	GE.CanvasRenderSystem = CanvasRenderSystem;
 	CanvasRenderSystem.prototype = new GE.GameObject();
+	CanvasRenderSystem.prototype.name = "CanvasRenderSystem";
 	CanvasRenderSystem.prototype.push = function(renderable, layer){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {

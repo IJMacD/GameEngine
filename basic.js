@@ -23,15 +23,20 @@ var GE = (function(GE){
 			var scale = this.target.mass*delta/vec3.squaredLength(this.vector);
 			vec3.normalize(this.vector, this.vector);
 			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
+		},
+		toHTML: function(){
+			return "PointGravityComponent(" + this.target + ")";
 		}
 	});
 
-	function MoveComponent () {};
-	GEC.MoveComponent = MoveComponent;
-	MoveComponent.prototype = new GameComponent();
-	MoveComponent.prototype.update = function(parent, delta) {
-		vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
-	};
+	GameComponent.create(
+		function MoveComponent () {},
+		{
+			update: function(parent, delta) {
+				vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
+			}
+		}
+	);
 
 
 	function RandomMotionComponent(){}
@@ -43,14 +48,15 @@ var GE = (function(GE){
 	};
 
 
-	function RotationComponent (dth) {
-		this.rotationSpeed = dth;
-	};
-	GEC.RotationComponent = RotationComponent;
-	RotationComponent.prototype = new GameComponent();
-	RotationComponent.prototype.update = function(parent, delta) {
-		parent.setRotation(parent.rotation + this.rotationSpeed * delta);
-	};
+	GameComponent.create(
+		function RotationComponent (dth) {
+			this.rotationSpeed = dth;
+		}, {
+			update: function(parent, delta) {
+				parent.setRotation(parent.rotation + this.rotationSpeed * delta);
+			}
+		}
+	);
 
 	function AnimatedSpriteComponent(images, speed){
 		this.images = images;

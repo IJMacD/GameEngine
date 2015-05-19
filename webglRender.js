@@ -21,6 +21,7 @@ var GE = (function(GE){
         this.pointLighting = 1.4;
     };
     GE.WebGLRenderSystem.prototype = new GE.GameObject();
+    GE.WebGLRenderSystem.prototype.name = "WebGLRenderSystem";
     GE.WebGLRenderSystem.prototype.push = function(renderable){
         this.renderQueue.push(renderable);
     };

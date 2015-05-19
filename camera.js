@@ -31,6 +31,7 @@ var GE = (function(GE){
 	}
 	GE.CameraSystem = CameraSystem;
 	CameraSystem.prototype = new GE.GameObject();
+	CameraSystem.prototype.name = "CameraSystem";
 	CameraSystem.prototype.setScreenSize = function(width, height){
 		this.width = width;
 		this.height = height;

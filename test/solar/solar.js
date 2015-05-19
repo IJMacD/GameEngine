@@ -259,20 +259,21 @@ $(function() {
     cameraSystem2.setScale(cameraDistance2);
     cameraSystem2.rotationAxis = [1,0,0];
 
-    function DotRenderingComponent(renderSystem, color){
+    var DotRenderingComponent = GameComponent.create(
+      function DotRenderingComponent(renderSystem, color){
         this.renderSystem = renderSystem;
         this.color = color || "#000";
-    }
-    DotRenderingComponent.prototype = new GameComponent();
-    DotRenderingComponent.prototype.update = function(parent, delta) {
-        var color = this.color;
-        this.renderSystem.push(function(context){
-            context.fillStyle = color;
-            context.beginPath();
-            context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
-            context.fill();
-        });
-    };
+      }, {
+        update: function(parent, delta) {
+          var color = this.color;
+          this.renderSystem.push(function(context){
+              context.fillStyle = color;
+              context.beginPath();
+              context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
+              context.fill();
+          });
+        }
+      });
 
     sun = new GameObject();
 
@@ -280,7 +281,7 @@ $(function() {
         cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        dotRenderer = new DotRenderingComponent(renderSystem2),
+        dotRenderer = new GEC.DotRenderingComponent(renderSystem2),
         // http://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
         sizes = [0.383,0.949,1,0.532,11.21,9.45,4.01,3.88],
         masses = [0.0553,0.815,1,0.107,317.8,95.2,14.5,17.1],
@@ -399,6 +400,7 @@ $(function() {
     gameRoot.addObject(cameraSystem);
     gameRoot.addObject(renderSystem);
 
+    drawGraph(gameRoot);
 
     function loop(time){
         requestAnimationFrame(loop);
@@ -406,5 +408,22 @@ $(function() {
         lastTime = time;
     }
     loop(0);
+
+    function drawGraph(gameObject){
+      var html = gameObject.toHTML();
+      $('#graph').html(html);
+    }
+
+    function gameObjectToGraph(gameObject){
+      if(gameObject instanceof GE.GameObjectManager){
+        return "<li>[GameObjectManager]<ul>" + gameObject.objects.map(gameObjectToGraph).join("") + "</ul>";
+      }
+      if(gameObject instanceof GE.GameObject){
+        return "<li>[GameObject]<ul>" + gameObject.components.map(gameObjectToGraph).join("") + "</ul>";
+      }
+      if(gameObject instanceof GE.GameComponent){
+        return "<li>[GameComponent]" + gameObject.toHTML();
+      }
+    }
 
 });
