@@ -291,12 +291,14 @@ $(function() {
 
         sunSize = scaleSize(109.2);
 
+    sun.setPosition(0,200,0);
     sun.mass = 1;
     sun.size = vec3.fromValues(sunSize,sunSize,sunSize);
     sun.rotationAxis = vec3.fromValues(0,1,0);
     sun.addComponent(new GEC.RotationComponent(-0.001));
     sun.addComponent(sphereRenderer);
     sun.addComponent(dotRenderer);
+    sun.addComponent(new GEC.LightSourceComponent(renderSystem));
     sun.texture = textures[0];
 
     cameraSystem.addComponent(new DotRenderingComponent(renderSystem2,"#f00"));
@@ -319,15 +321,15 @@ $(function() {
 
     gameRoot.addObject(sun);
 
-    var satellite = new GE.GameObject();
-    satellite = new GameObject();
-    var p = scaleDist(distances[2] + 0.00257),
+    var satellite = new GE.GameObject(),
+        p = scaleDist(distances[2] + 0.00257),
         v = posToVelocity(p),
         s = scaleSize(0.25);
-    satellite.setPosition(p, 0, 0);
+    satellite.setPosition(p, 200, 0);
     satellite.setVelocity(0, 0, v);
     satellite.size = vec3.fromValues(s,s,s);
     satellite.texture = textures[10];
+    satellite.lighting = true;
 
     satellite.addComponent(moveComponent);
     satellite.addComponent(pointGravityComponent);

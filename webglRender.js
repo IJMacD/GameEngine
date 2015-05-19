@@ -19,6 +19,7 @@ var GE = (function(GE){
         this.spareVector = vec3.create();
         this.ambientLight = 0.3;
         this.pointLighting = 1.4;
+        this.lightPosition = vec3.create();
     };
     GE.WebGLRenderSystem.prototype = new GE.GameObject();
     GE.WebGLRenderSystem.prototype.push = function(renderable){
@@ -54,6 +55,18 @@ var GE = (function(GE){
         this.canvasWidth = width;
         this.canvasHeight = height;
     }
+    GE.WebGLRenderSystem.prototype.setLightPosition = function(x, y, z){
+        if(x.length){
+          this.lightPosition[0] = x[0];
+          this.lightPosition[1] = x[1];
+          this.lightPosition[2] = x[2];
+        }
+        else{
+          this.lightPosition[0] = x;
+          this.lightPosition[1] = y;
+          this.lightPosition[2] = z;
+        }
+    }
 
     GE.WebGLRenderSystemManager = function WebGLRenderSystemManager(){};
     GE.WebGLRenderSystemManager.prototype = new GameObjectManager();
@@ -62,6 +75,14 @@ var GE = (function(GE){
             this.objects[i].push(renderable);
         };
     }
+
+    GameComponent.create(function LightSourceComponent(renderSystem){
+      this.renderSystem = renderSystem;
+    },{
+      update: function(parent, delta){
+        this.renderSystem.setLightPosition(parent);
+      }
+    });
 
     GameComponent.create(function PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices){
         var gl = renderSystem.context;
@@ -133,7 +154,7 @@ var GE = (function(GE){
                 if(lighting){
                     gl.uniform3f(shaderProgram.ambientColorUniform, this.ambientLight, this.ambientLight, this.ambientLight);
 
-                    gl.uniform3f(shaderProgram.pointLightingLocationUniform, 0.0, 0.0, 0.0);
+                    gl.uniform3f(shaderProgram.pointLightingLocationUniform, this.lightPosition[0], this.lightPosition[1], this.lightPosition[2]);
 
                     gl.uniform3f(shaderProgram.pointLightingColorUniform, this.pointLighting, this.pointLighting, this.pointLighting);
                 }
