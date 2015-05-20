@@ -8,7 +8,7 @@ var GE = (function(GE){
 
 	function CanvasRenderSystem(context, cameraSystem){
 		this.context = context;
-		this.canvas = context.canvas;
+		this.canvas = context && context.canvas;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
 		this.clearScreen = true;
@@ -76,6 +76,31 @@ var GE = (function(GE){
 			drawPath.call(this, context, path);
 			context.stroke();
 		}, layer);
+	};
+
+	function MultiRenderSystem(){
+		this.renderSystems = [];
+	}
+	GE.MultiRenderSystem = MultiRenderSystem;
+	MultiRenderSystem.prototype = new CanvasRenderSystem();
+	MultiRenderSystem.prototype.addRenderSystem = function(renderSystem){
+		this.renderSystems.push(renderSystem);
+	};
+	MultiRenderSystem.prototype.push = function(renderable, layer){
+		var renderSystems = this.renderSystems
+				i = 0,
+				l = renderSystems.length;
+		for(;i<l;i++){
+			renderSystems[i].push(renderable, layer);
+		}
+	};
+	MultiRenderSystem.prototype.update = function(delta){
+		var renderSystems = this.renderSystems
+				i = 0,
+				l = renderSystems.length;
+		for(;i<l;i++){
+			renderSystems[i].update(delta);
+		}
 	};
 
 
