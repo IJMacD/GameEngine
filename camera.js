@@ -2,10 +2,12 @@ var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
 
-	var GameComponent = GE.GameComponent,
-		GEC = GE.Comp;
+	var GameObject = GE.GameObject,
+			GameComponent = GE.GameComponent,
+			GEC = GE.Comp;
 
 	function CameraSystem (screen) {
+		GameObject.call(this);
 
 		this.pruneList = [];
 		this.suspendedObjects = [];
