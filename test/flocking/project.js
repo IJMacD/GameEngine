@@ -16,15 +16,16 @@ $(function() {
 
 	function GridSquareRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
+		this.snap = true;
 	}
 	GridSquareRenderingComponent.prototype = new GE.GameComponent();
 	GridSquareRenderingComponent.prototype.update = function(parent, delta) {
+		var size = Math.pow(10,(parent.position[2] + 1000) / 1000),
+				x = this.snap ? Math.floor(parent.position[0]/size)*size : parent.position[0],
+				y = this.snap ? Math.floor(parent.position[1]/size)*size : parent.position[1],
+				w = size,
+				h = size;
 		this.renderSystem.push(function(context){
-			var size = Math.pow(10,(parent.position[2] + 1000) / 1000),
-					x = parent.position[0],//Math.floor(parent.position[0]/size)*size,
-					y = parent.position[1],//Math.floor(parent.position[1]/size)*size,
-					w = size,
-					h = size;
 			context.fillStyle = parent.colour || "#000000";
 			context.beginPath();
 			context.rect(x,y,w,h);
@@ -79,8 +80,7 @@ $(function() {
 				if(dist < SEPARATION_RADIUS){
 					vec3.subtract(self.spare, parent.position, other.position);
 					vec3.normalize(self.spare, self.spare);
-					vec3.scale(self.spare, self.spare, 1 / dist);
-					vec3.add(self.separation, self.separation, self.spare);
+					vec3.scaleAndAdd(self.separation, self.separation, self.spare, 1 / dist);
 				}
 
 				count++;
@@ -90,20 +90,15 @@ $(function() {
 		if(count > 0){
 			vec3.scale(this.cohesion, this.cohesion, 1 / count);
 			vec3.subtract(this.cohesion, this.cohesion, parent.position);
-			vec3.scale(this.cohesion, this.cohesion, COHESION_WEIGHT);
-			vec3.add(parent.velocity, parent.velocity, this.cohesion);
+			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.cohesion, COHESION_WEIGHT);
 
-			vec3.scale(this.align, this.align, 1 / count);
-			vec3.scale(this.align, this.align, ALIGN_WEIGHT);
-			vec3.add(parent.velocity, parent.velocity, this.align);
+			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.align, ALIGN_WEIGHT / count);
 
-			vec3.scale(this.separation, this.separation, 1/ count);
-			vec3.scale(this.separation, this.separation, SEPARATION_WEIGHT);
-			vec3.add(parent.velocity, parent.velocity, this.separation);
+			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.separation, SEPARATION_WEIGHT / count);
 
-			if(vec3.length(parent.velocity) > MAX_SPEED){
-				vec3.normalize(parent.velocity, parent.velocity);
-				vec3.scale(parent.velocity, parent.velocity, MAX_SPEED);
+			var mag = vec3.length(parent.velocity);
+			if(mag > MAX_SPEED){
+				vec3.scale(parent.velocity, parent.velocity, MAX_SPEED / mag);
 			}
 		}
 	};
@@ -115,18 +110,23 @@ $(function() {
 
 			canvas = $('#surface'),
 			context = canvas[0].getContext("2d"),
+			canvas2 = $('#surface2'),
+			context2 = canvas2[0].getContext("2d"),
 			canvasWidth = canvas.width(),
 			canvasHeight = canvas.height(),
 			gameRoot = new GE.GameObjectManager(),
 			flock = new GE.GameObjectManager(),
 			cameraSystem,
 			renderSystem,
+			renderSystem1,
+			cameraSystem2,
+			renderSystem2,
 			backgroundSystem,
 			temporaryBackgroundSystem,
 			worldSystem,
 			worldBounds,
 			particle,
-			particleCount = 40,
+			particleCount = 400,
 			particleSep = 50,
 			particles = [],
 			lastTime = 0,
@@ -150,12 +150,12 @@ $(function() {
 				flocking: true
 			},
 
-			NEIGHBOUR_RADIUS = 55,
-			SEPARATION_RADIUS = 40,
+			NEIGHBOUR_RADIUS = 80,
+			SEPARATION_RADIUS = 35,
 			MAX_SPEED = 0.1,
-			COHESION_WEIGHT = 0.00025,
-			ALIGN_WEIGHT = 0.035,
-			SEPARATION_WEIGHT = 0.3;
+			COHESION_WEIGHT = 0.1 * MAX_SPEED / NEIGHBOUR_RADIUS,
+			ALIGN_WEIGHT = 30 * MAX_SPEED / NEIGHBOUR_RADIUS,
+			SEPARATION_WEIGHT = 6.125 / SEPARATION_RADIUS;
 
 	GE.DEBUG = false;
 
@@ -166,6 +166,8 @@ $(function() {
 		// canvasHeight = height||canvas.height();
 		canvas[0].width = canvasWidth;
 		canvas[0].height = canvasHeight;
+		canvas2[0].width = canvasWidth;
+		canvas2[0].height = canvasHeight;
 	}
 
 	initCanvas();
@@ -185,49 +187,78 @@ $(function() {
 
 	canvas.on("mousedown", function(e){
 		var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
-		mouseLine = [ v[0], v[1] ];
+		if(mouseLine){
+			backgroundSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
+		}
+		mouseLine = v;
 	})
-	.on("mousemove", function(e){
+	.on('mousemove', function(e){
+		var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
 		if(mouseLine){
 			temporaryBackgroundSystem.clearSurfaces();
-
-			var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
-
-			mouseLine[2] = v[0];
-			mouseLine[3] = v[1];
-
-			temporaryBackgroundSystem.addSurface(mouseLine);
+			temporaryBackgroundSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
-	}).on("mouseup", function(){
-		mouseLine = null;
-	}).on("click", function(){
-		controlObj.gravity = !controlObj.gravity;
-		controlObj.flocking = !controlObj.flocking;
+	});
+
+	$(document.body).on("keyup", function(e){
+		if(e.which == 13){ // enter
+			mouseLine = null;
+			temporaryBackgroundSystem.clearSurfaces();
+		}
+		else if(e.which == 67){ // c
+			backgroundSystem.clearSurfaces();
+		}
+		else if(e.which == 71){ // g
+			controlObj.gravity = !controlObj.gravity;
+			controlObj.flocking = !controlObj.flocking;
+		}
 	});
 
 	worldBounds = [-canvasWidth/2, -canvasHeight/2, canvasWidth/2, canvasHeight/2];
+	// worldBounds = [-500, -500, 500, 500];
 	worldSystem = new GE.WorldSystem(worldBounds);
-	cameraSystem = new GE.CameraSystem(context.canvas, worldSystem);
-	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
-	cameraSystem.setScale(0.8);
+
+	cameraSystem = new GE.CameraSystem(context.canvas);
+	renderSystem1 = new GE.CanvasRenderSystem(context, cameraSystem);
+
+	cameraSystem2 = new GE.CameraSystem(context2.canvas);
+	renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
+
+	renderSystem = new GE.MultiRenderSystem();
+	renderSystem.addRenderSystem(renderSystem1);
+	// renderSystem.addRenderSystem(renderSystem2);
+
+	cameraSystem.setScale(1);
+	cameraSystem2.setScale(1.2);
+
 	worldSystem.addComponent(new GEC.DrawBoundsComponent(renderSystem));
-	//cameraSystem.setRotation(-Math.PI/4);
-	//cameraSystem.addComponent(new GEC.RotationComponent(0.00005));
+	// cameraSystem.setRotation(-Math.PI/4);
+	// cameraSystem.addComponent(new GEC.RotationComponent(0.00005));
 	backgroundSystem = new GE.BackgroundSystem();
-	//backgroundSystem.addSurface([worldBounds[0], worldBounds[1], worldBounds[0], worldBounds[3], worldBounds[2], worldBounds[3], worldBounds[2], worldBounds[1], worldBounds[0], worldBounds[1]]);
-	backgroundSystem.addSurface([20,40,40,20,40,-20,20,-40,-20,-40,-40,-20,-40,20,-20,40]);
+	// backgroundSystem.addSurface([worldBounds[0], worldBounds[1], worldBounds[0], worldBounds[3], worldBounds[2], worldBounds[3], worldBounds[2], worldBounds[1], worldBounds[0], worldBounds[1]]);
+	// backgroundSystem.addSurface([20,40,40,20,40,-20,20,-40,-20,-40,-40,-20,-40,20,-20,40]);
 	temporaryBackgroundSystem = new GE.BackgroundSystem(renderSystem);
 	surfacesRenderComponent = new GEC.DrawSurfacesComponent(renderSystem);
 	backgroundSystem.addComponent(surfacesRenderComponent);
-	temporaryBackgroundSystem.addComponent(surfacesRenderComponent);
-	//worldComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10);
-	//worldComponent = new GEC.WorldWrapComponent(worldSystem);
+	temporaryBackgroundSystem.addComponent(new GEC.DrawSurfacesComponent(renderSystem, '#88f'));
+
+	gridSquareRenderingComponent = new GridSquareRenderingComponent(renderSystem);
+	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
+	arrowRenderingComponent = new ArrowRenderingComponent(renderSystem);
+
+	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10);
+	worldWrapComponent = new GEC.WorldWrapComponent(worldSystem);
+
 	gravitySwitchComponent = new GEC.SwitchComponent(controlObj, "gravity");
 	gravitySwitchComponent.addComponent(new GEC.GravityComponent());
-	gravitySwitchComponent.addComponent(new GEC.WorldBounceComponent(worldSystem, 10, 10));
+	gravitySwitchComponent.addComponent(worldBounceComponent);
+	gravitySwitchComponent.addComponent(gridSquareRenderingComponent);
+
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
 	flockingSwitchComponent.addComponent(new FlockingComponent());
-	flockingSwitchComponent.addComponent(new GEC.WorldWrapComponent(worldSystem));
+	flockingSwitchComponent.addComponent(worldWrapComponent);
+	flockingSwitchComponent.addComponent(particleRenderingComponent);
+
 	rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
 	rotationInterpolatorComponent = new GEC.RotationInterpolatorComponent();
 
@@ -243,11 +274,7 @@ $(function() {
 			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
 			particle.mass = 0.01;
 
-
-			var r = Math.random()*255,
-					g = Math.random()*255,
-					b = Math.random()*255;
-			particle.colour = "rgba("+r.toFixed()+","+g.toFixed()+","+b.toFixed()+",0.75)";
+			particle.colour = (i < boxSize / 2) ? "rgba(255,128,128,0.75)" : "rgba(128,128,255,0.75)";
 
 			particle.addComponent(moveComponent);
 
@@ -259,26 +286,33 @@ $(function() {
 
 			//particle.addComponent(worldComponent);
 			particle.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
-			particle.addComponent(new GEC.BackgroundCollisionComponent(temporaryBackgroundSystem));
-
-			//particle.addComponent(new GridSquareRenderingComponent(renderSystem));
-			//particle.addComponent(new ParticleRenderingComponent(renderSystem));
-			particle.addComponent(new ArrowRenderingComponent(renderSystem));
+			//particle.addComponent(new GEC.BackgroundCollisionComponent(temporaryBackgroundSystem));
 
 			flock.addObject(particle);
 			particles.push(particle);
 		}
 	}
 
+	cameraSystem2.addComponent(new GEC.FollowComponent(particles[0]));
+	cameraSystem2.addComponent(new GEC.TrackRotationComponent(particles[0]));
 
-	// cameraSystem.addComponent(new GEC.FollowComponent(particles[0]));
-	// cameraSystem.addComponent(new GEC.TrackRotationComponent(particles[0]));
+	// particles[0].addComponent({
+	// 	update: function (parent, delta) {
+	// 		renderSystem.push(function (context) {
+	// 			context.beginPath();
+	// 			context.arc(parent.position[0], parent.position[1], NEIGHBOUR_RADIUS, 0, Math.PI * 2, false);
+	// 			context.arc(parent.position[0], parent.position[1], SEPARATION_RADIUS, 0, Math.PI * 2, false);
+	// 			context.stroke();
+	// 		});
+	// 	}
+	// })
 
 	gameRoot.addObject(flock);
 	gameRoot.addObject(worldSystem);
 	gameRoot.addObject(backgroundSystem);
 	gameRoot.addObject(temporaryBackgroundSystem);
 	gameRoot.addObject(cameraSystem);
+	gameRoot.addObject(cameraSystem2);
 	gameRoot.addObject(renderSystem);
 
 	function loop(time){

@@ -8,6 +8,7 @@ var GE = (function(GE){
 			GEC = GE.Comp;
 
 	function BackgroundSystem() {
+		GameObject.call(this);
 		this.surfaces = [];
 	}
 	GE.BackgroundSystem = BackgroundSystem;
@@ -104,8 +105,9 @@ var GE = (function(GE){
 		return a[0]*b[1] - a[1]*b[0];
 	}
 
-	GameComponent.create(function DrawSurfacesComponent(renderSystem){
+	GameComponent.create(function DrawSurfacesComponent(renderSystem, colour){
 		this.renderSystem = renderSystem;
+		this.colour = colour || "#000";
 	},{
 		update: function(parent, delta){
 			var s = parent.surfaces,
@@ -113,7 +115,7 @@ var GE = (function(GE){
 				m = s.length,
 				i, c, l;
 			for(; j<m; j++){
-				this.renderSystem.strokePath(s[j],"#000");
+				this.renderSystem.strokePath(s[j], parent.colour || this.colour);
 			}
 
 			// Draw Normals
