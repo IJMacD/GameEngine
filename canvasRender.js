@@ -47,16 +47,18 @@ var GE = (function(GE){
 		this.context.translate(-p[0],+p[2]);
 
 		for(var i = 0, l = this.renderQueue.length; i < l; i++){
-			for(var j = 0, n = this.renderQueue[i] && this.renderQueue[i].length; j < n; j++){
-				this.context.save();
-				this.renderQueue[i][j].call(this, this.context);
-				this.context.restore();
+			var queue = this.renderQueue[i];
+			if(queue){
+				for(var j = 0, n = queue.length; j < n; j++){
+					this.context.save();
+					queue[j].call(this, this.context);
+					this.context.restore();
+				}
+				queue.length = 0;
 			}
 		}
 
 		this.context.restore();
-
-		this.renderQueue = [];
 	};
 	CanvasRenderSystem.prototype.setCanvasSize = function(width, height){
 		this.canvasWidth = width;
