@@ -64,7 +64,7 @@ $(function() {
     });
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
-    renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
+    renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
     cameraSystem.setScale(0.2);
     cameraDistance = 0;
     cameraSystem.setPosition(0,0,cameraDistance);
@@ -81,7 +81,7 @@ $(function() {
         this.renderSystem.push(function(context){
             context.fillStyle = color;
             context.beginPath();
-            context.arc(parent.position[0],-parent.position[2],10,0,Math.PI*2,false);
+            context.arc(parent.position[0],parent.position[1],10,0,Math.PI*2,false);
             context.fill();
         });
     };
@@ -110,7 +110,7 @@ $(function() {
 
         planet = new GameObject();
         planet.setPosition(r, 0, 0);
-        planet.setVelocity(0, 0, v);
+        planet.setVelocity(0, v, 0);
         planet.rotationAxis = vec3.fromValues(0,1,0);
         planet.mass = 10;
 
@@ -127,15 +127,15 @@ $(function() {
 
         lagrange = new GameObject();
         lagrange.setPosition(l1, 0, 0);
-        lagrange.setVelocity(0, 0, v);
+        lagrange.setVelocity(0, v1, 0);
 
         lagrange.addComponent(moveComponent);
         lagrange.addComponent(pointGravityComponent);
         lagrange.addComponent(new GEC.PointGravityComponent(planet));
         lagrange.addComponent(new DotRenderingComponent(renderSystem, "#f00"));
+        lagrange.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
 
         gameRoot.addObject(lagrange);
-
 
     //cameraSystem.addComponent(new GEC.FollowComponent(planet));
 
