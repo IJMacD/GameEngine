@@ -103,10 +103,10 @@ $(function() {
 	};
 
 	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
-	renderSystem = new GE.CanvasRenderSystem(context, canvasWidth, canvasHeight, cameraSystem);
+	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
 	cameraSystem.setScale(1);
 	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
-	renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
+	renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
 	cameraSystem2.setScale(0.05);
 	energySystem = new EnergySystem(renderSystem);
 	energyMonitorComponent = new EnergyMonitorComponent(energySystem);
