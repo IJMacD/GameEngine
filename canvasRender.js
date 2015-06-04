@@ -24,15 +24,19 @@ var GE = (function(GE){
 	};
 	CanvasRenderSystem.prototype.update = function(delta) {
 		if(this.clearScreen){
-			this.context.fillStyle = "#ffffff";
-			this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
+			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 		}
 
 		this.context.save();
 
 		var p = this.cameraSystem.position,
-				q = this.canvas.width / 2,
-				r = this.canvas.height / 2;
+			q = this.canvas.width / 2,
+			r = this.canvas.height / 2,
+			i,
+			l,
+			queue,
+			j,
+			n;
 
 		this.context.translate(q,r);
 		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
@@ -43,10 +47,10 @@ var GE = (function(GE){
 		this.context.scale(1, -1);
 		this.context.translate(-p[0],-p[1]);
 
-		for(var i = 0, l = this.renderQueue.length; i < l; i++){
-			var queue = this.renderQueue[i];
+		for(i = 0, l = this.renderQueue.length; i < l; i++){
+			queue = this.renderQueue[i];
 			if(queue){
-				for(var j = 0, n = queue.length; j < n; j++){
+				for(j = 0, n = queue.length; j < n; j++){
 					this.context.save();
 					queue[j].call(this, this.context);
 					this.context.restore();
@@ -89,17 +93,17 @@ var GE = (function(GE){
 		this.renderSystems.push(renderSystem);
 	};
 	MultiRenderSystem.prototype.push = function(renderable, layer){
-		var renderSystems = this.renderSystems
-				i = 0,
-				l = renderSystems.length;
+		var renderSystems = this.renderSystems,
+			i = 0,
+			l = renderSystems.length;
 		for(;i<l;i++){
 			renderSystems[i].push(renderable, layer);
 		}
 	};
 	MultiRenderSystem.prototype.update = function(delta){
-		var renderSystems = this.renderSystems
-				i = 0,
-				l = renderSystems.length;
+		var renderSystems = this.renderSystems,
+			i = 0,
+			l = renderSystems.length;
 		for(;i<l;i++){
 			renderSystems[i].update(delta);
 		}
@@ -130,7 +134,8 @@ var GE = (function(GE){
 		for (var i = this.objects.length - 1; i >= 0; i--) {
 			this.objects[i].push(renderable, layer);
 		};
-	}
+	};
+	
 	// Convenience
 	CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")

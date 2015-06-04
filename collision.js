@@ -3,9 +3,9 @@ var GE = (function(GE){
 	GE.Comp = GE.Comp || {};
 
 	var GameObject = GE.GameObject,
-			GameComponent = GE.GameComponent,
-			GameObjectManager = GE.GameObjectManager,
-			GEC = GE.Comp;
+		GameComponent = GE.GameComponent,
+		GameObjectManager = GE.GameObjectManager,
+		GEC = GE.Comp;
 
 	function BackgroundSystem() {
 		GameObject.call(this);
@@ -23,7 +23,7 @@ var GE = (function(GE){
 	};
 	BackgroundSystem.prototype.clearSurfaces = function(){
 		this.surfaces.length = 0;
-	}
+	};
 	BackgroundSystem.prototype.update = function(delta) {
 		// Background System updates
 		GameObject.prototype.update.call(this, delta);
@@ -99,7 +99,7 @@ var GE = (function(GE){
 		}
 		this.lastX = parent.position[0];
 		this.lastY = parent.position[1];
-	}
+	};
 
 	function cross(a, b){
 		return a[0]*b[1] - a[1]*b[0];
@@ -139,7 +139,7 @@ var GE = (function(GE){
 				}
 			}
 		}
-	})
+	});
 
 	return GE;
 }(GE || {}));

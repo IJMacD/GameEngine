@@ -31,21 +31,23 @@ var GE = (function(GE){
 				rx = this.relativeTo[0],
 				ry = this.relativeTo[1],
 				skip = this.pathIndex % this.pathSize,
-				path = [px, py];
+				path = [px, py],
+				i,
+				index;
 
 			// Draw Path
 			// TODO: 1. Check for jumps, don't show
 			// TODO: 2. Don't use strokePath helper -- very inefficient
 			if(this.pathIndex > this.pathSize){
-				for(var i = this.pathSize-1;i>=0;i--){
-					var index = (i + skip + this.pathSize) % this.pathSize;
+				for(i = this.pathSize-1;i>=0;i--){
+					index = (i + skip + this.pathSize) % this.pathSize;
 					path.push(
 						this.path[index][0]+rx,
 						this.path[index][1]+ry
 					);
 				}
 			}else{
-				for(var i = this.pathIndex-1;i>=0;i--){
+				for(i = this.pathIndex-1;i>=0;i--){
 					path.push(
 						this.path[i][0]+rx,
 						this.path[i][1]+ry

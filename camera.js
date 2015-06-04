@@ -2,9 +2,7 @@ var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
 
-	var GameObject = GE.GameObject,
-			GameComponent = GE.GameComponent,
-			GEC = GE.Comp;
+	var GameObject = GE.GameObject;
 
 	function CameraSystem (screen) {
 		GameObject.call(this);
@@ -13,8 +11,8 @@ var GE = (function(GE){
 		this.suspendedObjects = [];
 		this.skewX = this.skew;
 		this.skeyY = this.skew;
-		this.scaleX = this.scale;
-		this.scaleY = this.scale;
+		this.scaleX = 1;
+		this.scaleY = 1;
 		this.rotation = 0;
 		this.rotationAxis = vec3.create();
 		vec3.set(this.rotationAxis, 0, 0, 1);
@@ -28,13 +26,15 @@ var GE = (function(GE){
 		scaleY = scaleY || scaleX;
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
-	}
+	};
+	
 	CameraSystem.prototype.setRotation = function(rotation, rotationAxis){
 		this.rotation = rotation;
 		if(rotationAxis && rotationAxis.length == 3){
 			vec3.normalize(this.rotationAxis, rotationAxis);
 		}
-	}
+	};
+	
 	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
 		if(objectManager instanceof GE.GameObjectManager)
 			this.pruneList.push(objectManager);
@@ -82,8 +82,7 @@ var GE = (function(GE){
 		//this.rotMat = Matrix.rotationMatrix(this.rotation);
 		var i = 0,
 			l = this.pruneList.length,
-			mgr, objs, j,
-			dx, dy;
+			mgr, objs, j;
 		for(; i < l; i++){
 			mgr = this.pruneList[i];
 			if(mgr instanceof GE.GameObjectManager)
@@ -91,7 +90,7 @@ var GE = (function(GE){
 				objs = mgr.objects;
 				for(j=0;j<objs.length;j++){
 					this.pruneVec.set(objs[j].position).subtract(this.position);
-					if(Math.abs(this.pruneVec.x) > width * 2 || Math.abs(this.pruneVec.y) > height * 2)
+					if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
 					{
 						mgr.removeObject(objs[j]);
 						this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});

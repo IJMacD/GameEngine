@@ -3,7 +3,7 @@ var GE = (function(GE){
 	GE.Comp = GE.Comp || {};
 
 	var GameObject = GE.GameObject,
-			GameComponent = GE.GameComponent;
+		GameComponent = GE.GameComponent;
 
 	function WorldSystem(bounds){
 		this.bounds = bounds;
@@ -11,11 +11,12 @@ var GE = (function(GE){
 	GE.WorldSystem = WorldSystem;
 	WorldSystem.prototype = new GE.GameObject();
 
-	var WorldBounceComponent = GE.Comp.WorldBounceComponent = function WorldBounceComponent (worldSystem, width, height) {
+	function WorldBounceComponent (worldSystem, width, height) {
 		this.worldSystem = worldSystem;
 		this.ax = width / 2;
 		this.ay = height / 2;
-	};
+	}
+	GE.Comp.WorldBounceComponent = WorldBounceComponent;
 
 	WorldBounceComponent.prototype = new GE.GameComponent();
 
@@ -50,9 +51,10 @@ var GE = (function(GE){
 		}
 	};
 
-	var WorldWrapComponent = GE.Comp.WorldWrapComponent = function WorldWrapComponent (worldSystem) {
+	function WorldWrapComponent (worldSystem) {
 		this.worldSystem = worldSystem;
-	};
+	}
+	GE.Comp.WorldWrapComponent = WorldWrapComponent;
 
 	WorldWrapComponent.prototype = new GE.GameComponent();
 

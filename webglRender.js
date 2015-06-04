@@ -26,7 +26,9 @@ var GE = (function(GE){
     };
     GE.WebGLRenderSystem.prototype.update = function(delta) {
         var gl = this.context,
-            cam = this.cameraSystem;
+            cam = this.cameraSystem,
+            i,
+            l;
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -41,7 +43,7 @@ var GE = (function(GE){
 
         gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
 
-        for(var i = 0, l = this.renderQueue.length; i < l; i++){
+        for(i = 0, l = this.renderQueue.length; i < l; i++){
 
             mat4.identity(this.mvMatrix);
 
@@ -53,7 +55,7 @@ var GE = (function(GE){
     GE.WebGLRenderSystem.prototype.setCanvasSize = function(width, height){
         this.canvasWidth = width;
         this.canvasHeight = height;
-    }
+    };
 
     GE.WebGLRenderSystemManager = function WebGLRenderSystemManager(){};
     GE.WebGLRenderSystemManager.prototype = new GameObjectManager();
@@ -61,7 +63,7 @@ var GE = (function(GE){
         for (var i = this.objects.length - 1; i >= 0; i--) {
             this.objects[i].push(renderable);
         };
-    }
+    };
 
     GameComponent.create(function PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices){
         var gl = renderSystem.context;
@@ -267,27 +269,39 @@ var GE = (function(GE){
             20, 21, 22,   20, 22, 23  // Left face
         ];
         return new GEC.PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices);
-    }
+    };
 
     GEC.PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands, longitudeBands){
-        var vertexPositionData = [];
-        var normalData = [];
-        var textureCoordData = [];
-        for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-          var theta = latNumber * Math.PI / latitudeBands;
-          var sinTheta = Math.sin(theta);
-          var cosTheta = Math.cos(theta);
+        var vertexPositionData = [],
+            normalData = [],
+            textureCoordData = [],
+            latNumber,
+            theta,
+            sinTheta,
+            cosTheta,
+            longNumber,
+            phi,
+            sinPhi,
+            cosPhi,
+            x, y, z, u, v,
+            indexData,
+            first,
+            second;
+        for (latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+          theta = latNumber * Math.PI / latitudeBands;
+          sinTheta = Math.sin(theta);
+          cosTheta = Math.cos(theta);
 
-          for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-            var phi = longNumber * 2 * Math.PI / longitudeBands;
-            var sinPhi = Math.sin(phi);
-            var cosPhi = Math.cos(phi);
+          for (longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+            phi = longNumber * 2 * Math.PI / longitudeBands;
+            sinPhi = Math.sin(phi);
+            cosPhi = Math.cos(phi);
 
-            var x = cosPhi * sinTheta;
-            var y = cosTheta;
-            var z = sinPhi * sinTheta;
-            var u = 1 - (longNumber / longitudeBands);
-            var v = 1 - (latNumber / latitudeBands);
+            x = cosPhi * sinTheta;
+            y = cosTheta;
+            z = sinPhi * sinTheta;
+            u = 1 - (longNumber / longitudeBands);
+            v = 1 - (latNumber / latitudeBands);
 
             normalData.push(x);
             normalData.push(y);
@@ -299,11 +313,11 @@ var GE = (function(GE){
             vertexPositionData.push(z);
           }
         }
-        var indexData = [];
-        for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
-          for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
-            var first = (latNumber * (longitudeBands + 1)) + longNumber;
-            var second = first + longitudeBands + 1;
+        indexData = [];
+        for (latNumber = 0; latNumber < latitudeBands; latNumber++) {
+          for (longNumber = 0; longNumber < longitudeBands; longNumber++) {
+            first = (latNumber * (longitudeBands + 1)) + longNumber;
+            second = first + longitudeBands + 1;
             indexData.push(first);
             indexData.push(second);
             indexData.push(first + 1);
@@ -314,7 +328,7 @@ var GE = (function(GE){
           }
         }
         return new GEC.PolyShapeRenderingComponent(renderSystem, vertexPositionData, textureCoordData, vertexPositionData, indexData);
-    }
+    };
 
     return GE;
 }(GE || {}));

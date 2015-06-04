@@ -1,3 +1,8 @@
+/* global vec2 */
+/* global vec3 */
+/* global mat2 */
+/* global mat3 */
+/* global mat4 */
 var GE = (function(GE){
 
 	GE.Comp = GE.Comp || {};
@@ -83,12 +88,13 @@ var GE = (function(GE){
 			}
 		},
 		toHTML: function() {
-			var html = this.name;
+			var html = this.name,
+				i;
 			if(typeof this.position.x == "number")
 				html += " " + this.position;
 			if(this.components.length){
 				html += "<ul>";
-				for(var i=0;i<this.components.length;i++)
+				for(i=0;i<this.components.length;i++)
 					html += "<li>"+this.components[i].toHTML();
 				html += "</ul>";
 			}
@@ -149,18 +155,19 @@ var GE = (function(GE){
 		this.objectsToBeRemoved.length = 0;
 	};
 	GameObjectManager.prototype.toHTML = function() {
-		var html = this.name;
+		var html = this.name,
+			i;
 		if(this.objects.length > 1)
 			html += " (" + this.objects.length + " items)";
 		if(this.components.length){
 			html += "<ul>";
-			for(var i=0;i<this.components.length;i++)
+			for(i=0;i<this.components.length;i++)
 				html += "<li>"+this.components[i].toHTML();
 			html += "</ul>";
 		}
 		if(this.objects.length){
 			html += "<ul>";
-			for(var i=0;i<this.objects.length;i++)
+			for(i=0;i<this.objects.length;i++)
 				html += "<li>"+this.objects[i].toHTML();
 			html += "</ul>";
 		}
@@ -174,11 +181,11 @@ var GE = (function(GE){
 	};
 	GameComponent.create = function(constructor, properties){
 		constructor.prototype = new GameComponent();
-		for(prop in properties){
+		for(var prop in properties){
 			constructor.prototype[prop] = properties[prop];
 		}
 		GEC[constructor.name] = constructor;
-	}
+	};
 
 	function arrayRemoveItem(from, to) {
 		var rest = this.slice((to || from) + 1 || this.length);
