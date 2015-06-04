@@ -189,9 +189,9 @@ $(function() {
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
-    renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem);
+    renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem);
     cameraSystem.setScale(1);
-    cameraSystem.setPosition(0,0,00);
+    cameraSystem.setPosition(0,0,100);
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
