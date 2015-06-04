@@ -240,17 +240,86 @@ $(function() {
     }).on("mousewheel", function(e){
         cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
         cameraSystem.setPosition(0,-100,cameraDistance);
-    })
+    });
 
     canvas2.on("mousewheel", function(e){
         cameraDistance2 = Math.min(Math.max(cameraDistance2 - e.originalEvent.deltaY*0.0005, 0.1), 1);
         cameraSystem2.setScale(cameraDistance2);
-    })
+    });
+    
+    GameComponent.create(function FlippedDebugDrawPathComponent (renderSystem, object){
+		this.path = [];
+		this.pathSize = 1000;
+		this.pathIndex = 0;
+		this.lastVx = 0;
+		this.lastVy = 0;
+		this.renderSystem = renderSystem;
+		if(object instanceof GE.GameObject)
+			this.relativeTo = object.position;
+		else
+			this.relativeTo = vec2.create();
+	},
+    {
+        update: function(parent, delta) {
+    		if(GE.DEBUG){
+    			var px = parent.position[0],
+    				py = -parent.position[2],
+    				vx = parent.velocity[0],
+    				vy = -parent.velocity[2],
+    				ax = (vx - this.lastVx)/delta,
+    				ay = (vy - this.lastVy)/delta,
+    				rx = this.relativeTo[0],
+    				ry = this.relativeTo[1],
+    				skip = this.pathIndex % this.pathSize,
+    				path = [px, py],
+    				i,
+    				index;
+    
+    			// Draw Path
+    			// TODO: 1. Check for jumps, don't show
+    			// TODO: 2. Don't use strokePath helper -- very inefficient
+    			if(this.pathIndex > this.pathSize){
+    				for(i = this.pathSize-1;i>=0;i--){
+    					index = (i + skip + this.pathSize) % this.pathSize;
+    					path.push(
+    						this.path[index][0]+rx,
+    						this.path[index][1]+ry
+    					);
+    				}
+    			}else{
+    				for(i = this.pathIndex-1;i>=0;i--){
+    					path.push(
+    						this.path[i][0]+rx,
+    						this.path[i][1]+ry
+    					);
+    				}
+    			}
+    
+    			if(rx || ry)
+    				this.renderSystem.strokePath(path,"#CCF",0);
+    			else
+    				this.renderSystem.strokePath(path,"#CCC",0);
+    
+    			this.pathIndex++;
+    			this.path[skip] = [px-rx,py-ry];
+    
+    			// Draw Velocity
+    			this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
+    
+    			// Draw Acceleration
+    			this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
+    			this.lastVx = vx;
+    			this.lastVy = vy;
+    		}else{
+    			this.pathIndex = 0;
+    		}
+        }
+	});
 
     cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
-    renderSystem2 = new GE.CanvasRenderSystem(context2, canvas2Width, canvas2Height, cameraSystem2);
+    renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
     cameraSystem.setScale(1.0);
     cameraDistance = 800;
     cameraSystem.setPosition(0,-100,cameraDistance);
@@ -334,7 +403,7 @@ $(function() {
     satellite.addComponent(sphereRenderer);
 
     satellite.addComponent(dotRenderer);
-    satellite.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
+    satellite.addComponent(new GEC.FlippedDebugDrawPathComponent(renderSystem2));
 
     gameRoot.addObject(satellite);
 
@@ -389,7 +458,7 @@ $(function() {
         }
 
         planet.addComponent(dotRenderer);
-        planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem2));
+        planet.addComponent(new GEC.FlippedDebugDrawPathComponent(renderSystem2));
 
         gameRoot.addObject(planet);
 
