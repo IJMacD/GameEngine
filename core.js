@@ -129,10 +129,13 @@ var GE = (function(GE){
 			this.objectsToBeRemoved.push(object);
 		return this;
 	};
+	GameObjectManager.prototype.removeAll = function() {
+		this.objects.length = 0;
+	};
 	GameObjectManager.prototype.update = function(delta){
 		var i = 0,
 			l = this.objects.length,
-			m = this.objectsToBeRemoved.length,
+			m,
 			j = 0;
 
 		for(i=0;i<l;i++){
@@ -141,7 +144,9 @@ var GE = (function(GE){
 			else
 				this.removeObject(this.objects[i]);
 		}
-
+		
+		m = this.objectsToBeRemoved.length;
+		
 		for(;j<m;j++){
 			i = 0;
 			for(;i<l;i++){
