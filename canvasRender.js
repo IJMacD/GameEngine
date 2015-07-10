@@ -44,7 +44,7 @@ var GE = (function(GE){
 		if(this.cameraSystem.rotationAxis[2] == 1){
 			this.context.rotate(this.cameraSystem.rotation);
 		}
-		this.context.scale(1, -1);
+		//this.context.scale(1, -1);
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
