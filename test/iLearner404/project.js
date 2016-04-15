@@ -152,21 +152,22 @@ $(function() {
 	var GameObject = GE.GameObject,
 		GameComponent = GE.GameComponent,
 		GEC = GE.Comp,
-		
+
 		/* Constants */
 		GROUND_HEIGHT = 128,
 		TREE_HEIGHT = 290,
 		STATE_PAUSED = 0,
 		STATE_PLAYING = 1,
 		STATE_DEAD = 2,
-		CLICK_IMPULSE = -0.35,
+		CLICK_IMPULSE = -0.5,
+		GRAVITATIONAL_CONSTANT = 0.00055,
 
 		/* Bootstrap */
 		canvas = $('#surface'),
 		context = canvas[0].getContext("2d"),
 		canvasWidth = canvas.width(),
 		canvasHeight = canvas.height(),
-		
+
 		/* Game Objects */
 		gameRoot = new GE.GameObjectManager(),
 		cameraSystem,
@@ -177,28 +178,30 @@ $(function() {
 
 		/* Game Components */
 		moveComponent = new GEC.MoveComponent(),
-		
+
 		/* Data */
 		textures = [],
-        texturePaths = [
-            "img/sprite_player.png",
-            "img/grass.png",
-            "img/crate.png",
+		texturePaths = [
+			"img/sprite_player.png",
+			"img/grass.png",
+			"img/crate.png",
 			"img/game_over.png",
 			"img/tree.png",
 			"img/sky.png"
-        ],
-		
+		],
+
 		gameSpeed = -0.1,
 		gameDifficulty = 5000,
 		gameState = STATE_PAUSED,
-		
+
 		lastTime = 0;
+
+	GE.GRAVITATIONAL_CONSTANT = GRAVITATIONAL_CONSTANT;
 
 	GE.DEBUG = true;
 
 	initCanvas();
-	
+
 	initTextures();
 
 	function initCanvas(width,height){
@@ -229,9 +232,10 @@ $(function() {
 	$(window).on("resize", function(){
 		initCanvas();
 	});
-	
+
 	canvas.on("click", function name() {
 		if(gameState == STATE_PLAYING){
+			// TODO: add player component to check if on ground first
 			vec2.set(playerObject.impulse, 0, CLICK_IMPULSE);
 		}
 		else if (gameState == STATE_DEAD){
@@ -290,10 +294,10 @@ $(function() {
             {i:textures[0].image,x:187,y:342,w:187,h:171,ox:50,oy:160},
             {i:textures[0].image,x:0,y:513,w:187,h:171,ox:50,oy:160}
         ],
-        playerBounds = [-40, -160, 48, 1];
-	
+        playerBounds = [-25, -135, 40, -10];
+
 	createPlayer();
-	
+
 	function createPlayer() {
 		playerObject = new GameObject();
 		playerObject.setPosition(worldBounds[0] + 100, worldBounds[3] - 20);
@@ -308,12 +312,13 @@ $(function() {
 		playerObject.addComponent(new GEC.SpriteAnimationComponent(66));
 		playerObject.addComponent(new GEC.SpriteSheetRenderingComponent(renderSystem));
 		playerObject.addComponent(new GEC.VulnerableCollisionComponent(collisionSystem));
-		
+		// playerObject.addComponent(new GEC.DrawBoundsComponent(renderSystem));
+
 		gameRoot.addObject(playerObject);
 	}
-	
+
 	var crates = new GE.GameObjectManager();
-	
+
 	function KillCratesComponent (){};
 	KillCratesComponent.prototype = new GameComponent();
 	KillCratesComponent.update = function(parent, delta){
@@ -323,25 +328,26 @@ $(function() {
 	};
 	var killCratesComponent = new KillCratesComponent(),
 		attackComponent = new GEC.AttackCollisionComponent(collisionSystem);
-		
+
 	addCrate();
-	
+
 	function addCrate() {
 		var crate = new GameObject();
-	    crate.setPosition(worldBounds[2]+100,worldBounds[3] - 32);
+		crate.setPosition(worldBounds[2]+100,worldBounds[3] - 32);
 		crate.setVelocity(gameSpeed, 0);
-	    crate.sprite = textures[2].image;
-		crate.bounds = [-32,-32,32,32];
+		crate.sprite = textures[2].image;
+		crate.bounds = [-24,-24,24,24];
 		crate.addComponent(moveComponent);
-	    crate.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem));
+		crate.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem));
 		crate.addComponent(KillCratesComponent);
 		crate.addComponent(attackComponent);
+		//crate.addComponent(new GEC.DrawBoundsComponent(renderSystem));
 		crates.addObject(crate);
-		
+
 		var timeout = Math.random() * gameDifficulty + (gameDifficulty / 2);
 		setTimeout(addCrate, timeout);
 	}
-	
+
 	gameRoot.addObject(crates);
 	gameRoot.addObject(collisionSystem);
 	gameRoot.addObject(worldSystem);
