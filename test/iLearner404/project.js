@@ -3,7 +3,7 @@
 /// <reference path="../../typings/jquery/jquery.d.ts"/>
 $(function() {
 	"use strict";
-	
+
 	GE.GameComponent.create(function TileComponent(renderSystem, sprite, bounds) {
 		this.renderSystem = renderSystem;
 		this.sprite = sprite;
@@ -33,7 +33,7 @@ $(function() {
 			}
 		}
 	});
-	
+
     GE.GameComponent.create(function SpriteSheetRenderingComponent(renderSystem){
         this.renderSystem = renderSystem;
     }, {
@@ -52,14 +52,14 @@ $(function() {
 	    }
 	});
 
-	
-    GE.GameComponent.create(function PhysicsComponent(){ }, {
+
+	GE.GameComponent.create(function PhysicsComponent(){ }, {
 		update: function(parent, delta) {
-	    	if(parent.impulse){
+			if(parent.impulse){
 				vec2.add(parent.velocity, parent.velocity, parent.impulse);
 				vec2.set(parent.impulse, 0, 0);
 			}
-	    }
+		}
 	});
 
     GE.GameComponent.create(function SpriteAnimationComponent(duration){
@@ -75,7 +75,29 @@ $(function() {
 	        }
 		}
     });
-	
+
+	GE.GameComponent.create(function DisplayScoreComponent(renderSystem) {
+		this.frameCount = 0;
+		this.renderSystem = renderSystem;
+	},
+	{
+		update: function (parent, delta) {
+
+			var score = this.frameCount;
+			this.frameCount++;
+
+			renderSystem.push(function (context) {
+				context.strokeStyle = "rgba(0,0,0,0.3)";
+				context.lineWidth = 2;
+				context.fillStyle = "#f00";
+				context.font = "32px sans-serif";
+				context.strokeText(score, parent.position[0], parent.position[1]);
+				context.fillText(score, parent.position[0], parent.position[1]);
+			}, -1); // -1 is a special layer rendered at the end independant of camera
+
+		}
+	});
+
 	GE.GameComponent.create(function AttackCollisionComponent(collisionSystem) {
 		this.collisionSystem = collisionSystem;
 	},
@@ -92,7 +114,7 @@ $(function() {
 			]);
 		}
 	});
-	
+
 	GE.GameComponent.create(function VulnerableCollisionComponent(collisionSystem) {
 		this.collisionSystem = collisionSystem;
 	},
@@ -109,7 +131,7 @@ $(function() {
 			]);
 		}
 	});
-	
+
 	function CollisionSystem() {
 		this.attackBounds = [];
 		this.vulnerableBounds = [];
@@ -132,12 +154,12 @@ $(function() {
 			attack = this.attackBounds[i];
 			for(j = 0; j < m; j++){
 				vulnerable = this.vulnerableBounds[j];
-				
+
 				if(attack[0] < vulnerable[2] &&
 					attack[1] < vulnerable[3] &&
 					attack[2] > vulnerable[0] &&
 					attack[3] > vulnerable[1]){
-						
+
 						/*
 						 * We have been killed!
 						 */
@@ -178,6 +200,7 @@ $(function() {
 
 		/* Game Components */
 		moveComponent = new GEC.MoveComponent(),
+		displayScoreComponent,
 
 		/* Data */
 		textures = [],
@@ -210,7 +233,7 @@ $(function() {
 		canvas[0].width = canvasWidth;
 		canvas[0].height = canvasHeight;
 	}
-		
+
     function initTextures() {
 		var toLoad = texturePaths.length;
         textures = texturePaths.map(function(path){
@@ -248,42 +271,44 @@ $(function() {
 	});
 
 	worldBounds = [-canvasWidth/2, -canvasHeight/2, canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT + 10];
-	
+
 	worldSystem = new GE.WorldSystem(worldBounds);
 
 	cameraSystem = new GE.CameraSystem(context.canvas);
 	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
-	
+
+	displayScoreComponent = new GEC.DisplayScoreComponent(renderSystem);
+
 	collisionSystem = new CollisionSystem();
 
-	
+
 	var skyObject = new GameObject(),
 		skySprite = textures[5].image;
 	skyObject.setVelocity(gameSpeed / 16,0);
 	skyObject.addComponent(moveComponent);
 	skyObject.addComponent(new GEC.TileComponent(renderSystem, skySprite, worldBounds));
-	
+
 	gameRoot.addObject(skyObject);
 
-	
+
 	var treeObject = new GameObject(),
 		treeBounds = [-canvasWidth/2, canvasHeight/2 - TREE_HEIGHT - GROUND_HEIGHT, canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT],
 		treeSprite = textures[4].image;
 	treeObject.setVelocity(gameSpeed / 4,0);
 	treeObject.addComponent(moveComponent);
 	treeObject.addComponent(new GEC.TileComponent(renderSystem, treeSprite, treeBounds));
-	
+
 	gameRoot.addObject(treeObject);
-	
+
 	var tileObject = new GameObject(),
 		groundBounds = [-canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT, canvasWidth/2, canvasHeight/2],
 		grassSprite = textures[1].image;
 	tileObject.setVelocity(gameSpeed,0);
 	tileObject.addComponent(moveComponent);
 	tileObject.addComponent(new GEC.TileComponent(renderSystem, grassSprite, groundBounds));
-	
+
 	gameRoot.addObject(tileObject);
-	
+
 	var playerObject,
 		playerSprite = [
             {i:textures[0].image,x:0,y:0,w:187,h:171,ox:50,oy:160},
@@ -348,7 +373,13 @@ $(function() {
 		setTimeout(addCrate, timeout);
 	}
 
+	var hudObject = new GameObject();
+	hudObject.setPosition(canvasWidth - 100, 50);
+	hudObject.addComponent(displayScoreComponent);
+
 	gameRoot.addObject(crates);
+	gameRoot.addObject(hudObject);
+
 	gameRoot.addObject(collisionSystem);
 	gameRoot.addObject(worldSystem);
 	gameRoot.addObject(cameraSystem);
@@ -357,7 +388,7 @@ $(function() {
 	function loop(time){
 		try {
 			gameRoot.update(Math.min(time - lastTime,100));
-			
+
 			if(gameState == STATE_PLAYING){
 				requestAnimationFrame(loop);
 			}
@@ -372,21 +403,21 @@ $(function() {
 			console.error(e.stack);
 		}
 	}
-	
+
 	function loaded() {
 		loop(lastTime);
 	}
-	
+
 	function gameReset(){
 		crates.removeAll();
 		gameState = STATE_PAUSED;
 	}
-	
+
 	function gameStart(){
 		gameState = STATE_PLAYING;
 		loop(lastTime);
 	}
-	
+
 	function gameOver(){
 		gameState = STATE_DEAD;
 	}
