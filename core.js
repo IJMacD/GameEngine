@@ -48,10 +48,12 @@ var GE = (function(GE){
 			return this;
 		},
 		setPosition: function(x,y,z) {
+			if(z == undefined) { z = this.position[2]; }
 			vec3.set(this.position, x, y, z);
 			return this;
 		},
 		setVelocity: function(vx,vy,vz) {
+			if(vz == undefined) { vz = this.velocity[2]; }
 			vec3.set(this.velocity, vx, vy, vz);
 			return this;
 		},
@@ -144,9 +146,9 @@ var GE = (function(GE){
 			else
 				this.removeObject(this.objects[i]);
 		}
-		
+
 		m = this.objectsToBeRemoved.length;
-		
+
 		for(;j<m;j++){
 			i = 0;
 			for(;i<l;i++){
