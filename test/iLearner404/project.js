@@ -4,15 +4,6 @@
 $(function() {
 	"use strict";
 
-	GE.GameComponent.create(function PhysicsComponent(){ }, {
-		update: function(parent, delta) {
-			if(parent.impulse){
-				vec2.add(parent.velocity, parent.velocity, parent.impulse);
-				vec2.set(parent.impulse, 0, 0);
-			}
-		}
-	});
-
 	GE.GameComponent.create(function DisplayScoreComponent(renderSystem) {
 		this.frameCount = 0;
 		this.renderSystem = renderSystem;

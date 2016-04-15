@@ -35,6 +35,14 @@ var GE = (function(GE){
 		vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
 	};
 
+	GE.GameComponent.create(function PhysicsComponent(){ }, {
+		update: function(parent, delta) {
+			if(parent.impulse){
+				vec2.add(parent.velocity, parent.velocity, parent.impulse);
+				vec2.set(parent.impulse, 0, 0);
+			}
+		}
+	});
 
 	function RandomMotionComponent(){}
 	GEC.RandomMotionComponent = RandomMotionComponent;
