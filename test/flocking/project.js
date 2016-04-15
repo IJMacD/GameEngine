@@ -115,8 +115,6 @@ $(function() {
 
 			canvas = $('#surface'),
 			context = canvas[0].getContext("2d"),
-			canvas2 = $('#surface2'),
-			context2 = canvas2[0].getContext("2d"),
 			canvasWidth = canvas.width(),
 			canvasHeight = canvas.height(),
 			gameRoot = new GE.GameObjectManager(),
@@ -124,8 +122,6 @@ $(function() {
 			cameraSystem,
 			renderSystem,
 			renderSystem1,
-			cameraSystem2,
-			renderSystem2,
 			backgroundSystem,
 			temporaryBackgroundSystem,
 			worldSystem,
@@ -156,11 +152,12 @@ $(function() {
 			worldWrapComponent,
 			gravitySwitchComponent,
 			flockingSwitchComponent,
+			cameraTrackSwitchComponent,
 
 			controlObj = {
 				rotate: false,
-				gravity: false,
-				flocking: true
+				flocking: true,
+				cameraTrack: true
 			},
 
 			NEIGHBOUR_RADIUS = 80,
@@ -179,8 +176,6 @@ $(function() {
 		// canvasHeight = height||canvas.height();
 		canvas[0].width = canvasWidth;
 		canvas[0].height = canvasHeight;
-		canvas2[0].width = canvasWidth;
-		canvas2[0].height = canvasHeight;
 	}
 
 	initCanvas();
@@ -222,10 +217,16 @@ $(function() {
 			backgroundSystem.clearSurfaces();
 		}
 		else if(e.which == 71){ // g
-			controlObj.gravity = !controlObj.gravity;
 			controlObj.flocking = !controlObj.flocking;
 		}
+		else if(e.which == 84){ // t
+			controlObj.cameraTrack = !controlObj.cameraTrack;
+		}
 	});
+	/*
+	 * a 65 b 66 c 67 d 68 e 69 f 70 g 71 h 72 i 73 j 74 k 75 l 76 m 77
+	 * n 78 o 79 p 80 q 81 r 82 s 83 t 84 u 85 v 86 w 87 x 88 y 89 z 90
+	 */
 
 	worldBounds = [-canvasWidth/2, -canvasHeight/2, canvasWidth/2, canvasHeight/2];
 	// worldBounds = [-500, -500, 500, 500];
@@ -234,15 +235,10 @@ $(function() {
 	cameraSystem = new GE.CameraSystem(context.canvas);
 	renderSystem1 = new GE.CanvasRenderSystem(context, cameraSystem);
 
-	cameraSystem2 = new GE.CameraSystem(context2.canvas);
-	renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
-
 	renderSystem = new GE.MultiRenderSystem();
 	renderSystem.addRenderSystem(renderSystem1);
-	// renderSystem.addRenderSystem(renderSystem2);
 
 	cameraSystem.setScale(1);
-	cameraSystem2.setScale(1.2);
 
 	worldSystem.addComponent(new GEC.DrawBoundsComponent(renderSystem));
 	// cameraSystem.setRotation(-Math.PI/4);
@@ -251,6 +247,7 @@ $(function() {
 	// backgroundSystem.addSurface([worldBounds[0], worldBounds[1], worldBounds[0], worldBounds[3], worldBounds[2], worldBounds[3], worldBounds[2], worldBounds[1], worldBounds[0], worldBounds[1]]);
 	// backgroundSystem.addSurface([20,40,40,20,40,-20,20,-40,-20,-40,-40,-20,-40,20,-20,40]);
 	backgroundSystem.addSurfaces([[-27.5,103.5,-122.5,0.5],[-107.5,82,-178.5,145],[-209.5,-20,-107.5,-92],[-14.5,178,75.5,118],[-118.5,-173,-12.5,-46],[49.5,54,140.5,165],[-20.5,21,85.5,-50],[-238.5,133,-154.5,216],[-284.5,-20,-197.5,72],[-269.5,63,-352.5,151],[166.5,-10,81.5,-124],[-19.5,-142,111.5,-223],[135.5,85,269.5,4],[119.5,244,227.5,175],[234.5,87,317.5,206],[-232.5,201,-284.5,260],[-347.5,200,-419.5,142],[-360.5,68,-455.5,-28],[-384.5,-22,-277.5,-116],[-203.5,-105,-289.5,-212],[-212.5,-182,-88.5,-266],[25.5,-216,-24.5,-283],[-87.5,177,-6.5,260],[344.5,121,454.5,65],[384.5,16,316.5,-90],[190.5,-113,350.5,-202],[250.5,-203,202.5,-278],[414.5,-67,495.5,-104],[441.5,-189,399.5,-275],[-380.5,-115,-462.5,-192],[-394.5,-206,-275.5,-273],[-415.5,203,-473.5,271],[-505.5,165,-436.5,65],[426.5,148,484.5,235],[300.5,274,409.5,222]]);
+
 	temporaryBackgroundSystem = new GE.BackgroundSystem(renderSystem);
 	surfacesRenderComponent = new GEC.DrawSurfacesComponent(renderSystem);
 	backgroundSystem.addComponent(surfacesRenderComponent);
@@ -263,30 +260,32 @@ $(function() {
 	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10);
 	worldWrapComponent = new GEC.WorldWrapComponent(worldSystem);
 
+  rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
+  rotationInterpolatorComponent = new GEC.RotationInterpolatorComponent();
 
 	flockingComponent = new FlockingComponent();
 
-	gravitySwitchComponent = new GEC.SwitchComponent(controlObj, "gravity");
-	gravitySwitchComponent.addComponent(new GEC.GravityComponent());
-	gravitySwitchComponent.addComponent(worldWrapComponent);
-	gravitySwitchComponent.addComponent(particleRenderingComponent);
-
-
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
-	flockingSwitchComponent.addComponent(flockingComponent);
-	flockingSwitchComponent.addComponent(worldWrapComponent);
-	flockingSwitchComponent.addComponent(particleRenderingComponent);
+	flockingSwitchComponent.addComponents(
+    [flockingComponent, worldWrapComponent, arrowRenderingComponent],
+    [new GEC.GravityComponent(), worldWrapComponent, particleRenderingComponent]
+  );
 
+	cameraTrackSwitchComponent = new GEC.SwitchComponent(controlObj, "cameraTrack");
+	cameraTrackSwitchComponent.addComponents(
+    [
+      flockingComponent,
+      moveComponent,
+      arrowRenderingComponent,
+      rotateToHeadingComponent,
+      rotationInterpolatorComponent
+    ],
+    [particleRenderingComponent]);
 
-
-	cameraSystem.addComponent(moveComponent);
-	cameraSystem.addComponent(gravitySwitchComponent);
-	cameraSystem.addComponent(flockingSwitchComponent);
+	cameraSystem.addComponent(cameraTrackSwitchComponent);
+	cameraSystem.addComponent(worldWrapComponent);
 	// cameraSystem.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
 	particles.push(cameraSystem);
-
-	rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
-	rotationInterpolatorComponent = new GEC.RotationInterpolatorComponent();
 
 	for(var i = 0; i < boxSize; i++){
 		for(var j = 0; j < boxSize; j++){
@@ -304,7 +303,6 @@ $(function() {
 
 			particle.addComponent(moveComponent);
 
-			particle.addComponent(gravitySwitchComponent);
 			particle.addComponent(flockingSwitchComponent);
 
 			particle.addComponent(rotateToHeadingComponent);
@@ -319,26 +317,11 @@ $(function() {
 		}
 	}
 
-	cameraSystem2.addComponent(new GEC.FollowComponent(particles[0]));
-	cameraSystem2.addComponent(new GEC.TrackRotationComponent(particles[0]));
-
-	// particles[0].addComponent({
-	// 	update: function (parent, delta) {
-	// 		renderSystem.push(function (context) {
-	// 			context.beginPath();
-	// 			context.arc(parent.position[0], parent.position[1], NEIGHBOUR_RADIUS, 0, Math.PI * 2, false);
-	// 			context.arc(parent.position[0], parent.position[1], SEPARATION_RADIUS, 0, Math.PI * 2, false);
-	// 			context.stroke();
-	// 		});
-	// 	}
-	// })
-
 	gameRoot.addObject(flock);
 	gameRoot.addObject(worldSystem);
 	gameRoot.addObject(backgroundSystem);
 	gameRoot.addObject(temporaryBackgroundSystem);
 	gameRoot.addObject(cameraSystem);
-	gameRoot.addObject(cameraSystem2);
 	gameRoot.addObject(renderSystem);
 
 	function loop(time){
