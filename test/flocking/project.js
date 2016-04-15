@@ -219,6 +219,11 @@ $(function() {
 		else if(e.which == 71){ // g
 			controlObj.flocking = !controlObj.flocking;
 		}
+		else if(e.which == 82){ // r
+			cameraSystem.setPosition(0,0);
+			cameraSystem.setVelocity(0,0);
+			cameraSystem.setRotation(0);
+		}
 		else if(e.which == 84){ // t
 			controlObj.cameraTrack = !controlObj.cameraTrack;
 		}
