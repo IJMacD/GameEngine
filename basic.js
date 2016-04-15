@@ -77,6 +77,8 @@ var GE = (function(GE){
 					speed = 0.01;
 			if(diff > Math.PI){
 				diff -= Math.PI * 2;
+			} else if (diff < -Math.PI){
+				diff += Math.PI * 2;
 			}
 			parent.rotation = rotation + diff * delta * speed;
 		}
