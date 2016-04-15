@@ -44,17 +44,18 @@ var GE = (function(GE){
 			r = this.canvas.height / 2,
 			i,
 			l,
-			queue,
 			j,
 			n;
 
 		this.context.translate(q,r);
 		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
 		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
+
+		// Only rotation around the Z-axis makes sense for canvas rendering
 		if(this.cameraSystem.rotationAxis[2] == 1){
-			this.context.rotate(this.cameraSystem.rotation);
+			this.context.rotate(-this.cameraSystem.rotation);
 		}
-		//this.context.scale(1, -1);
+
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
