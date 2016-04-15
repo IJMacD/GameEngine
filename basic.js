@@ -66,7 +66,7 @@ var GE = (function(GE){
 	GEC.RotateToHeadingComponent = RotateToHeadingComponent;
 	RotateToHeadingComponent.prototype = new GameComponent();
 	RotateToHeadingComponent.prototype.update = function(parent, delta) {
-		parent.targetRotation = Math.atan2(parent.velocity[1], parent.velocity[0]) + Math.PI / 2;
+		parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
 	};
 
 	GameComponent.create(function RotationInterpolatorComponent() {}, {
