@@ -3,28 +3,103 @@ var GE = (function(GE){
 	GE.Comp = GE.Comp || {};
 
 	var GameObject = GE.GameObject,
-		GameComponent = GE.GameComponent,
-		GameObjectManager = GE.GameObjectManager,
-		GEC = GE.Comp;
+			GameComponent = GE.GameComponent,
+			GameObjectManager = GE.GameObjectManager,
+			GEC = GE.Comp;
 
-	function BackgroundSystem() {
-		GameObject.call(this);
+	function CollisionSystem(collisionCallback) {
+		GameObject.call(this); // Remember parent constructor
+		this.attackBounds = [];
+		this.vulnerableBounds = [];
+		this.callback = collisionCallback;
+	}
+	GE.CollisionSystem = CollisionSystem;
+	CollisionSystem.prototype = new GE.GameObject();
+	CollisionSystem.prototype.addAttackBounds = function(bounds){
+		this.attackBounds.push(bounds);
+	};
+	CollisionSystem.prototype.addVulnerableBounds = function(bounds){
+		this.vulnerableBounds.push(bounds);
+	};
+	CollisionSystem.prototype.update = function (delta) {
+		var i = 0,
+			l = this.attackBounds.length,
+			j = 0,
+			m = this.vulnerableBounds.length,
+			attack,
+			vulnerable;
+		for(; i < l; i++){
+			attack = this.attackBounds[i];
+			for(j = 0; j < m; j++){
+				vulnerable = this.vulnerableBounds[j];
+
+				if(attack[0] < vulnerable[2] &&
+					attack[1] < vulnerable[3] &&
+					attack[2] > vulnerable[0] &&
+					attack[3] > vulnerable[1] &&
+					this.callback
+				){
+					// Would probably be more useful to be able to send a GameObject back
+					this.callback(attack, vulnerable);
+				}
+			}
+		}
+		this.attackBounds.length = 0;
+		this.vulnerableBounds.length = 0;
+	};
+
+	GE.GameComponent.create(function AttackCollisionComponent(collisionSystem) {
+		this.collisionSystem = collisionSystem;
+	},
+	{
+		update: function(parent, delta){
+			var x = parent.position[0],
+				y = parent.position[1],
+				bounds = parent.bounds;
+			this.collisionSystem.addAttackBounds([
+				x + bounds[0],
+				y + bounds[1],
+				x + bounds[2],
+				y + bounds[3]
+			]);
+		}
+	});
+
+	GE.GameComponent.create(function VulnerableCollisionComponent(collisionSystem) {
+		this.collisionSystem = collisionSystem;
+	},
+	{
+		update: function(parent, delta){
+			var x = parent.position[0],
+				y = parent.position[1],
+				bounds = parent.bounds;
+			this.collisionSystem.addVulnerableBounds([
+				x + bounds[0],
+				y + bounds[1],
+				x + bounds[2],
+				y + bounds[3]
+			]);
+		}
+	});
+
+	function BackgroundCollisionSystem() {
+		GameObject.call(this); // Remember parent constructor
 		this.surfaces = [];
 	}
-	GE.BackgroundSystem = BackgroundSystem;
-	BackgroundSystem.prototype = new GameObject();
-	BackgroundSystem.prototype.addSurface = function(surface) {
+	GE.BackgroundCollisionSystem = BackgroundCollisionSystem;
+	BackgroundCollisionSystem.prototype = new GameObject();
+	BackgroundCollisionSystem.prototype.addSurface = function(surface) {
 		this.surfaces.push(surface);
 	};
-	BackgroundSystem.prototype.addSurfaces = function(surfaces) {
+	BackgroundCollisionSystem.prototype.addSurfaces = function(surfaces) {
 		for(var i = 0; i < surfaces.length; i++){
 			this.surfaces.push(surfaces[i]);
 		}
 	};
-	BackgroundSystem.prototype.clearSurfaces = function(){
+	BackgroundCollisionSystem.prototype.clearSurfaces = function(){
 		this.surfaces.length = 0;
 	};
-	BackgroundSystem.prototype.update = function(delta) {
+	BackgroundCollisionSystem.prototype.update = function(delta) {
 		// Background System updates
 		GameObject.prototype.update.call(this, delta);
 	};

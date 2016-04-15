@@ -123,7 +123,7 @@ $(function() {
 			renderSystem,
 			renderSystem1,
 			backgroundSystem,
-			temporaryBackgroundSystem,
+			temporaryBackgroundCollisionSystem,
 			worldSystem,
 			worldBounds,
 			particle,
@@ -203,15 +203,15 @@ $(function() {
 	.on('mousemove', function(e){
 		var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
 		if(mouseLine){
-			temporaryBackgroundSystem.clearSurfaces();
-			temporaryBackgroundSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
+			temporaryBackgroundCollisionSystem.clearSurfaces();
+			temporaryBackgroundCollisionSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
 	});
 
 	$(document.body).on("keyup", function(e){
 		if(e.which == 13){ // enter
 			mouseLine = null;
-			temporaryBackgroundSystem.clearSurfaces();
+			temporaryBackgroundCollisionSystem.clearSurfaces();
 		}
 		else if(e.which == 67){ // c
 			backgroundSystem.clearSurfaces();
@@ -243,15 +243,15 @@ $(function() {
 	worldSystem.addComponent(new GEC.DrawBoundsComponent(renderSystem));
 	// cameraSystem.setRotation(-Math.PI/4);
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.00005));
-	backgroundSystem = new GE.BackgroundSystem();
+	backgroundSystem = new GE.BackgroundCollisionSystem();
 	// backgroundSystem.addSurface([worldBounds[0], worldBounds[1], worldBounds[0], worldBounds[3], worldBounds[2], worldBounds[3], worldBounds[2], worldBounds[1], worldBounds[0], worldBounds[1]]);
 	// backgroundSystem.addSurface([20,40,40,20,40,-20,20,-40,-20,-40,-40,-20,-40,20,-20,40]);
 	backgroundSystem.addSurfaces([[-27.5,103.5,-122.5,0.5],[-107.5,82,-178.5,145],[-209.5,-20,-107.5,-92],[-14.5,178,75.5,118],[-118.5,-173,-12.5,-46],[49.5,54,140.5,165],[-20.5,21,85.5,-50],[-238.5,133,-154.5,216],[-284.5,-20,-197.5,72],[-269.5,63,-352.5,151],[166.5,-10,81.5,-124],[-19.5,-142,111.5,-223],[135.5,85,269.5,4],[119.5,244,227.5,175],[234.5,87,317.5,206],[-232.5,201,-284.5,260],[-347.5,200,-419.5,142],[-360.5,68,-455.5,-28],[-384.5,-22,-277.5,-116],[-203.5,-105,-289.5,-212],[-212.5,-182,-88.5,-266],[25.5,-216,-24.5,-283],[-87.5,177,-6.5,260],[344.5,121,454.5,65],[384.5,16,316.5,-90],[190.5,-113,350.5,-202],[250.5,-203,202.5,-278],[414.5,-67,495.5,-104],[441.5,-189,399.5,-275],[-380.5,-115,-462.5,-192],[-394.5,-206,-275.5,-273],[-415.5,203,-473.5,271],[-505.5,165,-436.5,65],[426.5,148,484.5,235],[300.5,274,409.5,222]]);
 
-	temporaryBackgroundSystem = new GE.BackgroundSystem(renderSystem);
+	temporaryBackgroundCollisionSystem = new GE.BackgroundCollisionSystem(renderSystem);
 	surfacesRenderComponent = new GEC.DrawSurfacesComponent(renderSystem);
 	backgroundSystem.addComponent(surfacesRenderComponent);
-	temporaryBackgroundSystem.addComponent(new GEC.DrawSurfacesComponent(renderSystem, '#88f'));
+	temporaryBackgroundCollisionSystem.addComponent(new GEC.DrawSurfacesComponent(renderSystem, '#88f'));
 
 	gridSquareRenderingComponent = new GridSquareRenderingComponent(renderSystem);
 	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
@@ -310,7 +310,7 @@ $(function() {
 
 			//particle.addComponent(worldComponent);
 			particle.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
-			//particle.addComponent(new GEC.BackgroundCollisionComponent(temporaryBackgroundSystem));
+			//particle.addComponent(new GEC.BackgroundCollisionComponent(temporaryBackgroundCollisionSystem));
 
 			flock.addObject(particle);
 			particles.push(particle);
@@ -320,7 +320,7 @@ $(function() {
 	gameRoot.addObject(flock);
 	gameRoot.addObject(worldSystem);
 	gameRoot.addObject(backgroundSystem);
-	gameRoot.addObject(temporaryBackgroundSystem);
+	gameRoot.addObject(temporaryBackgroundCollisionSystem);
 	gameRoot.addObject(cameraSystem);
 	gameRoot.addObject(renderSystem);
 

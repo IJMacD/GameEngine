@@ -26,79 +26,6 @@ $(function() {
 		}
 	});
 
-	GE.GameComponent.create(function AttackCollisionComponent(collisionSystem) {
-		this.collisionSystem = collisionSystem;
-	},
-	{
-		update: function(parent, delta){
-			var x = parent.position[0],
-				y = parent.position[1],
-				bounds = parent.bounds;
-			this.collisionSystem.addAttackBounds([
-				x + bounds[0],
-				y + bounds[1],
-				x + bounds[2],
-				y + bounds[3]
-			]);
-		}
-	});
-
-	GE.GameComponent.create(function VulnerableCollisionComponent(collisionSystem) {
-		this.collisionSystem = collisionSystem;
-	},
-	{
-		update: function(parent, delta){
-			var x = parent.position[0],
-				y = parent.position[1],
-				bounds = parent.bounds;
-			this.collisionSystem.addVulnerableBounds([
-				x + bounds[0],
-				y + bounds[1],
-				x + bounds[2],
-				y + bounds[3]
-			]);
-		}
-	});
-
-	function CollisionSystem() {
-		this.attackBounds = [];
-		this.vulnerableBounds = [];
-	}
-	CollisionSystem.prototype = new GE.GameObject();
-	CollisionSystem.prototype.addAttackBounds = function(bounds){
-		this.attackBounds.push(bounds);
-	};
-	CollisionSystem.prototype.addVulnerableBounds = function(bounds){
-		this.vulnerableBounds.push(bounds);
-	};
-	CollisionSystem.prototype.update = function (delta) {
-		var i = 0,
-			l = this.attackBounds.length,
-			j = 0,
-			m = this.vulnerableBounds.length,
-			attack,
-			vulnerable;
-		for(; i < l; i++){
-			attack = this.attackBounds[i];
-			for(j = 0; j < m; j++){
-				vulnerable = this.vulnerableBounds[j];
-
-				if(attack[0] < vulnerable[2] &&
-					attack[1] < vulnerable[3] &&
-					attack[2] > vulnerable[0] &&
-					attack[3] > vulnerable[1]){
-
-						/*
-						 * We have been killed!
-						 */
-						gameOver();
-					}
-			}
-		}
-		this.attackBounds.length = 0;
-		this.vulnerableBounds.length = 0;
-	};
-
 	var GameObject = GE.GameObject,
 		GameComponent = GE.GameComponent,
 		GEC = GE.Comp,
@@ -207,8 +134,11 @@ $(function() {
 
 	displayScoreComponent = new GEC.DisplayScoreComponent(renderSystem);
 
-	collisionSystem = new CollisionSystem();
-
+	function collisionCallback(attack, vulnerable) {
+		// We hit a crate
+		gameOver();
+	}
+	collisionSystem = new GE.CollisionSystem(collisionCallback);
 
 	var skyObject = new GameObject(),
 		skySprite = textures[5].image;
