@@ -74,25 +74,6 @@ var GE = (function(GE){
 		}
 	});
 
-	function AnimatedSpriteComponent(images, speed){
-		this.images = images;
-		this.delay = 1000 / speed;
-		this.lastChange = 0;
-		this.imageIndex = 0;
-	}
-	GEC.AnimatedSpriteComponent = AnimatedSpriteComponent;
-	AnimatedSpriteComponent.prototype = new GameComponent();
-	AnimatedSpriteComponent.prototype.update = function(parent, delta) {
-		if(this.lastChange > this.delay){
-			this.imageIndex = (this.imageIndex + 1) % this.images.length;
-			parent.sprite = this.images[this.imageIndex];
-			this.lastChange = 0;
-		}
-		else {
-			this.lastChange += delta;
-		}
-	};
-
 	GameComponent.create(function FollowComponent(object) {
 		this.target = object;
 	}, {
