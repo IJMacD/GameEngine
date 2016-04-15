@@ -22,6 +22,16 @@ var GE = (function(GE){
 		}
 		this.renderQueue[layer].push(renderable);
 	};
+	function _renderQueue(context, queue){
+		if(queue){
+			for(j = 0, n = queue.length; j < n; j++){
+				context.save();
+				queue[j].call(this, context);
+				context.restore();
+			}
+			queue.length = 0;
+		}
+	}
 	CanvasRenderSystem.prototype.update = function(delta) {
 		if(this.clearScreen){
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
@@ -48,18 +58,13 @@ var GE = (function(GE){
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			queue = this.renderQueue[i];
-			if(queue){
-				for(j = 0, n = queue.length; j < n; j++){
-					this.context.save();
-					queue[j].call(this, this.context);
-					this.context.restore();
-				}
-				queue.length = 0;
-			}
+			_renderQueue(this.context, this.renderQueue[i]);
 		}
 
 		this.context.restore();
+
+		// Special case layer renders on top independant of camera
+		_renderQueue(this.context, this.renderQueue[-1]);
 	};
 
 	function drawPath(context, path){
@@ -76,7 +81,7 @@ var GE = (function(GE){
 		if(typeof style == "undefined")
 			style = '#000';
 	 	if(typeof layer == "undefined")
-			layer = 0;
+			layer = 1;
 		this.push(function(context){
 			context.strokeStyle = style;
 			drawPath.call(this, context, path);
@@ -135,7 +140,7 @@ var GE = (function(GE){
 			this.objects[i].push(renderable, layer);
 		};
 	};
-	
+
 	// Convenience
 	CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")

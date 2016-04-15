@@ -6,11 +6,13 @@ var GE = (function(GE){
 	var GameComponent = GE.GameComponent,
 		GEC = GE.Comp;
 
+	GE.GRAVITATIONAL_CONSTANT = 0.0003;
+
 	GameComponent.create(function GravityComponent(){},{
 		update: function(parent, delta) {
 			if(typeof parent.velocity[1] == "undefined")
 				parent.velocity[1] = 0;
-			parent.velocity[1] += 0.0003*delta;
+			parent.velocity[1] += GE.GRAVITATIONAL_CONSTANT*delta;
 		}
 	});
 
