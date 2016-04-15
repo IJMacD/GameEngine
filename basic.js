@@ -126,19 +126,36 @@ var GE = (function(GE){
 	});
 
 	GameComponent.create(function SwitchComponent(switchObject, switchProperty) {
-		this.components = [];
+		this.positiveComponents = [];
+		this.negativeComponents = [];
 		this.object = switchObject;
 		this.prop = switchProperty;
 	}, {
 		addComponent: function(component){
-			this.components.push(component);
+			this.positiveComponents.push(component);
+		},
+		addPositiveComponent: function(component){
+			this.positiveComponents.push(component);
+		},
+		addNegativeComponent: function(component){
+			this.negativeComponents.push(component);
+		},
+		addComponents: function(positiveComponents, negativeComponents){
+			this.positiveComponents.push.apply(this.positiveComponents, positiveComponents);
+			this.negativeComponents.push.apply(this.negativeComponents, negativeComponents);
 		},
 		update: function(parent, delta) {
 			var i = 0,
-					l = this.components.length;
+					l;
 			if(this.object[this.prop]){
+				l = this.positiveComponents.length;
 				for(;i<l;i++){
-					this.components[i].update(parent, delta);
+					this.positiveComponents[i].update(parent, delta);
+				}
+			} else {
+				l = this.negativeComponents.length;
+				for(;i<l;i++){
+					this.negativeComponents[i].update(parent, delta);
 				}
 			}
 		}
