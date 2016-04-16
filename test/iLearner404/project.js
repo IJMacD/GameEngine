@@ -141,7 +141,7 @@ $(function() {
 	collisionSystem = new GE.CollisionSystem(collisionCallback);
 
 	var skyObject = new GameObject(),
-		skySprite = textures[5].image;
+		skySprite = textures[5];
 	skyObject.setVelocity(gameSpeed / 16,0);
 	skyObject.addComponent(moveComponent);
 	skyObject.addComponent(new GEC.TileComponent(renderSystem, skySprite, worldBounds));
@@ -151,7 +151,7 @@ $(function() {
 
 	var treeObject = new GameObject(),
 		treeBounds = [-canvasWidth/2, canvasHeight/2 - TREE_HEIGHT - GROUND_HEIGHT, canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT],
-		treeSprite = textures[4].image;
+		treeSprite = textures[4];
 	treeObject.setVelocity(gameSpeed / 4,0);
 	treeObject.addComponent(moveComponent);
 	treeObject.addComponent(new GEC.TileComponent(renderSystem, treeSprite, treeBounds));
@@ -160,7 +160,7 @@ $(function() {
 
 	var tileObject = new GameObject(),
 		groundBounds = [-canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT, canvasWidth/2, canvasHeight/2],
-		grassSprite = textures[1].image;
+		grassSprite = textures[1];
 	tileObject.setVelocity(gameSpeed,0);
 	tileObject.addComponent(moveComponent);
 	tileObject.addComponent(new GEC.TileComponent(renderSystem, grassSprite, groundBounds));
@@ -168,14 +168,14 @@ $(function() {
 	gameRoot.addObject(tileObject);
 
 	var playerObject,
-		playerSprite = [
-            {i:textures[0].image,x:0,y:0,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:187,y:0,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:0,y:171,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:187,y:171,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:0,y:342,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:187,y:342,w:187,h:171,ox:50,oy:160},
-            {i:textures[0].image,x:0,y:513,w:187,h:171,ox:50,oy:160}
+		playerSprites = [
+            {t:textures[0],x:0,y:0,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:187,y:0,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:0,y:171,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:187,y:171,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:0,y:342,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:187,y:342,w:187,h:171,ox:50,oy:160},
+            {t:textures[0],x:0,y:513,w:187,h:171,ox:50,oy:160}
         ],
         playerBounds = [-25, -135, 40, -10];
 
@@ -185,15 +185,15 @@ $(function() {
 		playerObject = new GameObject();
 		playerObject.setPosition(worldBounds[0] + 100, worldBounds[3] - 20);
 		playerObject.bounds = playerBounds;
-		playerObject.sprite = playerSprite;
-		playerObject.spriteIndex = 0;
+		playerObject.sprite = playerSprites[0];
+		playerObject.sprites = playerSprites;
 		playerObject.impulse = vec2.create();
 		playerObject.addComponent(moveComponent);
 		playerObject.addComponent(new GEC.GravityComponent());
 		playerObject.addComponent(new GEC.PhysicsComponent());
 		playerObject.addComponent(new GEC.WorldBounceComponent(worldSystem));
 		playerObject.addComponent(new GEC.SpriteAnimationComponent(66));
-		playerObject.addComponent(new GEC.SpriteSheetRenderingComponent(renderSystem));
+		playerObject.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
 		playerObject.addComponent(new GEC.VulnerableCollisionComponent(collisionSystem));
 		// playerObject.addComponent(new GEC.DrawBoundsComponent(renderSystem));
 
