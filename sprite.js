@@ -36,8 +36,9 @@ var GE = (function(GE){
     }
   });
 
-  GE.GameComponent.create(function SpriteRenderingComponent(renderSystem){
+  GE.GameComponent.create(function SpriteRenderingComponent(renderSystem, layer){
     this.renderSystem = renderSystem;
+    this.layer = layer;
   }, {
     update: function(parent, delta) {
       var sprite = parent.sprite,
@@ -51,7 +52,7 @@ var GE = (function(GE){
         context.translate(x,y);
         context.rotate(parent.rotation);
         context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
-      });
+      }, this.layer);
     }
   });
 
