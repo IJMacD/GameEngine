@@ -331,7 +331,10 @@ $(function() {
 			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
 			particle.mass = 0.01;
 
-			particle.colour = (i < boxSize / 2) ? "rgba(255,128,128,0.75)" : "rgba(128,128,255,0.75)";
+			// Red + Blue
+			// particle.colour = (i < boxSize / 2) ? "rgba(255,128,128,0.75)" : "rgba(128,128,255,0.75)";
+			// Black and Yellow
+			particle.colour = (i < boxSize / 2) ? "rgba(0,0,0,0.5)" : "rgba(255,255,0,0.5)";
 
 			particle.addComponent(moveComponent);
 
