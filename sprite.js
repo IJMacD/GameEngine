@@ -58,14 +58,14 @@ var GE = (function(GE){
 
   GE.GameComponent.create(function SpriteAnimationComponent(duration){
       this.duration = duration;
-      this.countdown = duration;
+      this.countdown = 0;
       this.spriteIndex = 0;
   }, {
     update: function(parent, delta) {
       var spriteCount = parent.sprites.length;
 
       this.countdown -= delta;
-      if(this.countdown < 0){
+      if(this.countdown <= 0){
         // TODO: Possible divide by zero
         this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
         parent.sprite = parent.sprites[this.spriteIndex];
@@ -73,6 +73,28 @@ var GE = (function(GE){
       }
     }
   });
+
+  GE.Sprite = GE.Sprite || {};
+
+  GE.Sprite.generateSpriteSheet = function(sprite, rows, cols){
+    var out = [],
+        i,
+        j;
+    for(i=0; i<rows; i++){
+      for(j=0; j<cols; j++){
+        out.push({
+          t: sprite.t,
+          x: j*sprite.w,
+          y: i*sprite.h,
+          w: sprite.w,
+          h: sprite.h,
+          ox: sprite.ox,
+          oy: sprite.oy
+        });
+      }
+    }
+    return out;
+  };
 
   /**
    * This component is not to be used any more. Use Sprite animation component instead
