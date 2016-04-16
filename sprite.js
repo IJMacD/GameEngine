@@ -90,5 +90,26 @@ var GE = (function(GE){
     }
   };
 
+  /**
+   * This component is not to be used any more. Use other components instead
+   * @deprecated
+   */
+  function CanvasSpriteRenderingComponent(renderSystem){
+    this.renderSystem = renderSystem;
+  }
+  GEC.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
+  CanvasSpriteRenderingComponent.prototype = new GameComponent();
+  CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
+    this.renderSystem.push(function(context){
+      var x = parent.position[0],
+          y = parent.position[1],
+          w = parent.sprite.width,
+          h = parent.sprite.height;
+      context.translate(x,y);
+      context.rotate(parent.rotation);
+      context.drawImage(parent.sprite,-w/2,-h/2);
+    });
+  };
+
   return GE;
 }(GE || {}));

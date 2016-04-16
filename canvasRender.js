@@ -115,24 +115,6 @@ var GE = (function(GE){
 		}
 	};
 
-
-	function CanvasSpriteRenderingComponent(renderSystem){
-		this.renderSystem = renderSystem;
-	}
-	GEC.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
-	CanvasSpriteRenderingComponent.prototype = new GameComponent();
-	CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
-		this.renderSystem.push(function(context){
-			var x = parent.position[0],
-				y = parent.position[1],
-				w = parent.sprite.width,
-				h = parent.sprite.height;
-			context.translate(x,y);
-			context.rotate(parent.rotation);
-			context.drawImage(parent.sprite,-w/2,-h/2);
-		});
-	};
-
 	function CanvasRenderSystemManager(){}
 	GE.CanvasRenderSystemManager = CanvasRenderSystemManager;
 	CanvasRenderSystemManager.prototype = new GameObjectManager();
