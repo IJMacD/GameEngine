@@ -4,7 +4,7 @@ var GE = (function(GE){
 
 	var GameObject = GE.GameObject;
 
-	function CameraSystem (screen) {
+	function CameraSystem () {
 		GameObject.call(this);
 
 		this.pruneList = [];
@@ -16,8 +16,6 @@ var GE = (function(GE){
 		this.rotation = 0;
 		this.rotationAxis = vec3.create();
 		vec3.set(this.rotationAxis, 0, 0, 1);
-
-		this.screen = screen;
 	}
 	GE.CameraSystem = CameraSystem;
 	CameraSystem.prototype = new GE.GameObject();
@@ -27,44 +25,17 @@ var GE = (function(GE){
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	};
-	
+
 	CameraSystem.prototype.setRotation = function(rotation, rotationAxis){
 		this.rotation = rotation;
 		if(rotationAxis && rotationAxis.length == 3){
 			vec3.normalize(this.rotationAxis, rotationAxis);
 		}
 	};
-	
+
 	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
 		if(objectManager instanceof GE.GameObjectManager)
 			this.pruneList.push(objectManager);
-	};
-	CameraSystem.prototype.worldToScreen = function(worldX,worldY){
-		var v = this.worldVec.set(worldX, worldY);
-		v.subtract(this.position);
-		v.leftMultiply(this.shearMatrix);
-		v.leftMultiply(this.scaleMatrix);
-		v.leftMultiply(this.rotMat);
-		v.add(this.width / 2, this.height / 2);
-		return v;
-	};
-	CameraSystem.prototype.screenToWorld = function(screenX,screenY){
-		var v = vec2.create(),
-				rotMat = mat2.create();
-
-		vec2.set(v,
-				screenX - this.screen.width / 2,
-				-screenY + this.screen.height / 2);
-
-		vec2.set(v, v[0] / this.scaleX, v[1] / this.scaleY);
-
-		if(this.rotationAxis[2] == 1){
-			mat2.rotate(rotMat, rotMat, -this.rotation);
-			vec2.transformMat2(v, v, rotMat);
-		}
-
-		vec2.add(v, v, this.position);
-		return v;
 	};
 	CameraSystem.prototype.getTransformMatrix = function(){
 		// var m = new Matrix(this.shearMatrix);
@@ -80,6 +51,9 @@ var GE = (function(GE){
 		//this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
 		//this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
 		//this.rotMat = Matrix.rotationMatrix(this.rotation);
+
+		/*
+		TODO: Pruning objeccts which are off screen could be a component's job?
 		var i = 0,
 			l = this.pruneList.length,
 			mgr, objs, j;
@@ -98,6 +72,7 @@ var GE = (function(GE){
 				}
 			}
 		}
+		*/
 	};
 
 	return GE;

@@ -76,6 +76,9 @@ var GE = (function(GE){
     return this.cameraSystem;
   };
 
+  /**
+   * Must call getDefaultCamera before this method
+   */
   Game.prototype.getDefaultRenderer = function () {
     var context = this.canvas.getContext("2d");
     return new GE.CanvasRenderSystem(context, this.cameraSystem);
@@ -84,6 +87,15 @@ var GE = (function(GE){
   Game.prototype.getDefaultWorld = function () {
     var bounds = [0, 0, this.canvas.width, this.canvas.height];
     return new GE.WorldSystem(bounds);
+  };
+
+  /**
+   * Must call getDefaultCamera before this method
+   */
+  Game.prototype.getDefaultInput = function () {
+    // params are: (screen, keyboard, camera)
+    // Input system needs a screen it can call width() and height() on
+    return new GE.InputSystem($(this.canvas), document, this.cameraSystem);
   };
 
   Game.prototype._loop = function () {
