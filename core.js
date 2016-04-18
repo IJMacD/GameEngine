@@ -53,12 +53,25 @@ var GE = (function(GE){
 			}
 			return this;
 		},
+		/**
+		 * Protective method to set position of the object.
+		 *
+		 * This method will preserve position on axes which you leave undefined
+		 * in the call to this method.
+		 *
+		 * e.g. `gameObject.setPosition(undefined, 20)` will only set the y
+		 * co-ordinate, leaving x and z at their original values.
+		 */
 		setPosition: function(x,y,z) {
+			if(x == undefined) { x = this.position[0]; }
+			if(y == undefined) { y = this.position[1]; }
 			if(z == undefined) { z = this.position[2]; }
 			vec3.set(this.position, x, y, z);
 			return this;
 		},
 		setVelocity: function(vx,vy,vz) {
+			if(vx == undefined) { vx = this.velocity[0]; }
+			if(vy == undefined) { vy = this.velocity[1]; }
 			if(vz == undefined) { vz = this.velocity[2]; }
 			vec3.set(this.velocity, vx, vy, vz);
 			return this;
