@@ -25,8 +25,14 @@ var GE = (function(GE){
 
 	GameObject.prototype = {
 		addComponent: function(component){
-			//if(component instanceof GameComponent)
-				this.components.push(component);
+
+			// Allow syntactic sugar of addComponent(function() {...}) which is a
+			// shorthand for specifying a simple component with only an update method
+			if(isFunction(component)){
+				component = { update: component };
+			}
+
+			this.components.push(component);
 			return this;
 		},
 		removeComponent: function(component){
@@ -198,7 +204,11 @@ var GE = (function(GE){
 		var rest = this.slice((to || from) + 1 || this.length);
 		this.length = from < 0 ? this.length + from : from;
 		return this.push.apply(this, rest);
-	};
+	}
+
+	function isFunction(a) {
+		return (a instanceof Function);
+	}
 
 	GE.GameObject = GameObject;
 	GE.GameComponent = GameComponent;
