@@ -41,15 +41,18 @@ $(function() {
 	ArrowRenderingComponent.prototype = new GE.GameComponent();
 	ArrowRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
-			var size = parent.size || 10;
+			var size = parent.size || Math.pow(10,(parent.position[2] + 1000) / 1000),
+					vz = parent.velocity[2]*10,
+					velocityScale = 1 / Math.exp(vz * vz);
 			context.fillStyle = parent.colour || "#000000";
 			context.translate(parent.position[0], parent.position[1]);
 			context.rotate(parent.rotation);
+			context.scale(size, size * velocityScale);
 			context.beginPath();
-			context.moveTo(0,-size);
-			context.lineTo(size/2,size/2);
+			context.moveTo(0,-1);
+			context.lineTo(0.5,0.5);
 			context.lineTo(0,0);
-			context.lineTo(-size/2,size/2);
+			context.lineTo(-0.5,0.5);
 			context.closePath();
 			context.fill();
 		});
@@ -242,7 +245,11 @@ $(function() {
 	 * n 78 o 79 p 80 q 81 r 82 s 83 t 84 u 85 v 86 w 87 x 88 y 89 z 90
 	 */
 
-	worldBounds = [-canvasWidth/2, -canvasHeight/2, canvasWidth/2, canvasHeight/2];
+	worldBounds = [
+		-canvasWidth/2, -canvasHeight/2,		// MinX, MinY,
+		canvasWidth/2, canvasHeight/2,			// MaxX, MaxY,
+		-500, 500														// MinZ, MaxZ
+	];
 	// worldBounds = [-500, -500, 500, 500];
 	worldSystem = new GE.WorldSystem(worldBounds);
 
@@ -289,7 +296,7 @@ $(function() {
 	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
 	arrowRenderingComponent = new ArrowRenderingComponent(renderSystem);
 
-	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10);
+	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10, 10);
 	worldWrapComponent = new GEC.WorldWrapComponent(worldSystem);
 
   rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
@@ -300,7 +307,7 @@ $(function() {
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
 	flockingSwitchComponent.addComponents(
     [flockingComponent, worldWrapComponent, arrowRenderingComponent],
-    [new GEC.GravityComponent(), worldWrapComponent, particleRenderingComponent]
+    [new GEC.RandomMotionComponent(), worldBounceComponent, gridSquareRenderingComponent]
   );
 
 	cameraTrackSwitchComponent = new GEC.SwitchComponent(controlObj, "cameraTrack");
