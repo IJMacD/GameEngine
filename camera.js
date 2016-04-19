@@ -4,8 +4,11 @@ var GE = (function(GE){
 
 	var GameObject = GE.GameObject;
 
-	function CameraSystem () {
+	function CameraSystem (width, height) {
 		GameObject.call(this);
+
+		this.width = width;
+		this.height = height;
 
 		this.pruneList = [];
 		this.suspendedObjects = [];

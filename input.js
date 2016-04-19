@@ -60,8 +60,7 @@ var GE = (function(GE){
   function initScreen(inputSystem){
     $(inputSystem.screen).on("click", function(e) {
       var x = e.offsetX,
-          y = e.offsetY,
-          cam = inputSystem.cameraSystem;
+          y = e.offsetY;
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
     });
 
@@ -90,12 +89,18 @@ var GE = (function(GE){
     var v = vec2.create(),
         rotMat = mat2.create(),
         cam = inputSystem.cameraSystem,
-        width = inputSystem.screen.width(),
-        height = inputSystem.screen.height();
+        camWidth = cam.width,
+        camHeight = cam.height,
+        screen = inputSystem.screen,
+        screenWidth = screen.width(),
+        screenHeight = screen.height(),
+        screenScale = camWidth / screenWidth;
 
     vec2.set(v,
-        screenX - width / 2,
-        -screenY + height / 2);
+        screenX - screenWidth / 2,
+        screenY - screenHeight / 2);
+
+    vec2.scale(v, v, screenScale);
 
     vec2.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
 
@@ -109,6 +114,8 @@ var GE = (function(GE){
     vec2.add(v, v, cam.position);
     return v;
   };
+  // Exported as Static method
+  InputSystem.screenToWorld = screenToWorld;
 
   return GE;
 }(GE || {}));

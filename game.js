@@ -71,8 +71,10 @@ var GE = (function(GE){
   };
 
   Game.prototype.getDefaultCamera = function () {
-    this.cameraSystem = new GE.CameraSystem();
-    this.cameraSystem.setPosition(this.canvas.width / 2, this.canvas.height / 2);
+    var width = this.canvas.width,
+        height = this.canvas.height;
+    this.cameraSystem = new GE.CameraSystem(width, height);
+    this.cameraSystem.setPosition(width / 2, height / 2);
     return this.cameraSystem;
   };
 
