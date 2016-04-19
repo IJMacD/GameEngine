@@ -69,8 +69,9 @@ var GE = (function(GE){
 		parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
 	};
 
-  GE.GameComponent.create(function PositionInterpolatorComponent(duration) {
+  GE.GameComponent.create(function PositionInterpolatorComponent(duration, easing) {
     this.duration = duration;
+    this.easing = (easing == undefined) ? GEC.PositionInterpolatorComponent.linear : easing;
     this.elapsed = 0;
     this.running = false;
     this.starting = false;
@@ -95,9 +96,12 @@ var GE = (function(GE){
         this.starting = false;
         this.elapsed = 0;
       }
+
       if(this.running){
-        var t = this.elapsed / this.duration;
-        if(t > 1){
+        var x = this.elapsed / this.duration,
+            t = this.easing(x);
+
+        if(x > 1){
           vec3.copy(parent.position, this.target);
           this.running = false;
         }
@@ -112,6 +116,43 @@ var GE = (function(GE){
       this.starting = true;
     }
   });
+  GEC.PositionInterpolatorComponent.linear = function (t) { return t };
+  GEC.PositionInterpolatorComponent.quadIn = function (t) { return t*t };
+  GEC.PositionInterpolatorComponent.quadOut = function (t) { return -t*(t-2) };
+  GEC.PositionInterpolatorComponent.circIn = function (t) { return 1-Math.sqrt(1-t*t) };
+  GEC.PositionInterpolatorComponent.circOut = function (t) { return Math.sqrt(1-(t-1)*(t-1)) };
+  GEC.PositionInterpolatorComponent.smooth = function (t) { return t*t*(3-2*t) };
+  // Stolen from Dojo:
+  // https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+  GEC.PositionInterpolatorComponent.backIn = function (t) {
+    var s = 1.70158;
+    return t * t * ((s + 1) * t - s);
+  };
+  GEC.PositionInterpolatorComponent.backOut = function (t) {
+    var s = 1.70158;
+    t = t - 1;
+    return t*t*((s+1)*t + s) + 1;
+  };
+  GEC.PositionInterpolatorComponent.backInOut = function (t) {
+    var s = 1.70158 * 1.525;
+    t = t * 2;
+    if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
+    t-=2;
+    return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+  };
+  GEC.PositionInterpolatorComponent.elasticIn = function(n){
+    if(n == 0 || n == 1){ return n; }
+    var p = .3;
+    var s = p / 4;
+    n = n - 1;
+    return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+  };
+  GEC.PositionInterpolatorComponent.elasticOut = function(n){
+    if(n==0 || n == 1){ return n; }
+    var p = .3;
+    var s = p / 4;
+    return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+  };
 
 	GameComponent.create(function RotationInterpolatorComponent() {}, {
 		update: function(parent, delta) {
