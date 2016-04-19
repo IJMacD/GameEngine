@@ -69,6 +69,50 @@ var GE = (function(GE){
 		parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
 	};
 
+  GE.GameComponent.create(function PositionInterpolatorComponent(duration) {
+    this.duration = duration;
+    this.elapsed = 0;
+    this.running = false;
+    this.starting = false;
+    this.start = vec3.create();
+    this.target = vec3.create();
+  }, {
+    update: function(parent, delta) {
+      // The first frame we run after being told to interpolate somewhere
+      // we need to gather some information from our parent
+      if(this.starting){
+
+        // If any co-ordinate is NaN this means the consumer wants to
+        // retain those values from the parent
+        if(isNaN(this.target[0])) this.target[0] = parent.position[0];
+        if(isNaN(this.target[1])) this.target[1] = parent.position[1];
+        if(isNaN(this.target[2])) this.target[2] = parent.position[2];
+
+        // Linear interpolation requires that we remember where we started
+        vec3.copy(this.start, parent.position);
+
+        this.running = true;
+        this.starting = false;
+        this.elapsed = 0;
+      }
+      if(this.running){
+        var t = this.elapsed / this.duration;
+        if(t > 1){
+          vec3.copy(parent.position, this.target);
+          this.running = false;
+        }
+        else {
+          vec3.lerp(parent.position, this.start, this.target, t);
+          this.elapsed += delta;
+        }
+      }
+    },
+    setPosition: function(x, y, z) {
+      vec3.set(this.target, x, y, z);
+      this.starting = true;
+    }
+  });
+
 	GameComponent.create(function RotationInterpolatorComponent() {}, {
 		update: function(parent, delta) {
 			var rotation = parent.rotation,
