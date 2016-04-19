@@ -63,7 +63,7 @@ $(function() {
         }
     });
 
-    cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
+    cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
     renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
     cameraSystem.setScale(0.2);
     cameraDistance = 0;

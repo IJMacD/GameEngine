@@ -129,7 +129,7 @@ $(function() {
 
 	worldSystem = new GE.WorldSystem(worldBounds);
 
-	cameraSystem = new GE.CameraSystem(context.canvas);
+	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
 	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
 
 	displayScoreComponent = new GEC.DisplayScoreComponent(renderSystem);

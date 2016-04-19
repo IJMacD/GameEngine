@@ -187,7 +187,7 @@ $(function() {
         });
     };
 
-    cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
+    cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
     renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem);
     cameraSystem.setScale(1);

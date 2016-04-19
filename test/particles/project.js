@@ -102,10 +102,10 @@ $(function() {
 		this.energySystem.add(0.5 * parent.mass * vec2.squaredLength(parent.velocity));
 	};
 
-	cameraSystem = new GE.CameraSystem(0, 0, canvasWidth, canvasHeight);
+	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
 	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
 	cameraSystem.setScale(1);
-	cameraSystem2 = new GE.CameraSystem(0, 0, canvas2Width, canvas2Height);
+	cameraSystem2 = new GE.CameraSystem(canvas2Width, canvas2Height);
 	renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
 	cameraSystem2.setScale(0.05);
 	energySystem = new EnergySystem(renderSystem);

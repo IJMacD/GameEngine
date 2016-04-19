@@ -119,6 +119,7 @@ $(function() {
 			canvasHeight = canvas.height(),
 			gameRoot = new GE.GameObjectManager(),
 			flock = new GE.GameObjectManager(),
+			inputSystem,
 			cameraSystem,
 			renderSystem,
 			renderSystem1,
@@ -194,15 +195,15 @@ $(function() {
 	});
 
 	canvas.on("mousedown", function(e){
-		var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
+		var v = GE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
 		if(mouseLine){
 			backgroundSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
 		mouseLine = v;
 	})
 	.on('mousemove', function(e){
-		var v = cameraSystem.screenToWorld(e.offsetX, e.offsetY);
 		if(mouseLine){
+			var v = GE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
 			temporaryBackgroundCollisionSystem.clearSurfaces();
 			temporaryBackgroundCollisionSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
@@ -254,8 +255,10 @@ $(function() {
 	// worldBounds = [-500, -500, 500, 500];
 	worldSystem = new GE.WorldSystem(worldBounds);
 
-	cameraSystem = new GE.CameraSystem(context.canvas);
+	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
 	renderSystem1 = new GE.CanvasRenderSystem(context, cameraSystem);
+
+	inputSystem = new GE.InputSystem(canvas, document, cameraSystem);
 
 	renderSystem = new GE.MultiRenderSystem();
 	renderSystem.addRenderSystem(renderSystem1);
@@ -352,6 +355,7 @@ $(function() {
 		}
 	}
 
+	gameRoot.addObject(inputSystem);
 	gameRoot.addObject(flock);
 	gameRoot.addObject(worldSystem);
 	gameRoot.addObject(backgroundSystem);
