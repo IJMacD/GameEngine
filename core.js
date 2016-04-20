@@ -138,16 +138,19 @@ var GE = (function(GE){
 	GameObjectManager.prototype.addObject = function(object){
 		if(object instanceof GameObject)
 			this.objects.push(object);
+		object.parent = this;
 		return this;
 	};
 	GameObjectManager.prototype.addObjectAt = function(index, object){
 		if(object instanceof GameObject)
 			this.objects.splice(index,0,object);
+		object.parent = this;
 		return this;
 	};
 	GameObjectManager.prototype.removeObject = function(object){
 		if(object instanceof GameObject)
 			this.objectsToBeRemoved.push(object);
+		if(object.parent == this) { object.parent = null; }
 		return this;
 	};
 	GameObjectManager.prototype.removeAll = function() {
