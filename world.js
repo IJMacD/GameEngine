@@ -16,22 +16,25 @@ var GE = (function(GE){
 		this.ax = (width || 0) / 2;
 		this.ay = (height || 0) / 2;
 		this.az = (thickness || 0) / 2;
+
+		this.cRestitution = 1;
+		this.cFriction = 1;
 	}
 	GE.Comp.WorldBounceComponent = WorldBounceComponent;
 
 	WorldBounceComponent.prototype = new GE.GameComponent();
 
 	WorldBounceComponent.prototype.update = function(parent, delta) {
-		var coef = 0.4,
-			friction = 0.9;
+		var coef = this.cRestitution,
+				friction = this.cFriction;
 
 		if(parent.bounds){
-			this.bx1 = this.worldSystem.bounds[0] + parent.bounds[0];
-			this.by1 = this.worldSystem.bounds[1] + parent.bounds[1];
-			this.bx2 = this.worldSystem.bounds[2] + parent.bounds[2];
-			this.by2 = this.worldSystem.bounds[3] + parent.bounds[3];
-			this.bz1 = this.worldSystem.bounds[4] + parent.bounds[4];
-			this.bz2 = this.worldSystem.bounds[5] + parent.bounds[5];
+			this.bx1 = this.worldSystem.bounds[0] - parent.bounds[0];
+			this.by1 = this.worldSystem.bounds[1] - parent.bounds[1];
+			this.bx2 = this.worldSystem.bounds[2] - parent.bounds[2];
+			this.by2 = this.worldSystem.bounds[3] - parent.bounds[3];
+			this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4];
+			this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5];
 		}
 		else{
 			this.bx1 = this.worldSystem.bounds[0] + this.ax;

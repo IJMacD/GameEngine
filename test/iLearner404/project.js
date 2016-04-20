@@ -191,7 +191,10 @@ $(function() {
 		playerObject.addComponent(moveComponent);
 		playerObject.addComponent(new GEC.GravityComponent());
 		playerObject.addComponent(new GEC.PhysicsComponent());
-		playerObject.addComponent(new GEC.WorldBounceComponent(worldSystem));
+		var worldBounceComponent = new GEC.WorldBounceComponent(worldSystem);
+		worldBounceComponent.cRestitution = 0.4;
+		worldBounceComponent.cFriction = 0.9;
+		playerObject.addComponent(worldBounceComponent);
 		playerObject.addComponent(new GEC.SpriteAnimationComponent(66));
 		playerObject.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
 		playerObject.addComponent(new GEC.VulnerableCollisionComponent(collisionSystem));

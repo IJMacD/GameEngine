@@ -30,6 +30,7 @@ var GE = (function(GE){
     // Init some properties
     this.root = new GE.GameObjectManager();
     this.textures = [];
+    this.frame = 0;
 
     // Number of resources currently pending
     this._toLoad = 0;
@@ -106,6 +107,7 @@ var GE = (function(GE){
     loop(self._lastTime);
 
     function loop(time){
+      self.frame++;
       try {
         self.root.update(Math.min(time - self._lastTime,100));
 
