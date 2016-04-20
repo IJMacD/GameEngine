@@ -109,7 +109,12 @@ var GE = (function(GE){
 
   Game.prototype.nextLevel = function () {
     this.level++;
-    this.fire("nextLevel", this.level);
+    this.fire("loadLevel", this.level);
+  };
+
+  Game.prototype.setLevel = function (level) {
+    this.level = level;
+    this.fire("loadLevel", this.level);
   };
 
   Game.prototype.on = function (event, callback) {
@@ -117,6 +122,7 @@ var GE = (function(GE){
       this._events[event] = [];
     }
     this._events[event].push(callback);
+    return this;
   };
 
   Game.prototype.fire = function (event) {
