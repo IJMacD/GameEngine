@@ -22,7 +22,8 @@ $(function() {
 	}
 	GridSquareRenderingComponent.prototype = new GE.GameComponent();
 	GridSquareRenderingComponent.prototype.update = function(parent, delta) {
-		var size = Math.pow(10,(parent.position[2] + 1000) / 1000),
+		var z = this.snap ? Math.floor(parent.position[2]/100)*100 : parent.position[2],
+				size = Math.pow(10,(z + 1000) / 1000),
 				x = this.snap ? Math.floor(parent.position[0]/size)*size : parent.position[0],
 				y = this.snap ? Math.floor(parent.position[1]/size)*size : parent.position[1],
 				w = size,
@@ -296,7 +297,7 @@ $(function() {
 	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
 	arrowRenderingComponent = new ArrowRenderingComponent(renderSystem);
 
-	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 10, 10, 10);
+	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 0, 0, 10);
 	worldWrapComponent = new GEC.WorldWrapComponent(worldSystem);
 
   rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
@@ -306,8 +307,8 @@ $(function() {
 
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
 	flockingSwitchComponent.addComponents(
-    [flockingComponent, worldWrapComponent, arrowRenderingComponent],
-    [new GEC.RandomMotionComponent(), worldBounceComponent, gridSquareRenderingComponent]
+    [flockingComponent, arrowRenderingComponent],
+    [new GEC.RandomMotionComponent(), gridSquareRenderingComponent]
   );
 
 	cameraTrackSwitchComponent = new GEC.SwitchComponent(controlObj, "cameraTrack");
@@ -344,6 +345,9 @@ $(function() {
 			particle.colour = (i < boxSize / 2) ? "rgba(0,0,0,0.5)" : "rgba(255,255,0,0.5)";
 
 			particle.addComponent(moveComponent);
+
+			particle.addComponent(worldWrapComponent);
+			particle.addComponent(worldBounceComponent);
 
 			particle.addComponent(flockingSwitchComponent);
 
