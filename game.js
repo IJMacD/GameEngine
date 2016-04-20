@@ -31,6 +31,8 @@ var GE = (function(GE){
     this.root = new GE.GameObjectManager();
     this.textures = [];
     this.frame = 0;
+    this.score = 0;
+    this.level = 0;
 
     // Number of resources currently pending
     this._toLoad = 0;
@@ -39,6 +41,7 @@ var GE = (function(GE){
       self._failedToStart = reject;
     });
     this._lastTime = 0;
+    this._events = {};
   }
   GE.Game = Game;
 
@@ -65,6 +68,8 @@ var GE = (function(GE){
 
   Game.prototype.start = function (resolve, reject) {
     this._startPromise.then(resolve, reject);
+
+    this.nextLevel();
 
     this.state = STATE_PLAYING;
 
@@ -99,6 +104,30 @@ var GE = (function(GE){
     // params are: (screen, keyboard, camera)
     // Input system needs a screen it can call width() and height() on
     return new GE.InputSystem($(this.canvas), document, this.cameraSystem);
+  };
+
+  Game.prototype.nextLevel = function () {
+    this.level++;
+    this.fire("nextLevel", this.level);
+  };
+
+  Game.prototype.on = function (event, callback) {
+    if(!this._events[event]){
+      this._events[event] = [];
+    }
+    this._events[event].push(callback);
+  };
+
+  Game.prototype.fire = function (event) {
+    var callbacks = this._events[event],
+        args = [].slice.call(arguments, 1),
+        self = this;
+
+    if(callbacks && callbacks.length){
+      callbacks.forEach(function(callback){
+        callback.apply(self, args);
+      });
+    }
   };
 
   Game.prototype._loop = function () {
