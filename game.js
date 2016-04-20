@@ -31,6 +31,7 @@ var GE = (function(GE){
     this.root = new GE.GameObjectManager();
     this.textures = [];
     this.frame = 0;
+    this.time = 0;
     this.score = 0;
     this.level = 0;
 
@@ -136,6 +137,7 @@ var GE = (function(GE){
     loop(self._lastTime);
 
     function loop(time){
+      self.time = time;
       self.frame++;
       try {
         self.root.update(Math.min(time - self._lastTime,100));
