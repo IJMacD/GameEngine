@@ -1,5 +1,5 @@
 var GE = (function(GE){
-	"GravityComponent:nomunge, PointGravityComponent: nomunge";
+	"GravityComponent:nomunge, PointGravityComponent: nomunge, PositionInterpolatorComponent: nomunge";
 
 	GE.Comp = GE.Comp || {};
 
