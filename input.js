@@ -59,10 +59,11 @@ var GE = (function(GE){
 
   function initScreen(inputSystem){
     TouchClick(inputSystem.screen, function(e) {
-      var event = e.originalEvent,
+      var offset = inputSystem.screen.offset(),
+          event = e.originalEvent,
           touch = event.touches && event.touches[0],
-          x = touch ? touch.pageX : e.offsetX,
-          y = touch ? touch.pageY : e.offsetY;
+          x = (touch ? touch.pageX : e.pageX) - offset.left,
+          y = (touch ? touch.pageY : e.pageY) - offset.top;
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
     });
 
