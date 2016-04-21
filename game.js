@@ -9,7 +9,17 @@ var GE = (function(GE){
 
       STATE_PAUSED = 0,
       STATE_PLAYING = 1,
-      STATE_DEAD = 2;
+      STATE_DEAD = 2,
+
+      _lastTime = 0,
+      _raf = window.requestAnimationFrame || function(callback, element) {
+          var currTime = new Date().getTime();
+          var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
+          var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+            timeToCall);
+          _lastTime = currTime + timeToCall;
+          return id;
+      };
 
   /**
    * Utility class for things such as bootstrapping Game
@@ -149,11 +159,13 @@ var GE = (function(GE){
         self.root.update(Math.min(time - self._lastTime,100));
 
         if(self.state == STATE_PLAYING){
-          requestAnimationFrame(loop);
+          _raf(loop);
         }
         self._lastTime = time;
       } catch (e){
-        console.error(e.stack);
+        if(window.console){
+          console.error(e.stack || e);
+        }
       }
     }
   };
