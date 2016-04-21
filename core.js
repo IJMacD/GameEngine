@@ -213,7 +213,14 @@ var GE = (function(GE){
 		for(var prop in properties){
 			constructor.prototype[prop] = properties[prop];
 		}
-		GEC[constructor.name] = constructor;
+		var name = false;// constructor.name;
+		if(!name){
+			name = constructor.toString().match(/^function ([a-z_]+)/i)[1];
+		}
+		if(name){
+			GEC[name] = constructor;
+		}
+		return constructor;
 	};
 
 	function arrayRemoveItem(from, to) {
