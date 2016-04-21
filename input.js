@@ -58,9 +58,11 @@ var GE = (function(GE){
   };
 
   function initScreen(inputSystem){
-    $(inputSystem.screen).on("click", function(e) {
-      var x = e.offsetX,
-          y = e.offsetY;
+    TouchClick(inputSystem.screen, function(e) {
+      var event = e.originalEvent,
+          touch = event.touches && event.touches[0],
+          x = touch ? touch.pageX : e.offsetX,
+          y = touch ? touch.pageY : e.offsetY;
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
     });
 
@@ -68,6 +70,19 @@ var GE = (function(GE){
       inputSystem.nextKey = e.which;
     });
   };
+
+  function TouchClick(sel, fnc) {
+    $(sel).on('touchstart click', function(event){
+          event.stopPropagation();
+          event.preventDefault();
+          if(event.handled !== true) {
+              fnc(event);
+              event.handled = true;
+          } else {
+              return false;
+          }
+    });
+  }
 
   function worldToScreen(inputSystem, worldX, worldY){
     // TODO: Check whether or not this code is outdated
