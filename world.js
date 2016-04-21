@@ -11,6 +11,10 @@ var GE = (function(GE){
 	GE.WorldSystem = WorldSystem;
 	WorldSystem.prototype = new GE.GameObject();
 
+	WorldSystem.prototype.setBounds = function (bounds) {
+		this.bounds = bounds;
+	};
+
 	function WorldBounceComponent (worldSystem, width, height, thickness) {
 		this.worldSystem = worldSystem;
 		this.ax = (width || 0) / 2;

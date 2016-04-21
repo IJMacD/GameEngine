@@ -117,6 +117,11 @@ var GE = (function(GE){
     this.fire("loadLevel", this.level);
   };
 
+  Game.prototype.setSize = function (width, height) {
+    this.canvas.width = width;
+    this.canvas.height = height;
+  };
+
   Game.prototype.on = function (event, callback) {
     if(!this._events[event]){
       this._events[event] = [];
