@@ -37,10 +37,6 @@ var GE = (function(GE){
 
     // Number of resources currently pending
     this._toLoad = 0;
-    this._startPromise = new Promise(function(resolve, reject) {
-      self._readyToStart = resolve;
-      self._failedToStart = reject;
-    });
     this._lastTime = 0;
     this._events = {};
   }
@@ -67,8 +63,7 @@ var GE = (function(GE){
     });
   };
 
-  Game.prototype.start = function (resolve, reject) {
-    this._startPromise.then(resolve, reject);
+  Game.prototype.start = function () {
 
     this.nextLevel();
 
@@ -166,7 +161,7 @@ var GE = (function(GE){
   Game.prototype._resourceLoaded = function (resource) {
     this._toLoad--;
     if(this._toLoad == 0){
-      this._readyToStart();
+      this.fire("resourcesLoaded");
     }
   };
 
