@@ -62,10 +62,10 @@ var GE = (function(GE){
          texture.width = texture.image.width;
          texture.height = texture.image.height;
          texture.loaded = true;
-         self._resourceLoaded(texture);
+         _resourceLoaded(self, texture);
       };
       texture.image.onerror = function(){
-        self._failedToStart(new Error());
+        throw new Error("Failed to load a texture: " + path);
       }
       texture.image.src = path;
       self.textures.push(texture);
@@ -79,7 +79,7 @@ var GE = (function(GE){
 
     this.state = STATE_PLAYING;
 
-    this._loop();
+    _loop(this);
   };
 
   Game.prototype.getDefaultCamera = function () {
@@ -114,12 +114,16 @@ var GE = (function(GE){
 
   Game.prototype.nextLevel = function () {
     this.level++;
-    this.fire("loadLevel", this.level);
+    fire(this, "loadLevel", this.level);
   };
 
   Game.prototype.setLevel = function (level) {
     this.level = level;
-    this.fire("loadLevel", this.level);
+    fire(this, "loadLevel", this.level);
+  };
+
+  Game.prototype.completeLevel = function () {
+    fire(this, "levelComplete", this.level);
   };
 
   Game.prototype.setSize = function (width, height) {
@@ -135,10 +139,9 @@ var GE = (function(GE){
     return this;
   };
 
-  Game.prototype.fire = function (event) {
-    var callbacks = this._events[event],
-        args = [].slice.call(arguments, 1),
-        self = this;
+  function fire(self, event) {
+    var callbacks = self._events[event],
+        args = [].slice.call(arguments, 2);
 
     if(callbacks && callbacks.length){
       callbacks.forEach(function(callback){
@@ -147,8 +150,7 @@ var GE = (function(GE){
     }
   };
 
-  Game.prototype._loop = function () {
-    var self = this;
+  function _loop(self) {
 
     loop(self._lastTime);
 
@@ -170,10 +172,10 @@ var GE = (function(GE){
     }
   };
 
-  Game.prototype._resourceLoaded = function (resource) {
-    this._toLoad--;
-    if(this._toLoad == 0){
-      this.fire("resourcesLoaded");
+  function _resourceLoaded(self, resource) {
+    self._toLoad--;
+    if(self._toLoad == 0){
+      fire(self, "resourcesLoaded");
     }
   };
 
