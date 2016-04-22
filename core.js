@@ -157,6 +157,8 @@ var GE = (function(GE){
 		this.objects.length = 0;
 	};
 	GameObjectManager.prototype.update = function(delta){
+		GameObject.prototype.update.call(this, delta);
+
 		var i = 0,
 			l = this.objects.length,
 			m,
