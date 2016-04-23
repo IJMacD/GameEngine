@@ -59,7 +59,8 @@ var GE = (function(GE){
 	GEC.RotationComponent = RotationComponent;
 	RotationComponent.prototype = new GameComponent();
 	RotationComponent.prototype.update = function(parent, delta) {
-		parent.setRotation(parent.rotation + this.rotationSpeed * delta);
+		var w = parent.rotationSpeed || this.rotationSpeed || 0;
+		parent.setRotation(parent.rotation + w * delta);
 	};
 
 	function RotateToHeadingComponent () {}

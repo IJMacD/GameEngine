@@ -16,6 +16,7 @@ var GE = (function(GE){
 		this.position = vec3.create();
 		this.velocity = vec3.create();
 		this.rotation = 0;
+		this.rotationSpeed = 0;
 		this.toBeRemoved = [];
 		this.life = 1;
 		this.team = 0;
