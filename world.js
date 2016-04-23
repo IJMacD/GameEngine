@@ -49,18 +49,24 @@ var GE = (function(GE){
 			this.bz2 = this.worldSystem.bounds[5] - this.az;
 		}
 
+		// hasBounced: 1: x, 2: y, 3: z
+		parent.hasBounced = false;
 
 		if(parent.position[0] < this.bx1){
 			parent.position[0] = this.bx1;
 			parent.velocity[0] = -parent.velocity[0]*coef;
 			parent.velocity[1] = parent.velocity[1]*friction;
 			parent.velocity[2] = parent.velocity[2]*friction;
+
+			parent.hasBounced = 1;
 		}
 		else if(parent.position[0] > this.bx2){
 			parent.position[0] = this.bx2;
 			parent.velocity[0] = -parent.velocity[0]*coef;
 			parent.velocity[1] = parent.velocity[1]*friction;
 			parent.velocity[2] = parent.velocity[2]*friction;
+
+			parent.hasBounced = 1;
 		}
 
 		if(parent.position[1] < this.by1){
@@ -68,12 +74,16 @@ var GE = (function(GE){
 			parent.velocity[1] = -parent.velocity[1]*coef;
 			parent.velocity[0] = parent.velocity[0]*friction;
 			parent.velocity[2] = parent.velocity[2]*friction;
+
+			parent.hasBounced = 2;
 		}
 		else if(parent.position[1] > this.by2){
 			parent.position[1] = this.by2;
 			parent.velocity[1] = -parent.velocity[1]*coef;
 			parent.velocity[0] = parent.velocity[0]*friction;
 			parent.velocity[2] = parent.velocity[2]*friction;
+
+			parent.hasBounced = 2;
 		}
 
 		if(parent.position[2] < this.bz1){
@@ -81,12 +91,16 @@ var GE = (function(GE){
 			parent.velocity[2] = -parent.velocity[2]*coef;
 			parent.velocity[0] = parent.velocity[0]*friction;
 			parent.velocity[1] = parent.velocity[1]*friction;
+
+			parent.hasBounced = 3;
 		}
 		else if(parent.position[2] > this.bz2){
 			parent.position[2] = this.bz2;
 			parent.velocity[2] = -parent.velocity[2]*coef;
 			parent.velocity[0] = parent.velocity[0]*friction;
 			parent.velocity[1] = parent.velocity[1]*friction;
+
+			parent.hasBounced = 3;
 		}
 	};
 
