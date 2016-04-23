@@ -202,6 +202,7 @@ var GE = (function(GE){
 		}
 	});
 
+	var addComponent = GE.GameObject.prototype.addComponent;
 	GameComponent.create(function SwitchComponent(switchObject, switchProperty) {
 		this.positiveComponents = [];
 		this.negativeComponents = [];
@@ -210,17 +211,23 @@ var GE = (function(GE){
 		this.prop = switchProperty;
 	}, {
 		addComponent: function(component){
-			this.positiveComponents.push(component);
+			this.components = this.positiveComponents;
+			addComponent.call(this, component);
+			this.components  = undefined;
 		},
 		addPositiveComponent: function(component){
-			this.positiveComponents.push(component);
+			this.components = this.positiveComponents;
+			addComponent.call(this, component);
+			this.components  = undefined;
 		},
 		addNegativeComponent: function(component){
-			this.negativeComponents.push(component);
+			this.components = this.negativeComponents;
+			addComponent.call(this, component);
+			this.components  = undefined;
 		},
 		addComponents: function(positiveComponents, negativeComponents){
-			this.positiveComponents.push.apply(this.positiveComponents, positiveComponents);
-			this.negativeComponents.push.apply(this.negativeComponents, negativeComponents);
+			positiveComponents.forEach(this.addPositiveComponent.bind(this));
+			negativeComponents.forEach(this.addNegativeComponent.bind(this));
 		},
 		flip: function (active) {
 			this.setActive(!this.active);
