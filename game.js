@@ -25,17 +25,13 @@ var GE = (function(GE){
    * Utility class for things such as bootstrapping Game
    */
   function Game(options) {
-    var width,
-        height,
-        self = this;
-
     this.canvas = options.canvas;
 
-    width = options.width || this.canvas.width;
-    height = options.height || this.canvas.height;
+    this.width = options.width || this.canvas.width;
+    this.height = options.height || this.canvas.height;
 
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
 
     // Init some properties
     this.root = new GE.GameObjectManager();
@@ -127,6 +123,8 @@ var GE = (function(GE){
   };
 
   Game.prototype.setSize = function (width, height) {
+    this.width = width;
+    this.height = height;
     this.canvas.width = width;
     this.canvas.height = height;
   };
