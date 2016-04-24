@@ -26,11 +26,16 @@ var GE = (function(GE){
     this.keyboard = keyboard;
     this.cameraSystem = cameraSystem;
 
-     // Consumers should use lastClick and lastKey
+     // Consumers should use lastTouch and lastKey
      // These values will persist for exactly one frame
 
-    this.nextClick = vec2.create();
-    this.lastClick = vec2.fromValues(undefined, undefined); // Consumers should use lastClick
+     // Need to create these as vec3 even if we only ever intend to populate
+     // them wil 2D values as other parts of the system expect 3D positions
+    this.nextClick = vec3.create();
+    this.lastClick = vec3.fromValues(undefined, undefined); // One off consumers should use lastTouch
+    this.currentTouch = vec3.create(); // Consumers should use lastTouch
+
+    this.touches = [];
 
     this.nextKey = null;
     this.lastKey = null; // Consumers should use lastKey
@@ -58,22 +63,46 @@ var GE = (function(GE){
   };
 
   function initScreen(inputSystem){
-    TouchClick(inputSystem.screen, function(e) {
-      var offset = inputSystem.screen.offset(),
-          event = e.originalEvent,
-          touch = event.touches && event.touches[0],
-          x = (touch ? touch.pageX : e.pageX) - offset.left,
-          y = (touch ? touch.pageY : e.pageY) - offset.top;
-      vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
-    });
+    TouchClick(inputSystem.screen,
+      function(e) { // Touch Start
+        var offset = inputSystem.screen.offset(),
+            event = e.originalEvent,
+            touch = event.touches && event.touches[0],
+            x = (touch ? touch.pageX : e.pageX) - offset.left,
+            y = (touch ? touch.pageY : e.pageY) - offset.top;
+        vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
+        vec2.copy(inputSystem.currentTouch, inputSystem.nextClick);
+
+        inputSystem.touches.push({position: inputSystem.currentTouch});
+      },
+      function (e) {  // Touch End
+        inputSystem.touches.length = 0;
+      },
+      function (e) {  // Touch Move
+        // TODO: Avoid duplication!
+        var offset = inputSystem.screen.offset(),
+            event = e.originalEvent,
+            touch = event.touches && event.touches[0],
+            x = (touch ? touch.pageX : e.pageX) - offset.left,
+            y = (touch ? touch.pageY : e.pageY) - offset.top;
+
+        vec2.copy(inputSystem.currentTouch, screenToWorld(inputSystem, x, y));
+      }
+    );
 
     $(inputSystem.keyboard).on("keydown", function(e) {
       inputSystem.nextKey = e.which;
     });
   };
 
-  function TouchClick(sel, fnc) {
-    $(sel).on('touchstart click', function(event){
+  function TouchClick(sel, fncStart, fncEnd, fncMove) {
+    [
+      'touchstart mousedown',
+      'touchend mouseup',
+      'touchmove mousemove'
+    ].forEach(function (ev, i) {
+      $(sel).on(ev, function(event){
+          var fnc = (i == 0) ? fncStart : ((i == 1) ? fncEnd: fncMove);
           event.stopPropagation();
           event.preventDefault();
           if(event.handled !== true) {
@@ -82,7 +111,8 @@ var GE = (function(GE){
           } else {
               return false;
           }
-    });
+      });
+    })
   }
 
   function worldToScreen(inputSystem, worldX, worldY){
@@ -98,13 +128,11 @@ var GE = (function(GE){
     return v;
   };
 
+  var s2WV = vec2.create(),
+      s2WRotMat = mat2.create();
+
   function screenToWorld(inputSystem, screenX, screenY){
-    // Creating vectors in here *should* be OK as I assume this method
-    // won't be called too often as it will usually be as a result of
-    // user interaction
-    var v = vec2.create(),
-        rotMat = mat2.create(),
-        cam = inputSystem.cameraSystem,
+    var cam = inputSystem.cameraSystem,
         camWidth = cam.width,
         camHeight = cam.height,
         screen = inputSystem.screen,
@@ -112,23 +140,23 @@ var GE = (function(GE){
         screenHeight = screen.height(),
         screenScale = camWidth / screenWidth;
 
-    vec2.set(v,
+    vec2.set(s2WV,
         screenX - screenWidth / 2,
         screenY - screenHeight / 2);
 
-    vec2.scale(v, v, screenScale);
+    vec2.scale(s2WV, s2WV, screenScale);
 
-    vec2.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+    vec2.set(s2WV, s2WV[0] / cam.scaleX, s2WV[1] / cam.scaleY);
 
     // Rotation in 2D only makes sense around the Z-axis so that is
     // all that is handled here.
     if(cam.rotationAxis[2] == 1){
-      mat2.rotate(rotMat, rotMat, -cam.rotation);
-      vec2.transformMat2(v, v, rotMat);
+      mat2.rotate(s2WRotMat, s2WRotMat, -cam.rotation);
+      vec2.transformMat2(s2WV, s2WV, s2WRotMat);
     }
 
-    vec2.add(v, v, cam.position);
-    return v;
+    vec2.add(s2WV, s2WV, cam.position);
+    return s2WV;
   };
   // Exported as Static method
   InputSystem.screenToWorld = screenToWorld;

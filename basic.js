@@ -38,8 +38,8 @@ var GE = (function(GE){
 	GE.GameComponent.create(function PhysicsComponent(){ }, {
 		update: function(parent, delta) {
 			if(parent.impulse){
-				vec2.add(parent.velocity, parent.velocity, parent.impulse);
-				vec2.set(parent.impulse, 0, 0);
+				vec3.add(parent.velocity, parent.velocity, parent.impulse);
+				vec3.set(parent.impulse, 0, 0, 0);
 			}
 		}
 	});
@@ -180,12 +180,29 @@ var GE = (function(GE){
 			this.target = object;
 		}
 	});
+
 	GameComponent.create(function FollowAtDistanceComponent(object, distance) {
 		this.target = object;
 		this.distance = distance;
 	}, {
 		update: function(parent, delta) {
 			vec3.add(parent.position, this.target.position, this.distance);
+		}
+	});
+
+	GameComponent.create(function TrackComponent(object) {
+		this.target = object;
+		this._vec = vec3.create();
+	}, {
+		update: function(parent, delta) {
+			if(this.target){
+				vec3.subtract(this._vec, this.target.position, parent.position);
+				vec3.scale(this._vec, this._vec, 1 / delta);
+				vec3.add(parent.position, parent.position, this._vec);
+			}
+		},
+		setTarget: function (object) {
+			this.target = object;
 		}
 	});
 
