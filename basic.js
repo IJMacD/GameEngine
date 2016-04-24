@@ -174,7 +174,10 @@ var GE = (function(GE){
 		this.target = object;
 	}, {
 		update: function(parent, delta) {
-			vec3.copy(parent.position, this.target.position);
+			if(this.target) vec3.copy(parent.position, this.target.position);
+		},
+		setTarget: function (object) {
+			this.target = object;
 		}
 	});
 	GameComponent.create(function FollowAtDistanceComponent(object, distance) {
