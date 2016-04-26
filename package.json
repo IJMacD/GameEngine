@@ -1,0 +1,27 @@
+{
+  "name": "game-engine",
+  "version": "1.0.0",
+  "description": "A highly configurable, extremely modular Javascript game engine.",
+  "main": "ge.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "ink-docstrap": "^1.1.4",
+    "jsdoc-babel": "^0.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc -c jsdoc.conf.js -t ./node_modules/ink-docstrap/template -R README.md -r src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IJMacD/GameEngine.git"
+  },
+  "author": "Iain MacDonald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IJMacD/GameEngine/issues"
+  },
+  "homepage": "https://github.com/IJMacD/GameEngine#readme"
+}
