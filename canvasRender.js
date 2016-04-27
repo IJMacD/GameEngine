@@ -22,11 +22,11 @@ var GE = (function(GE){
 		}
 		this.renderQueue[layer].push(renderable);
 	};
-	function _renderQueue(context, queue){
+	function _renderQueue(context, queue, camera){
 		if(queue){
 			for(j = 0, n = queue.length; j < n; j++){
 				context.save();
-				queue[j].call(this, context);
+				queue[j].call(this, context, camera);
 				context.restore();
 			}
 			queue.length = 0;
@@ -59,7 +59,7 @@ var GE = (function(GE){
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			_renderQueue(this.context, this.renderQueue[i]);
+			_renderQueue(this.context, this.renderQueue[i], this.cameraSystem);
 		}
 
 		this.context.restore();
