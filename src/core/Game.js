@@ -25,20 +25,36 @@ var STATE_PAUSED = 0,
 export default function Game(options) {
   this.canvas = options.canvas;
 
-  /** Width of game */
+  /** Width of game canvas. Use {@link Game#setSize} to change.
+   * @readonly
+   */
   this.width = options.width || this.canvas.width;
-  /** height of game */
+  /** Height of game canvas. Use {@link Game#setSize} to change.
+   * @readonly
+   */
   this.height = options.height || this.canvas.height;
 
   this.canvas.width = this.width;
   this.canvas.height = this.height;
 
   // Init some properties
+  /** The root {@link GameObject} from which the object tree grows. This is the
+   * input point for the loop to inject the time delta. All objects wanting updated
+   * need to be a child or grandchild of this object.
+   * @type {GameObject}
+   */
   this.root = new GE.GameObjectManager();
   this.textures = [];
+  /** Counter of how many frames have been rendered so far. */
   this.frame = 0;
+  /** Current game time in milliseconds */
   this.time = 0;
+  /** Keeps track of an arbritary score. */
   this.score = 0;
+  /** Tracks what level the game is running. Don't change this directly use
+   * {@link Game#setLevel} instead.
+   * @readonly
+   */
   this.level = 0;
 
   // Number of resources currently pending

@@ -7,31 +7,31 @@ import GameComponent from 'GameComponent';
  */
 export default function GameObject(){
   /** Array of components which update this GameObject.
-   * @member {array} */
+   * @type {array} */
   this.components = [];
   /** Position of this object in the world.
-  * @member {vec3} */
+  * @type {vec3} */
   this.position = vec3.create();
   /** Velocity of this object moving through the world.
-  * @member {vec3} */
+  * @type {vec3} */
   this.velocity = vec3.create();
   /** Current rotation of this object.
-  * @member {number} */
+  * @type {number} */
   this.rotation = 0;
   /** Current speed of rotation.
-  * @member {number} */
+  * @type {number} */
   this.rotationSpeed = 0;
   /**
     * List of components which will be removed on next update.
     * @private
-    * @member {array}
+    * @type {array}
     */
   this.toBeRemoved = [];
   /** Integer representing the number of lives remaining for this object.
-  * @member {number} */
+  * @type {number} */
   this.life = 1;
   /** Integer representing the team this object belongs to.
-  * @member {number} */
+  * @type {number} */
   this.team = 0;
 
   this.components.remove = arrayRemoveItem;
