@@ -96,7 +96,8 @@ var GE = (function(GE){
 
   Game.prototype.getDefaultWorld = function () {
     var bounds = [0, 0, this.canvas.width, this.canvas.height];
-    return new GE.WorldSystem(bounds);
+    this.worldSystem = new GE.WorldSystem(bounds);
+    return this.worldSystem;
   };
 
   /**
@@ -128,6 +129,33 @@ var GE = (function(GE){
     this.canvas.width = width;
     this.canvas.height = height;
   };
+
+  Game.prototype.autosize = function (autosize) {
+    var self = this,
+        fn = function () { _autosize(self); };
+    if(autosize == undefined) autosize = true;
+    if(autosize){
+      $(window).on("resize", fn);
+      fn();
+    }
+    else {
+      // This will break stuff!!
+      // Should be $(window).off("resize", fn);
+      // but it won't work because we recreate fn and don't store original fn
+      $(window).off("resize");
+    }
+  }
+
+  function _autosize(game) {
+    var $canvas = $(game.canvas),
+        scale = window.devicePixelRatio || 1,
+        w = $canvas.width() * scale,
+        h = $canvas.height() * scale;
+    game.setSize(w, h);
+    game.cameraSystem.setPosition(w/2,h/2);
+    game.cameraSystem.setSize(w, h);
+    game.worldSystem.setBounds([0,0,w,h]);
+  }
 
   Game.prototype.on = function (event, callback) {
     if(!this._events[event]){
