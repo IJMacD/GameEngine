@@ -48,6 +48,7 @@ var GE = (function(GE){
 
     // Click
     vec2.copy(this.lastClick, this.nextClick);
+    this.lastClick.which = this.nextClick.which;
     // Consumers should interpret (NaN, NaN) as no click
     vec2.set(this.nextClick, undefined, undefined);
 
@@ -65,6 +66,7 @@ var GE = (function(GE){
           x = (touch ? touch.pageX : e.pageX) - offset.left,
           y = (touch ? touch.pageY : e.pageY) - offset.top;
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
+      inputSystem.nextClick.which = e.which;
     });
 
     $(inputSystem.keyboard).on("keydown", function(e) {
@@ -73,7 +75,7 @@ var GE = (function(GE){
   };
 
   function TouchClick(sel, fnc) {
-    $(sel).on('touchstart click', function(event){
+    $(sel).on('touchstart mousedown', function(event){
           event.stopPropagation();
           event.preventDefault();
           if(event.handled !== true) {
@@ -82,7 +84,7 @@ var GE = (function(GE){
           } else {
               return false;
           }
-    });
+    }).on('contextmenu', false);
   }
 
   function worldToScreen(inputSystem, worldX, worldY){
