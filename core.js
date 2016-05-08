@@ -15,9 +15,14 @@ var GE = (function(GE){
 		this.components = [];
 		this.position = vec3.create();
 		this.velocity = vec3.create();
+		this.acceleration = vec3.create();
+		this.impulse = vec3.create();
 		this.rotation = 0;
 		this.rotationSpeed = 0;
+		this.mass = 1;
+
 		this.toBeRemoved = [];
+
 		this.life = 1;
 		this.team = 0;
 

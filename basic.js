@@ -10,9 +10,7 @@ var GE = (function(GE){
 
 	GameComponent.create(function GravityComponent(){},{
 		update: function(parent, delta) {
-			if(typeof parent.velocity[1] == "undefined")
-				parent.velocity[1] = 0;
-			parent.velocity[1] += GE.GRAVITATIONAL_CONSTANT*delta;
+			parent.acceleration[1] += GE.GRAVITATIONAL_CONSTANT;
 		}
 	});
 
@@ -22,9 +20,9 @@ var GE = (function(GE){
 	}, {
 		update: function(parent, delta) {
 			vec3.subtract(this.vector, this.target.position, parent.position);
-			var scale = this.target.mass*delta/vec3.squaredLength(this.vector);
+			var scale = this.target.mass/vec3.squaredLength(this.vector);
 			vec3.normalize(this.vector, this.vector);
-			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
+			vec3.scaleAndAdd(parent.acceleration, parent.acceleration, this.vector, scale);
 		}
 	});
 
@@ -37,9 +35,13 @@ var GE = (function(GE){
 
 	GE.GameComponent.create(function PhysicsComponent(){ }, {
 		update: function(parent, delta) {
-			if(parent.impulse){
-				vec2.add(parent.velocity, parent.velocity, parent.impulse);
-				vec2.set(parent.impulse, 0, 0);
+			if(parent.acceleration){
+				vec3.scaleAndAdd(parent.velocity, parent.velocity, parent.acceleration, delta);
+				vec3.set(parent.acceleration, 0, 0, 0);
+			}
+			if(parent.impulse && parent.mass){
+				vec3.scaleAndAdd(parent.velocity, parent.velocity, parent.impulse, 1 / parent.mass);
+				vec3.set(parent.impulse, 0, 0, 0);
 			}
 		}
 	});
