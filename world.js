@@ -37,8 +37,8 @@ var GE = (function(GE){
 			this.by1 = this.worldSystem.bounds[1] - parent.bounds[1];
 			this.bx2 = this.worldSystem.bounds[2] - parent.bounds[2];
 			this.by2 = this.worldSystem.bounds[3] - parent.bounds[3];
-			this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4];
-			this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5];
+			this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4] || 0;
+			this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5] || 0;
 		}
 		else{
 			this.bx1 = this.worldSystem.bounds[0] + this.ax;
