@@ -40,6 +40,7 @@ var GE = (function(GE){
     this.time = 0;
     this.score = 0;
     this.level = 0;
+    this.timeScale = 1;
 
     // Number of resources currently pending
     this._toLoad = 0;
@@ -155,8 +156,9 @@ var GE = (function(GE){
     function loop(time){
       self.time = time;
       self.frame++;
+      var delta = Math.min(time - self._lastTime,100)
       try {
-        self.root.update(Math.min(time - self._lastTime,100));
+        self.root.update(delta * self.timeScale);
 
         if(self.state == STATE_PLAYING){
           _raf(loop);
