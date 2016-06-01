@@ -34,6 +34,13 @@ var GE = (function(GE){
 			}
 
 			this.components.push(component);
+
+			// If the component has an init method call it when added so that the
+			// component can add properties to the parent object
+			if(component.init){
+				component.init(this);
+			}
+
 			return this;
 		},
 		removeComponent: function(component){
