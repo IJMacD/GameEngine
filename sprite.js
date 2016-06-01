@@ -44,33 +44,57 @@ var GE = (function(GE){
       var sprite = parent.sprite,
           image = sprite && sprite.t.image;
 
-      this.renderSystem.push(function(context){
-        var x = parent.position[0],
-            y = parent.position[1],
-            w = sprite.w,
-            h = sprite.h;
-        context.translate(x,y);
-        context.rotate(parent.rotation);
-        context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
-      }, this.layer);
+      if(sprite){
+        this.renderSystem.push(function(context){
+          var x = parent.position[0],
+              y = parent.position[1],
+              w = sprite.w,
+              h = sprite.h;
+          context.translate(x,y);
+          context.rotate(parent.rotation);
+          context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
+        }, this.layer);
+      }
     }
   });
 
   GE.GameComponent.create(function SpriteAnimationComponent(duration){
       this.duration = duration;
-      this.countdown = 0;
       this.spriteIndex = 0;
+      this.playing = true;
   }, {
-    update: function(parent, delta) {
-      var spriteCount = parent.sprites.length;
-
-      this.countdown -= delta;
-      if(this.countdown <= 0){
-        // TODO: Possible divide by zero
-        this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
-        parent.sprite = parent.sprites[this.spriteIndex];
-        this.countdown = this.duration;
+    init: function(parent){
+      if(parent.sprites.length){
+        parent.sprite = parent.sprites[0];
       }
+      parent.spriteCountdown = (parent.sprite && parent.sprite.d) || this.duration;
+    },
+    update: function(parent, delta) {
+      var spriteCount = parent.sprites.length,
+          sprite,
+          duration;
+
+      if(this.playing){
+        parent.spriteCountdown -= delta;
+        if(parent.spriteCountdown <= 0){
+          // TODO: Possible divide by zero
+          this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
+          sprite = parent.sprites[this.spriteIndex];
+          parent.sprite = sprite;
+          duration = sprite.d || this.duration;
+          parent.spriteCountdown = duration;
+        }
+      }
+    },
+    play: function() {
+      this.playing = true;
+    },
+    stop: function () {
+      this.playing = false;
+      this.spriteIndex = 0;
+    },
+    pause: function () {
+      this.playing = false;
     }
   });
 
