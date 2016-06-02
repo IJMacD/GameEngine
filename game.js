@@ -9,7 +9,8 @@ var GE = (function(GE){
 
       STATE_PAUSED = 0,
       STATE_PLAYING = 1,
-      STATE_DEAD = 2,
+      STATE_STOPPED = 2,
+      STATE_DEAD = 3,
 
       _lastTime = 0,
       _raf = window.requestAnimationFrame || function(callback, element) {
@@ -76,6 +77,11 @@ var GE = (function(GE){
     this.state = STATE_PLAYING;
 
     _loop(this);
+  };
+
+  Game.prototype.stop = function () {
+
+    this.state = STATE_STOPPED;
   };
 
   Game.prototype.getDefaultCamera = function () {
