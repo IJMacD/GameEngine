@@ -28,11 +28,13 @@ var GE = (function(GE){
   function Game(options) {
     this.canvas = options.canvas;
 
-    this.width = options.width || this.canvas.width;
-    this.height = options.height || this.canvas.height;
+    this.width = options.width || (this.canvas && this.canvas.width);
+    this.height = options.height || (this.canvas && this.canvas.height);
 
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    if(this.canvas){
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+    }
 
     // Init some properties
     this.root = new GE.GameObjectManager();
@@ -48,6 +50,16 @@ var GE = (function(GE){
     this._events = {};
   }
   GE.Game = Game;
+
+  Game.prototype.setCanvas = function (canvas) {
+    this.canvas = canvas;
+
+    this.width = this.width || this.canvas.width;
+    this.height = this.height || this.canvas.height;
+
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+  };
 
   Game.prototype.loadTextures = function (texturePaths) {
     this._toLoad += texturePaths.length;
