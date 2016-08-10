@@ -120,10 +120,10 @@ var GE = (function(GE){
   /**
    * Must call getDefaultCamera before this method
    */
-  Game.prototype.getDefaultInput = function () {
+  Game.prototype.getDefaultInput = function (screen) {
     // params are: (screen, keyboard, camera)
     // Input system needs a screen it can call width() and height() on
-    return new GE.InputSystem($(this.canvas), document, this.cameraSystem);
+    return new GE.InputSystem(screen, document, this.cameraSystem);
   };
 
   Game.prototype.nextLevel = function () {

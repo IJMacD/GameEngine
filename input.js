@@ -67,13 +67,13 @@ var GE = (function(GE){
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
     });
 
-    $(inputSystem.keyboard).on("keydown", function(e) {
+    inputSystem.keyboard.addEventListener("keydown", function(e) {
       inputSystem.nextKey = e.which;
     });
   };
 
   function TouchClick(sel, fnc) {
-    $(sel).on('touchstart click', function(event){
+    sel.on('touchstart click', function(event){
           event.stopPropagation();
           event.preventDefault();
           if(event.handled !== true) {
