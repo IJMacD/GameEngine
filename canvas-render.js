@@ -1,20 +1,13 @@
-var GE = (function(GE){
+import { GameObject, GameObjectManager } from './core';
 
-	GE.Comp = GE.Comp || {};
-
-	var GameComponent = GE.GameComponent,
-		GameObjectManager = GE.GameObjectManager,
-		GEC = GE.Comp;
-
-	function CanvasRenderSystem(context, cameraSystem){
+	export default function CanvasRenderSystem(context, cameraSystem){
 		this.context = context;
 		this.canvas = context && context.canvas;
 		this.cameraSystem = cameraSystem;
 		this.renderQueue = [];
 		this.clearScreen = true;
 	}
-	GE.CanvasRenderSystem = CanvasRenderSystem;
-	CanvasRenderSystem.prototype = new GE.GameObject();
+	CanvasRenderSystem.prototype = new GameObject();
 	CanvasRenderSystem.prototype.push = function(renderable, layer){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
@@ -24,7 +17,7 @@ var GE = (function(GE){
 	};
 	function _renderQueue(context, queue){
 		if(queue){
-			for(j = 0, n = queue.length; j < n; j++){
+			for(let j = 0, n = queue.length; j < n; j++){
 				context.save();
 				queue[j].call(this, context);
 				context.restore();
@@ -90,10 +83,9 @@ var GE = (function(GE){
 		}, layer);
 	};
 
-	function MultiRenderSystem(){
+	export function MultiRenderSystem(){
 		this.renderSystems = [];
 	}
-	GE.MultiRenderSystem = MultiRenderSystem;
 	MultiRenderSystem.prototype = new CanvasRenderSystem();
 	MultiRenderSystem.prototype.addRenderSystem = function(renderSystem){
 		this.renderSystems.push(renderSystem);
@@ -115,8 +107,7 @@ var GE = (function(GE){
 		}
 	};
 
-	function CanvasRenderSystemManager(){}
-	GE.CanvasRenderSystemManager = CanvasRenderSystemManager;
+	export function CanvasRenderSystemManager(){}
 	CanvasRenderSystemManager.prototype = new GameObjectManager();
 	CanvasRenderSystemManager.prototype.push = function(renderable, layer){
 		for (var i = this.objects.length - 1; i >= 0; i--) {
@@ -134,6 +125,3 @@ var GE = (function(GE){
 			context.stroke();
 		}, layer);
 	};
-
-	return GE;
-}(GE || {}));

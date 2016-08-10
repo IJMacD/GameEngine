@@ -1,21 +1,15 @@
-var GE = (function(GE){
+import { GameObject, GameComponent } from './core';
 
-	GE.Comp = GE.Comp || {};
-
-	var GameObject = GE.GameObject,
-		GameComponent = GE.GameComponent;
-
-	function WorldSystem(bounds){
+	export default function WorldSystem(bounds){
 		this.bounds = bounds;
 	}
-	GE.WorldSystem = WorldSystem;
-	WorldSystem.prototype = new GE.GameObject();
+	WorldSystem.prototype = new GameObject();
 
 	WorldSystem.prototype.setBounds = function (bounds) {
 		this.bounds = bounds;
 	};
 
-	function WorldBounceComponent (worldSystem, width, height, thickness) {
+	export function WorldBounceComponent (worldSystem, width, height, thickness) {
 		this.worldSystem = worldSystem;
 		this.ax = (width || 0) / 2;
 		this.ay = (height || 0) / 2;
@@ -24,9 +18,8 @@ var GE = (function(GE){
 		this.cRestitution = 1;
 		this.cFriction = 1;
 	}
-	GE.Comp.WorldBounceComponent = WorldBounceComponent;
 
-	WorldBounceComponent.prototype = new GE.GameComponent();
+	WorldBounceComponent.prototype = new GameComponent();
 
 	WorldBounceComponent.prototype.update = function(parent, delta) {
 		var coef = this.cRestitution,
@@ -104,12 +97,11 @@ var GE = (function(GE){
 		}
 	};
 
-	function WorldWrapComponent (worldSystem) {
+	export function WorldWrapComponent (worldSystem) {
 		this.worldSystem = worldSystem;
 	}
-	GE.Comp.WorldWrapComponent = WorldWrapComponent;
 
-	WorldWrapComponent.prototype = new GE.GameComponent();
+	WorldWrapComponent.prototype = new GameComponent();
 
 	WorldWrapComponent.prototype.update = function(parent, delta) {
 		this.ax = this.worldSystem.bounds[0];
@@ -139,9 +131,10 @@ var GE = (function(GE){
 		}
 	};
 
-	GameComponent.create(function DrawBoundsComponent(renderSystem){
+	export function DrawBoundsComponent(renderSystem){
 		this.renderSystem = renderSystem;
-	},{
+	}
+	GameComponent.create(DrawBoundsComponent,{
 		update: function(parent, delta){
 			var b = parent.bounds,
 				x = parent.position[0],
@@ -155,6 +148,3 @@ var GE = (function(GE){
 			]);
 		}
 	});
-
-	return GE;
-}(GE || {}));

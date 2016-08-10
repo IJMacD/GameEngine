@@ -2,7 +2,7 @@
  * This function simplifies paths which are really just path segments
  * by joining up adjacent segments
  */
-function simplifyPaths(paths){
+export function simplifyPaths(paths){
   var out = [],
       current,
       x,

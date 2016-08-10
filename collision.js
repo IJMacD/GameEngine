@@ -1,20 +1,13 @@
-var GE = (function(GE){
+import { GameObject, GameComponent } from './core';
+import { vec2 } from 'gl-matrix';
 
-	GE.Comp = GE.Comp || {};
-
-	var GameObject = GE.GameObject,
-			GameComponent = GE.GameComponent,
-			GameObjectManager = GE.GameObjectManager,
-			GEC = GE.Comp;
-
-	function CollisionSystem(collisionCallback) {
+	export default function CollisionSystem(collisionCallback) {
 		GameObject.call(this); // Remember parent constructor
 		this.attackBounds = [];
 		this.vulnerableBounds = [];
 		this.callback = collisionCallback;
 	}
-	GE.CollisionSystem = CollisionSystem;
-	CollisionSystem.prototype = new GE.GameObject();
+	CollisionSystem.prototype = new GameObject();
 	CollisionSystem.prototype.addAttackBounds = function(bounds){
 		this.attackBounds.push(bounds);
 	};
@@ -48,9 +41,10 @@ var GE = (function(GE){
 		this.vulnerableBounds.length = 0;
 	};
 
-	GE.GameComponent.create(function AttackCollisionComponent(collisionSystem) {
+	export function AttackCollisionComponent(collisionSystem) {
 		this.collisionSystem = collisionSystem;
-	},
+	}
+	GameComponent.create(AttackCollisionComponent,
 	{
 		update: function(parent, delta){
 			var x = parent.position[0],
@@ -65,9 +59,10 @@ var GE = (function(GE){
 		}
 	});
 
-	GE.GameComponent.create(function VulnerableCollisionComponent(collisionSystem) {
+	export function VulnerableCollisionComponent(collisionSystem) {
 		this.collisionSystem = collisionSystem;
-	},
+	}
+	GameComponent.create(VulnerableCollisionComponent,
 	{
 		update: function(parent, delta){
 			var x = parent.position[0],
@@ -82,11 +77,10 @@ var GE = (function(GE){
 		}
 	});
 
-	function BackgroundCollisionSystem() {
+	export function BackgroundCollisionSystem() {
 		GameObject.call(this); // Remember parent constructor
 		this.surfaces = [];
 	}
-	GE.BackgroundCollisionSystem = BackgroundCollisionSystem;
 	BackgroundCollisionSystem.prototype = new GameObject();
 	BackgroundCollisionSystem.prototype.addSurface = function(surface) {
 		this.surfaces.push(surface);
@@ -114,12 +108,11 @@ var GE = (function(GE){
 			q_p = vec2.create(),
 			v = vec2.create();
 
-	function BackgroundCollisionComponent(backgroundSystem, collisionBounds) {
+	export function BackgroundCollisionComponent(backgroundSystem, collisionBounds) {
 		this.backgroundSystem = backgroundSystem;
 		this.bounds = collisionBounds;
 	}
-	GEC.BackgroundCollisionComponent = BackgroundCollisionComponent;
-	BackgroundCollisionComponent.prototype = new GE.GameComponent();
+	BackgroundCollisionComponent.prototype = new GameComponent();
 	BackgroundCollisionComponent.prototype.update = function(parent, delta)
 	{
 		// This logic should probably be moved to BackgroundCollisionSystem
@@ -180,10 +173,11 @@ var GE = (function(GE){
 		return a[0]*b[1] - a[1]*b[0];
 	}
 
-	GameComponent.create(function DrawSurfacesComponent(renderSystem, colour){
+	export function DrawSurfacesComponent(renderSystem, colour){
 		this.renderSystem = renderSystem;
 		this.colour = colour || "#000";
-	},{
+	}
+	GameComponent.create(DrawSurfacesComponent,{
 		update: function(parent, delta){
 			var s = parent.surfaces,
 				j = 0,
@@ -215,6 +209,3 @@ var GE = (function(GE){
 			}
 		}
 	});
-
-	return GE;
-}(GE || {}));

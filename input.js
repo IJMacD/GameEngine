@@ -1,11 +1,5 @@
-var GE = (function(GE){
-  "use strict";
-
-  GE.Comp = GE.Comp || {};
-
-  var GameObject = GE.GameObject,
-      GameComponent = GE.GameComponent,
-      GEC = GE.Comp;
+import { GameObject } from './core';
+import { vec2, mat2 } from 'gl-matrix';
 
   /**
    * InputSystem's job is to keep track of most recent user input to provide
@@ -19,7 +13,7 @@ var GE = (function(GE){
    * @param keyboard Something to watch for keyboard events on e.g. document
    * @param cameraSystem A camera to be used for mapping co-ordinates
    */
-  function InputSystem(screen, keyboard, cameraSystem) {
+  export default function InputSystem(screen, keyboard, cameraSystem) {
     GameObject.call(this); // Remember parent constructor
 
     this.screen = screen;
@@ -37,11 +31,10 @@ var GE = (function(GE){
 
     initScreen(this);
   }
-  GE.InputSystem = InputSystem;
-  InputSystem.prototype = new GE.GameObject();
+  InputSystem.prototype = new GameObject();
 
   InputSystem.prototype.update = function(delta) {
-    GE.GameObject.prototype.update.call(this, delta);
+    GameObject.prototype.update.call(this, delta);
 
     // Cycle the next event to last event property here so that
     // last event persists for exactly one frame.
@@ -138,6 +131,3 @@ var GE = (function(GE){
     a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
     n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
   };
-
-  return GE;
-}(GE || {}));

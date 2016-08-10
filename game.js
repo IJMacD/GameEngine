@@ -1,13 +1,10 @@
-var GE = (function(GE){
-  "use strict";
+import { GameObject, GameComponent, GameObjectManager } from './core';
+import CameraSystem from './camera';
+import CanvasRenderSystem from './canvas-render';
+import WorldSystem from './world';
+import InputSystem from './input';
 
-  GE.Comp = GE.Comp || {};
-
-  var GameObject = GE.GameObject,
-      GameComponent = GE.GameComponent,
-      GEC = GE.Comp,
-
-      STATE_PAUSED = 0,
+  var STATE_PAUSED = 0,
       STATE_PLAYING = 1,
       STATE_STOPPED = 2,
       STATE_DEAD = 3,
@@ -25,7 +22,7 @@ var GE = (function(GE){
   /**
    * Utility class for things such as bootstrapping Game
    */
-  function Game(options) {
+  export default function Game(options) {
     this.canvas = options.canvas;
 
     this.width = options.width || (this.canvas && this.canvas.width);
@@ -37,7 +34,7 @@ var GE = (function(GE){
     }
 
     // Init some properties
-    this.root = new GE.GameObjectManager();
+    this.root = new GameObjectManager();
     this.textures = [];
     this.frame = 0;
     this.time = 0;
@@ -49,7 +46,6 @@ var GE = (function(GE){
     this._lastTime = 0;
     this._events = {};
   }
-  GE.Game = Game;
 
   Game.prototype.setCanvas = function (canvas) {
     this.canvas = canvas;
@@ -99,7 +95,7 @@ var GE = (function(GE){
   Game.prototype.getDefaultCamera = function () {
     var width = this.canvas.width,
         height = this.canvas.height;
-    this.cameraSystem = new GE.CameraSystem(width, height);
+    this.cameraSystem = new CameraSystem(width, height);
     this.cameraSystem.setPosition(width / 2, height / 2);
     return this.cameraSystem;
   };
@@ -109,12 +105,12 @@ var GE = (function(GE){
    */
   Game.prototype.getDefaultRenderer = function () {
     var context = this.canvas.getContext("2d");
-    return new GE.CanvasRenderSystem(context, this.cameraSystem);
+    return new CanvasRenderSystem(context, this.cameraSystem);
   };
 
   Game.prototype.getDefaultWorld = function () {
     var bounds = [0, 0, this.canvas.width, this.canvas.height];
-    return new GE.WorldSystem(bounds);
+    return new WorldSystem(bounds);
   };
 
   /**
@@ -123,7 +119,7 @@ var GE = (function(GE){
   Game.prototype.getDefaultInput = function (screen) {
     // params are: (screen, keyboard, camera)
     // Input system needs a screen it can call width() and height() on
-    return new GE.InputSystem(screen, document, this.cameraSystem);
+    return new InputSystem(screen, document, this.cameraSystem);
   };
 
   Game.prototype.nextLevel = function () {
@@ -194,6 +190,3 @@ var GE = (function(GE){
       fire(self, "resourcesLoaded");
     }
   };
-
-  return GE;
-}(GE || {}));

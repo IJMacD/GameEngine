@@ -1,16 +1,11 @@
-var GE = (function(GE){
+import { GameComponent } from './core';
 
-  GE.Comp = GE.Comp || {};
-
-  var GameObject = GE.GameObject,
-      GameComponent = GE.GameComponent,
-      GEC = GE.Comp;
-
-  GE.GameComponent.create(function TileComponent(renderSystem, texture, bounds) {
+  export function TileComponent(renderSystem, texture, bounds) {
     this.renderSystem = renderSystem;
     this.texture = texture;
     this.bounds = bounds;
-  }, {
+  }
+  GameComponent.create(TileComponent, {
     update: function(parent, delta){
       var renderSystem = this.renderSystem,
           texture = this.texture,
@@ -36,10 +31,11 @@ var GE = (function(GE){
     }
   });
 
-  GE.GameComponent.create(function SpriteRenderingComponent(renderSystem, layer){
+  export function SpriteRenderingComponent(renderSystem, layer){
     this.renderSystem = renderSystem;
     this.layer = layer;
-  }, {
+  }
+  GameComponent.create(SpriteRenderingComponent, {
     update: function(parent, delta) {
       var sprite = parent.sprite,
           image = sprite && sprite.t.image;
@@ -58,11 +54,12 @@ var GE = (function(GE){
     }
   });
 
-  GE.GameComponent.create(function SpriteAnimationComponent(duration){
+  export function SpriteAnimationComponent(duration){
       this.duration = duration;
       this.spriteIndex = 0;
       this.playing = true;
-  }, {
+  }
+  GameComponent.create(SpriteAnimationComponent, {
     init: function(parent){
       if(parent.sprites.length){
         parent.sprite = parent.sprites[0];
@@ -98,9 +95,9 @@ var GE = (function(GE){
     }
   });
 
-  GE.Sprite = GE.Sprite || {};
+  export const Sprite = {};
 
-  GE.Sprite.generateSpriteSheet = function(sprite, rows, cols){
+  Sprite.generateSpriteSheet = function(sprite, rows, cols){
     var out = [],
         i,
         j;
@@ -124,13 +121,12 @@ var GE = (function(GE){
    * This component is not to be used any more. Use Sprite animation component instead
    * @deprecated
    */
-  function AnimatedSpriteComponent(images, speed){
+  export function AnimatedSpriteComponent(images, speed){
     this.images = images;
     this.delay = 1000 / speed;
     this.lastChange = 0;
     this.imageIndex = 0;
   }
-  GEC.AnimatedSpriteComponent = AnimatedSpriteComponent;
   AnimatedSpriteComponent.prototype = new GameComponent();
   AnimatedSpriteComponent.prototype.update = function(parent, delta) {
     if(this.lastChange > this.delay){
@@ -146,10 +142,9 @@ var GE = (function(GE){
    * This component is not to be used any more. Use other components instead
    * @deprecated
    */
-  function CanvasSpriteRenderingComponent(renderSystem){
+  export function CanvasSpriteRenderingComponent(renderSystem){
     this.renderSystem = renderSystem;
   }
-  GEC.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
   CanvasSpriteRenderingComponent.prototype = new GameComponent();
   CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
     this.renderSystem.push(function(context){
@@ -162,6 +157,3 @@ var GE = (function(GE){
       context.drawImage(parent.sprite,-w/2,-h/2);
     });
   };
-
-  return GE;
-}(GE || {}));

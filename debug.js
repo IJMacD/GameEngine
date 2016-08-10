@@ -1,12 +1,6 @@
-var GE = (function(GE){
+import { GameComponent } from './core';
 
-	GE.Comp = GE.Comp || {};
-
-	var GameComponent = GE.GameComponent,
-		GEC = GE.Comp;
-
-
-	function DebugDrawPathComponent (renderSystem, object){
+	export function DebugDrawPathComponent (renderSystem, object){
 		this.path = [];
 		this.pathSize = 1000;
 		this.pathIndex = 0;
@@ -18,7 +12,6 @@ var GE = (function(GE){
 		else
 			this.relativeTo = vec2.create();
 	}
-	GEC.DebugDrawPathComponent = DebugDrawPathComponent;
 	DebugDrawPathComponent.prototype = new GameComponent();
 	DebugDrawPathComponent.prototype.update = function(parent, delta) {
 		if(GE.DEBUG){
@@ -74,6 +67,3 @@ var GE = (function(GE){
 			this.pathIndex = 0;
 		}
 	};
-
-	return GE;
-}(GE || {}));

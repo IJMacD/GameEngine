@@ -1,10 +1,7 @@
-var GE = (function(GE){
+import { GameObject, GameObjectManager } from './core';
+import { vec3 } from 'gl-matrix';
 
-	GE.Comp = GE.Comp || {};
-
-	var GameObject = GE.GameObject;
-
-	function CameraSystem (width, height) {
+	export default function CameraSystem (width, height) {
 		GameObject.call(this);
 
 		this.width = width;
@@ -20,8 +17,7 @@ var GE = (function(GE){
 		this.rotationAxis = vec3.create();
 		vec3.set(this.rotationAxis, 0, 0, 1);
 	}
-	GE.CameraSystem = CameraSystem;
-	CameraSystem.prototype = new GE.GameObject();
+	CameraSystem.prototype = new GameObject();
 
 	CameraSystem.prototype.setScale = function(scaleX, scaleY){
 		scaleY = scaleY || scaleX;
@@ -42,7 +38,7 @@ var GE = (function(GE){
 	};
 
 	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
-		if(objectManager instanceof GE.GameObjectManager)
+		if(objectManager instanceof GameObjectManager)
 			this.pruneList.push(objectManager);
 	};
 	CameraSystem.prototype.getTransformMatrix = function(){
@@ -52,7 +48,7 @@ var GE = (function(GE){
 		return this.transformMatrix;
 	};
 	CameraSystem.prototype.update = function(delta) {
-		GE.GameObject.prototype.update.call(this, delta);
+		GameObject.prototype.update.call(this, delta);
 		//this.rotation += 0.0001 * delta;
 		//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
 		//this.angle += 0.0001 * delta;
@@ -82,6 +78,3 @@ var GE = (function(GE){
 		}
 		*/
 	};
-
-	return GE;
-}(GE || {}));

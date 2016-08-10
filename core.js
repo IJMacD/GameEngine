@@ -1,17 +1,8 @@
-/* global vec2 */
-/* global vec3 */
-/* global mat2 */
-/* global mat3 */
-/* global mat4 */
-var GE = (function(GE){
-
-	GE.Comp = GE.Comp || {};
-
-	var GEC = GE.Comp;
+import { vec3 } from 'gl-matrix';
 
 	// Exported at end.
 
-	function GameObject(){
+	export function GameObject(){
 		this.components = [];
 		this.position = vec3.create();
 		this.velocity = vec3.create();
@@ -131,7 +122,7 @@ var GE = (function(GE){
 		}
 	};
 
-	function GameObjectManager (){
+	export function GameObjectManager (){
 		GameObject.call(this);
 
 		this.objects = [];
@@ -213,7 +204,7 @@ var GE = (function(GE){
 		return html;
 	};
 
-	function GameComponent(){};
+	export function GameComponent(){};
 	GameComponent.prototype.update = function(parent, delta){};
 	GameComponent.prototype.toHTML = function() {
 		return this.name;
@@ -222,13 +213,6 @@ var GE = (function(GE){
 		constructor.prototype = new GameComponent();
 		for(var prop in properties){
 			constructor.prototype[prop] = properties[prop];
-		}
-		var name = false;// constructor.name;
-		if(!name){
-			name = constructor.toString().match(/^function ([a-z_]+)/i)[1];
-		}
-		if(name){
-			GEC[name] = constructor;
 		}
 		return constructor;
 	};
@@ -242,11 +226,3 @@ var GE = (function(GE){
 	function isFunction(a) {
 		return (a instanceof Function);
 	}
-
-	GE.GameObject = GameObject;
-	GE.GameComponent = GameComponent;
-	GE.GameObjectManager = GameObjectManager;
-
-	return GE;
-
-}(GE || {}));
