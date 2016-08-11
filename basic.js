@@ -11,69 +11,75 @@ import { vec3 } from 'gl-matrix';
 		}
 	}
 
-	export function PointGravityComponent (target) {
-		this.target = target;
-		this.vector = vec3.create();
-	}
-	GameComponent.create(PointGravityComponent, {
-		update: function(parent, delta) {
+	export class PointGravityComponent extends GameComponent {
+		constructor (target) {
+			super();
+			this.target = target;
+			this.vector = vec3.create();
+		}
+
+		update (parent, delta) {
 			vec3.subtract(this.vector, this.target.position, parent.position);
 			var scale = this.target.mass*delta/vec3.squaredLength(this.vector);
 			vec3.normalize(this.vector, this.vector);
 			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
 		}
-	});
+	}
 
-	export function MoveComponent () {};
-	MoveComponent.prototype = new GameComponent();
-	MoveComponent.prototype.update = function(parent, delta) {
-		vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
-	};
+	export class MoveComponent extends GameComponent {
+		update (parent, delta) {
+			vec3.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
+		}
+	}
 
-	export function PhysicsComponent(){ }
-	GameComponent.create(PhysicsComponent, {
-		update: function(parent, delta) {
+	export class PhysicsComponent extends GameComponent {
+		update (parent, delta) {
 			if(parent.impulse){
 				vec2.add(parent.velocity, parent.velocity, parent.impulse);
 				vec2.set(parent.impulse, 0, 0);
 			}
 		}
-	});
-
-	export function RandomMotionComponent(){}
-	RandomMotionComponent.prototype = new GameComponent();
-	RandomMotionComponent.prototype.update = function(parent, delta) {
-		if(Math.random()<0.001)
-			vec3.random(parent.velocity, Math.random());
-	};
-
-
-	export function RotationComponent (dth) {
-		this.rotationSpeed = dth;
 	}
-	RotationComponent.prototype = new GameComponent();
-	RotationComponent.prototype.update = function(parent, delta) {
-		var w = parent.rotationSpeed || this.rotationSpeed || 0;
-		parent.setRotation(parent.rotation + w * delta);
-	};
 
-	export function RotateToHeadingComponent () {}
-	RotateToHeadingComponent.prototype = new GameComponent();
-	RotateToHeadingComponent.prototype.update = function(parent, delta) {
-		parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
-	};
+	export class RandomMotionComponent extends GameComponent {
+		update (parent, delta) {
+			if(Math.random()<0.001)
+				vec3.random(parent.velocity, Math.random());
+		}
+	}
 
-	export function PositionInterpolatorComponent(duration, easing) {
-    this.duration = duration;
-    this.easing = easing || PositionInterpolatorComponent.linear;
-    this.elapsed = 0;
-    this.running = false;
-    this.starting = false;
-    this.start = vec3.create();
-    this.position = vec3.create();
-  }
-  let PIC = GameComponent.create(PositionInterpolatorComponent, {
-    update: function(parent, delta) {
+
+	export class RotationComponent extends GameComponent {
+		constructor (dth) {
+			super();
+			this.rotationSpeed = dth;
+		}
+
+		update (parent, delta) {
+			var w = parent.rotationSpeed || this.rotationSpeed || 0;
+			parent.setRotation(parent.rotation + w * delta);
+		}
+	}
+
+	export class RotateToHeadingComponent extends GameComponent {
+		update (parent, delta) {
+			parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
+		}
+	}
+
+	export class PositionInterpolatorComponent extends GameComponent {
+		constructor (duration, easing) {
+			super();
+	    this.duration = duration;
+	    this.easing = easing || PositionInterpolatorComponent.linear;
+	    this.elapsed = 0;
+	    this.running = false;
+	    this.starting = false;
+	    this.start = vec3.create();
+	    this.position = vec3.create();
+	  }
+
+    update (parent, delta) {
       // The first frame we run after being told to interpolate somewhere
       // we need to gather some information from our parent
       if(this.starting){
@@ -105,12 +111,14 @@ import { vec3 } from 'gl-matrix';
           this.elapsed += delta;
         }
       }
-    },
-    setPosition: function(x, y, z) {
+    }
+
+    setPosition (x, y, z) {
       vec3.set(this.position, x, y, z);
       this.starting = true;
     }
-  });
+  }
+	let PIC = PositionInterpolatorComponent;
   PIC.linear = function (t) { return t };
   PIC.quadIn = function (t) { return t*t };
   PIC.quadOut = function (t) { return -t*(t-2) };
@@ -149,9 +157,8 @@ import { vec3 } from 'gl-matrix';
     return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
   };
 
-	export function RotationInterpolatorComponent() {}
-	GameComponent.create(RotationInterpolatorComponent, {
-		update: function(parent, delta) {
+	export class RotationInterpolatorComponent extends GameComponent {
+		update (parent, delta) {
 			var rotation = parent.rotation,
 					target = parent.targetRotation,
 					diff = target - rotation,
@@ -163,87 +170,104 @@ import { vec3 } from 'gl-matrix';
 			}
 			parent.rotation = rotation + diff * delta * speed;
 		}
-	});
-
-	export function FollowComponent(object) {
-		this.target = object;
 	}
-	GameComponent.create(FollowComponent, {
-		update: function(parent, delta) {
-			if(this.target) vec3.copy(parent.position, this.target.position);
-		},
-		setTarget: function (object) {
+
+	export class FollowComponent extends GameComponent {
+		constructor (object) {
+			super();
 			this.target = object;
 		}
-	});
 
-	export function FollowAtDistanceComponent(object, distance) {
-		this.target = object;
-		this.distance = distance;
+		update (parent, delta) {
+			if(this.target) vec3.copy(parent.position, this.target.position);
+		}
+
+		setTarget (object) {
+			this.target = object;
+		}
 	}
-	GameComponent.create(FollowAtDistanceComponent, {
-		update: function(parent, delta) {
+
+	export class FollowAtDistanceComponent extends GameComponent {
+		constructor(object, distance) {
+			super();
+			this.target = object;
+			this.distance = distance;
+		}
+
+		update (parent, delta) {
 			vec3.add(parent.position, this.target.position, this.distance);
 		}
-	});
-
-	export function TrackRotationComponent(object) {
-		this.target = object;
 	}
-	GameComponent.create(TrackRotationComponent, {
-		update: function(parent, delta) {
+
+	export class TrackRotationComponent extends GameCompoent {
+		constructor (object) {
+			super();
+			this.target = object;
+		}
+
+		update (parent, delta) {
 			parent.rotation = this.target.rotation + Math.PI;
 		}
-	});
-
-	export function CounterRotationComponent(object) {
-		this.target = object;
 	}
-	GameComponent.create(CounterRotationComponent, {
-		update: function(parent, delta) {
+
+	export class CounterRotationComponent extends GameComponent {
+		constructor (object) {
+			super();
+			this.target = object;
+		}
+
+		update (parent, delta) {
 			parent.rotation = -this.target.rotation;
 		}
-	});
+	}
 
 	var addComponent = GameObject.prototype.addComponent;
-	export function SwitchComponent(switchObject, switchProperty) {
-		this.positiveComponents = [];
-		this.negativeComponents = [];
-		this.active = true;
-		this.object = switchObject;
-		this.prop = switchProperty;
-	}
-	GameComponent.create(SwitchComponent, {
-		addComponent: function(component){
+	export class SwitchComponent extends GameComponent {
+		constructor (switchObject, switchProperty) {
+			super();
+			this.positiveComponents = [];
+			this.negativeComponents = [];
+			this.active = true;
+			this.object = switchObject;
+			this.prop = switchProperty;
+		}
+
+		addComponent (component){
 			this.components = this.positiveComponents;
 			addComponent.call(this, component);
 			this.components  = undefined;
-		},
-		addPositiveComponent: function(component){
+		}
+
+		addPositiveComponent (component){
 			this.components = this.positiveComponents;
 			addComponent.call(this, component);
 			this.components  = undefined;
-		},
-		addNegativeComponent: function(component){
+		}
+
+		addNegativeComponent (component){
 			this.components = this.negativeComponents;
 			addComponent.call(this, component);
 			this.components  = undefined;
-		},
-		addComponents: function(positiveComponents, negativeComponents){
+		}
+
+		addComponents (positiveComponents, negativeComponents){
 			positiveComponents.forEach(this.addPositiveComponent.bind(this));
 			negativeComponents.forEach(this.addNegativeComponent.bind(this));
-		},
-		flip: function (active) {
+		}
+
+		flip (active) {
 			this.setActive(!this.active);
-		},
-		setActive: function (active) {
+		}
+
+		setActive (active) {
 			this.active = active;
 
 			if(this.object){
 				this.object[this.prop] = this.active;
 			}
-		},
-		update: function(parent, delta) {
+		}
+
+		update (parent, delta) {
 			var i = 0,
 					l;
 
@@ -263,4 +287,4 @@ import { vec3 } from 'gl-matrix';
 				}
 			}
 		}
-	});
+	}
