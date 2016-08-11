@@ -3,14 +3,13 @@ import { vec3 } from 'gl-matrix';
 
 	const GRAVITATIONAL_CONSTANT = 0.0003;
 
-	export function GravityComponent(){}
-	GameComponent.create(GravityComponent,{
-		update: function(parent, delta) {
+	export class GravityComponent extends GameComponent {
+		update (parent, delta) {
 			if(typeof parent.velocity[1] == "undefined")
 				parent.velocity[1] = 0;
 			parent.velocity[1] += GE.GRAVITATIONAL_CONSTANT*delta;
 		}
-	});
+	}
 
 	export function PointGravityComponent (target) {
 		this.target = target;

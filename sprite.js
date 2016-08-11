@@ -1,12 +1,15 @@
 import { GameComponent } from './core';
 
-  export function TileComponent(renderSystem, texture, bounds) {
-    this.renderSystem = renderSystem;
-    this.texture = texture;
-    this.bounds = bounds;
-  }
-  GameComponent.create(TileComponent, {
-    update: function(parent, delta){
+  export class TileComponent extends GameComponent{
+    constructor (renderSystem, texture, bounds) {
+      super();
+
+      this.renderSystem = renderSystem;
+      this.texture = texture;
+      this.bounds = bounds;
+    }
+
+    update (parent, delta) {
       var renderSystem = this.renderSystem,
           texture = this.texture,
           bounds = this.bounds,
@@ -29,14 +32,17 @@ import { GameComponent } from './core';
         }
       }
     }
-  });
-
-  export function SpriteRenderingComponent(renderSystem, layer){
-    this.renderSystem = renderSystem;
-    this.layer = layer;
   }
-  GameComponent.create(SpriteRenderingComponent, {
-    update: function(parent, delta) {
+
+  export class SpriteRenderingComponent extends GameComponent {
+    constructor (renderSystem, layer){
+      super();
+
+      this.renderSystem = renderSystem;
+      this.layer = layer;
+    }
+
+    update (parent, delta) {
       var sprite = parent.sprite,
           image = sprite && sprite.t.image;
 
@@ -52,21 +58,24 @@ import { GameComponent } from './core';
         }, this.layer);
       }
     }
-  });
+  }
 
-  export function SpriteAnimationComponent(duration){
+  export class SpriteAnimationComponent extends GameComponent {
+    constructor (duration) {
+      super();
       this.duration = duration;
       this.spriteIndex = 0;
       this.playing = true;
-  }
-  GameComponent.create(SpriteAnimationComponent, {
-    init: function(parent){
+    }
+
+    init (parent) {
       if(parent.sprites.length){
         parent.sprite = parent.sprites[0];
       }
       parent.spriteCountdown = (parent.sprite && parent.sprite.d) || this.duration;
-    },
-    update: function(parent, delta) {
+    }
+
+    update (parent, delta) {
       var spriteCount = parent.sprites.length,
           sprite,
           duration;
@@ -82,18 +91,21 @@ import { GameComponent } from './core';
           parent.spriteCountdown = duration;
         }
       }
-    },
-    play: function() {
+    }
+
+    play() {
       this.playing = true;
-    },
-    stop: function () {
+    }
+
+    stop () {
       this.playing = false;
       this.spriteIndex = 0;
-    },
-    pause: function () {
+    }
+
+    pause () {
       this.playing = false;
     }
-  });
+  }
 
   export const Sprite = {};
 
