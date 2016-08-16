@@ -199,7 +199,7 @@ import { vec3 } from 'gl-matrix';
 		}
 	}
 
-	export class TrackRotationComponent extends GameCompoent {
+	export class TrackRotationComponent extends GameComponent {
 		constructor (object) {
 			super();
 			this.target = object;
