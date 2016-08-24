@@ -127,6 +127,9 @@ import InputSystem from './input';
      * Must call getDefaultCamera before this method
      */
     getDefaultRenderer () {
+      if (!this.cameraSystem) {
+        throw new Error("getDefaultCamera() has not been called");
+      }
       var context = this.canvas.getContext("2d");
       return new CanvasRenderSystem(context, this.cameraSystem);
     }
@@ -140,6 +143,9 @@ import InputSystem from './input';
      * Must call getDefaultCamera before this method
      */
     getDefaultInput (screen) {
+      if (!this.cameraSystem) {
+        throw new Error("getDefaultCamera() has not been called");
+      }
       // params are: (screen, keyboard, camera)
       // Input system needs a screen it can call width() and height() on
       return new InputSystem(screen, document, this.cameraSystem);
