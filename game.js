@@ -197,6 +197,10 @@ import InputSystem from './input';
     loop(self._lastTime);
 
     function loop(time){
+      if(time && self.time == time) {
+        console.log("Multiple calls: " + time);
+        return;
+      }
       self.time = time;
       self.frame++;
       try {
