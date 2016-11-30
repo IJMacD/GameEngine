@@ -216,20 +216,12 @@ import { vec3 } from 'gl-matrix';
   	}
   }
 
-	export class GameComponent {
-    /**
-     * @abstract
-     */
-  	update (parent, delta){}
+	export class GameComponent extends GameObject {
+		toHTML () {
+			return this.name;
+		}
+	};
 
-  	toHTML () {
-  		return this.name;
-  	}
-  }
-
-  /**
-   * @deprecated Use ES6 extends
-   */
 	GameComponent.create = function(constructor, properties){
 		constructor.prototype = new GameComponent();
 		for(var prop in properties){

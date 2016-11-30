@@ -35,15 +35,18 @@ import { GameComponent } from './core';
   }
 
   export class SpriteRenderingComponent extends GameComponent {
-    constructor (renderSystem, layer){
+    constructor (renderSystem, layer, sprite){
       super();
 
       this.renderSystem = renderSystem;
       this.layer = layer;
+      this.sprite = sprite;
     }
 
     update (parent, delta) {
-      var sprite = parent.sprite,
+      super.update(delta);
+
+      var sprite = this.sprite || parent.sprite,
           image = sprite && sprite.t.image;
 
       if(sprite){
@@ -61,14 +64,18 @@ import { GameComponent } from './core';
   }
 
   export class SpriteAnimationComponent extends GameComponent {
-    constructor (duration) {
+    constructor (duration, sprites) {
       super();
       this.duration = duration;
       this.spriteIndex = 0;
       this.playing = true;
+      this.sprites = sprites;
     }
 
     init (parent) {
+      if(this.sprites) {
+        parent.sprites = this.sprites;
+      }
       if(parent.sprites.length){
         parent.sprite = parent.sprites[0];
       }
