@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 		update (parent, delta) {
 			if(typeof parent.velocity[1] == "undefined")
 				parent.velocity[1] = 0;
-			parent.velocity[1] += GE.GRAVITATIONAL_CONSTANT*delta;
+			parent.velocity[1] += GRAVITATIONAL_CONSTANT * delta;
 		}
 	}
 
@@ -288,3 +288,20 @@ import { vec3 } from 'gl-matrix';
 			}
 		}
 	}
+
+export class TerminalVelocityComponent extends GameComponent {
+	constructor (velocity) {
+		super();
+
+		this.velocity = velocity;
+	}
+
+	update (parent, delta) {
+		const v = vec3.length(parent.velocity);
+
+		if(v > this.velocity){
+			const scale = this.velocity / v;
+			vec3.scale(parent.velocity, parent.velocity, scale);
+		}
+	}
+}

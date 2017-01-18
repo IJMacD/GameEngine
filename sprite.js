@@ -17,7 +17,7 @@ import { GameComponent } from './core';
           dy = texture.height,
           startX = parent.position[0] % dx,
           startY = parent.position[1] % dy,
-          x = bounds[0] + startX - dx,
+          x,
           y = bounds[1],// + startY - dy,
           width = bounds[2],
           height = bounds[3],
@@ -27,7 +27,7 @@ import { GameComponent } from './core';
             };
           };
       for(; y < height + dy; y += dy){
-        for(; x < width + dx; x += dx){
+        for(x = bounds[0] + startX - dx; x < width + dx; x += dx){
           renderSystem.push(render(texture, x, y));
         }
       }
@@ -129,7 +129,8 @@ import { GameComponent } from './core';
           w: sprite.w,
           h: sprite.h,
           ox: sprite.ox,
-          oy: sprite.oy
+          oy: sprite.oy,
+          d: sprite.d
         });
       }
     }
