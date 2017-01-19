@@ -179,6 +179,10 @@ import InputSystem from './input';
       this._events[event].push(callback);
       return this;
     }
+
+    fire (event) {
+      fire(this, event);
+    }
   }
 
   function fire(self, event) {

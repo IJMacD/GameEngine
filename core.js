@@ -12,6 +12,8 @@ import { vec3 } from 'gl-matrix';
   		this.team = 0;
 
   		this.components.remove = arrayRemoveItem;
+
+		this._events = {};
   	}
 
 		addComponent (component){
@@ -127,6 +129,18 @@ import { vec3 } from 'gl-matrix';
 				html += "</ul>";
 			}
 			return html;
+		}
+
+		on (eventType, fn) {
+			// TODO: support multiple events
+			console.debug("If you are trying to add multiple events to the same object, it has not been implemented yet.");
+			this._events[eventType] = fn;
+		}
+
+		fire (eventType) {
+			if(this._events[eventType]) {
+				this._events[eventType].apply(this, [].slice.call(arguments, 1));
+			}
 		}
 	}
 

@@ -113,21 +113,27 @@ import { GameObject, GameComponent } from './core';
 
 		if(parent.position[0] < this.ax){
 			parent.position[0] = this.bx;
+			this.fire("wrap", parent);
 		}
 		else if(parent.position[0] > this.bx){
 			parent.position[0] = this.ax;
+			this.fire("wrap", parent);
 		}
 		if(parent.position[1] < this.ay){
 			parent.position[1] = this.by;
+			this.fire("wrap", parent);
 		}
 		else if(parent.position[1] > this.by){
 			parent.position[1] = this.ay;
+			this.fire("wrap", parent);
 		}
 		if(parent.position[2] < this.az){
 			parent.position[2] = this.bz;
+			this.fire("wrap", parent);
 		}
 		else if(parent.position[2] > this.bz){
 			parent.position[2] = this.az;
+			this.fire("wrap", parent);
 		}
 	};
 
