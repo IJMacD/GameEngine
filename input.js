@@ -25,6 +25,7 @@ import { vec2, mat2 } from 'gl-matrix';
 
     this.nextClick = vec2.create();
     this.lastClick = vec2.fromValues(undefined, undefined); // Consumers should use lastClick
+    this.hasClick = false;
 
     this.nextKey = null;
     this.lastKey = null; // Consumers should use lastKey
@@ -43,6 +44,7 @@ import { vec2, mat2 } from 'gl-matrix';
     vec2.copy(this.lastClick, this.nextClick);
     // Consumers should interpret (NaN, NaN) as no click
     vec2.set(this.nextClick, undefined, undefined);
+    this.hasClick = !isNaN(this.lastClick[0]);
 
     // Keypress
     this.lastKey = this.nextKey;
@@ -52,11 +54,11 @@ import { vec2, mat2 } from 'gl-matrix';
 
   function initScreen(inputSystem){
     TouchClick(inputSystem.screen, function(e) {
-      var offset = inputSystem.screen.offset(),
-          event = e.originalEvent,
-          touch = event.touches && event.touches[0],
-          x = (touch ? touch.pageX : e.pageX) - offset.left,
-          y = (touch ? touch.pageY : e.pageY) - offset.top;
+      var offsetLeft = inputSystem.screen.offsetLeft,
+          offsetTop = inputSystem.screen.offsetTop,
+          touch = e.touches && e.touches[0],
+          x = (touch ? touch.pageX : e.pageX) - offsetLeft,
+          y = (touch ? touch.pageY : e.pageY) - offsetTop;
       vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
     });
 
@@ -66,16 +68,21 @@ import { vec2, mat2 } from 'gl-matrix';
   };
 
   function TouchClick(sel, fnc) {
-    sel.on('touchstart click', function(event){
-          event.stopPropagation();
-          event.preventDefault();
-          if(event.handled !== true) {
-              fnc(event);
-              event.handled = true;
-          } else {
-              return false;
-          }
-    });
+    const handle = function(event){
+      event.stopPropagation();
+      event.preventDefault();
+      if(event.handled !== true) {
+          fnc(event);
+          event.handled = true;
+      } else {
+          return false;
+      }
+    };
+    sel.removeEventListener('touchstart', sel.touchClick);
+    sel.removeEventListener('click', sel.touchClick);
+    sel.addEventListener('touchstart', handle);
+    sel.addEventListener('click', handle);
+    sel.touchClick = handle;
   }
 
   function worldToScreen(inputSystem, worldX, worldY){
@@ -87,7 +94,7 @@ import { vec2, mat2 } from 'gl-matrix';
     v.leftMultiply(cam.shearMatrix);
     v.leftMultiply(cam.scaleMatrix);
     v.leftMultiply(cam.rotMat);
-    v.add(screen.width / 2, screen.height / 2);
+    v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
     return v;
   };
 
@@ -101,8 +108,8 @@ import { vec2, mat2 } from 'gl-matrix';
         camWidth = cam.width,
         camHeight = cam.height,
         screen = inputSystem.screen,
-        screenWidth = screen.width(),
-        screenHeight = screen.height(),
+        screenWidth = screen.offsetWidth,
+        screenHeight = screen.offsetHeight,
         screenScale = camWidth / screenWidth;
 
     vec2.set(v,
