@@ -1,81 +1,99 @@
 import { GameObject, GameComponent } from './core';
 import { vec2 } from 'gl-matrix';
 
-	export default function CollisionSystem(collisionCallback) {
-		GameObject.call(this); // Remember parent constructor
-		this.attackBounds = [];
-		this.vulnerableBounds = [];
-		this.callback = collisionCallback;
-	}
-	CollisionSystem.prototype = new GameObject();
-	CollisionSystem.prototype.addAttackBounds = function(bounds){
-		this.attackBounds.push(bounds);
-	};
-	CollisionSystem.prototype.addVulnerableBounds = function(bounds){
-		this.vulnerableBounds.push(bounds);
-	};
-	CollisionSystem.prototype.update = function (delta) {
-		var i = 0,
-			l = this.attackBounds.length,
-			j = 0,
-			m = this.vulnerableBounds.length,
-			attack,
-			vulnerable;
-		for(; i < l; i++){
-			attack = this.attackBounds[i];
-			for(j = 0; j < m; j++){
-				vulnerable = this.vulnerableBounds[j];
+export class CollisionSystem extends GameObject {
+	constructor () {
+		super();
 
-				if(attack[0] < vulnerable[2] &&
-					attack[1] < vulnerable[3] &&
-					attack[2] > vulnerable[0] &&
-					attack[3] > vulnerable[1] &&
-					this.callback
-				){
-					// Would probably be more useful to be able to send a GameObject back
-					this.callback(attack, vulnerable);
+		this.attackObjects = [];
+		this.vulnerableObjects = [];
+	}
+
+	addAttackObject (object){
+		this.attackObjects.push(object);
+	}
+
+	addVulnerableObject (object){
+		this.vulnerableObjects.push(object);
+	}
+
+	update (delta) {
+		const attackCount = this.attackObjects.length;
+		const vulnerableCount = this.vulnerableObjects.length;
+
+
+		for(let i = 0; i < attackCount; i++){
+			const attack = this.attackObjects[i];
+			const ax = attack.position[0];
+			const ay = attack.position[1];
+			const ab = attack.bounds;
+			const attackBounds = [
+				ax + ab[0],
+				ay + ab[1],
+				ax + ab[2],
+				ay + ab[3]
+			];
+
+			for(let j = 0; j < vulnerableCount; j++){
+				const vulnerable = this.vulnerableObjects[j];
+				const vx = vulnerable.position[0];
+				const vy = vulnerable.position[1];
+				const vb = vulnerable.bounds;
+				const vulnerableBounds = [
+					vx + vb[0],
+					vy + vb[1],
+					vx + vb[2],
+					vy + vb[3]
+				];
+
+				if(attack === vulnerable) {
+					continue;
+				}
+
+				if(attackBounds[0] < vulnerableBounds[2] &&
+					attackBounds[1] < vulnerableBounds[3] &&
+					attackBounds[2] > vulnerableBounds[0] &&
+					attackBounds[3] > vulnerableBounds[1] ) {
+
+					attack.fire("attack", vulnerable);
+					vulnerable.fire("attackedBy", attack);
 				}
 			}
 		}
-		this.attackBounds.length = 0;
-		this.vulnerableBounds.length = 0;
+		this.attackObjects.length = 0;
+		this.vulnerableObjects.length = 0;
 	};
+}
 
-	export function AttackCollisionComponent(collisionSystem) {
-		this.collisionSystem = collisionSystem;
-	}
-	GameComponent.create(AttackCollisionComponent,
-	{
-		update: function(parent, delta){
-			var x = parent.position[0],
-				y = parent.position[1],
-				bounds = parent.bounds;
-			this.collisionSystem.addAttackBounds([
-				x + bounds[0],
-				y + bounds[1],
-				x + bounds[2],
-				y + bounds[3]
-			]);
-		}
-	});
+/**
+ * Component to interface with collision system. Handles both attack
+ * and vulnerable configurations.
+ * @class
+ */
+export class CollisionComponent extends GameComponent {
 
-	export function VulnerableCollisionComponent(collisionSystem) {
+	/**
+	 * @constructor
+	 * @param {CollisionSystem} collisionSystem - Which CollisionSystem to report to
+	 * @param {boolean} attack - Can this object attack?
+	 * @param {boolean} vulnerable - Is this object vulnerable?
+	 */
+	constructor (collisionSystem, attack, vulnerable) {
+		super();
+
 		this.collisionSystem = collisionSystem;
+		this.attack = attack;
+		this.vulnerable = vulnerable;
 	}
-	GameComponent.create(VulnerableCollisionComponent,
-	{
-		update: function(parent, delta){
-			var x = parent.position[0],
-				y = parent.position[1],
-				bounds = parent.bounds;
-			this.collisionSystem.addVulnerableBounds([
-				x + bounds[0],
-				y + bounds[1],
-				x + bounds[2],
-				y + bounds[3]
-			]);
-		}
-	});
+
+	update (parent, delta){
+		if(this.attack)
+			this.collisionSystem.addAttackObject(parent);
+
+		if(this.vulnerable)
+			this.collisionSystem.addVulnerableObject(parent);
+	}
+}
 
 	export function BackgroundCollisionSystem() {
 		GameObject.call(this); // Remember parent constructor
