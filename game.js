@@ -134,8 +134,14 @@ import InputSystem from './input';
       return new CanvasRenderSystem(context, this.cameraSystem);
     }
 
-    getDefaultWorld () {
-      var bounds = [0, 0, this.canvas.width, this.canvas.height];
+    /**
+     * Create a default world system
+     * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
+     * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
+     * @return {WorldSystem}
+     */
+    getDefaultWorld (paddingX = 0, paddingY = paddingX) {
+      var bounds = [-paddingX, -paddingY, this.canvas.width + paddingX, this.canvas.height + paddingY];
       return new WorldSystem(bounds);
     }
 
