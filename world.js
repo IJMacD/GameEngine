@@ -111,27 +111,33 @@ import { GameObject, GameComponent } from './core';
 		this.az = this.worldSystem.bounds[4];
 		this.bz = this.worldSystem.bounds[5];
 
-		if(parent.position[0] < this.ax){
+		if(parent.position[0] < this.ax
+			&& parent.velocity[0] < 0){
 			parent.position[0] = this.bx;
 			this.fire("wrap", parent);
 		}
-		else if(parent.position[0] > this.bx){
+		else if(parent.position[0] > this.bx
+			&& parent.velocity[0] > 0){
 			parent.position[0] = this.ax;
 			this.fire("wrap", parent);
 		}
-		if(parent.position[1] < this.ay){
+		if(parent.position[1] < this.ay
+			&& parent.velocity[1] < 0){
 			parent.position[1] = this.by;
 			this.fire("wrap", parent);
 		}
-		else if(parent.position[1] > this.by){
+		else if(parent.position[1] > this.by
+			&& parent.velocity[1] > 0){
 			parent.position[1] = this.ay;
 			this.fire("wrap", parent);
 		}
-		if(parent.position[2] < this.az){
+		if(parent.position[2] < this.az
+			&& parent.velocity[2] < 0){
 			parent.position[2] = this.bz;
 			this.fire("wrap", parent);
 		}
-		else if(parent.position[2] > this.bz){
+		else if(parent.position[2] > this.bz
+			&& parent.velocity[2] > 0){
 			parent.position[2] = this.az;
 			this.fire("wrap", parent);
 		}
