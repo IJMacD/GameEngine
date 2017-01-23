@@ -34,6 +34,29 @@ import { GameComponent } from './core';
     }
   }
 
+  /**
+   * Sprite Object Definition
+   * ------------------------
+   *
+   * let sprite = {
+   *    t:  texture object (i.e. {image: new Image(), width: 0, height: 0, loaded: false})
+   *    x:  X-offset of sprite in spritesheet
+   *    y:  Y-offset of sprite in spritesheet
+   *    w:  width of sprite
+   *    h:  height of sprite
+   *    ox: origin x-offset, so sprite can be centred on parent's position
+   *    oy: origin y-offset, so sprite can be centred on parent's position
+   *    d:  (optional) duration of sprite for animation
+   * }
+   */
+
+  /**
+   * Component renders a sprite for a parent object.
+   *
+   * Component can either contain its own sprite or use one provided on the parent.
+   * In the case where both component and parent have sprites, the one on the parent
+   * is prefered.
+   */
   export class SpriteRenderingComponent extends GameComponent {
     constructor (renderSystem, layer, sprite){
       super();

@@ -9,9 +9,9 @@ import { vec2, mat2 } from 'gl-matrix';
    *
    * TODO: Right now this is very 2D orientated. Try to make more generic
    *
-   * @param screen Should be something relevant with width()/height() methods
-   * @param keyboard Something to watch for keyboard events on e.g. document
-   * @param cameraSystem A camera to be used for mapping co-ordinates
+   * @param {Element} screen - Should be a DOMElement to get size information from
+   * @param {any} keyboard - Something to watch for keyboard events on e.g. document
+   * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
    */
   export default function InputSystem(screen, keyboard, cameraSystem) {
     GameObject.call(this); // Remember parent constructor
@@ -67,6 +67,16 @@ import { vec2, mat2 } from 'gl-matrix';
     });
   };
 
+  /**
+   * @callback TouchClickCallback
+   * @param {object} event
+   */
+
+  /**
+   * Helper function to handle both touches and clicks consistently
+   * @param {Element} sel - Element on which we should look for input
+   * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
+   */
   function TouchClick(sel, fnc) {
     const handle = function(event){
       event.stopPropagation();
@@ -78,10 +88,16 @@ import { vec2, mat2 } from 'gl-matrix';
           return false;
       }
     };
+
+    // Remove previous handler in case this is element being re-initialised
     sel.removeEventListener('touchstart', sel.touchClick);
     sel.removeEventListener('click', sel.touchClick);
+
+    // Add new handler
     sel.addEventListener('touchstart', handle);
     sel.addEventListener('click', handle);
+
+    // We need to keep track of this handler in order to be able to remove it later.
     sel.touchClick = handle;
   }
 

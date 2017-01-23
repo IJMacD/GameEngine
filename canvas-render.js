@@ -8,6 +8,17 @@ import { GameObject, GameObjectManager } from './core';
 		this.clearScreen = true;
 	}
 	CanvasRenderSystem.prototype = new GameObject();
+
+	/**
+	 * @callback CanvasRenderable
+	 * @param {CanvasRenderingContext2D} context
+	 */
+
+	/**
+	 * Add a renderable to the draw queue
+	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
+	 * @param {number} layer - Layer to add this drawable to. Default: 1
+	 */
 	CanvasRenderSystem.prototype.push = function(renderable, layer){
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
@@ -15,6 +26,7 @@ import { GameObject, GameObjectManager } from './core';
 		}
 		this.renderQueue[layer].push(renderable);
 	};
+
 	function _renderQueue(context, queue){
 		if(queue){
 			for(let j = 0, n = queue.length; j < n; j++){
