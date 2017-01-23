@@ -67,3 +67,28 @@ import { GameComponent } from './core';
 			this.pathIndex = 0;
 		}
 	};
+
+export class DebugDrawBoundsComponent extends GameComponent {
+
+	/**
+	 * @param {CanvasRenderSystem} renderSystem - A target to draw to.
+	 */
+	constructor (renderSystem) {
+		super();
+
+		this.renderSystem = renderSystem;
+	}
+
+	update (parent, delta) {
+		const bounds = parent.bounds;
+		if(bounds){
+			this.renderSystem.push(ctx => {
+				ctx.translate(parent.position[0], parent.position[1]);
+				ctx.beginPath();
+				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
+				ctx.strokeStyle = "#000";
+				ctx.stroke();
+			});
+		}
+	}
+}

@@ -220,19 +220,7 @@ SolidComponent.prototype.update = function(parent, delta) {
 	}
 	GameObject.sBackgroundCollisionSystem.addTemporarySurfaces(lines);
 };
-var DebugDrawBoundsComponent = GameComponent.extend("DebugDrawBoundsComponent");
-DebugDrawBoundsComponent.prototype._init = function(context){
-	this.context = context;
-}
-DebugDrawBoundsComponent.prototype.update = function(parent, delta) {
-	if(DEBUG){
-		var bounds = GameObject.sCollisionSystem.getBounds();
-		for(var i=0;i<bounds.length;i++){
-			var bound = bounds[i];
-			GameObject.sRenderSystem.strokeRect(bound[0],bound[1],bound[2]-bound[0],bound[3]-bound[1],"#999");
-		}
-	}
-};
+
 var InputSystem = GameObject.extend("InputSystem");
 InputSystem.prototype._init = function() {
 	GameObject.prototype._init.call(this);
