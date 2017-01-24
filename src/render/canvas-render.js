@@ -1,4 +1,4 @@
-import { GameObject, GameObjectManager } from './core';
+import { GameObject, GameObjectManager } from '../core';
 
 	export default function CanvasRenderSystem(context, cameraSystem){
 		this.context = context;

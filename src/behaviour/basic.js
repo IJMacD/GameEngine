@@ -1,4 +1,4 @@
-import { GameObject, GameComponent } from './core'
+import { GameObject, GameComponent } from '../core'
 import { vec3 } from 'gl-matrix';
 
 	const GRAVITATIONAL_CONSTANT = 0.0003;

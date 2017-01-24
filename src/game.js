@@ -1,6 +1,6 @@
 import { GameObject, GameComponent, GameObjectManager } from './core';
 import CameraSystem from './camera';
-import CanvasRenderSystem from './canvas-render';
+import CanvasRenderSystem from './render/canvas-render';
 import WorldSystem from './world';
 import InputSystem from './input';
 

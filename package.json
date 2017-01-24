@@ -1,0 +1,25 @@
+{
+  "name": "ijmacd-game-engine",
+  "version": "1.0.0",
+  "description": "A javascript game engine built on the principle of composition",
+  "main": "src/game-engine.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IJMacD/GameEngine.git"
+  },
+  "author": "Iain MacDonald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IJMacD/GameEngine/issues"
+  },
+  "homepage": "https://github.com/IJMacD/GameEngine#readme",
+  "dependencies": {
+    "gl-matrix": "^2.3.2"
+  }
+}

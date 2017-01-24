@@ -1,4 +1,4 @@
-import { GameComponent } from './core';
+import { GameComponent } from '../core';
 
   export class TileComponent extends GameComponent{
     constructor (renderSystem, texture, bounds) {

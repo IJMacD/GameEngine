@@ -142,21 +142,3 @@ import { GameObject, GameComponent } from './core';
 			this.fire("wrap", parent);
 		}
 	};
-
-	export function DrawBoundsComponent(renderSystem){
-		this.renderSystem = renderSystem;
-	}
-	GameComponent.create(DrawBoundsComponent,{
-		update: function(parent, delta){
-			var b = parent.bounds,
-				x = parent.position[0],
-				y = parent.position[1];
-			this.renderSystem.strokePath([
-				b[0] + x, b[1] + y,
-				b[0] + x, b[3] + y,
-				b[2] + x, b[3] + y,
-				b[2] + x, b[1] + y,
-				b[0] + x, b[1] + y
-			]);
-		}
-	});

@@ -1,6 +1,6 @@
 import { vec3 } from 'gl-matrix';
 
-	export class GameObject {
+export class GameObject {
     constructor () {
   		this.components = [];
   		this.position = vec3.create();
