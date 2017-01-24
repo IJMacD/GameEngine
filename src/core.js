@@ -16,135 +16,135 @@ export class GameObject {
 		this._events = {};
   	}
 
-		addComponent (component){
+	addComponent (component){
 
-			// Allow syntactic sugar of addComponent(function() {...}) which is a
-			// shorthand for specifying a simple component with only an update method
-			if(isFunction(component)){
-				component = { update: component };
-			}
-
-			this.components.push(component);
-
-			// If the component has an init method call it when added so that the
-			// component can add properties to the parent object
-			if(component.init){
-				component.init(this);
-			}
-
-			return this;
+		// Allow syntactic sugar of addComponent(function() {...}) which is a
+		// shorthand for specifying a simple component with only an update method
+		if(isFunction(component)){
+			component = { update: component };
 		}
 
-		removeComponent (component){
-			this.toBeRemoved.push(component);
-			return this;
+		this.components.push(component);
+
+		// If the component has an init method call it when added so that the
+		// component can add properties to the parent object
+		if(component.init){
+			component.init(this);
 		}
 
-		removeComponentByName (name){
-			for(var i = 0; i < this.components.length; i++){
-				if(this.components[i].name == name)
-					this.toBeRemoved.push(this.components[i]);
-			}
-			return this;
-		}
+		return this;
+	}
 
-		removeComponentByTest (test){
-			for(var i = 0; i < this.components.length; i++){
-				if(test(this.components[i]))
-					this.toBeRemoved.push(this.components[i]);
-			}
-			return this;
-		}
+	removeComponent (component){
+		this.toBeRemoved.push(component);
+		return this;
+	}
 
-		/**
-		 * Protective method to set position of the object.
-		 *
-		 * This method will preserve position on axes which you leave undefined
-		 * in the call to this method.
-		 *
-		 * e.g. `gameObject.setPosition(undefined, 20)` will only set the y
-		 * co-ordinate, leaving x and z at their original values.
-		 */
-		setPosition (x,y,z) {
-			if(x == undefined) { x = this.position[0]; }
-			if(y == undefined) { y = this.position[1]; }
-			if(z == undefined) { z = this.position[2]; }
-			vec3.set(this.position, x, y, z);
-			return this;
+	removeComponentByName (name){
+		for(var i = 0; i < this.components.length; i++){
+			if(this.components[i].name == name)
+				this.toBeRemoved.push(this.components[i]);
 		}
+		return this;
+	}
 
-		setVelocity (vx,vy,vz) {
-			if(vx == undefined) { vx = this.velocity[0]; }
-			if(vy == undefined) { vy = this.velocity[1]; }
-			if(vz == undefined) { vz = this.velocity[2]; }
-			vec3.set(this.velocity, vx, vy, vz);
-			return this;
+	removeComponentByTest (test){
+		for(var i = 0; i < this.components.length; i++){
+			if(test(this.components[i]))
+				this.toBeRemoved.push(this.components[i]);
 		}
+		return this;
+	}
 
-		setRotation (th) {
-			this.rotation = th;
-			return this;
-		}
+	/**
+	 * Protective method to set position of the object.
+	 *
+	 * This method will preserve position on axes which you leave undefined
+	 * in the call to this method.
+	 *
+	 * e.g. `gameObject.setPosition(undefined, 20)` will only set the y
+	 * co-ordinate, leaving x and z at their original values.
+	 */
+	setPosition (x,y,z) {
+		if(x == undefined) { x = this.position[0]; }
+		if(y == undefined) { y = this.position[1]; }
+		if(z == undefined) { z = this.position[2]; }
+		vec3.set(this.position, x, y, z);
+		return this;
+	}
 
-		hit (victim) {
-			if(this.hitVictim == null)
-				this.hitVictim = victim;
-		}
+	setVelocity (vx,vy,vz) {
+		if(vx == undefined) { vx = this.velocity[0]; }
+		if(vy == undefined) { vy = this.velocity[1]; }
+		if(vz == undefined) { vz = this.velocity[2]; }
+		vec3.set(this.velocity, vx, vy, vz);
+		return this;
+	}
 
-		hitBy (attacker) {
-			if(this.attackerHit == null)
-				this.attackerHit = attacker;
-		}
+	setRotation (th) {
+		this.rotation = th;
+		return this;
+	}
 
-		update (delta){
-			var i = 0,
-				l = this.components.length,
-				j = 0,
-				m = this.toBeRemoved.length;
-			for(;j<m;j++){
-				for(i=0;i<l;i++){
-					if(this.components[i] == this.toBeRemoved[j]){
-						this.components.remove(i);
-						break;
-					}
+	hit (victim) {
+		if(this.hitVictim == null)
+			this.hitVictim = victim;
+	}
+
+	hitBy (attacker) {
+		if(this.attackerHit == null)
+			this.attackerHit = attacker;
+	}
+
+	update (delta){
+		var i = 0,
+			l = this.components.length,
+			j = 0,
+			m = this.toBeRemoved.length;
+		for(;j<m;j++){
+			for(i=0;i<l;i++){
+				if(this.components[i] == this.toBeRemoved[j]){
+					this.components.remove(i);
+					break;
 				}
 			}
-			this.toBeRemoved.length = 0;
-
-			l = this.components.length;
-			for(i=0;i<l;i++){
-				this.components[i].update(this, delta);
-			}
 		}
+		this.toBeRemoved.length = 0;
 
-		toHTML () {
-			var html = this.name,
-				i;
-			if(typeof this.position.x == "number")
-				html += " " + this.position;
-			if(this.components.length){
-				html += "<ul>";
-				for(i=0;i<this.components.length;i++)
-					html += "<li>"+this.components[i].toHTML();
-				html += "</ul>";
-			}
-			return html;
-		}
-
-		on (eventType, fn) {
-			// TODO: support multiple events
-			console.debug("If you are trying to add multiple events to the same object, it has not been implemented yet.");
-			this._events[eventType] = fn;
-		}
-
-		fire (eventType) {
-			if(this._events[eventType]) {
-				this._events[eventType].apply(this, [].slice.call(arguments, 1));
-			}
+		l = this.components.length;
+		for(i=0;i<l;i++){
+			this.components[i].update(this, delta);
 		}
 	}
 
-	export class GameObjectManager extends GameObject {
+	toHTML () {
+		var html = this.name,
+			i;
+		if(typeof this.position.x == "number")
+			html += " " + this.position;
+		if(this.components.length){
+			html += "<ul>";
+			for(i=0;i<this.components.length;i++)
+				html += "<li>"+this.components[i].toHTML();
+			html += "</ul>";
+		}
+		return html;
+	}
+
+	on (eventType, fn) {
+		// TODO: support multiple events
+		console.debug("If you are trying to add multiple events to the same object, it has not been implemented yet.");
+		this._events[eventType] = fn;
+	}
+
+	fire (eventType) {
+		if(this._events[eventType]) {
+			this._events[eventType].apply(this, [].slice.call(arguments, 1));
+		}
+	}
+}
+
+export class GameObjectManager extends GameObject {
     constructor() {
   		super();
 
@@ -228,28 +228,28 @@ export class GameObject {
   		}
   		return html;
   	}
-  }
+}
 
-	export class GameComponent extends GameObject {
-		toHTML () {
-			return this.name;
-		}
-	};
-
-	GameComponent.create = function(constructor, properties){
-		constructor.prototype = new GameComponent();
-		for(var prop in properties){
-			constructor.prototype[prop] = properties[prop];
-		}
-		return constructor;
-	};
-
-	function arrayRemoveItem(from, to) {
-		var rest = this.slice((to || from) + 1 || this.length);
-		this.length = from < 0 ? this.length + from : from;
-		return this.push.apply(this, rest);
+export class GameComponent extends GameObject {
+	toHTML () {
+		return this.name;
 	}
+};
 
-	function isFunction(a) {
-		return (a instanceof Function);
+GameComponent.create = function(constructor, properties){
+	constructor.prototype = new GameComponent();
+	for(var prop in properties){
+		constructor.prototype[prop] = properties[prop];
 	}
+	return constructor;
+};
+
+function arrayRemoveItem(from, to) {
+	var rest = this.slice((to || from) + 1 || this.length);
+	this.length = from < 0 ? this.length + from : from;
+	return this.push.apply(this, rest);
+}
+
+function isFunction(a) {
+	return (a instanceof Function);
+}
