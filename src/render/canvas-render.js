@@ -1,6 +1,15 @@
 import { GameObject, GameObjectManager } from '../core';
 
-	export default function CanvasRenderSystem(context, cameraSystem){
+	/**
+	 * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
+	 * will get rendered to the canvas.
+	 * <p>It supports render layers as well.
+	 * @constructor
+	 * @extends {GameObject}
+	 * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
+	 * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
+	 */
+	export function CanvasRenderSystem(context, cameraSystem){
 		this.context = context;
 		this.canvas = context && context.canvas;
 		this.cameraSystem = cameraSystem;
@@ -37,6 +46,7 @@ import { GameObject, GameObjectManager } from '../core';
 			queue.length = 0;
 		}
 	}
+
 	CanvasRenderSystem.prototype.update = function(delta) {
 		if(this.clearScreen){
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
@@ -82,7 +92,13 @@ import { GameObject, GameObjectManager } from '../core';
 			context.lineTo(path[i],path[i+1]);
 		}
 	}
-	// Convenience
+
+	/**
+	 * Convenience method to stroke a path with the given style and to the given layer.
+	 * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
+	 * @param {string} style - Colour of line to draw. Default: #000
+	 * @param {number} layer - Layer this should be drawn on. Default: 1
+	 */
 	CanvasRenderSystem.prototype.strokePath = function(path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
@@ -95,10 +111,20 @@ import { GameObject, GameObjectManager } from '../core';
 		}, layer);
 	};
 
+	/**
+	 * Manages the task of distributing renderables to multiple RenderSystems
+	 * @constructor
+	 * @extends {CanvasRenderSystem}
+	 */
 	export function MultiRenderSystem(){
 		this.renderSystems = [];
 	}
 	MultiRenderSystem.prototype = new CanvasRenderSystem();
+
+	/**
+	 * Add a child render system which will receive updates.
+	 * @param {CanvasRenderSystem} renderSystem - RenderSystem to add
+	 */
 	MultiRenderSystem.prototype.addRenderSystem = function(renderSystem){
 		this.renderSystems.push(renderSystem);
 	};

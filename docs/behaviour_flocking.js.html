@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: behaviour/flocking.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: behaviour/flocking.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import GameComponent from '../core/GameComponent';
+import { vec3 } from 'gl-matrix';
+
+// Working Vectors
+const vecSeparation = vec3.create();
+const vecAlign = vec3.create();
+const vecCohesion = vec3.create();
+const vecSpare = vec3.create();
+
+/**
+ * &lt;p>Objects with this component will try to 'flock' together. There are three effects Working
+ * together to produce flocking behaviour.
+ * &lt;p>The parent object will be attracted to the average position of objects within the
+ * {@link FlockingComponent#NEIGHBOUR_RADIUS}, this is called cohesion.
+ * &lt;p>The parent object wil try to move in the average direction of all the other objects within
+ * the neighbourhood, this is called alignment.
+ * &lt;p>The parent object will try to move away from object with the
+ * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
+ * @param {array} flock - An array of game objects which are considered to be in the same flock.
+ * @extends {GameComponent}
+ */
+export class FlockingComponent extends GameComponent {
+
+    constructor (flock) {
+        super();
+        this.flock = flock;
+    }
+
+    update (parent, delta) {
+        vec3.set(vecCohesion, 0, 0, 0);
+        vec3.set(vecAlign, 0, 0, 0);
+        vec3.set(vecSeparation, 0, 0, 0);
+        vec3.set(vecSpare, 0, 0, 0);
+
+        let count = 0;
+        const length = this.flock.length;
+
+        for(let i = 0; i &lt; length; i++){
+            const other = this.flock[i];
+            const dist = vec3.dist(other.position, parent.position);
+
+            if(dist > 0 &amp;&amp; dist &lt; FlockingComponent.NEIGHBOUR_RADIUS){
+                vec3.add(vecCohesion, vecCohesion, other.position);
+                vec3.add(vecAlign, vecAlign, other.velocity);
+
+                if(dist &lt; FlockingComponent.SEPARATION_RADIUS){
+                    vec3.subtract(vecSpare, parent.position, other.position);
+                    vec3.normalize(vecSpare, vecSpare);
+                    vec3.scaleAndAdd(vecSeparation, vecSeparation, vecSpare, 1 / dist);
+                }
+
+                count++;
+            }
+        }
+
+        if(count > 0){
+            vec3.scale(vecCohesion, vecCohesion, 1 / count);
+            vec3.subtract(vecCohesion, vecCohesion, parent.position);
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, FlockingComponent.COHESION_WEIGHT);
+
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, FlockingComponent.ALIGN_WEIGHT / count);
+
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, FlockingComponent.SEPARATION_WEIGHT / count);
+
+            var mag = vec3.length(parent.velocity);
+
+            if(mag > FlockingComponent.MAX_SPEED){
+                vec3.scale(parent.velocity, parent.velocity, FlockingComponent.MAX_SPEED / mag);
+            }
+        }
+    }
+}
+
+// FlockingComponent Constants
+FlockingComponent.NEIGHBOUR_RADIUS = 200;
+FlockingComponent.SEPARATION_RADIUS = 150;
+FlockingComponent.MAX_SPEED = 0.1;
+FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
+
+/**
+ * Class to draw NEIGHBOUR_RADIUS and SEPARATION_RADIUS around objects
+ * @extends {GameComponent}
+ * @param {CanvasRenderSystem} renderSystem - Where should this be drawn
+ */
+export class DebugFlockingComponent extends GameComponent {
+
+    constructor (renderSystem) {
+        super();
+
+        this.renderSystem = renderSystem;
+    }
+
+    update (parent, delta) {
+        this.renderSystem.push(ctx => {
+            ctx.translate(parent.position[0], parent.position[1]);
+            ctx.beginPath();
+            ctx.arc(0, 0, FlockingComponent.NEIGHBOUR_RADIUS, 0, Math.PI * 2, false);
+            ctx.strokeStyle = "#008";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, FlockingComponent.SEPARATION_RADIUS, 0, Math.PI * 2, false);
+            ctx.strokeStyle = "#800";
+            ctx.stroke();
+        });
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AnimatedSpriteComponent.html">AnimatedSpriteComponent</a></li><li><a href="AudioSystem.html">AudioSystem</a></li><li><a href="BounceComponent.html">BounceComponent</a></li><li><a href="CameraSystem.html">CameraSystem</a></li><li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li><li><a href="CanvasSpriteRenderingComponent.html">CanvasSpriteRenderingComponent</a></li><li><a href="CollisionComponent.html">CollisionComponent</a></li><li><a href="CollisionSystem.html">CollisionSystem</a></li><li><a href="DebugDrawBoundsComponent.html">DebugDrawBoundsComponent</a></li><li><a href="DebugFlockingComponent.html">DebugFlockingComponent</a></li><li><a href="FlockingComponent.html">FlockingComponent</a></li><li><a href="Game.html">Game</a></li><li><a href="GameComponent.html">GameComponent</a></li><li><a href="GameObject.html">GameObject</a></li><li><a href="GameObjectManager.html">GameObjectManager</a></li><li><a href="GravityComponent.html">GravityComponent</a></li><li><a href="InputSystem.html">InputSystem</a></li><li><a href="MoveComponent.html">MoveComponent</a></li><li><a href="PhysicsComponent.html">PhysicsComponent</a></li><li><a href="SolidComponent.html">SolidComponent</a></li><li><a href="SpriteAnimationComponent.html">SpriteAnimationComponent</a></li><li><a href="SpriteRenderingComponent.html">SpriteRenderingComponent</a></li><li><a href="SwitchComponent.html">SwitchComponent</a></li><li><a href="TerminalVelocityComponent.html">TerminalVelocityComponent</a></li><li><a href="TileComponent.html">TileComponent</a></li><li><a href="WorldBounceComponent.html">WorldBounceComponent</a></li><li><a href="WorldSystem.html">WorldSystem</a></li><li><a href="WorldWrapComponent.html">WorldWrapComponent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#Sprite">Sprite</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Jan 25 2017 18:16:41 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

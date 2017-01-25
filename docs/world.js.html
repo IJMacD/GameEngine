@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: world.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: world.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import GameObject from '../core/GameObject';
+import GameComponent from '../core/GameComponent';
+
+/**
+ * Generic way to access a 'world' with intrinsic bounds.
+ * @constructor
+ * @extends {GameObject}
+ */
+export function WorldSystem(bounds){
+	this.bounds = bounds;
+}
+WorldSystem.prototype = new GameObject();
+
+WorldSystem.prototype.setBounds = function (bounds) {
+	this.bounds = bounds;
+};
+
+/**
+ * Bouce off the walls of a world.
+ * @constructor
+ * @extends {GameComponent}
+ * @param {WorldSystem} worldSystem - The world the parent object is in.
+ * @param {number} width - Default width if parent has no bounds
+ * @param {number} height - Default height if parent has no bounds
+ * @param {number} thickness - Default thickness if parent has no bounds
+ */
+export function WorldBounceComponent (worldSystem, width, height, thickness) {
+	this.worldSystem = worldSystem;
+	this.ax = (width || 0) / 2;
+	this.ay = (height || 0) / 2;
+	this.az = (thickness || 0) / 2;
+
+	this.cRestitution = 1;
+	this.cFriction = 1;
+}
+
+WorldBounceComponent.prototype = new GameComponent();
+
+WorldBounceComponent.prototype.update = function(parent, delta) {
+	var coef = this.cRestitution,
+			friction = this.cFriction;
+
+	if(parent.bounds){
+		this.bx1 = this.worldSystem.bounds[0] - parent.bounds[0];
+		this.by1 = this.worldSystem.bounds[1] - parent.bounds[1];
+		this.bx2 = this.worldSystem.bounds[2] - parent.bounds[2];
+		this.by2 = this.worldSystem.bounds[3] - parent.bounds[3];
+		this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4];
+		this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5];
+	}
+	else{
+		this.bx1 = this.worldSystem.bounds[0] + this.ax;
+		this.by1 = this.worldSystem.bounds[1] + this.ay;
+		this.bx2 = this.worldSystem.bounds[2] - this.ax;
+		this.by2 = this.worldSystem.bounds[3] - this.ay;
+		this.bz1 = this.worldSystem.bounds[4] + this.az;
+		this.bz2 = this.worldSystem.bounds[5] - this.az;
+	}
+
+	// hasBounced: 1: x, 2: y, 3: z
+	parent.hasBounced = false;
+
+	if(parent.position[0] &lt; this.bx1){
+		parent.position[0] = this.bx1;
+		parent.velocity[0] = -parent.velocity[0]*coef;
+		parent.velocity[1] = parent.velocity[1]*friction;
+		parent.velocity[2] = parent.velocity[2]*friction;
+
+		parent.hasBounced = 1;
+	}
+	else if(parent.position[0] > this.bx2){
+		parent.position[0] = this.bx2;
+		parent.velocity[0] = -parent.velocity[0]*coef;
+		parent.velocity[1] = parent.velocity[1]*friction;
+		parent.velocity[2] = parent.velocity[2]*friction;
+
+		parent.hasBounced = 1;
+	}
+
+	if(parent.position[1] &lt; this.by1){
+		parent.position[1] = this.by1;
+		parent.velocity[1] = -parent.velocity[1]*coef;
+		parent.velocity[0] = parent.velocity[0]*friction;
+		parent.velocity[2] = parent.velocity[2]*friction;
+
+		parent.hasBounced = 2;
+	}
+	else if(parent.position[1] > this.by2){
+		parent.position[1] = this.by2;
+		parent.velocity[1] = -parent.velocity[1]*coef;
+		parent.velocity[0] = parent.velocity[0]*friction;
+		parent.velocity[2] = parent.velocity[2]*friction;
+
+		parent.hasBounced = 2;
+	}
+
+	if(parent.position[2] &lt; this.bz1){
+		parent.position[2] = this.bz1;
+		parent.velocity[2] = -parent.velocity[2]*coef;
+		parent.velocity[0] = parent.velocity[0]*friction;
+		parent.velocity[1] = parent.velocity[1]*friction;
+
+		parent.hasBounced = 3;
+	}
+	else if(parent.position[2] > this.bz2){
+		parent.position[2] = this.bz2;
+		parent.velocity[2] = -parent.velocity[2]*coef;
+		parent.velocity[0] = parent.velocity[0]*friction;
+		parent.velocity[1] = parent.velocity[1]*friction;
+
+		parent.hasBounced = 3;
+	}
+};
+
+/**
+ * When parent goes outside of world bounds wrap to the opposite wall.
+ * @constructor
+ * @extends {GameComponent}
+ * @param {WorldSystem} worldSystem - Which world is the parent in.
+ */
+export function WorldWrapComponent (worldSystem) {
+	this.worldSystem = worldSystem;
+}
+
+WorldWrapComponent.prototype = new GameComponent();
+
+WorldWrapComponent.prototype.update = function(parent, delta) {
+	this.ax = this.worldSystem.bounds[0];
+	this.ay = this.worldSystem.bounds[1];
+	this.bx = this.worldSystem.bounds[2];
+	this.by = this.worldSystem.bounds[3];
+	this.az = this.worldSystem.bounds[4];
+	this.bz = this.worldSystem.bounds[5];
+
+	if(parent.position[0] &lt; this.ax
+		&amp;&amp; parent.velocity[0] &lt; 0){
+		parent.position[0] = this.bx;
+		this.fire("wrap", parent);
+	}
+	else if(parent.position[0] > this.bx
+		&amp;&amp; parent.velocity[0] > 0){
+		parent.position[0] = this.ax;
+		this.fire("wrap", parent);
+	}
+	if(parent.position[1] &lt; this.ay
+		&amp;&amp; parent.velocity[1] &lt; 0){
+		parent.position[1] = this.by;
+		this.fire("wrap", parent);
+	}
+	else if(parent.position[1] > this.by
+		&amp;&amp; parent.velocity[1] > 0){
+		parent.position[1] = this.ay;
+		this.fire("wrap", parent);
+	}
+	if(parent.position[2] &lt; this.az
+		&amp;&amp; parent.velocity[2] &lt; 0){
+		parent.position[2] = this.bz;
+		this.fire("wrap", parent);
+	}
+	else if(parent.position[2] > this.bz
+		&amp;&amp; parent.velocity[2] > 0){
+		parent.position[2] = this.az;
+		this.fire("wrap", parent);
+	}
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AnimatedSpriteComponent.html">AnimatedSpriteComponent</a></li><li><a href="AudioSystem.html">AudioSystem</a></li><li><a href="BounceComponent.html">BounceComponent</a></li><li><a href="CameraSystem.html">CameraSystem</a></li><li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li><li><a href="CanvasSpriteRenderingComponent.html">CanvasSpriteRenderingComponent</a></li><li><a href="CollisionComponent.html">CollisionComponent</a></li><li><a href="CollisionSystem.html">CollisionSystem</a></li><li><a href="DebugDrawBoundsComponent.html">DebugDrawBoundsComponent</a></li><li><a href="DebugFlockingComponent.html">DebugFlockingComponent</a></li><li><a href="FlockingComponent.html">FlockingComponent</a></li><li><a href="Game.html">Game</a></li><li><a href="GameComponent.html">GameComponent</a></li><li><a href="GameObject.html">GameObject</a></li><li><a href="GameObjectManager.html">GameObjectManager</a></li><li><a href="GravityComponent.html">GravityComponent</a></li><li><a href="InputSystem.html">InputSystem</a></li><li><a href="MoveComponent.html">MoveComponent</a></li><li><a href="PhysicsComponent.html">PhysicsComponent</a></li><li><a href="SolidComponent.html">SolidComponent</a></li><li><a href="SpriteAnimationComponent.html">SpriteAnimationComponent</a></li><li><a href="SpriteRenderingComponent.html">SpriteRenderingComponent</a></li><li><a href="SwitchComponent.html">SwitchComponent</a></li><li><a href="TerminalVelocityComponent.html">TerminalVelocityComponent</a></li><li><a href="TileComponent.html">TileComponent</a></li><li><a href="WorldBounceComponent.html">WorldBounceComponent</a></li><li><a href="WorldSystem.html">WorldSystem</a></li><li><a href="WorldWrapComponent.html">WorldWrapComponent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#Sprite">Sprite</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Jan 25 2017 18:16:41 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

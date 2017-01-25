@@ -23,7 +23,7 @@ var STATE_PAUSED = 0,
 
 /**
  * Utility class for things such as bootstrapping Game
- * @class
+ * @class Game
  */
 export default class Game {
     constructor (options) {

@@ -5,9 +5,21 @@ import GameObject from './GameObject';
  * should be subclassed to implement desired behaviour. The `update` method
  * is called once per frame for each GameObject it has been attached to. This
  * is where most of the work will be done.
- * @constructor
+ * @class GameComponent
+ * @extends {GameObject}
+ * @abstract
  */
 export default class GameComponent extends GameObject {
+
+	/**
+	 * This method is called once when the component is first added to each parent.
+	 * Use this to perform set-up and add any necessary properties to parent objects.
+	 * @abstract
+	 * @param {GameObject} parent - A reference to the {@link GameObject} on which
+	 * this component is operating. This allows multiple GameObjects to share
+	 * stateless components.
+	 */
+	init (parent) {}
 
 	/**
 	 * This method is called once per frame for each GameObject this component

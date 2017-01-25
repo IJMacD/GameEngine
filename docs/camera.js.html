@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: camera.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: camera.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import GameObject from '../core/GameObject';
+import GameComponent from '../core/GameComponent';
+import { vec3 } from 'gl-matrix';
+
+	/**
+	 * Render systems require a camera. Use this class to create one.
+	 * @constructor
+	 * @extends {GameObject}
+	 */
+	export function CameraSystem (width, height) {
+		GameObject.call(this);
+
+		this.width = width;
+		this.height = height;
+
+		this.pruneList = [];
+		this.suspendedObjects = [];
+		this.skewX = this.skew;
+		this.skeyY = this.skew;
+		this.scaleX = 1;
+		this.scaleY = 1;
+		this.rotation = 0;
+		this.rotationAxis = vec3.create();
+		vec3.set(this.rotationAxis, 0, 0, 1);
+	}
+	CameraSystem.prototype = new GameObject();
+
+	CameraSystem.prototype.setScale = function(scaleX, scaleY){
+		scaleY = scaleY || scaleX;
+		this.scaleX = scaleX;
+		this.scaleY = scaleY;
+	};
+
+	CameraSystem.prototype.setRotation = function(rotation, rotationAxis){
+		this.rotation = rotation;
+		if(rotationAxis &amp;&amp; rotationAxis.length == 3){
+			vec3.normalize(this.rotationAxis, rotationAxis);
+		}
+	};
+
+	CameraSystem.prototype.setSize = function(width, height){
+		this.width = width;
+		this.height = height;
+	};
+
+	CameraSystem.prototype.addManagerForPruning = function(objectManager) {
+		if(objectManager instanceof GameObjectManager)
+			this.pruneList.push(objectManager);
+	};
+	CameraSystem.prototype.getTransformMatrix = function(){
+		// var m = new Matrix(this.shearMatrix);
+		// m.multiplyBy(this.scaleMatrix);
+		// m.multiplyBy(this.rotMat);
+		return this.transformMatrix;
+	};
+	CameraSystem.prototype.update = function(delta) {
+		GameObject.prototype.update.call(this, delta);
+		//this.rotation += 0.0001 * delta;
+		//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
+		//this.angle += 0.0001 * delta;
+		//this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
+		//this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
+		//this.rotMat = Matrix.rotationMatrix(this.rotation);
+
+		/*
+		TODO: Pruning objeccts which are off screen could be a component's job?
+		var i = 0,
+			l = this.pruneList.length,
+			mgr, objs, j;
+		for(; i &lt; l; i++){
+			mgr = this.pruneList[i];
+			if(mgr instanceof GE.GameObjectManager)
+			{
+				objs = mgr.objects;
+				for(j=0;j&lt;objs.length;j++){
+					this.pruneVec.set(objs[j].position).subtract(this.position);
+					if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
+					{
+						mgr.removeObject(objs[j]);
+						this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});
+					}
+				}
+			}
+		}
+		*/
+	};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AnimatedSpriteComponent.html">AnimatedSpriteComponent</a></li><li><a href="AudioSystem.html">AudioSystem</a></li><li><a href="BounceComponent.html">BounceComponent</a></li><li><a href="CameraSystem.html">CameraSystem</a></li><li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li><li><a href="CanvasSpriteRenderingComponent.html">CanvasSpriteRenderingComponent</a></li><li><a href="CollisionComponent.html">CollisionComponent</a></li><li><a href="CollisionSystem.html">CollisionSystem</a></li><li><a href="DebugDrawBoundsComponent.html">DebugDrawBoundsComponent</a></li><li><a href="DebugFlockingComponent.html">DebugFlockingComponent</a></li><li><a href="FlockingComponent.html">FlockingComponent</a></li><li><a href="Game.html">Game</a></li><li><a href="GameComponent.html">GameComponent</a></li><li><a href="GameObject.html">GameObject</a></li><li><a href="GameObjectManager.html">GameObjectManager</a></li><li><a href="GravityComponent.html">GravityComponent</a></li><li><a href="InputSystem.html">InputSystem</a></li><li><a href="MoveComponent.html">MoveComponent</a></li><li><a href="PhysicsComponent.html">PhysicsComponent</a></li><li><a href="SolidComponent.html">SolidComponent</a></li><li><a href="SpriteAnimationComponent.html">SpriteAnimationComponent</a></li><li><a href="SpriteRenderingComponent.html">SpriteRenderingComponent</a></li><li><a href="SwitchComponent.html">SwitchComponent</a></li><li><a href="TerminalVelocityComponent.html">TerminalVelocityComponent</a></li><li><a href="TileComponent.html">TileComponent</a></li><li><a href="WorldBounceComponent.html">WorldBounceComponent</a></li><li><a href="WorldSystem.html">WorldSystem</a></li><li><a href="WorldWrapComponent.html">WorldWrapComponent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#Sprite">Sprite</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Jan 25 2017 18:16:41 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

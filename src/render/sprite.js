@@ -1,5 +1,12 @@
 import { GameComponent } from '../core';
 
+  /**
+   * Component for rendering backgrounds for example.
+   * @extends {GameComponent}
+   * @param {RenderSystem} renderSystem - Where to draw.
+   * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
+   * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
+   */
   export class TileComponent extends GameComponent{
     constructor (renderSystem, texture, bounds) {
       super();
@@ -56,6 +63,7 @@ import { GameComponent } from '../core';
    * Component can either contain its own sprite or use one provided on the parent.
    * In the case where both component and parent have sprites, the one on the parent
    * is prefered.
+   * @extends {GameComponent}
    */
   export class SpriteRenderingComponent extends GameComponent {
     constructor (renderSystem, layer, sprite){
@@ -86,6 +94,12 @@ import { GameComponent } from '../core';
     }
   }
 
+  /**
+   * Animate through a sequence of sprites.
+   * @extends {GameComponent}
+   * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
+   * @param {array} sprites - Array of sprite objects.
+   */
   export class SpriteAnimationComponent extends GameComponent {
     constructor (duration, sprites) {
       super();
@@ -123,22 +137,39 @@ import { GameComponent } from '../core';
       }
     }
 
+    /**
+     * Start the animation.
+     */
     play() {
       this.playing = true;
     }
 
+    /**
+     * Stop the animation and reset the frame to the first sprite.
+     */
     stop () {
       this.playing = false;
       this.spriteIndex = 0;
     }
 
+    /**
+     * Pause the animation.
+     */
     pause () {
       this.playing = false;
     }
   }
 
+  /** @namespace */
   export const Sprite = {};
 
+  /**
+   * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
+   * @static
+   * @param {object} sprite - The sprite template.
+   * @param {number} rows - Number of rows in the sprite sheet.
+   * @param {number} cols - Number of columns in the sprite sheet.
+   */
   Sprite.generateSpriteSheet = function(sprite, rows, cols){
     var out = [],
         i,
@@ -162,7 +193,9 @@ import { GameComponent } from '../core';
 
   /**
    * This component is not to be used any more. Use Sprite animation component instead
+   * @constructor
    * @deprecated
+   * @extends {GameComponent}
    */
   export function AnimatedSpriteComponent(images, speed){
     this.images = images;
@@ -183,7 +216,9 @@ import { GameComponent } from '../core';
 
   /**
    * This component is not to be used any more. Use other components instead
+   * @constructor
    * @deprecated
+   * @extends {GameComponent}
    */
   export function CanvasSpriteRenderingComponent(renderSystem){
     this.renderSystem = renderSystem;

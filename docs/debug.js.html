@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: debug.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: debug.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { GameComponent } from './core';
+
+export function DebugDrawPathComponent (renderSystem, object){
+	this.path = [];
+	this.pathSize = 1000;
+	this.pathIndex = 0;
+	this.lastVx = 0;
+	this.lastVy = 0;
+	this.renderSystem = renderSystem;
+	if(object instanceof GE.GameObject)
+		this.relativeTo = object.position;
+	else
+		this.relativeTo = vec2.create();
+}
+DebugDrawPathComponent.prototype = new GameComponent();
+DebugDrawPathComponent.prototype.update = function(parent, delta) {
+	if(GE.DEBUG){
+		var px = parent.position[0],
+			py = parent.position[1],
+			vx = parent.velocity[0],
+			vy = parent.velocity[1],
+			ax = (vx - this.lastVx)/delta,
+			ay = (vy - this.lastVy)/delta,
+			rx = this.relativeTo[0],
+			ry = this.relativeTo[1],
+			skip = this.pathIndex % this.pathSize,
+			path = [px, py],
+			i,
+			index;
+
+		// Draw Path
+		// TODO: 1. Check for jumps, don't show
+		// TODO: 2. Don't use strokePath helper -- very inefficient
+		if(this.pathIndex > this.pathSize){
+			for(i = this.pathSize-1;i>=0;i--){
+				index = (i + skip + this.pathSize) % this.pathSize;
+				path.push(
+					this.path[index][0]+rx,
+					this.path[index][1]+ry
+				);
+			}
+		}else{
+			for(i = this.pathIndex-1;i>=0;i--){
+				path.push(
+					this.path[i][0]+rx,
+					this.path[i][1]+ry
+				);
+			}
+		}
+
+		if(rx || ry)
+			this.renderSystem.strokePath(path,"#CCF",0);
+		else
+			this.renderSystem.strokePath(path,"#CCC",0);
+
+		this.pathIndex++;
+		this.path[skip] = [px-rx,py-ry];
+
+		// Draw Velocity
+		this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
+
+		// Draw Acceleration
+		this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
+		this.lastVx = vx;
+		this.lastVy = vy;
+	}else{
+		this.pathIndex = 0;
+	}
+};
+
+/**
+ * It is sometimes useful to draw the bounds of an object or world for example.
+ * @extends {GameComponent}
+ */
+export class DebugDrawBoundsComponent extends GameComponent {
+
+	/**
+	 * @param {CanvasRenderSystem} renderSystem - A target to draw to.
+	 */
+	constructor (renderSystem) {
+		super();
+
+		this.renderSystem = renderSystem;
+	}
+
+	update (parent, delta) {
+		const bounds = parent.bounds;
+		if(bounds){
+			this.renderSystem.push(ctx => {
+				ctx.translate(parent.position[0], parent.position[1]);
+				ctx.beginPath();
+				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
+				ctx.strokeStyle = "#000";
+				ctx.stroke();
+			});
+		}
+	}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AnimatedSpriteComponent.html">AnimatedSpriteComponent</a></li><li><a href="AudioSystem.html">AudioSystem</a></li><li><a href="BounceComponent.html">BounceComponent</a></li><li><a href="CameraSystem.html">CameraSystem</a></li><li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li><li><a href="CanvasSpriteRenderingComponent.html">CanvasSpriteRenderingComponent</a></li><li><a href="CollisionComponent.html">CollisionComponent</a></li><li><a href="CollisionSystem.html">CollisionSystem</a></li><li><a href="DebugDrawBoundsComponent.html">DebugDrawBoundsComponent</a></li><li><a href="DebugFlockingComponent.html">DebugFlockingComponent</a></li><li><a href="FlockingComponent.html">FlockingComponent</a></li><li><a href="Game.html">Game</a></li><li><a href="GameComponent.html">GameComponent</a></li><li><a href="GameObject.html">GameObject</a></li><li><a href="GameObjectManager.html">GameObjectManager</a></li><li><a href="GravityComponent.html">GravityComponent</a></li><li><a href="InputSystem.html">InputSystem</a></li><li><a href="MoveComponent.html">MoveComponent</a></li><li><a href="PhysicsComponent.html">PhysicsComponent</a></li><li><a href="SolidComponent.html">SolidComponent</a></li><li><a href="SpriteAnimationComponent.html">SpriteAnimationComponent</a></li><li><a href="SpriteRenderingComponent.html">SpriteRenderingComponent</a></li><li><a href="SwitchComponent.html">SwitchComponent</a></li><li><a href="TerminalVelocityComponent.html">TerminalVelocityComponent</a></li><li><a href="TileComponent.html">TileComponent</a></li><li><a href="WorldBounceComponent.html">WorldBounceComponent</a></li><li><a href="WorldSystem.html">WorldSystem</a></li><li><a href="WorldWrapComponent.html">WorldWrapComponent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#Sprite">Sprite</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Jan 25 2017 18:16:41 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
