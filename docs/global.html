@@ -47,7 +47,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#addAttackObject">addAttackObject</a></li><li><a href="global.html#addComponent">addComponent</a></li><li><a href="global.html#addObject">addObject</a></li><li><a href="global.html#addObjectAt">addObjectAt</a></li><li><a href="global.html#addSurface">addSurface</a></li><li><a href="global.html#addSurfaces">addSurfaces</a></li><li><a href="global.html#addTemporarySurface">addTemporarySurface</a></li><li><a href="global.html#addVulnerableObject">addVulnerableObject</a></li><li><a href="global.html#clearSurfaces">clearSurfaces</a></li><li><a href="global.html#completeLevel">completeLevel</a></li><li><a href="global.html#getDefaultCamera">getDefaultCamera</a></li><li><a href="global.html#getDefaultInput">getDefaultInput</a></li><li><a href="global.html#getDefaultRenderer">getDefaultRenderer</a></li><li><a href="global.html#getDefaultWorld">getDefaultWorld</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#nextLevel">nextLevel</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#playSound">playSound</a></li><li><a href="global.html#removeAll">removeAll</a></li><li><a href="global.html#removeComponent">removeComponent</a></li><li><a href="global.html#removeObject">removeObject</a></li><li><a href="global.html#setBounds">setBounds</a></li><li><a href="global.html#setLevel">setLevel</a></li><li><a href="global.html#setPosition">setPosition</a></li><li><a href="global.html#setRotation">setRotation</a></li><li><a href="global.html#setScale">setScale</a></li><li><a href="global.html#setSize">setSize</a></li><li><a href="global.html#setVelocity">setVelocity</a></li><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#toHTML">toHTML</a></li><li><a href="global.html#update">update</a></li>
+					<li><a href="global.html#addAttackObject">addAttackObject</a></li><li><a href="global.html#addComponent">addComponent</a></li><li><a href="global.html#addObject">addObject</a></li><li><a href="global.html#addObjectAt">addObjectAt</a></li><li><a href="global.html#addSurface">addSurface</a></li><li><a href="global.html#addSurfaces">addSurfaces</a></li><li><a href="global.html#addTemporarySurface">addTemporarySurface</a></li><li><a href="global.html#addVulnerableObject">addVulnerableObject</a></li><li><a href="global.html#clearSurfaces">clearSurfaces</a></li><li><a href="global.html#completeLevel">completeLevel</a></li><li><a href="global.html#getDefaultCamera">getDefaultCamera</a></li><li><a href="global.html#getDefaultInput">getDefaultInput</a></li><li><a href="global.html#getDefaultRenderer">getDefaultRenderer</a></li><li><a href="global.html#getDefaultWorld">getDefaultWorld</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#nextLevel">nextLevel</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#playSound">playSound</a></li><li><a href="global.html#push">push</a></li><li><a href="global.html#removeAll">removeAll</a></li><li><a href="global.html#removeComponent">removeComponent</a></li><li><a href="global.html#removeObject">removeObject</a></li><li><a href="global.html#setBounds">setBounds</a></li><li><a href="global.html#setLevel">setLevel</a></li><li><a href="global.html#setPosition">setPosition</a></li><li><a href="global.html#setRotation">setRotation</a></li><li><a href="global.html#setScale">setScale</a></li><li><a href="global.html#setSize">setSize</a></li><li><a href="global.html#setVelocity">setVelocity</a></li><li><a href="global.html#simplifyPaths">simplifyPaths</a></li><li><a href="global.html#strokePath">strokePath</a></li><li><a href="global.html#toHTML">toHTML</a></li><li><a href="global.html#update">update</a></li>
 				</ul>
 			</li>
 			
@@ -2400,6 +2400,158 @@
             
 <hr>
 <dt>
+    <h4 class="name" id="push"><span class="type-signature"></span>push(renderable, layer)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Add a renderable to the draw queue
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>renderable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#CanvasRenderable">CanvasRenderable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Function which will receive drawing context</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Layer to add this drawable to. Default: 1</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="removeAll"><span class="type-signature"></span>removeAll()</h4>
     
     
@@ -3988,7 +4140,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="toHTML"><span class="type-signature"></span>toHTML()</h4>
+    <h4 class="name" id="strokePath"><span class="type-signature"></span>strokePath(path, style, layer)</h4>
     
     
 </dt>
@@ -3996,7 +4148,7 @@
 
     
     <div class="description">
-        This method is used to produce a html representation of the object forthings such as debugging trees. It will include components in its rendering.Similar to the toString method.
+        Convenience method to stroke a path with the given style and to the given layer.
     </div>
     
 
@@ -4005,6 +4157,104 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Colour of line to draw. Default: #000</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Layer this should be drawn on. Default: 1</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -4058,30 +4308,6 @@
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    Representation of this component in HTML
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
@@ -4294,7 +4520,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="update"><span class="type-signature">&lt;abstract> </span>update(parent, delta)</h4>
+    <h4 class="name" id="toHTML"><span class="type-signature"></span>toHTML()</h4>
     
     
 </dt>
@@ -4302,7 +4528,7 @@
 
     
     <div class="description">
-        This method is called once per frame for each GameObject this componenthas been attached to.
+        This method is used to produce a html representation of the object forthings such as debugging trees. It will include components in its rendering.Similar to the toString method.
     </div>
     
 
@@ -4311,80 +4537,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>parent</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="GameObject.html">GameObject</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A reference to the <a href="GameObject.html">GameObject</a> on whichthis component is operating. This allows multiple GameObjects to sharestateless components.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>delta</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Time since last frame in milliseconds</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -4438,6 +4590,30 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Representation of this component in HTML
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -4613,6 +4789,158 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>delta</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Time since last frame in milliseconds</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="update"><span class="type-signature">&lt;abstract> </span>update(parent, delta)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        This method is called once per frame for each GameObject this componenthas been attached to.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GameObject.html">GameObject</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A reference to the <a href="GameObject.html">GameObject</a> on whichthis component is operating. This allows multiple GameObjects to sharestateless components.</td>
+        </tr>
+
     
 
         <tr>
@@ -5000,7 +5328,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on 2017-01-25T20:11:24+08:00
+		on 2017-01-26T00:36:21+08:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
