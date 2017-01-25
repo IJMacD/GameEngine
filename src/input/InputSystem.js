@@ -1,5 +1,6 @@
 import GameObject from '../core/GameObject';
-import { vec2, mat2 } from 'gl-matrix';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
 /**
  * InputSystem's job is to keep track of most recent user input to provide

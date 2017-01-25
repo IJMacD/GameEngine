@@ -1,10 +1,10 @@
 import GameObject from './GameObject';
 import GameObjectManager from './GameObjectManager';
 import GameComponent from './GameComponent';
-import CameraSystem from '../camera';
-import CanvasRenderSystem from '../render/canvas-render';
-import WorldSystem from '../world';
-import InputSystem from '../input';
+import CameraSystem from '../CameraSystem';
+import CanvasRenderSystem from '../render/CanvasRenderSystem';
+import WorldSystem from '../world/WorldSystem';
+import InputSystem from '../input/InputSystem';
 
 var STATE_PAUSED = 0,
     STATE_PLAYING = 1,

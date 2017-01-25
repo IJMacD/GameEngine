@@ -1,5 +1,5 @@
 import GameComponent from './GameComponent';
-import { vec3 } from 'gl-matrix';
+import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 /**
  * The base object in the GameEngine. Most objects managed by the system

@@ -1,5 +1,5 @@
-import GameObject from '../core/GameObject';
-import { vec3 } from 'gl-matrix';
+import GameObject from './core/GameObject';
+import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 /**
  * Render systems require a camera. Use this class to create one.

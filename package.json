@@ -6,14 +6,22 @@
   "directories": {
     "test": "test"
   },
+  "dependencies": {
+    "gl-matrix": "^2.3.2"
+  },
   "devDependencies": {
     "ink-docstrap": "^1.1.4",
     "jsdoc": "^3.4.3",
-    "jsdoc-babel": "^0.1.0"
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony",
+    "uglifyjs-webpack-plugin": "^0.1.2",
+    "webpack": "^2.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "jsdoc -t ./node_modules/ink-docstrap/template -R README.md -r -d docs src"
+    "docs": "jsdoc -t ./node_modules/ink-docstrap/template -R README.md -r -d docs src",
+    "build": "webpack",
+    "build-min": "webpack --config webpack.config.min.js",
+    "build-all": "webpack && npm run build-min && npm run docs"
   },
   "repository": {
     "type": "git",
@@ -24,8 +32,5 @@
   "bugs": {
     "url": "https://github.com/IJMacD/GameEngine/issues"
   },
-  "homepage": "https://github.com/IJMacD/GameEngine#readme",
-  "dependencies": {
-    "gl-matrix": "^2.3.2"
-  }
+  "homepage": "https://github.com/IJMacD/GameEngine#readme"
 }

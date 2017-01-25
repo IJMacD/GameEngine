@@ -1,22 +1,28 @@
-import { GameObject, GameObjectManager } from '../core';
+import GameObject from '../core/GameObject';
+import GameComponent from '../core/GameComponent';
 
-	/**
-	 * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
-	 * will get rendered to the canvas.
-	 * <p>It supports render layers as well.
-	 * @constructor
-	 * @extends {GameObject}
-	 * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
-	 * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
-	 */
-	export function CanvasRenderSystem(context, cameraSystem){
+/**
+ * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
+ * will get rendered to the canvas.
+ * <p>It supports render layers as well.
+ * @class CanvasRenderSystem
+ * @extends {GameObject}
+ * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
+ * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
+ */
+export default class CanvasRenderSystem extends GameObject {
+
+	constructor (context, cameraSystem) {
+		super();
+
 		this.context = context;
 		this.canvas = context && context.canvas;
 		this.cameraSystem = cameraSystem;
+
 		this.renderQueue = [];
+
 		this.clearScreen = true;
 	}
-	CanvasRenderSystem.prototype = new GameObject();
 
 	/**
 	 * @callback CanvasRenderable
@@ -28,26 +34,15 @@ import { GameObject, GameObjectManager } from '../core';
 	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
 	 * @param {number} layer - Layer to add this drawable to. Default: 1
 	 */
-	CanvasRenderSystem.prototype.push = function(renderable, layer){
+	push (renderable, layer) {
 		layer = layer == undefined ? 1 : layer;
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
 		}
 		this.renderQueue[layer].push(renderable);
-	};
-
-	function _renderQueue(context, queue){
-		if(queue){
-			for(let j = 0, n = queue.length; j < n; j++){
-				context.save();
-				queue[j].call(this, context);
-				context.restore();
-			}
-			queue.length = 0;
-		}
 	}
 
-	CanvasRenderSystem.prototype.update = function(delta) {
+	update (delta) {
 		if(this.clearScreen){
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 		}
@@ -74,16 +69,16 @@ import { GameObject, GameObjectManager } from '../core';
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			_renderQueue(this.context, this.renderQueue[i]);
+			_renderQueue(this, i);
 		}
 
 		this.context.restore();
 
 		// Special case layer renders on top independant of camera
-		_renderQueue(this.context, this.renderQueue[-1]);
-	};
+		_renderQueue(this, -1);
+	}
 
-	function drawPath(context, path){
+	drawPath (context, path){
 		var i = 2,
 				l = path.length;
 		context.beginPath();
@@ -99,7 +94,7 @@ import { GameObject, GameObjectManager } from '../core';
 	 * @param {string} style - Colour of line to draw. Default: #000
 	 * @param {number} layer - Layer this should be drawn on. Default: 1
 	 */
-	CanvasRenderSystem.prototype.strokePath = function(path, style, layer) {
+	strokePath (path, style, layer) {
 		if(typeof style == "undefined")
 			style = '#000';
 	 	if(typeof layer == "undefined")
@@ -109,7 +104,21 @@ import { GameObject, GameObjectManager } from '../core';
 			drawPath.call(this, context, path);
 			context.stroke();
 		}, layer);
-	};
+	}
+}
+
+function _renderQueue (renderSystem, layer) {
+	const { context, renderQueue } = renderSystem;
+	const queue = renderQueue[layer];
+	if(queue){
+		for(let j = 0, n = queue.length; j < n; j++){
+			context.save();
+			queue[j].call(renderSystem, context);
+			context.restore();
+		}
+		queue.length = 0;
+	}
+}
 
 	/**
 	 * Manages the task of distributing renderables to multiple RenderSystems
