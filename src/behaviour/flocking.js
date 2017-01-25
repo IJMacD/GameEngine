@@ -1,6 +1,7 @@
 import { GameComponent } from '../core';
 import { vec3 } from 'gl-matrix';
 
+// Working Vectors
 const vecSeparation = vec3.create();
 const vecAlign = vec3.create();
 const vecCohesion = vec3.create();
@@ -25,11 +26,11 @@ export class FlockingComponent extends GameComponent {
             const other = this.flock[i];
             const dist = vec3.dist(other.position, parent.position);
 
-            if(dist > 0 && dist < NEIGHBOUR_RADIUS){
+            if(dist > 0 && dist < FlockingComponent.NEIGHBOUR_RADIUS){
                 vec3.add(vecCohesion, vecCohesion, other.position);
                 vec3.add(vecAlign, vecAlign, other.velocity);
 
-                if(dist < SEPARATION_RADIUS){
+                if(dist < FlockingComponent.SEPARATION_RADIUS){
                     vec3.subtract(vecSpare, parent.position, other.position);
                     vec3.normalize(vecSpare, vecSpare);
                     vec3.scaleAndAdd(vecSeparation, vecSeparation, vecSpare, 1 / dist);
@@ -42,22 +43,30 @@ export class FlockingComponent extends GameComponent {
         if(count > 0){
             vec3.scale(vecCohesion, vecCohesion, 1 / count);
             vec3.subtract(vecCohesion, vecCohesion, parent.position);
-            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, COHESION_WEIGHT);
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, FlockingComponent.COHESION_WEIGHT);
 
-            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, ALIGN_WEIGHT / count);
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, FlockingComponent.ALIGN_WEIGHT / count);
 
-            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, SEPARATION_WEIGHT / count);
+            vec3.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, FlockingComponent.SEPARATION_WEIGHT / count);
 
             var mag = vec3.length(parent.velocity);
 
-            if(mag > MAX_SPEED){
-                vec3.scale(parent.velocity, parent.velocity, MAX_SPEED / mag);
+            if(mag > FlockingComponent.MAX_SPEED){
+                vec3.scale(parent.velocity, parent.velocity, FlockingComponent.MAX_SPEED / mag);
             }
         }
     }
 }
 
-class DebugFlockingComponent extends GameComponent {
+// FlockingComponent Constants
+FlockingComponent.NEIGHBOUR_RADIUS = 200;
+FlockingComponent.SEPARATION_RADIUS = 150;
+FlockingComponent.MAX_SPEED = 0.1;
+FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
+
+export class DebugFlockingComponent extends GameComponent {
     constructor (renderSystem) {
         super();
 
@@ -68,11 +77,11 @@ class DebugFlockingComponent extends GameComponent {
         this.renderSystem.push(ctx => {
             ctx.translate(parent.position[0], parent.position[1]);
             ctx.beginPath();
-            ctx.arc(0, 0, NEIGHBOUR_RADIUS, 0, Math.PI * 2, false);
+            ctx.arc(0, 0, FlockingComponent.NEIGHBOUR_RADIUS, 0, Math.PI * 2, false);
             ctx.strokeStyle = "#008";
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(0, 0, SEPARATION_RADIUS, 0, Math.PI * 2, false);
+            ctx.arc(0, 0, FlockingComponent.SEPARATION_RADIUS, 0, Math.PI * 2, false);
             ctx.strokeStyle = "#800";
             ctx.stroke();
         });

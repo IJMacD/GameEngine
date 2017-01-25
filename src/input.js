@@ -1,4 +1,4 @@
-import { GameObject } from './core';
+import { GameObject, GameComponent } from './core';
 import { vec2, mat2 } from 'gl-matrix';
 
 /**
@@ -155,7 +155,7 @@ InputSystem.Keys = {
   n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
 };
 
-class ClickComponent extends GameComponent {
+export class ClickComponent extends GameComponent {
   constructor (inputSystem) {
     super();
 

@@ -11,7 +11,9 @@ export * from './audio';
 // Export additional components. MoveComponent, GravityComponent etc.
 export * from './behaviour/basic';
 export * from './behaviour/collision';
+export * from './behaviour/flocking';
 export * from './render/sprite';
+export * from './debug';
 
 // Export support classes. e.g. Game
-export * from './game';
+export { default as Game } from './game';
