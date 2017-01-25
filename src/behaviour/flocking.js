@@ -1,4 +1,4 @@
-import { GameComponent } from '../core';
+import GameComponent from '../core/GameComponent';
 import { vec3 } from 'gl-matrix';
 
 // Working Vectors

@@ -1,4 +1,5 @@
-import { GameObject, GameComponent } from '../core';
+import GameObject from '../core/GameObject';
+import GameComponent from '../core/GameComponent';
 import { vec2, vec3 } from 'gl-matrix';
 
 export class CollisionSystem extends GameObject {

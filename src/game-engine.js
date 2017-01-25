@@ -1,5 +1,7 @@
 // Export core classes. GameObject, GameComponent etc.
-export * from './core';
+export { GameObject } from './core/GameObject';
+export { GameObjectManager } from './core/GameObjectManager';
+export { GameComponent } from './core/GameComponent';
 
 // Export key systems. CameraSsytem, CanvasRenderSystem etc.
 export * from './camera';
