@@ -7,6 +7,9 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
  */
 
 	export class PointGravityComponent extends GameComponent {
+		target: GameObject;
+		vector: vec3;
+
 		constructor (target) {
 			super();
 			this.target = target;
@@ -75,15 +78,18 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 	}
 
 	export class PositionInterpolatorComponent extends GameComponent {
-		constructor (duration, easing) {
+		duration: number;
+		easing;
+		elapsed = 0;
+		running = false;
+		starting = false;
+		start = vec3.create();
+
+		constructor (duration: number, easing) {
 			super();
+
 	    this.duration = duration;
 	    this.easing = easing || PositionInterpolatorComponent.linear;
-	    this.elapsed = 0;
-	    this.running = false;
-	    this.starting = false;
-	    this.start = vec3.create();
-	    this.position = vec3.create();
 	  }
 
     update (parent, delta) {
@@ -120,50 +126,50 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
       }
     }
 
-    setPosition (x, y, z) {
+    setPosition (x?: number, y?: number, z?: number) {
       vec3.set(this.position, x, y, z);
       this.starting = true;
+			return this;
     }
-  }
 
-	let PIC = PositionInterpolatorComponent;
-  PIC.linear = function (t) { return t };
-  PIC.quadIn = function (t) { return t*t };
-  PIC.quadOut = function (t) { return -t*(t-2) };
-  PIC.circIn = function (t) { return 1-Math.sqrt(1-t*t) };
-  PIC.circOut = function (t) { return Math.sqrt(1-(t-1)*(t-1)) };
-  PIC.smooth = function (t) { return t*t*(3-2*t) };
-  // Stolen from Dojo:
-  // https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-  PIC.backIn = function (t) {
-    var s = 1.70158;
-    return t * t * ((s + 1) * t - s);
-  };
-  PIC.backOut = function (t) {
-    var s = 1.70158;
-    t = t - 1;
-    return t*t*((s+1)*t + s) + 1;
-  };
-  PIC.backInOut = function (t) {
-    var s = 1.70158 * 1.525;
-    t = t * 2;
-    if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
-    t-=2;
-    return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-  };
-  PIC.elasticIn = function(n){
-    if(n == 0 || n == 1){ return n; }
-    var p = .3;
-    var s = p / 4;
-    n = n - 1;
-    return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-  };
-  PIC.elasticOut = function(n){
-    if(n==0 || n == 1){ return n; }
-    var p = .3;
-    var s = p / 4;
-    return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-  };
+		static linear (t) { return t };
+		static quadIn (t) { return t*t };
+		static quadOut (t) { return -t*(t-2) };
+		static circIn (t) { return 1-Math.sqrt(1-t*t) };
+		static circOut (t) { return Math.sqrt(1-(t-1)*(t-1)) };
+		static smooth (t) { return t*t*(3-2*t) };
+		// Stolen from Dojo:
+		// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+		static backIn (t) {
+			var s = 1.70158;
+			return t * t * ((s + 1) * t - s);
+		}
+		static backOut (t) {
+			var s = 1.70158;
+			t = t - 1;
+			return t*t*((s+1)*t + s) + 1;
+		}
+		static backInOut (t) {
+			var s = 1.70158 * 1.525;
+			t = t * 2;
+			if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
+			t-=2;
+			return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+		}
+		static elasticIn (n) {
+			if(n == 0 || n == 1){ return n; }
+			var p = .3;
+			var s = p / 4;
+			n = n - 1;
+			return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+		}
+		static elasticOut (n) {
+			if(n==0 || n == 1){ return n; }
+			var p = .3;
+			var s = p / 4;
+			return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+		}
+  }
 
 	export class RotationInterpolatorComponent extends GameComponent {
 		update (parent, delta) {
@@ -181,6 +187,8 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 	}
 
 	export class FollowComponent extends GameComponent {
+		target: GameObject;
+
 		constructor (object) {
 			super();
 			this.target = object;
@@ -196,6 +204,9 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 	}
 
 	export class FollowAtDistanceComponent extends GameComponent {
+		target: GameObject;
+		distance: number;
+
 		constructor(object, distance) {
 			super();
 			this.target = object;
@@ -208,6 +219,8 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 	}
 
 	export class TrackRotationComponent extends GameComponent {
+		target: GameObject;
+
 		constructor (object) {
 			super();
 			this.target = object;
@@ -219,6 +232,8 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 	}
 
 	export class CounterRotationComponent extends GameComponent {
+		target: GameObject;
+
 		constructor (object) {
 			super();
 			this.target = object;
@@ -236,16 +251,17 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
    * @extends {GameComponent}
 	 */
 	export class SwitchComponent extends GameComponent {
-		constructor (switchObject, switchProperty) {
-			super();
-			this.positiveComponents = [];
-			this.negativeComponents = [];
+		positiveComponents: GameComponent[] = [];
+		negativeComponents: GameComponent[] = [];
 
-			/**
-			 * The switch for whether the positive components are active or the negative ones. Default: true
-			 * @type {boolean}
-			 */
-			this.active = true;
+		/** The switch for whether the positive components are active or the negative ones. Default: true */
+		active = true;
+
+		object: any;
+		prop: string;
+
+		constructor (switchObject: any, switchProperty: string) {
+			super();
 
 			this.object = switchObject;
 			this.prop = switchProperty;
@@ -259,6 +275,7 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 			this.components = this.positiveComponents;
 			addComponent.call(this, component);
 			this.components  = undefined;
+			return this;
 		}
 
 		/**

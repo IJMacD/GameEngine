@@ -8,46 +8,41 @@ export default GameObject;
  * will be based on this class.
  */
 class GameObject {
-    constructor () {
-        /** Array of components which update this GameObject.
-         * @type {array} */
-        this.components = [];
+    /** Array of components which update this GameObject. */
+    components: GameComponent[] = [];
 
-        /** Position of this object in the world.
-         * @type {vec3} */
-        this.position = vec3.create();
+    /** Position of this object in the world. */
+    position: vec3 = vec3.create();
 
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
-        this.velocity = vec3.create();
+    /** Velocity of this object moving through the world. */
+    velocity: vec3 = vec3.create();
 
-        /** Current rotation of this object.
-         * @type {number} */
-        this.rotation = 0;
+    /** Current rotation of this object. */
+    rotation = 0;
 
-        /** Current speed of rotation.
-         * @type {number} */
-        this.rotationSpeed = 0;
+    /** 3D rotations require a rotation axis */
+    rotationAxis: vec3 = vec3.fromValues(0, 0, 1);
 
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
-        this.toBeRemoved = [];
+    /** Current speed of rotation. */
+    rotationSpeed = 0;
 
-        /** Integer representing the number of lives remaining for this object.
-         * @type {number} */
-        this.life = 1;
+    /** List of components which will be removed on next update. */
+    private toBeRemoved: GameComponent[] = [];
 
-        /** Integer representing the team this object belongs to.
-         * @type {number} */
-        this.team = 0;
+    mass = 1;
 
-        this.components.remove = arrayRemoveItem;
+    /** Integer representing the number of lives remaining for this object. */
+    life = 1;
 
-        this._events = {};
-    }
+    /** Integer representing the team this object belongs to. */
+    team = 0;
+
+    private _events = {};
+
+    name: string;
+
+    /** Array of numbers describing bounds [minX, minY, maxX, maxY, minZ, maxZ] */
+    bounds: number[];
 
     /**
      * <p>This method is used to add a {@link GameComponent} to this object.
@@ -58,13 +53,7 @@ class GameObject {
      * @param {GameComponent} component - The component to be added to this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-    addComponent (component){
-
-        // Allow syntactic sugar of addComponent(function() {...}) which is a
-        // shorthand for specifying a simple component with only an update method
-        if(isFunction(component)){
-            component = { update: component };
-        }
+    addComponent (component: GameComponent){
 
         this.components.push(component);
 
@@ -83,12 +72,12 @@ class GameObject {
      * @param {GameComponent} component - The component to be removed from this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-    removeComponent (component){
+    removeComponent (component: GameComponent){
         this.toBeRemoved.push(component);
         return this;
     }
 
-    removeComponentByName (name){
+    removeComponentByName (name: string){
         for(var i = 0; i < this.components.length; i++){
             if(this.components[i].name == name)
                 this.toBeRemoved.push(this.components[i]);
@@ -123,7 +112,7 @@ class GameObject {
      * @param {number} z - z component of position vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setPosition (x,y,z) {
+    setPosition (x?:number, y?:number, z?:number) {
         if(x == undefined) { x = this.position[0]; }
         if(y == undefined) { y = this.position[1]; }
         if(z == undefined) { z = this.position[2]; }
@@ -151,7 +140,7 @@ class GameObject {
      * @param {number} z - z component of velocity vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setVelocity (vx,vy,vz) {
+    setVelocity (vx?: number, vy?: number, vz?: number) {
         if(vx == undefined) { vx = this.velocity[0]; }
         if(vy == undefined) { vy = this.velocity[1]; }
         if(vz == undefined) { vz = this.velocity[2]; }
@@ -159,20 +148,17 @@ class GameObject {
         return this;
     }
 
-    setRotation (th) {
-        this.rotation = th;
-        return this;
-    }
-
-    hit (victim) {
-        if(this.hitVictim == null)
-            this.hitVictim = victim;
-    }
-
-    hitBy (attacker) {
-        if(this.attackerHit == null)
-            this.attackerHit = attacker;
-    }
+	/**
+	 * Set rotation
+	 * @param {number} rotation - Rotation in radians
+	 * @param {vec3} rotationAxis - RotationAxis in radians
+	 */
+	setRotation (rotation: number, rotationAxis?: vec3){
+		this.rotation = rotation;
+		if(rotationAxis){
+			vec3.normalize(this.rotationAxis, rotationAxis);
+		}
+	}
 
     /**
      * This method is called once per frame. GameObjects will usually only need
@@ -188,7 +174,7 @@ class GameObject {
         for(;j<m;j++){
             for(i=0;i<l;i++){
                 if(this.components[i] == this.toBeRemoved[j]){
-                    this.components.remove(i);
+                    arrayRemoveItem.call(this.components, i);
                     break;
                 }
             }
@@ -227,9 +213,9 @@ class GameObject {
         this._events[eventType] = fn;
     }
 
-    fire (eventType) {
+    fire (eventType, ...rest) {
         if(this._events[eventType]) {
-            this._events[eventType].apply(this, [].slice.call(arguments, 1));
+            this._events[eventType].apply(this, rest);
         }
     }
 }

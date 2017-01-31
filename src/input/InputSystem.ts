@@ -1,4 +1,5 @@
 import GameObject from '../core/GameObject';
+import CameraSystem from '../CameraSystem';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
@@ -20,35 +21,29 @@ export default InputSystem;
  * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
  */
 class InputSystem extends GameObject {
-  constructor (screen, keyboard, cameraSystem) {
+  screen: HTMLElement;
+  keyboard: HTMLElement;
+  cameraSystem: CameraSystem;
+
+  private _nextClick: vec2 = vec2.create();
+
+  /** If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click. */
+  lastClick: vec2 = vec2.create();
+
+  /** Boolean to indicate if a click has been registered during the last frame. */
+  hasClick: boolean = false;
+
+  private _nextKey: number = null;
+
+  /** The most recent key press if one occured during the previous frame. */
+  lastKey:number = null;
+
+  constructor (screen: HTMLElement, keyboard: HTMLElement, cameraSystem: CameraSystem) {
     super();
 
     this.screen = screen;
     this.keyboard = keyboard;
     this.cameraSystem = cameraSystem;
-
-    this._nextClick = vec2.create();
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    this.lastClick = vec2.create();
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    this.hasClick = false;
-
-    this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    this.lastKey = null;
 
     initScreen.call(this);
     initKeyboard.call(this);
@@ -75,7 +70,7 @@ class InputSystem extends GameObject {
    * Set a new screen object and initialse event listening on it.
    * @param {Element} screen - New screen
    */
-  setScreen (screen) {
+  setScreen (screen: HTMLElement) {
     this.screen = screen;
 
     initScreen.call(this);
@@ -114,6 +109,14 @@ class InputSystem extends GameObject {
     vec2.add(v, v, cam.position);
     return v;
   }
+
+  /** Reference object to convert keys to keycodes */
+  static Keys = {
+    "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+    a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+    n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+  }
+
 }
 
 /**
@@ -180,27 +183,3 @@ function TouchClick(sel, fnc) {
   // We need to keep track of this handler in order to be able to remove it later.
   sel.touchClick = handle;
 }
-
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};

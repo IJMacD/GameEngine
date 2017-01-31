@@ -1,30 +1,31 @@
 import GameObject from './core/GameObject';
+import GameObjectManager from './core/GameObjectManager';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 export default CameraSystem;
 
 /**
  * Render systems require a camera. Use this class to create one.
- * @extends {GameObject}
  * @param {number} width
  * @param {number} height
  */
 class CameraSystem extends GameObject {
+	width: number;
+	height: number;
+
+	pruneList: GameObjectManager[] = [];
+	suspendedObjects = [];
+
+	skewX = 0;
+	skeyY = 0;
+	scaleX = 1;
+	scaleY = 1;
+
 	constructor (width, height) {
 		super();
 
 		this.width = width;
 		this.height = height;
-
-		this.pruneList = [];
-		this.suspendedObjects = [];
-		this.skewX = this.skew;
-		this.skeyY = this.skew;
-		this.scaleX = 1;
-		this.scaleY = 1;
-		this.rotation = 0;
-		this.rotationAxis = vec3.create();
-		vec3.set(this.rotationAxis, 0, 0, 1);
 	}
 
 	/**
@@ -39,17 +40,6 @@ class CameraSystem extends GameObject {
 	}
 
 	/**
-	 * Set Camera rotation
-	 * @param {number} rotation - Rotation in radians
-	 */
-	setRotation (rotation, rotationAxis){
-		this.rotation = rotation;
-		if(rotationAxis && rotationAxis.length == 3){
-			vec3.normalize(this.rotationAxis, rotationAxis);
-		}
-	}
-
-	/**
 	 * Change the size of the camera
 	 * @param {number} width
 	 * @param {number} height
@@ -59,20 +49,19 @@ class CameraSystem extends GameObject {
 		this.height = height;
 	}
 
-	addManagerForPruning (objectManager) {
-		if(objectManager instanceof GameObjectManager)
-			this.pruneList.push(objectManager);
+	addManagerForPruning (objectManager: GameObjectManager) {
+		this.pruneList.push(objectManager);
 	}
 
-	getTransformMatrix () {
-		// var m = new Matrix(this.shearMatrix);
-		// m.multiplyBy(this.scaleMatrix);
-		// m.multiplyBy(this.rotMat);
-		return this.transformMatrix;
-	}
+	// getTransformMatrix () {
+	// 	// var m = new Matrix(this.shearMatrix);
+	// 	// m.multiplyBy(this.scaleMatrix);
+	// 	// m.multiplyBy(this.rotMat);
+	// 	return this.transformMatrix;
+	// }
 
-	update (delta) {
-		super.update(delta);
+	// update (delta) {
+	// 	super.update(delta);
 		//this.rotation += 0.0001 * delta;
 		//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
 		//this.angle += 0.0001 * delta;
@@ -101,5 +90,5 @@ class CameraSystem extends GameObject {
 			}
 		}
 		*/
-	}
+	// }
 }

@@ -4,12 +4,12 @@
  * @param {array} paths - Array of arrays of numbers
  * @return {array} Array of arrays of numbers
  */
-export function simplifyPaths(paths){
-  var out = [],
-      current,
-      x,
-      y;
-  paths.forEach(function(path){
+export function simplifyPaths(paths: number[][]){
+  var out: number[][] = [],
+      current: number[],
+      x: number,
+      y: number;
+  paths.forEach(function(path: number[]){
     if(path.length == 4){
       if(path[0] == x && path[1] == y){
         x = path[2];
