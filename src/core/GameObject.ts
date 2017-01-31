@@ -209,7 +209,9 @@ class GameObject {
 
     on (eventType, fn) {
         // TODO: support multiple events
-        console.debug("If you are trying to add multiple events to the same object, it has not been implemented yet.");
+        if(this._events[eventType]) {
+            console.warn("You are trying to add multiple events to the same object, which has not been implemented yet.");
+        }
         this._events[eventType] = fn;
     }
 

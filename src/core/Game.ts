@@ -1,10 +1,10 @@
-import GameObject from './GameObject';
-import GameObjectManager from './GameObjectManager';
+import GameObject from './GameObject.ts';
+import GameObjectManager from './GameObjectManager.ts';
 import GameComponent from './GameComponent';
-import CameraSystem from '../CameraSystem';
-import CanvasRenderSystem from '../render/CanvasRenderSystem';
-import WorldSystem from '../world/WorldSystem';
-import InputSystem from '../input/InputSystem';
+import CameraSystem from '../CameraSystem.ts';
+import CanvasRenderSystem from '../render/CanvasRenderSystem.ts';
+import WorldSystem from '../world/WorldSystem.ts';
+import InputSystem from '../input/InputSystem.ts';
 
 enum State {
     STATE_PAUSED = 0,

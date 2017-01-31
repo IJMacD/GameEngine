@@ -12,6 +12,8 @@
   "devDependencies": {
     "ink-docstrap": "^1.1.4",
     "jsdoc": "^3.4.3",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.5",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony",
     "uglifyjs-webpack-plugin": "^0.1.2",
     "webpack": "^2.2.0"

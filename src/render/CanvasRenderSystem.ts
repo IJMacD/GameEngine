@@ -1,6 +1,6 @@
-import GameObject from '../core/GameObject';
-import GameComponent from '../core/GameComponent';
-import CameraSystem from '../CameraSystem';
+import GameObject from '../core/GameObject.ts';
+import GameComponent from '../core/GameComponent.ts';
+import CameraSystem from '../CameraSystem.ts';
 
 export default CanvasRenderSystem;
 

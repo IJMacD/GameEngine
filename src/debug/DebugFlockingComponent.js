@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 import FlockingComponent from '../behaviour/FlockingComponent';
 
 /**

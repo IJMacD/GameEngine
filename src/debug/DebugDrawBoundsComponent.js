@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 
 /**
  * It is sometimes useful to draw the bounds of an object or world for example.

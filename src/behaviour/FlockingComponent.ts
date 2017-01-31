@@ -1,5 +1,5 @@
-import GameObject from '../core/GameObject';
-import GameComponent from '../core/GameComponent';
+import GameObject from '../core/GameObject.ts';
+import GameComponent from '../core/GameComponent.ts';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 // Working Vectors

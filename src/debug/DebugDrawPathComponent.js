@@ -1,5 +1,5 @@
-import GameObject from '../core/GameObject';
-import GameComponent from '../core/GameComponent';
+import GameObject from '../core/GameObject.ts';
+import GameComponent from '../core/GameComponent.ts';
 
 /**
  * Component which traces out the path of an object

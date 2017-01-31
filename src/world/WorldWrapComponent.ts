@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 import WorldSystem from './WorldSystem';
 
 export default WorldWrapComponent;

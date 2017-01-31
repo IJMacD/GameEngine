@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 
 /**
  * Commponent which checks the input system for clicks which occured with

@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 
 /**
  * Component to draw surfaces from a BackgroundCollisionSystem. Will also draw surface normals.

@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 import { vec2 } from 'gl-matrix';
 
 const u = vec2.create();

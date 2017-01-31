@@ -1,4 +1,4 @@
-import GameObject from './core/GameObject';
+import GameObject from './core/GameObject.ts';
 import GameObjectManager from './core/GameObjectManager';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 

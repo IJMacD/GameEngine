@@ -1,5 +1,5 @@
-import GameObject from '../core/GameObject';
-import CameraSystem from '../CameraSystem';
+import GameObject from '../core/GameObject.ts';
+import CameraSystem from '../CameraSystem.ts';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
@@ -22,7 +22,7 @@ export default InputSystem;
  */
 class InputSystem extends GameObject {
   screen: HTMLElement;
-  keyboard: HTMLElement;
+  keyboard: HTMLDocument;
   cameraSystem: CameraSystem;
 
   private _nextClick: vec2 = vec2.create();
@@ -38,7 +38,7 @@ class InputSystem extends GameObject {
   /** The most recent key press if one occured during the previous frame. */
   lastKey:number = null;
 
-  constructor (screen: HTMLElement, keyboard: HTMLElement, cameraSystem: CameraSystem) {
+  constructor (screen: HTMLElement, keyboard: HTMLDocument, cameraSystem: CameraSystem) {
     super();
 
     this.screen = screen;
