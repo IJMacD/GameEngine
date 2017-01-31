@@ -159,10 +159,12 @@ export default class Game {
      * @return {CameraSystem}
      */
     getDefaultCamera () {
-        var width = this.canvas.width,
-            height = this.canvas.height;
-        this.cameraSystem = new CameraSystem(width, height);
-        this.cameraSystem.setPosition(width / 2, height / 2);
+        if (!this.cameraSystem) {
+            var width = this.canvas.width,
+                height = this.canvas.height;
+            this.cameraSystem = new CameraSystem(width, height);
+            this.cameraSystem.setPosition(width / 2, height / 2);
+        }
         return this.cameraSystem;
     }
 
@@ -173,11 +175,15 @@ export default class Game {
      * @return {CanvasRenderSystem}
      */
     getDefaultRenderer () {
-        if (!this.cameraSystem) {
-            throw new Error("getDefaultCamera() has not been called");
+        if (!this.renderSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+
+            var context = this.canvas.getContext("2d");
+            this.renderSystem = new CanvasRenderSystem(context, this.cameraSystem);
         }
-        var context = this.canvas.getContext("2d");
-        return new CanvasRenderSystem(context, this.cameraSystem);
+        return this.renderSystem;
     }
 
     /**
@@ -188,8 +194,14 @@ export default class Game {
      * @return {WorldSystem}
      */
     getDefaultWorld (paddingX = 0, paddingY = paddingX) {
-        var bounds = [-paddingX, -paddingY, this.canvas.width + paddingX, this.canvas.height + paddingY];
-        return new WorldSystem(bounds);
+        const bounds = [-paddingX, -paddingY, this.canvas.width + paddingX, this.canvas.height + paddingY];
+        if (!this.worldSystem) {
+            this.worldSystem = new WorldSystem(bounds);
+        }
+        else {
+            this.worldSystem.setBounds(bounds);
+        }
+        return this.worldSystem;
     }
 
     /**
@@ -199,12 +211,15 @@ export default class Game {
      * @return {InputSystem}
      */
     getDefaultInput (screen) {
-        if (!this.cameraSystem) {
-            throw new Error("getDefaultCamera() has not been called");
+        if (!this.inputSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+            // params are: (screen, keyboard, camera)
+            // Input system needs a screen it can call width() and height() on
+            this.inputSystem = new InputSystem(screen, document, this.cameraSystem);
         }
-        // params are: (screen, keyboard, camera)
-        // Input system needs a screen it can call width() and height() on
-        return new InputSystem(screen, document, this.cameraSystem);
+        return this.inputSystem;
     }
 
     /** Move to the next level */
