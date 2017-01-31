@@ -1,15 +1,17 @@
 import GameComponent from '../core/GameComponent';
 
+export default CollisionComponent;
+
 /**
- * Component to interface with collision system. Handles both attack
- * and vulnerable configurations.
- * @class CollisionComponent
+ * This component registers the parent object with collision system.
+ * It can handle configurations where the parent is both attack and vulnerable.
  * @extends {GameComponent}
  * @param {CollisionSystem} collisionSystem - Which CollisionSystem to report to
  * @param {boolean} attack - Can this object attack?
  * @param {boolean} vulnerable - Is this object vulnerable?
+ * @memberof Collision
  */
-export default class CollisionComponent extends GameComponent {
+class CollisionComponent extends GameComponent {
 
 	constructor (collisionSystem, attack, vulnerable) {
 		super();

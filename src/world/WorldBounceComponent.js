@@ -1,15 +1,17 @@
 import GameComponent from '../core/GameComponent';
 
+export default WorldBounceComponent;
+
 /**
  * Bounce off the walls of a world.
- * @class WorldBounceComponent
  * @extends {GameComponent}
  * @param {WorldSystem} worldSystem - The world the parent object is in.
  * @param {number} width - Default width if parent has no bounds
  * @param {number} height - Default height if parent has no bounds
  * @param {number} thickness - Default thickness if parent has no bounds
+ * @memberof World
  */
-export default class WorldBounceComponent extends GameComponent {
+class WorldBounceComponent extends GameComponent {
     constructor (worldSystem, width, height, thickness) {
         super();
 

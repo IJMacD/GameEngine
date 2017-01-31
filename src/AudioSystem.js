@@ -1,14 +1,15 @@
 import GameObject from './core/GameObject';
 
+export default AudioSystem;
+
 /**
  * Class to play audio at specific points during gameplay
  *
  * This is a very basic implementaion which is limited to one sound effect at a time.
  * It is possible to enhance this class to provide multi-track playback.
  * @extends {GameObject}
- * @class AudioSystem
  */
-export default class AudioSystem extends GameObject {
+class AudioSystem extends GameObject {
     constructor () {
         super();
 

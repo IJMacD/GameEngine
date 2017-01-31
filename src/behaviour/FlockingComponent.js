@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import { vec3 } from 'gl-matrix';
+import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 // Working Vectors
 const vecSeparation = vec3.create();
@@ -7,20 +7,22 @@ const vecAlign = vec3.create();
 const vecCohesion = vec3.create();
 const vecSpare = vec3.create();
 
+export default FlockingComponent;
+
 /**
  * <p>Objects with this component will try to 'flock' together. There are three effects Working
  * together to produce flocking behaviour.
  * <p>The parent object will be attracted to the average position of objects within the
- * {@link FlockingComponent#NEIGHBOUR_RADIUS}, this is called cohesion.
+ * {@link FlockingComponent.NEIGHBOUR_RADIUS}, this is called cohesion.
  * <p>The parent object wil try to move in the average direction of all the other objects within
  * the neighbourhood, this is called alignment.
  * <p>The parent object will try to move away from object with the
  * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
- * @class FlockingComponent
- * @param {array} flock - An array of game objects which are considered to be in the same flock.
  * @extends {GameComponent}
+ * @param {array} flock - An array of game objects which are considered to be in the same flock.
+ * @memberof Behaviour
  */
-export default class FlockingComponent extends GameComponent {
+class FlockingComponent extends GameComponent {
 
     constructor (flock) {
         super();
@@ -73,9 +75,16 @@ export default class FlockingComponent extends GameComponent {
 }
 
 // FlockingComponent Constants
+
+/** Size of sphere of influence. */
 FlockingComponent.NEIGHBOUR_RADIUS = 200;
+/** Size of replulsion sphere. */
 FlockingComponent.SEPARATION_RADIUS = 150;
+/** Lock speed to maximum magnitude. */
 FlockingComponent.MAX_SPEED = 0.1;
+/** Coefficient controlling desire to move to same position. */
 FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+/** Coefficient controlling desire to match velocity. */
 FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+/** Coefficient controlling desire to move away from others. */
 FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;

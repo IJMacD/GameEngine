@@ -6,6 +6,7 @@ import { GameComponent } from '../core';
    * @param {RenderSystem} renderSystem - Where to draw.
    * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
    * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
+   * @memberof Sprite
    */
   export class TileComponent extends GameComponent{
     constructor (renderSystem, texture, bounds) {
@@ -42,35 +43,28 @@ import { GameComponent } from '../core';
   }
 
   /**
-   * Sprite Object Definition
-   * ------------------------
-   *
-   * let sprite = {
-   *    t:  texture object (i.e. {image: new Image(), width: 0, height: 0, loaded: false})
-   *    x:  X-offset of sprite in spritesheet
-   *    y:  Y-offset of sprite in spritesheet
-   *    w:  width of sprite
-   *    h:  height of sprite
-   *    ox: origin x-offset, so sprite can be centred on parent's position
-   *    oy: origin y-offset, so sprite can be centred on parent's position
-   *    d:  (optional) duration of sprite for animation
-   * }
-   */
-
-  /**
    * Component renders a sprite for a parent object.
    *
    * Component can either contain its own sprite or use one provided on the parent.
    * In the case where both component and parent have sprites, the one on the parent
    * is prefered.
    * @extends {GameComponent}
+   * @param {RenderSystem} renderSystem - Target renderer
+   * @param {number} layer - optional layer to render this sprite on to.
+   * @param {Sprite} sprite - Sprite object
+   * @memberof Sprite
    */
   export class SpriteRenderingComponent extends GameComponent {
     constructor (renderSystem, layer, sprite){
       super();
 
+      /** @type {RenderSystem} */
       this.renderSystem = renderSystem;
+
+      /** @type {number} */
       this.layer = layer;
+
+      /** @type {Sprite} */
       this.sprite = sprite;
     }
 
@@ -98,7 +92,8 @@ import { GameComponent } from '../core';
    * Animate through a sequence of sprites.
    * @extends {GameComponent}
    * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
-   * @param {array} sprites - Array of sprite objects.
+   * @param {Sprite[]} sprites - Array of sprite objects.
+   * @memberof Sprite
    */
   export class SpriteAnimationComponent extends GameComponent {
     constructor (duration, sprites) {
@@ -160,7 +155,16 @@ import { GameComponent } from '../core';
     }
   }
 
-  /** @namespace */
+  /** @namespace
+   * @property {Texture} t - texture object
+   * @property {number} x - X-offset of sprite in spritesheet
+   * @property {number} y - Y-offset of sprite in spritesheet
+   * @property {number} width - width of sprite
+   * @property {number} height - height of sprite
+   * @property {number} ox - origin x-offset, so sprite can be centred on parent's position
+   * @property {number} oy - origin y-offset, so sprite can be centred on parent's position
+   * @property {number} d - (optional) duration of sprite for animation
+   */
   export const Sprite = {};
 
   /**
@@ -192,10 +196,11 @@ import { GameComponent } from '../core';
   };
 
   /**
-   * This component is not to be used any more. Use Sprite animation component instead
+   * This component is not to be used any more. Use {@link SpriteAnimationComponent} instead
    * @constructor
    * @deprecated
    * @extends {GameComponent}
+   * @memberof Sprite
    */
   export function AnimatedSpriteComponent(images, speed){
     this.images = images;
@@ -219,6 +224,7 @@ import { GameComponent } from '../core';
    * @constructor
    * @deprecated
    * @extends {GameComponent}
+   * @memberof Sprite
    */
   export function CanvasSpriteRenderingComponent(renderSystem){
     this.renderSystem = renderSystem;

@@ -1,12 +1,15 @@
 import GameObject from './core/GameObject';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
+export default CameraSystem;
+
 /**
  * Render systems require a camera. Use this class to create one.
- * @class CameraSystem
  * @extends {GameObject}
+ * @param {number} width
+ * @param {number} height
  */
-export default class CameraSystem extends GameObject {
+class CameraSystem extends GameObject {
 	constructor (width, height) {
 		super();
 
@@ -46,6 +49,11 @@ export default class CameraSystem extends GameObject {
 		}
 	}
 
+	/**
+	 * Change the size of the camera
+	 * @param {number} width
+	 * @param {number} height
+	 */
 	setSize (width, height){
 		this.width = width;
 		this.height = height;

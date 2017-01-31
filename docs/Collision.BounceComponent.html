@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: MultiRenderSystem</title>
+	<title>Documentation Class: BounceComponent</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,14 +79,18 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: MultiRenderSystem</h1>
+	<h1 class="page-title">Class: BounceComponent</h1>
 <section>
 
 <header>
     
         <h2>
-        MultiRenderSystem
+            <span class="ancestors"><a href="Collision.html">Collision</a>.</span>
+        
+        BounceComponent
         </h2>
+        
+            <div class="class-description">Component which allows collided objects to bounce off one-another. Respectsconservation of momentum.<p>This component behaves differently from other components. There is noupdate method. Instead it attaches a listener to the parents' "attack" event.<p><em>Note: There is currently no method for removing listeners so removingthis component may have undesired effects.</em></p></div>
         
     
 </header>
@@ -98,16 +102,12 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="MultiRenderSystem"><span class="type-signature"></span>new MultiRenderSystem()</h4>
+    <h4 class="name" id="BounceComponent"><span class="type-signature"></span>new BounceComponent()</h4>
     
     
 </dt>
 <dd>
 
-    
-    <div class="description">
-        Manages the task of distributing renderables to multiple RenderSystems
-    </div>
     
 
     
@@ -182,7 +182,7 @@
 
 
     <ul>
-        <li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li>
+        <li><a href="GameComponent.html">GameComponent</a></li>
     </ul>
 
 
@@ -200,86 +200,6 @@
         <h3 class="subsection-title">Members</h3>
 
         <dl>
-            
-<hr>
-<dt class="name" id="clearScreen">
-    <h4 id="clearScreen"><span class="type-signature"></span>clearScreen<span class="type-signature"> :boolean</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Should the renderer clear the screen before drawing a frame or just overdraw.
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="CanvasRenderSystem.html#clearScreen">CanvasRenderSystem#clearScreen</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
             
 <hr>
 <dt class="name" id="components">
@@ -1010,7 +930,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="addRenderSystem"><span class="type-signature"></span>addRenderSystem(renderSystem)</h4>
+    <h4 class="name" id="init"><span class="type-signature">&lt;abstract> </span>init(parent)</h4>
     
     
 </dt>
@@ -1018,7 +938,7 @@
 
     
     <div class="description">
-        Add a child render system which will receive updates.
+        This method is called once when the component is first added to each parent.Use this to perform set-up and add any necessary properties to parent objects.
     </div>
     
 
@@ -1053,13 +973,13 @@
 
         <tr>
             
-                <td class="name"><code>renderSystem</code></td>
+                <td class="name"><code>parent</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></span>
+<span class="param-type"><a href="GameObject.html">GameObject</a></span>
 
 
 
@@ -1070,159 +990,7 @@
 
             
 
-            <td class="description last">RenderSystem to add</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="push"><span class="type-signature"></span>push(renderable, layer)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Add a renderable to the draw queue
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>renderable</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#CanvasRenderable">CanvasRenderable</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Function which will receive drawing context</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Layer to add this drawable to. Default: 1</td>
+            <td class="description last">A reference to the <a href="GameObject.html">GameObject</a> on whichthis component is operating. This allows multiple GameObjects to sharestateless components.</td>
         </tr>
 
     
@@ -1244,7 +1012,7 @@
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="CanvasRenderSystem.html#push">CanvasRenderSystem#push</a>
+				<a href="GameComponent.html#init">GameComponent#init</a>
 			</li>
 		</ul>
 	</dd>
@@ -1253,7 +1021,7 @@
     
     <dt class="tag-overrides">Overrides:</dt>
     <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="CanvasRenderSystem.html#push">CanvasRenderSystem#push</a>
+        <a href="GameComponent.html#init">GameComponent#init</a>
     </li></ul></dd>
     
 
@@ -1899,191 +1667,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="strokePath"><span class="type-signature"></span>strokePath(path, style, layer)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Convenience method to stroke a path with the given style and to the given layer.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>path</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>style</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Colour of line to draw. Default: #000</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Layer this should be drawn on. Default: 1</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="CanvasRenderSystem.html#strokePath">CanvasRenderSystem#strokePath</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="toHTML"><span class="type-signature"></span>toHTML()</h4>
     
     
@@ -2092,7 +1675,7 @@
 
     
     <div class="description">
-        This method is used to produce a html representation of the object forthings such as debugging trees. It will include components in its rendering.Similar to the toString method.
+        This method is used to produce a html representation of the component forthings such as debugging trees. Similar to toString method.
     </div>
     
 
@@ -2116,7 +1699,7 @@
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="GameObject.html#toHTML">GameObject#toHTML</a>
+				<a href="GameComponent.html#toHTML">GameComponent#toHTML</a>
 			</li>
 		</ul>
 	</dd>
@@ -2195,7 +1778,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="update"><span class="type-signature"></span>update(delta)</h4>
+    <h4 class="name" id="update"><span class="type-signature">&lt;abstract> </span>update(parent, delta)</h4>
     
     
 </dt>
@@ -2203,7 +1786,7 @@
 
     
     <div class="description">
-        This method is called once per frame. GameObjects will usually only needto call update on each of its components in this method passing a referenceto itself.
+        This method is called once per frame for each GameObject this componenthas been attached to.
     </div>
     
 
@@ -2234,6 +1817,30 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GameObject.html">GameObject</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A reference to the <a href="GameObject.html">GameObject</a> on whichthis component is operating. This allows multiple GameObjects to sharestateless components.</td>
+        </tr>
+
     
 
         <tr>
@@ -2277,17 +1884,12 @@
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="GameObject.html#update">GameObject#update</a>
+				<a href="GameComponent.html#update">GameComponent#update</a>
 			</li>
 		</ul>
 	</dd>
 	
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="CanvasRenderSystem.html#update">CanvasRenderSystem#update</a>
-    </li></ul></dd>
     
 
     

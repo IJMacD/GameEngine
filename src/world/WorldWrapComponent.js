@@ -1,12 +1,14 @@
 import GameComponent from '../core/GameComponent';
 
+export default WorldWrapComponent;
+
 /**
  * When parent goes outside of world bounds wrap to the opposite wall.
- * @class WorldWrapComponent
  * @extends {GameComponent}
  * @param {WorldSystem} worldSystem - Which world is the parent in.
+ * @memberof World
  */
-export default class WorldWrapComponent extends GameComponent {
+class WorldWrapComponent extends GameComponent {
 	constructor (worldSystem) {
 		super();
 

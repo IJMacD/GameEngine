@@ -1,16 +1,17 @@
 import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
 
+export default CanvasRenderSystem;
+
 /**
  * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
  * will get rendered to the canvas.
  * <p>It supports render layers as well.
- * @class CanvasRenderSystem
  * @extends {GameObject}
  * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
  * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
  */
-export default class CanvasRenderSystem extends GameObject {
+class CanvasRenderSystem extends GameObject {
 
 	constructor (context, cameraSystem) {
 		super();
@@ -21,6 +22,10 @@ export default class CanvasRenderSystem extends GameObject {
 
 		this.renderQueue = [];
 
+		/**
+		 * Should the renderer clear the screen before drawing a frame or just overdraw.
+		 * @type {boolean}
+		 */
 		this.clearScreen = true;
 	}
 

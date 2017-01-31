@@ -21,12 +21,24 @@ var STATE_PAUSED = 0,
         return id;
     };
 
+export default Game;
+
 /**
- * Utility class for things such as bootstrapping Game
- * @class Game
+ * Utility class for things such as bootstrapping.
+ *
+ * <p>Providing width and height in options object as well as a canvas will set
+ * the intrinsic rendering size of the canvas.
+ * @param {object} options
+ * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
+ * @param {number} options.width - Render width.
+ * @param {number} options.height - Render height.
  */
-export default class Game {
+class Game {
     constructor (options) {
+        /**
+         * Canvas this game will rener to.
+         * @type {HTMLCanvasElement}
+         */
         this.canvas = options.canvas;
 
         /** Width of game canvas. Use {@link Game#setSize} to change.
@@ -82,13 +94,23 @@ export default class Game {
          */
         this.level = 0;
 
-        // Number of resources currently pending
+        /**
+         * Number of resources currently pending.
+         * @private
+         * */
         this._toLoad = 0;
+
         this._lastTime = 0;
         this._events = {};
         this._loaded = 0;
     }
 
+    /**
+     * Replace the canvas of this game.
+     *
+     * <p>It will re-initialise width and height based on canvas size.
+     * @param {HTMLCanvasElement} canvas - New canvas
+     */
     setCanvas (canvas) {
         this.canvas = canvas;
 
@@ -99,6 +121,21 @@ export default class Game {
         this.canvas.height = this.height;
     }
 
+    /**
+     * @typedef {object} Texture
+     * @property {Image} image - HTML <code>&ltimage></code> Element
+     * @property {number} width - Natural width of image
+     * @property {number} height - Natural height of image
+     * @property {boolean} loaded - If image has loaded width and height properties should be available.
+     */
+
+    /**
+     * Provide an array of urls pointing to image resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of texture objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {Texture[]}
+     */
     loadTextures (texturePaths) {
         this._toLoad += texturePaths.length;
         var self = this;
@@ -112,14 +149,28 @@ export default class Game {
                 _resourceLoaded(self, texture);
             };
             texture.image.onerror = function(){
-            throw new Error("Failed to load a texture: " + path);
-            }
+                throw new Error("Failed to load a texture: " + path);
+            };
             texture.image.src = path;
             self.textures.push(texture);
             return texture;
         });
     }
 
+    /**
+     * @typedef {object} AudioTexture
+     * @property {Audio} audio - HTML <code>&lt;audio></code> element
+     * @property {number} length - Total length of audio
+     * @property {boolean} loaded - If loaded is <code>true</code> length should be available.
+     */
+
+    /**
+     * Provide an array of urls pointing to audio resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of 'audio texture' objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {AudioTexture[]}
+     */
     loadAudio (audioPaths) {
         this._toLoad += audioPaths.length;
         var self = this;
@@ -142,6 +193,9 @@ export default class Game {
         });
     }
 
+    /**
+     * Start the loop.
+     */
     start () {
         this.nextLevel();
 
@@ -150,6 +204,9 @@ export default class Game {
         _loop(this);
     }
 
+    /**
+     * Stop the loop after the current frame.
+     */
     stop () {
         this.state = STATE_STOPPED;
     }
@@ -171,7 +228,6 @@ export default class Game {
     /**
      * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
      * this game instance.
-     * <p>You must call <code>getDefaultCamera()</code> before calling this method.
      * @return {CanvasRenderSystem}
      */
     getDefaultRenderer () {
@@ -207,7 +263,6 @@ export default class Game {
     /**
      * <p>Generate a default {@link InputSystem} based on properties set on
      * this game instance.
-     * <p>You must call <code>getDefaultCamera()</code> before calling this method.
      * @return {InputSystem}
      */
     getDefaultInput (screen) {
@@ -216,7 +271,6 @@ export default class Game {
                 this.getDefaultCamera();
             }
             // params are: (screen, keyboard, camera)
-            // Input system needs a screen it can call width() and height() on
             this.inputSystem = new InputSystem(screen, document, this.cameraSystem);
         }
         return this.inputSystem;
@@ -225,7 +279,7 @@ export default class Game {
     /** Move to the next level */
     nextLevel () {
         this.level++;
-        fire(this, "loadLevel", this.level);
+        _fire(this, "loadLevel", this.level);
     }
 
     /** Specify a level to jump to.
@@ -233,7 +287,7 @@ export default class Game {
      */
     setLevel (level) {
         this.level = level;
-        fire(this, "loadLevel", this.level);
+        _fire(this, "loadLevel", this.level);
     }
 
     /**
@@ -241,7 +295,7 @@ export default class Game {
      * <p>This does not automatically move to the next level.
      */
     completeLevel () {
-        fire(this, "levelComplete", this.level);
+        _fire(this, "levelComplete", this.level);
     }
 
     /**
@@ -269,12 +323,15 @@ export default class Game {
         return this;
     }
 
+    /**
+     * Fire an event on the game.
+     */
     fire (event) {
-        fire(this, event);
+        _fire(this, event);
     }
 }
 
-function fire(self, event) {
+function _fire(self, event) {
     var callbacks = self._events[event],
         args = [].slice.call(arguments, 2);
 
@@ -313,8 +370,8 @@ function _loop(self) {
 
 function _resourceLoaded(self, resource) {
   self._loaded++;
-  fire(self, "resourcesProgress", self._loaded / self._toLoad);
+  _fire(self, "resourcesProgress", self._loaded / self._toLoad);
   if(self._toLoad - self._loaded <= 0){
-    fire(self, "resourcesLoaded");
+    _fire(self, "resourcesLoaded");
   }
 };

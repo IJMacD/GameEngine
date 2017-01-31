@@ -1,11 +1,13 @@
 import GameObject from '../core/GameObject';
 
+export default BackgroundCollisionSystem;
+
 /**
- * System to maintain list of polylines ffor collision detection
- * @class BackgroundCollisionSystem
- * @extends GameObject
+ * System to maintain list of polylines for collision detection.
+ * @extends {GameObject}
+ * @memberof Collision
  */
-export default class BackgroundCollisionSystem extends GameObject {
+class BackgroundCollisionSystem extends GameObject {
     constructor () {
 		super();
 		this.surfaces = [];
@@ -13,7 +15,10 @@ export default class BackgroundCollisionSystem extends GameObject {
 	}
 
     /**
-     * Add permanent surface.
+     * Add permanent surface. Surfaces are all polylines.
+     *
+     * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
+     * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
      * @param {array} surface - Array defining surface.
      */
 	addSurface (surface) {
@@ -21,7 +26,7 @@ export default class BackgroundCollisionSystem extends GameObject {
 	}
 
     /**
-     * Add permanent surfaces.
+     * Add multiple permanent surfaces at once.
      * @param {array} surfaces - Array of arrays defining surfaces.
      */
 	addSurfaces (surfaces) {
@@ -31,7 +36,7 @@ export default class BackgroundCollisionSystem extends GameObject {
 	}
 
     /**
-     * Remove permanent surfaces.
+     * Remove all permanent surfaces.
      */
 	clearSurfaces (){
 		this.surfaces.length = 0;

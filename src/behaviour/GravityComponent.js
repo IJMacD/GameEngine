@@ -1,15 +1,19 @@
 import GameComponent from '../core/GameComponent';
 
-const GRAVITATIONAL_CONSTANT = 0.0003;
+export default GravityComponent;
 
 /**
  * Objects with this component will fall to the floor.
- * @class GravityComponent
+ * @extends {GameComponent}
+ * @memberof Behaviour
  */
-export default class GravityComponent extends GameComponent {
+class GravityComponent extends GameComponent {
     update (parent, delta) {
         if(typeof parent.velocity[1] == "undefined")
             parent.velocity[1] = 0;
-        parent.velocity[1] += GRAVITATIONAL_CONSTANT * delta;
+        parent.velocity[1] += GravityComponent.GRAVITATIONAL_CONSTANT * delta;
     }
 }
+
+/** Gravitational Constant is the acceleration object will head towards the ground with. */
+GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;

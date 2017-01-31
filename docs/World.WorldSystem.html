@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: MultiRenderSystem</title>
+	<title>Documentation Class: WorldSystem</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,14 +79,18 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: MultiRenderSystem</h1>
+	<h1 class="page-title">Class: WorldSystem</h1>
 <section>
 
 <header>
     
         <h2>
-        MultiRenderSystem
+            <span class="ancestors"><a href="World.html">World</a>.</span>
+        
+        WorldSystem
         </h2>
+        
+            <div class="class-description">Generic way to access a 'world' with intrinsic bounds.</div>
         
     
 </header>
@@ -98,23 +102,69 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="MultiRenderSystem"><span class="type-signature"></span>new MultiRenderSystem()</h4>
+    <h4 class="name" id="WorldSystem"><span class="type-signature"></span>new WorldSystem(bounds)</h4>
     
     
 </dt>
 <dd>
 
     
-    <div class="description">
-        Manages the task of distributing renderables to multiple RenderSystems
-    </div>
-    
 
     
 
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -182,7 +232,7 @@
 
 
     <ul>
-        <li><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></li>
+        <li><a href="GameObject.html">GameObject</a></li>
     </ul>
 
 
@@ -200,86 +250,6 @@
         <h3 class="subsection-title">Members</h3>
 
         <dl>
-            
-<hr>
-<dt class="name" id="clearScreen">
-    <h4 id="clearScreen"><span class="type-signature"></span>clearScreen<span class="type-signature"> :boolean</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Should the renderer clear the screen before drawing a frame or just overdraw.
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="CanvasRenderSystem.html#clearScreen">CanvasRenderSystem#clearScreen</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
             
 <hr>
 <dt class="name" id="components">
@@ -1010,300 +980,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="addRenderSystem"><span class="type-signature"></span>addRenderSystem(renderSystem)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Add a child render system which will receive updates.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>renderSystem</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="CanvasRenderSystem.html">CanvasRenderSystem</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">RenderSystem to add</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="push"><span class="type-signature"></span>push(renderable, layer)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Add a renderable to the draw queue
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>renderable</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#CanvasRenderable">CanvasRenderable</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Function which will receive drawing context</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Layer to add this drawable to. Default: 1</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="CanvasRenderSystem.html#push">CanvasRenderSystem#push</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="CanvasRenderSystem.html#push">CanvasRenderSystem#push</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="removeComponent"><span class="type-signature"></span>removeComponent(component)</h4>
     
     
@@ -1457,6 +1133,134 @@
 
 
         
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setBounds"><span class="type-signature"></span>setBounds(bounds)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Set the bounds of this world.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>
@@ -1899,191 +1703,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="strokePath"><span class="type-signature"></span>strokePath(path, style, layer)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Convenience method to stroke a path with the given style and to the given layer.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>path</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>style</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Colour of line to draw. Default: #000</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Layer this should be drawn on. Default: 1</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="CanvasRenderSystem.html#strokePath">CanvasRenderSystem#strokePath</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="toHTML"><span class="type-signature"></span>toHTML()</h4>
     
     
@@ -2284,11 +1903,6 @@
 	
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="CanvasRenderSystem.html#update">CanvasRenderSystem#update</a>
-    </li></ul></dd>
-    
 
     
 
@@ -2383,7 +1997,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on 2017-01-31T19:40:17+08:00
+		on 2017-01-31T19:40:18+08:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

@@ -1,15 +1,16 @@
 import GameObject from './GameObject';
 
+export default GameComponent;
+
 /**
  * A GameComponent adds a particular behaviour to a GameObject. This class
  * should be subclassed to implement desired behaviour. The `update` method
  * is called once per frame for each GameObject it has been attached to. This
  * is where most of the work will be done.
- * @class GameComponent
  * @extends {GameObject}
  * @abstract
  */
-export default class GameComponent extends GameObject {
+class GameComponent extends GameObject {
 
 	/**
 	 * This method is called once when the component is first added to each parent.

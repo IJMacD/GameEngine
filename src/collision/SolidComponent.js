@@ -1,14 +1,17 @@
 import GameComponent from '../core/GameComponent';
 
+export default SolidComponent;
+
 /**
- * Submit surfaces to BackgroundCollisionSystem. These are added relative to parent object.
- * This is useful if the parent object is moving like a platform for example.
- * @class SolidComponent
- * @extends GameComponent
+ * Submit temporary surfaces to BackgroundCollisionSystem every frame.
+ * These are added relative to parent object. This is useful if the parent
+ * object is a moving platform for example.
+ * @extends {GameComponent}
  * @param {BackgroundCollisionSystem} backgroundSystem - Where can I add my surfaces.
- * @param {array} lineSegments - Line segments to add
+ * @param {array} lineSegments - Line segments to add. These are polylines e.g. <code>[x1, y1, x2, y2, ..., xn, yn]</code>
+ * @memberof Collision
  */
-export default class SolidComponent extends GameComponent {
+class SolidComponent extends GameComponent {
     constructor (backgroundSystem, lineSegments) {
         super();
 

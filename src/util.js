@@ -1,6 +1,8 @@
 /**
  * This function simplifies paths which are really just path segments
- * by joining up adjacent segments
+ * by joining up adjacent segments.
+ * @param {array} paths - Array of arrays of numbers
+ * @return {array} Array of arrays of numbers
  */
 export function simplifyPaths(paths){
   var out = [],

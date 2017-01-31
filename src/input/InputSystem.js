@@ -2,21 +2,24 @@ import GameObject from '../core/GameObject';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
+// Create some spare vectors for use in screenToWorld method
+const v = vec2.create();
+const rotMat = mat2.create();
+
+export default InputSystem;
 /**
  * InputSystem's job is to keep track of most recent user input to provide
  * filtering and rate-limiting etc. Inputs should be passed on the the rest
  * of game in World co-ordinates rather than screen co-ordinates so the
  * InputSystem is responsible for mapping between the two.
  *
- * TODO: Right now this is very 2D orientated. Try to make more generic
- *
- * @class InputSystem
+ * @todo Right now this is very 2D orientated. Try to make more generic
  * @extends {GameObject}
  * @param {Element} screen - Should be a DOMElement to get size information from
  * @param {any} keyboard - Something to watch for keyboard events on e.g. document
  * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
  */
-export default class InputSystem extends GameObject {
+class InputSystem extends GameObject {
   constructor (screen, keyboard, cameraSystem) {
     super();
 
@@ -24,17 +27,31 @@ export default class InputSystem extends GameObject {
     this.keyboard = keyboard;
     this.cameraSystem = cameraSystem;
 
-      // Consumers should use lastClick and lastKey
-      // These values will persist for exactly one frame
+    this._nextClick = vec2.create();
 
-    this.nextClick = vec2.create();
-    this.lastClick = vec2.fromValues(undefined, undefined); // Consumers should use lastClick
+    // These values will persist for exactly one frame
+
+    /**
+     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
+     * @type {vec2}
+     */
+    this.lastClick = vec2.create();
+    /**
+     * Boolean to indicate if a click has been registered during the last frame.
+     * @type {boolean}
+     */
     this.hasClick = false;
 
-    this.nextKey = null;
-    this.lastKey = null; // Consumers should use lastKey
+    this._nextKey = null;
 
-    initScreen(this);
+    /**
+     * The most recent key press if one occured during the previous frame.
+     * @type {boolean}
+     */
+    this.lastKey = null;
+
+    initScreen.call(this);
+    initKeyboard.call(this);
   }
 
   update (delta) {
@@ -44,32 +61,90 @@ export default class InputSystem extends GameObject {
     // last event persists for exactly one frame.
 
     // Click
-    vec2.copy(this.lastClick, this.nextClick);
-    // Consumers should interpret (NaN, NaN) as no click
-    vec2.set(this.nextClick, undefined, undefined);
+    vec2.copy(this.lastClick, this._nextClick);
+    vec2.set(this._nextClick, NaN, NaN);
     this.hasClick = !isNaN(this.lastClick[0]);
 
     // Keypress
-    this.lastKey = this.nextKey;
+    this.lastKey = this._nextKey;
     // Consumers should interpret (null) as no keypress
-    this.nextKey = null;
+    this._nextKey = null;
+  }
+
+  /**
+   * Set a new screen object and initialse event listening on it.
+   * @param {Element} screen - New screen
+   */
+  setScreen (screen) {
+    this.screen = screen;
+
+    initScreen.call(this);
+  }
+
+  /**
+   * Convert screen co-ordinates to world co-ordinates.
+   * @param {number} screenX - X co-ordinate on screen.
+   * @param {number} screenY - Y co-ordinate on screen.
+   * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
+   */
+  screenToWorld (screenX, screenY){
+    const cam = this.cameraSystem,
+        camWidth = cam.width,
+        camHeight = cam.height,
+        screen = this.screen,
+        screenWidth = screen.offsetWidth,
+        screenHeight = screen.offsetHeight,
+        screenScale = camWidth / screenWidth;
+
+    vec2.set(v,
+        screenX - screenWidth / 2,
+        screenY - screenHeight / 2);
+
+    vec2.scale(v, v, screenScale);
+
+    vec2.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+
+    // Rotation in 2D only makes sense around the Z-axis so that is
+    // all that is handled here.
+    if(cam.rotationAxis[2] == 1){
+      mat2.rotate(rotMat, rotMat, -cam.rotation);
+      vec2.transformMat2(v, v, rotMat);
+    }
+
+    vec2.add(v, v, cam.position);
+    return v;
   }
 }
 
-function initScreen(inputSystem){
-  TouchClick(inputSystem.screen, function(e) {
-    var offsetLeft = inputSystem.screen.offsetLeft,
-        offsetTop = inputSystem.screen.offsetTop,
+/**
+ * Private method to initialse touch events on screen.
+ *
+ * Should be invoked as initScreen.call(this);
+ * @private
+ */
+function initScreen () {
+  TouchClick(this.screen, e => {
+    const offsetLeft = this.screen.offsetLeft,
+        offsetTop = this.screen.offsetTop,
         touch = e.touches && e.touches[0],
         x = (touch ? touch.pageX : e.pageX) - offsetLeft,
         y = (touch ? touch.pageY : e.pageY) - offsetTop;
-    vec2.copy(inputSystem.nextClick, screenToWorld(inputSystem, x, y));
-  });
 
-  inputSystem.keyboard.addEventListener("keydown", function(e) {
-    inputSystem.nextKey = e.which;
+    vec2.copy(this._nextClick, this.screenToWorld(x, y));
   });
-};
+}
+
+/**
+ * Initialse keyboard events
+ *
+ * Should be invoked as initKeyboard.call(this);
+ * @private
+ */
+function initKeyboard () {
+  this.keyboard.addEventListener("keydown", e => {
+    this._nextKey = e.which;
+  });
+}
 
 /**
  * @callback TouchClickCallback
@@ -106,55 +181,24 @@ function TouchClick(sel, fnc) {
   sel.touchClick = handle;
 }
 
-function worldToScreen(inputSystem, worldX, worldY){
-  // TODO: Check whether or not this code is outdated
-  var cam = inputSystem.cameraSystem,
-      screen = inputSystem.screen,
-      v = cam.worldVec.set(worldX, worldY);
-  v.subtract(cam.position);
-  v.leftMultiply(cam.shearMatrix);
-  v.leftMultiply(cam.scaleMatrix);
-  v.leftMultiply(cam.rotMat);
-  v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-  return v;
-};
+// function worldToScreen(inputSystem, worldX, worldY){
+//   // TODO: Check whether or not this code is outdated
+//   var cam = inputSystem.cameraSystem,
+//       screen = inputSystem.screen,
+//       v = cam.worldVec.set(worldX, worldY);
+//   v.subtract(cam.position);
+//   v.leftMultiply(cam.shearMatrix);
+//   v.leftMultiply(cam.scaleMatrix);
+//   v.leftMultiply(cam.rotMat);
+//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
+//   return v;
+// };
 
-function screenToWorld(inputSystem, screenX, screenY){
-  // Creating vectors in here *should* be OK as I assume this method
-  // won't be called too often as it will usually be as a result of
-  // user interaction
-  var v = vec2.create(),
-      rotMat = mat2.create(),
-      cam = inputSystem.cameraSystem,
-      camWidth = cam.width,
-      camHeight = cam.height,
-      screen = inputSystem.screen,
-      screenWidth = screen.offsetWidth,
-      screenHeight = screen.offsetHeight,
-      screenScale = camWidth / screenWidth;
-
-  vec2.set(v,
-      screenX - screenWidth / 2,
-      screenY - screenHeight / 2);
-
-  vec2.scale(v, v, screenScale);
-
-  vec2.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
-
-  // Rotation in 2D only makes sense around the Z-axis so that is
-  // all that is handled here.
-  if(cam.rotationAxis[2] == 1){
-    mat2.rotate(rotMat, rotMat, -cam.rotation);
-    vec2.transformMat2(v, v, rotMat);
-  }
-
-  vec2.add(v, v, cam.position);
-  return v;
-};
-
-// Exported as Static method
-InputSystem.screenToWorld = screenToWorld;
-
+/**
+ * Reference object to convert keys to keycodes
+ * @static
+ * @type {object}
+ */
 InputSystem.Keys = {
   "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
   a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,

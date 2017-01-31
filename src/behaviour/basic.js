@@ -1,6 +1,10 @@
 import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
-import { vec3 } from 'gl-matrix';
+import vec3 from 'gl-matrix/src/gl-matrix/vec3';
+
+/**
+ * @namespace Behaviour
+ */
 
 	export class PointGravityComponent extends GameComponent {
 		constructor (target) {
@@ -18,8 +22,8 @@ import { vec3 } from 'gl-matrix';
 	}
 
 	/**
-	 * Objects cannot move withou this component.
-	 * @extends {GameComponent}
+	 * Objects cannot move without this component.
+ 	 * @extends {GameComponent}
 	 */
 	export class MoveComponent extends GameComponent {
 		update (parent, delta) {
@@ -27,15 +31,19 @@ import { vec3 } from 'gl-matrix';
 		}
 	}
 
-	/**
-	 * This component allows objects to respond to impulses
-	 * @extends {GameComponent}
-	 */
+/**
+ * This component allows objects to respond to impulses.
+ *
+	* @example <caption>If parent has an impulse vector its contents will be added to the velocity.</caption>
+	* // Apply impulse of 0.05 pixels per second in direction of x-axis
+	* vec3.set(gameObject.impulse, 0.05, 0, 0);
+	* @extends {GameComponent}
+	*/
 	export class PhysicsComponent extends GameComponent {
 		update (parent, delta) {
 			if(parent.impulse){
-				vec2.add(parent.velocity, parent.velocity, parent.impulse);
-				vec2.set(parent.impulse, 0, 0);
+				vec3.add(parent.velocity, parent.velocity, parent.impulse);
+				vec3.set(parent.impulse, 0, 0, 0);
 			}
 		}
 	}
@@ -117,6 +125,7 @@ import { vec3 } from 'gl-matrix';
       this.starting = true;
     }
   }
+
 	let PIC = PositionInterpolatorComponent;
   PIC.linear = function (t) { return t };
   PIC.quadIn = function (t) { return t*t };
@@ -223,8 +232,8 @@ import { vec3 } from 'gl-matrix';
 	var addComponent = GameObject.prototype.addComponent;
 
 	/**
-	 * Component which conditionally activates child components
-	 * @extends {GameComponent}
+	 * Component which conditionally activates child components.
+   * @extends {GameComponent}
 	 */
 	export class SwitchComponent extends GameComponent {
 		constructor (switchObject, switchProperty) {
@@ -324,14 +333,12 @@ import { vec3 } from 'gl-matrix';
 	}
 
 /**
- * Limit the velocity of an object
+ * Limit the velocity of an object.
  * @extends {GameComponent}
+ * @param {number} velocity - Scalar maximum velocity.
  */
 export class TerminalVelocityComponent extends GameComponent {
 
-	/**
-	 * @param {number} velocity - Scalar maximum velocity.
-	 */
 	constructor (velocity) {
 		super();
 

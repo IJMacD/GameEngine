@@ -11,14 +11,16 @@ const s = vec2.create();
 const q_p = vec2.create();
 const v = vec2.create();
 
+export default BackgroundCollisionComponent;
+
 /**
  * Component which interacts with the background system to bounce an object off surfaces.
- * @class BackgroundCollisionComponent
- * @extends GameComponent
+ * @extends {GameComponent}
  * @param {BackgroundCollisionSystem} backgroundSystem - Where can I find surfaces to collide with.
  * @param {array} collisionBounds - Default bounds array for the parent object
+ * @memberof Collision
  */
-export default class BackgroundCollisionComponent extends GameComponent {
+class BackgroundCollisionComponent extends GameComponent {
     constructor (backgroundSystem, collisionBounds) {
         super();
 		this.backgroundSystem = backgroundSystem;

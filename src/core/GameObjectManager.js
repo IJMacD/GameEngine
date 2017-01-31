@@ -1,11 +1,12 @@
 import GameObject from './GameObject';
 
+export default GameObjectManager;
+
 /**
  * A subclass of {@link GameObject} which manages its own children
  * @extends {GameObject}
- * @class GameObjectManager
  */
-export default class GameObjectManager extends GameObject {
+class GameObjectManager extends GameObject {
     constructor() {
   		super();
 

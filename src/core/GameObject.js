@@ -1,12 +1,13 @@
 import GameComponent from './GameComponent';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
+export default GameObject;
+
 /**
  * The base object in the GameEngine. Most objects managed by the system
  * will be based on this class.
- * @class GameObject
  */
-export default class GameObject {
+class GameObject {
     constructor () {
         /** Array of components which update this GameObject.
          * @type {array} */

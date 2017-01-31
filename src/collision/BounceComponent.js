@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import { vec3 } from 'gl-matrix';
+import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 const sCBVdelta = vec3.create();
 const sCBVmtd = vec3.create();
@@ -7,15 +7,25 @@ const sCBVv = vec3.create();
 const sCBVmtdNorm = vec3.create();
 const sCBVimpulse = vec3.create();
 
+export default BounceComponent;
+
 /**
  * Component which allows collided objects to bounce off one-another. Respects
  * conservation of momentum.
- * @class BounceComponent
+ *
+ * <p>This component behaves differently from other components. There is no
+ * update method. Instead it attaches a listener to the parents' "attack" event.
+ *
+ * <p><em>Note: There is currently no method for removing listeners so removing
+ * this component may have undesired effects.</em></p>
  * @extends {GameComponent}
+ * @memberof Collision
  */
-export default class BounceComponent extends GameComponent {
+class BounceComponent extends GameComponent {
 	constructor () {
 		super();
+
+		/** Coefficient of restitution. */
 		this.cRestitution = 0.9;
 	}
 
