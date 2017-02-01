@@ -1,7 +1,5 @@
 import GameComponent from '../core/GameComponent';
 
-export default SolidComponent;
-
 /**
  * Submit temporary surfaces to BackgroundCollisionSystem every frame.
  * These are added relative to parent object. This is useful if the parent
@@ -37,3 +35,5 @@ class SolidComponent extends GameComponent {
         this.backgroundSystem.addTemporarySurfaces(lines);
     }
 }
+
+export default SolidComponent;

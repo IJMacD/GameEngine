@@ -7,8 +7,6 @@ const sCBVv = vec3.create();
 const sCBVmtdNorm = vec3.create();
 const sCBVimpulse = vec3.create();
 
-export default BounceComponent;
-
 /**
  * Component which allows collided objects to bounce off one-another. Respects
  * conservation of momentum.
@@ -78,3 +76,5 @@ class BounceComponent extends GameComponent {
 		});
 	}
 }
+
+export default BounceComponent;

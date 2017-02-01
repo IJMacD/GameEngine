@@ -1,7 +1,5 @@
 import GameObject from '../core/GameObject';
 
-export default BackgroundCollisionSystem;
-
 /**
  * System to maintain list of polylines for collision detection.
  * @extends {GameObject}
@@ -56,3 +54,5 @@ class BackgroundCollisionSystem extends GameObject {
         this.temporarySurfaces.length = 0;
     }
 }
+
+export default BackgroundCollisionSystem;

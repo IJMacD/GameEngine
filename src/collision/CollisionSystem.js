@@ -2,8 +2,6 @@ import GameObject from '../core/GameObject';
 
 /** @namespace Collision */
 
-export default CollisionSystem;
-
 /**
  * This system's purpose is to accept 'attack' and 'vulnerable' bounds to be submitted
  * then once per frame sweep these to find intersections. Any which are found are then
@@ -82,3 +80,5 @@ class CollisionSystem extends GameObject {
 		this.vulnerableObjects.length = 0;
 	}
 }
+
+export default CollisionSystem;

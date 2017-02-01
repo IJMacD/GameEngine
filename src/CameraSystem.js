@@ -37,17 +37,6 @@ class CameraSystem extends GameObject {
 	}
 
 	/**
-	 * Set Camera rotation
-	 * @param {number} rotation - Rotation in radians
-	 */
-	setRotation (rotation, rotationAxis){
-		this.rotation = rotation;
-		if(rotationAxis && rotationAxis.length == 3){
-			vec3.normalize(this.rotationAxis, rotationAxis);
-		}
-	}
-
-	/**
 	 * Change the size of the camera
 	 * @param {number} width
 	 * @param {number} height

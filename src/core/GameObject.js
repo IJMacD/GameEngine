@@ -156,16 +156,46 @@ class GameObject {
         return this;
     }
 
-    setRotation (th) {
-        this.rotation = th;
+    /**
+     * Set the bounds of the component relative to its position.
+     * @param {number} minX
+     * @param {number} minY
+     * @param {number} maxX
+     * @param {number} maxY
+     * @param {number} minZ - Optional
+     * @param {number} maxZ - Optional
+     * @return this
+     */
+    setBounds (...bounds) {
+        this.bounds = bounds;
         return this;
     }
 
+    /**
+     * Set object rotation
+     * @param {number} rotation - Rotation in radians
+     * @param {vec3} rotationAxis - 3D rotations require rotation axis.
+     * @return this
+     */
+    setRotation (rotation, rotationAxis){
+        this.rotation = rotation;
+        if(rotationAxis && rotationAxis.length == 3){
+            vec3.normalize(this.rotationAxis, rotationAxis);
+        }
+        return this;
+    }
+
+    /**
+     * @deprecated
+     */
     hit (victim) {
         if(this.hitVictim == null)
             this.hitVictim = victim;
     }
 
+    /**
+     * @deprecated
+     */
     hitBy (attacker) {
         if(this.attackerHit == null)
             this.attackerHit = attacker;

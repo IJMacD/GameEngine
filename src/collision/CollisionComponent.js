@@ -1,7 +1,5 @@
 import GameComponent from '../core/GameComponent';
 
-export default CollisionComponent;
-
 /**
  * This component registers the parent object with collision system.
  * It can handle configurations where the parent is both attack and vulnerable.
@@ -29,3 +27,5 @@ class CollisionComponent extends GameComponent {
 			this.collisionSystem.addVulnerableObject(parent);
 	}
 }
+
+export default CollisionComponent;

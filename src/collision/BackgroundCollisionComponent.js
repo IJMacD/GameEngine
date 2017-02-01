@@ -11,8 +11,6 @@ const s = vec2.create();
 const q_p = vec2.create();
 const v = vec2.create();
 
-export default BackgroundCollisionComponent;
-
 /**
  * Component which interacts with the background system to bounce an object off surfaces.
  * @extends {GameComponent}
@@ -86,3 +84,5 @@ class BackgroundCollisionComponent extends GameComponent {
 function cross(a, b){
     return a[0]*b[1] - a[1]*b[0];
 }
+
+export default BackgroundCollisionComponent;
