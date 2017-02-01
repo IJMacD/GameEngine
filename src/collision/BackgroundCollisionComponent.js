@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import { vec2 } from 'gl-matrix';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
 const u = vec2.create();
 const n = vec2.create();
