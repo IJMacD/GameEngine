@@ -70,20 +70,20 @@ export default class DebugDrawGraphComponent extends GameComponent {
 DebugDrawGraphComponent.Velocity = function(object){return object.velocity.magnitude()};
 DebugDrawGraphComponent.VelocityAngle = function(object){return object.velocity.angle()};
 DebugDrawGraphComponent.Acceleration = function(){
-	var lastV = new Vector2(),
-		vector = new Vector2();
-	return function(object, delta){
-		vector.set(object.velocity).subtract(lastV).scale(1/delta);
-		lastV.set(object.velocity);
-		return vector.magnitude();
-	}
+	// var lastV = new Vector2(),
+	// 	vector = new Vector2();
+	// return function(object, delta){
+	// 	vector.set(object.velocity).subtract(lastV).scale(1/delta);
+	// 	lastV.set(object.velocity);
+	// 	return vector.magnitude();
+	// }
 }();
 DebugDrawGraphComponent.AccelerationAngle = function(){
-	var lastV = new Vector2(),
-		vector = new Vector2();
-	return function(object, delta){
-		vector.set(object.velocity).subtract(lastV).scale(1/delta);
-		lastV.set(object.velocity);
-		return vector.angle();
-	}
+	// var lastV = new Vector2(),
+	// 	vector = new Vector2();
+	// return function(object, delta){
+	// 	vector.set(object.velocity).subtract(lastV).scale(1/delta);
+	// 	lastV.set(object.velocity);
+	// 	return vector.angle();
+	// }
 }();

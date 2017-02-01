@@ -104,7 +104,7 @@ class CanvasRenderSystem extends GameObject {
 			layer = 1;
 		this.push(function(context){
 			context.strokeStyle = style;
-			drawPath.call(this, context, path);
+			this.drawPath(context, path);
 			context.stroke();
 		}, layer);
 	}

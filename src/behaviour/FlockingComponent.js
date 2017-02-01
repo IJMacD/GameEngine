@@ -7,8 +7,6 @@ const vecAlign = vec3.create();
 const vecCohesion = vec3.create();
 const vecSpare = vec3.create();
 
-export default FlockingComponent;
-
 /**
  * <p>Objects with this component will try to 'flock' together. There are three effects Working
  * together to produce flocking behaviour.
@@ -73,6 +71,8 @@ class FlockingComponent extends GameComponent {
         }
     }
 }
+
+export default FlockingComponent;
 
 // FlockingComponent Constants
 

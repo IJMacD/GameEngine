@@ -51,8 +51,16 @@ Components['CollisionComponent'] = CollisionComponent;
 import BounceComponent from './collision/BounceComponent';
 Components['BounceComponent'] = BounceComponent;
 
+import BackgroundCollisionComponent from './collision/BackgroundCollisionComponent';
+Components['BackgroundCollisionComponent'] = BackgroundCollisionComponent;
+
 import SolidComponent from './collision/SolidComponent';
 Components['SolidComponent'] = SolidComponent;
 
+// Export render
 import DotRenderComponent from './render/DotRenderComponent';
 Components['DotRenderComponent'] = DotRenderComponent;
+
+// Export debug
+import * as debug from './debug';
+export { debug as Debug };
