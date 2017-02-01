@@ -31,6 +31,9 @@ var STATE_PAUSED = 0,
  * @param {number} options.width - Render width.
  * @param {number} options.height - Render height.
  * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
+ * @param {number} options.score - Initial score
+ * @param {number} options.level - Initial level
+ * @param {number} options.lives - Initial lives
  */
 class Game {
     constructor (options) {
@@ -83,7 +86,13 @@ class Game {
          * Keeps track of an arbritary score.
          * @type {number}
          */
-        this.score = 0;
+        this.score = options.score || 0;
+
+        /**
+         * Keeps track of an arbritary number of lives.
+         * @type {number}
+         */
+        this.lives = options.lives || 0;
 
         /**
          * Tracks what level the game is running. Don't change this directly use
@@ -91,7 +100,7 @@ class Game {
          * @readonly
          * @type {number}
          */
-        this.level = 0;
+        this.level = options.level || 0;
 
         /**
          * Number of resources currently pending.
@@ -400,12 +409,12 @@ function _loop(self) {
             self.root.update(Math.min(time - self._lastTime,100));
 
             if(self.state == STATE_PLAYING){
-            _raf(loop);
+                _raf(loop);
             }
             self._lastTime = time;
         } catch (e){
             if(window.console){
-            console.error(e.stack || e);
+                console.error(e.stack || e);
             }
         }
     }
