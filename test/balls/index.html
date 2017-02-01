@@ -39,9 +39,12 @@
         return ball;
       }
 
-      game.root.addObject(ballFactory(game, renderSystem, "rgba(255,0,0,0.5)"));
-      game.root.addObject(ballFactory(game, renderSystem, "rgba(0,255,0,0.5)"));
-      game.root.addObject(ballFactory(game, renderSystem, "rgba(0,0,255,0.5)"));
+      for(let i = 0; i < 10; i++) {
+        const r = Math.random() * 255;
+        const g = Math.random() * 255;
+        const b = Math.random() * 255;
+        game.root.addObject(ballFactory(game, renderSystem, `rgba(${r|0},${g|0},${b|0},0.5)`));
+      }
       game.root.addObject(renderSystem);
 
       game.start();
