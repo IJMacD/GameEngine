@@ -13,14 +13,6 @@ class WorldSystem extends GameObject {
         super();
         this.bounds = bounds;
     }
-
-    /**
-     * Set the bounds of this world.
-     * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
-     */
-    setBounds (bounds) {
-        this.bounds = bounds;
-    }
 }
 
 export default WorldSystem;

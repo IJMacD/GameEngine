@@ -253,7 +253,7 @@ class Game {
             this.worldSystem = new WorldSystem(bounds);
         }
         else {
-            this.worldSystem.setBounds(bounds);
+            this.worldSystem.setBounds(...bounds);
         }
         return this.worldSystem;
     }
