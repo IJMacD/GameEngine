@@ -30,6 +30,7 @@ var STATE_PAUSED = 0,
  * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
  * @param {number} options.width - Render width.
  * @param {number} options.height - Render height.
+ * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
  */
 class Game {
     constructor (options) {
@@ -101,6 +102,28 @@ class Game {
         this._lastTime = 0;
         this._events = {};
         this._loaded = 0;
+
+        this._autosizeCallback = () => {
+            const width = this.canvas.offsetWidth;
+            const height = this.canvas.offsetHeight;
+
+            this.setSize(width, height);
+
+            // Keep Camera centred
+            if (this.cameraSystem) {
+                this.cameraSystem.setPosition(width / 2, height / 2);
+            }
+
+            // Update bounds of the world
+            // WARN: Does not retain previous world 'padding'
+            if (this.worldSystem) {
+                this.worldSystem.setBounds(0,0,width,height);
+            }
+        }
+
+        if(options.autosize) {
+            this.setAutosize(true);
+        }
     }
 
     /**
@@ -274,6 +297,14 @@ class Game {
         return this.inputSystem;
     }
 
+    /** Specify a new score
+     * @param {number} score - New score.
+     */
+    setScore (score) {
+        this.score = score;
+        _fire(this, "score", this.score);
+    }
+
     /** Move to the next level */
     nextLevel () {
         this.level++;
@@ -306,6 +337,18 @@ class Game {
         this.height = height;
         this.canvas.width = width;
         this.canvas.height = height;
+    }
+
+    /**
+     * Set whether or not to update the world dimensions with changes to the canvas dimensions.
+     * @param {boolean} enable
+     */
+    setAutosize (enable) {
+        if(enable) {
+            window.addEventListener("resize", this._autosizeCallback);
+        } else {
+            window.removeEventListener("resize", this._autosizeCallback);
+        }
     }
 
     /**
