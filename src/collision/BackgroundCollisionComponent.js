@@ -23,6 +23,8 @@ class BackgroundCollisionComponent extends GameComponent {
         super();
 		this.backgroundSystem = backgroundSystem;
 		this.bounds = collisionBounds;
+		this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
+		this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
 	}
 
 	update (parent, delta) {
@@ -35,8 +37,8 @@ class BackgroundCollisionComponent extends GameComponent {
 			p_t,
 			p_u,
 			//theta,
-			f = 0.95,
-			e = 0.4,
+			f = this.coefficientFriction,
+			e = this.coefficientRestitution,
 			parentX = parent.position[0],
 			parentY = parent.position[1];
 		if(this.lastX &&
@@ -80,6 +82,8 @@ class BackgroundCollisionComponent extends GameComponent {
 		this.lastY = parent.position[1];
 	}
 }
+BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
+BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
 
 function cross(a, b){
     return a[0]*b[1] - a[1]*b[0];

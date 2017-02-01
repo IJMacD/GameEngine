@@ -17,6 +17,8 @@ class BackgroundCollisionSystem extends GameObject {
      *
      * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
      * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
+     * @example
+     * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
      * @param {array} surface - Array defining surface.
      */
 	addSurface (surface) {
