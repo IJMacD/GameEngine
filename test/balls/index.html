@@ -19,12 +19,22 @@
       const game = new IGE.Game({
         canvas,
         width: canvas.offsetWidth,
-        height: canvas.offsetHeight
+        height: canvas.offsetHeight,
+        autosize: true
       });
 
       const renderSystem = game.getDefaultRenderer();
+      // renderSystem.context.globalCompositeOperation = "screen";
 
-      renderSystem.context.globalCompositeOperation = "screen";
+      // ScoreRenderComponent
+      game.root.addComponent((parent, delta) => {
+        renderSystem.push(ctx => {
+          ctx.fillStyle = "#000";
+          ctx.font = "48px sans-serif";
+          ctx.textAlign = "end";
+          ctx.fillText(game.score, game.width - 25, game.height - 25);
+        }, -1);
+      })
 
       function ballFactory (game, renderSystem, color) {
         const ball = new IGE.GameObject();
@@ -39,15 +49,40 @@
         return ball;
       }
 
-      for(let i = 0; i < 10; i++) {
+      const ballBag = new IGE.GameObjectManager();
+
+      for(let i = 0; i < 100; i++) {
         const r = Math.random() * 255;
         const g = Math.random() * 255;
         const b = Math.random() * 255;
-        game.root.addObject(ballFactory(game, renderSystem, `rgba(${r|0},${g|0},${b|0},0.5)`));
+        ballBag.addObject(ballFactory(game, renderSystem, `rgba(${r|0},${g|0},${b|0},0.5)`));
       }
+
+      game.root.addObject(ballBag);
       game.root.addObject(renderSystem);
 
       game.start();
+
+      document.addEventListener("keyup", e => {
+        if(e.which == 38) { game.setScore(game.score + 1) }
+        else if(e.which == 40) { game.setScore(game.score -1) }
+      });
+
+      document.addEventListener("click", e => game.setScore(game.score - 1));
+
+      game.on("score", score => {
+        if(ballBag.objects.length > score) {
+          ballBag.objects.length = score;
+        }
+        else {
+          while(ballBag.objects.length < score) {
+            const r = Math.random() * 255;
+            const g = Math.random() * 255;
+            const b = Math.random() * 255;
+            ballBag.addObject(ballFactory(game, renderSystem, `rgba(${r|0},${g|0},${b|0},0.5)`));
+          }
+        }
+      });
     </script>
   </body>
 </html>
