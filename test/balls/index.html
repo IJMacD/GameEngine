@@ -20,7 +20,8 @@
         canvas,
         width: canvas.offsetWidth,
         height: canvas.offsetHeight,
-        autosize: true
+        autosize: true,
+        score: 10
       });
 
       const renderSystem = game.getDefaultRenderer();
@@ -51,7 +52,7 @@
 
       const ballBag = new IGE.GameObjectManager();
 
-      for(let i = 0; i < 100; i++) {
+      for(let i = 0; i < game.score; i++) {
         const r = Math.random() * 255;
         const g = Math.random() * 255;
         const b = Math.random() * 255;
@@ -63,7 +64,7 @@
 
       game.start();
 
-      document.addEventListener("keyup", e => {
+      document.addEventListener("keydown", e => {
         if(e.which == 38) { game.setScore(game.score + 1) }
         else if(e.which == 40) { game.setScore(game.score -1) }
       });
@@ -72,7 +73,7 @@
 
       game.on("score", score => {
         if(ballBag.objects.length > score) {
-          ballBag.objects.length = score;
+          ballBag.objects.length = Math.max(score, 0);
         }
         else {
           while(ballBag.objects.length < score) {
