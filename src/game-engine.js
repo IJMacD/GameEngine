@@ -12,3 +12,19 @@ export { default as AudioSystem } from './AudioSystem';
 
 // Export support classes. e.g. Game
 export { default as Game } from './core/Game';
+
+export const Components = {};
+
+import * as basic from './behaviour/basic';
+for(let name in basic) {
+  Components[name] = basic[name];
+}
+
+import GravityComponent from './behaviour/GravityComponent';
+Components['GravityComponent'] = GravityComponent;
+
+import WorldBounceComponent from './world/WorldBounceComponent';
+Components['WorldBounceComponent'] = WorldBounceComponent;
+
+import WorldWrapComponent from './world/WorldWrapComponent';
+Components['WorldWrapComponent'] = WorldWrapComponent;

@@ -3,6 +3,6 @@ module.exports = {
   output: {
     path: __dirname + '/dist',
     filename: 'ijmacd-game-engine.js',
-    libraryTarget: 'umd'
+    library: 'IGE'
   }
 };

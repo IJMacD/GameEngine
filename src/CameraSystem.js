@@ -1,8 +1,6 @@
 import GameObject from './core/GameObject';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
-export default CameraSystem;
-
 /**
  * Render systems require a camera. Use this class to create one.
  * @extends {GameObject}
@@ -103,3 +101,5 @@ class CameraSystem extends GameObject {
 		*/
 	}
 }
+
+export default CameraSystem;

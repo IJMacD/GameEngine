@@ -6,7 +6,6 @@ import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 const v = vec2.create();
 const rotMat = mat2.create();
 
-export default InputSystem;
 /**
  * InputSystem's job is to keep track of most recent user input to provide
  * filtering and rate-limiting etc. Inputs should be passed on the the rest
@@ -115,6 +114,8 @@ class InputSystem extends GameObject {
     return v;
   }
 }
+
+export default InputSystem;
 
 /**
  * Private method to initialse touch events on screen.

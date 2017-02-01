@@ -1,7 +1,5 @@
 import GameObject from './GameObject';
 
-export default GameObjectManager;
-
 /**
  * A subclass of {@link GameObject} which manages its own children
  * @extends {GameObject}
@@ -124,6 +122,8 @@ class GameObjectManager extends GameObject {
   		return html;
   	}
 }
+
+export default GameObjectManager;
 
 function arrayRemoveItem(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);

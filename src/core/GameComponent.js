@@ -1,7 +1,5 @@
 import GameObject from './GameObject';
 
-export default GameComponent;
-
 /**
  * A GameComponent adds a particular behaviour to a GameObject. This class
  * should be subclassed to implement desired behaviour. The `update` method
@@ -69,3 +67,5 @@ GameComponent.create = function(constructor, properties){
 	}
 	return constructor;
 };
+
+export default GameComponent;

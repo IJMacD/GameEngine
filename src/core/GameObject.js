@@ -1,7 +1,4 @@
-import GameComponent from './GameComponent';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
-
-export default GameObject;
 
 /**
  * The base object in the GameEngine. Most objects managed by the system
@@ -233,6 +230,8 @@ class GameObject {
         }
     }
 }
+
+export default GameObject;
 
 function arrayRemoveItem(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);

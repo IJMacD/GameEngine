@@ -2,8 +2,6 @@ import GameObject from '../core/GameObject';
 
 /** @namespace World */
 
-export default WorldSystem;
-
 /**
  * Generic way to access a 'world' with intrinsic bounds.
  * @extends {GameObject}
@@ -24,3 +22,5 @@ class WorldSystem extends GameObject {
         this.bounds = bounds;
     }
 }
+
+export default WorldSystem;

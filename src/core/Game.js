@@ -21,8 +21,6 @@ var STATE_PAUSED = 0,
         return id;
     };
 
-export default Game;
-
 /**
  * Utility class for things such as bootstrapping.
  *
@@ -330,6 +328,8 @@ class Game {
         _fire(this, event);
     }
 }
+
+export default Game;
 
 function _fire(self, event) {
     var callbacks = self._events[event],

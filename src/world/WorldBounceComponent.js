@@ -1,7 +1,5 @@
 import GameComponent from '../core/GameComponent';
 
-export default WorldBounceComponent;
-
 /**
  * Bounce off the walls of a world.
  * @extends {GameComponent}
@@ -100,3 +98,5 @@ class WorldBounceComponent extends GameComponent {
         }
     }
 }
+
+export default WorldBounceComponent;

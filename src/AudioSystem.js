@@ -1,7 +1,5 @@
 import GameObject from './core/GameObject';
 
-export default AudioSystem;
-
 /**
  * Class to play audio at specific points during gameplay
  *
@@ -27,3 +25,5 @@ class AudioSystem extends GameObject {
         }
     }
 }
+
+export default AudioSystem;

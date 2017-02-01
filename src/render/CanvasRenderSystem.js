@@ -1,8 +1,6 @@
 import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
 
-export default CanvasRenderSystem;
-
 /**
  * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
  * will get rendered to the canvas.
@@ -112,6 +110,8 @@ class CanvasRenderSystem extends GameObject {
 	}
 }
 
+export default CanvasRenderSystem;
+
 function _renderQueue (renderSystem, layer) {
 	const { context, renderQueue } = renderSystem;
 	const queue = renderQueue[layer];
@@ -125,55 +125,55 @@ function _renderQueue (renderSystem, layer) {
 	}
 }
 
-	/**
-	 * Manages the task of distributing renderables to multiple RenderSystems
-	 * @constructor
-	 * @extends {CanvasRenderSystem}
-	 */
-	export function MultiRenderSystem(){
-		this.renderSystems = [];
-	}
-	MultiRenderSystem.prototype = new CanvasRenderSystem();
+	// /**
+	//  * Manages the task of distributing renderables to multiple RenderSystems
+	//  * @constructor
+	//  * @extends {CanvasRenderSystem}
+	//  */
+	// export function MultiRenderSystem(){
+	// 	this.renderSystems = [];
+	// }
+	// MultiRenderSystem.prototype = new CanvasRenderSystem();
 
-	/**
-	 * Add a child render system which will receive updates.
-	 * @param {CanvasRenderSystem} renderSystem - RenderSystem to add
-	 */
-	MultiRenderSystem.prototype.addRenderSystem = function(renderSystem){
-		this.renderSystems.push(renderSystem);
-	};
-	MultiRenderSystem.prototype.push = function(renderable, layer){
-		var renderSystems = this.renderSystems,
-			i = 0,
-			l = renderSystems.length;
-		for(;i<l;i++){
-			renderSystems[i].push(renderable, layer);
-		}
-	};
-	MultiRenderSystem.prototype.update = function(delta){
-		var renderSystems = this.renderSystems,
-			i = 0,
-			l = renderSystems.length;
-		for(;i<l;i++){
-			renderSystems[i].update(delta);
-		}
-	};
+	// /**
+	//  * Add a child render system which will receive updates.
+	//  * @param {CanvasRenderSystem} renderSystem - RenderSystem to add
+	//  */
+	// MultiRenderSystem.prototype.addRenderSystem = function(renderSystem){
+	// 	this.renderSystems.push(renderSystem);
+	// };
+	// MultiRenderSystem.prototype.push = function(renderable, layer){
+	// 	var renderSystems = this.renderSystems,
+	// 		i = 0,
+	// 		l = renderSystems.length;
+	// 	for(;i<l;i++){
+	// 		renderSystems[i].push(renderable, layer);
+	// 	}
+	// };
+	// MultiRenderSystem.prototype.update = function(delta){
+	// 	var renderSystems = this.renderSystems,
+	// 		i = 0,
+	// 		l = renderSystems.length;
+	// 	for(;i<l;i++){
+	// 		renderSystems[i].update(delta);
+	// 	}
+	// };
 
-	export function CanvasRenderSystemManager(){}
-	CanvasRenderSystemManager.prototype = new GameObjectManager();
-	CanvasRenderSystemManager.prototype.push = function(renderable, layer){
-		for (var i = this.objects.length - 1; i >= 0; i--) {
-			this.objects[i].push(renderable, layer);
-		};
-	};
+	// export function CanvasRenderSystemManager(){}
+	// CanvasRenderSystemManager.prototype = new GameObjectManager();
+	// CanvasRenderSystemManager.prototype.push = function(renderable, layer){
+	// 	for (var i = this.objects.length - 1; i >= 0; i--) {
+	// 		this.objects[i].push(renderable, layer);
+	// 	};
+	// };
 
-	// Convenience
-	CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
-		if(typeof style == "undefined")
-			style = '#000';
-		this.push(function(context){
-			context.strokeStyle = style;
-			drawPath.call(this, context, path);
-			context.stroke();
-		}, layer);
-	};
+	// // Convenience
+	// CanvasRenderSystemManager.prototype.strokePath = function(path, style, layer) {
+	// 	if(typeof style == "undefined")
+	// 		style = '#000';
+	// 	this.push(function(context){
+	// 		context.strokeStyle = style;
+	// 		drawPath.call(this, context, path);
+	// 		context.stroke();
+	// 	}, layer);
+	// };

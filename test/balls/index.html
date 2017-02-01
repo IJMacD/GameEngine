@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Ball Test</title>
+    <style>
+      html, body, canvas {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script src="../../dist/ijmacd-game-engine.js"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const game = new IGE.Game({
+        canvas,
+        width: canvas.offsetWidth,
+        height: canvas.offsetHeight
+      });
+
+      const worldSystem = game.getDefaultWorld();
+      const renderSystem = game.getDefaultRenderer();
+
+      const redBall = new IGE.GameObject();
+      redBall.setPosition(150, 100);
+      redBall.setVelocity(Math.random() - 0.5, Math.random() - 0.5);
+      redBall.bounds = [-10, -10, 10, 10];
+      redBall.addComponent(new IGE.Components.MoveComponent());
+      redBall.addComponent(new IGE.Components.WorldBounceComponent(worldSystem));
+      redBall.addComponent((parent, detla) => {
+        renderSystem.push(ctx => {
+          ctx.beginPath();
+          ctx.fillStyle = "#f00";
+          ctx.arc(parent.position[0], parent.position[1], Math.abs(parent.bounds[0]), 0, Math.PI*2, false);
+          ctx.fill();
+        });
+      });
+
+      game.root.addObject(redBall);
+      game.root.addObject(renderSystem);
+
+      game.start();
+    </script>
+  </body>
+</html>
