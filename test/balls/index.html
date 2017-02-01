@@ -22,25 +22,26 @@
         height: canvas.offsetHeight
       });
 
-      const worldSystem = game.getDefaultWorld();
       const renderSystem = game.getDefaultRenderer();
 
-      const redBall = new IGE.GameObject();
-      redBall.setPosition(150, 100);
-      redBall.setVelocity(Math.random() - 0.5, Math.random() - 0.5);
-      redBall.bounds = [-10, -10, 10, 10];
-      redBall.addComponent(new IGE.Components.MoveComponent());
-      redBall.addComponent(new IGE.Components.WorldBounceComponent(worldSystem));
-      redBall.addComponent((parent, detla) => {
-        renderSystem.push(ctx => {
-          ctx.beginPath();
-          ctx.fillStyle = "#f00";
-          ctx.arc(parent.position[0], parent.position[1], Math.abs(parent.bounds[0]), 0, Math.PI*2, false);
-          ctx.fill();
-        });
-      });
+      renderSystem.context.globalCompositeOperation = "screen";
 
-      game.root.addObject(redBall);
+      function ballFactory (game, renderSystem, color) {
+        const ball = new IGE.GameObject();
+        ball.setPosition(Math.random() * game.width, Math.random() * game.height);
+        ball.setVelocity(Math.random()*0.1 - 0.05, Math.random()*0.1 - 0.05);
+        const rx = Math.random() * 20 + 20;
+        const ry = Math.random() * 20 + 20;
+        ball.setBounds(-rx, -ry, rx, ry);
+        ball.addComponent(new IGE.Components.MoveComponent());
+        ball.addComponent(new IGE.Components.WorldBounceComponent(game.getDefaultWorld()));
+        ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
+        return ball;
+      }
+
+      game.root.addObject(ballFactory(game, renderSystem, "rgba(255,0,0,0.5)"));
+      game.root.addObject(ballFactory(game, renderSystem, "rgba(0,255,0,0.5)"));
+      game.root.addObject(ballFactory(game, renderSystem, "rgba(0,0,255,0.5)"));
       game.root.addObject(renderSystem);
 
       game.start();
