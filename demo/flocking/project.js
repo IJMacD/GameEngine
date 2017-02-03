@@ -1,11 +1,11 @@
-$(function() {
+(function() {
 
 	"use strict";
 
 	function ParticleRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 	}
-	ParticleRenderingComponent.prototype = new GE.GameComponent();
+	ParticleRenderingComponent.prototype = new IGE.GameComponent();
 	ParticleRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
 			context.fillStyle = parent.colour || "#000000";
@@ -20,7 +20,7 @@ $(function() {
 		this.renderSystem = renderSystem;
 		this.snap = true;
 	}
-	GridSquareRenderingComponent.prototype = new GE.GameComponent();
+	GridSquareRenderingComponent.prototype = new IGE.GameComponent();
 	GridSquareRenderingComponent.prototype.update = function(parent, delta) {
 		var z = this.snap ? Math.floor(parent.position[2]/100)*100 : parent.position[2],
 				size = Math.pow(10,(z + 1000) / 1000),
@@ -39,7 +39,7 @@ $(function() {
 	function ArrowRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 	}
-	ArrowRenderingComponent.prototype = new GE.GameComponent();
+	ArrowRenderingComponent.prototype = new IGE.GameComponent();
 	ArrowRenderingComponent.prototype.update = function(parent, delta) {
 		this.renderSystem.push(function(context){
 			var size = parent.size || Math.pow(10,(parent.position[2] + 1000) / 1000),
@@ -59,70 +59,21 @@ $(function() {
 		});
 	};
 
-
-	function FlockingComponent(renderSystem){
-		this.renderSystem = renderSystem;
-		this.separation = vec3.create();
-		this.align = vec3.create();
-		this.cohesion = vec3.create();
-		this.spare = vec3.create();
-	}
-	FlockingComponent.prototype = new GE.GameComponent();
-	FlockingComponent.prototype.update = function(parent, delta) {
-		vec3.set(this.cohesion, 0, 0, 0);
-		vec3.set(this.align, 0, 0, 0);
-		vec3.set(this.separation, 0, 0, 0);
-		vec3.set(this.spare, 0, 0, 0);
-
-		var count = 0,
-				self = this,
-				i = 0,
-				length = particles.length;
-
-		for(;i<length;i++){
-			var other = particles[i],
-					dist = vec3.dist(other.position, parent.position);
-			if(dist > 0 && dist < NEIGHBOUR_RADIUS){
-				vec3.add(self.cohesion, self.cohesion, other.position);
-				vec3.add(self.align, self.align, other.velocity);
-
-				if(dist < SEPARATION_RADIUS){
-					vec3.subtract(self.spare, parent.position, other.position);
-					vec3.normalize(self.spare, self.spare);
-					vec3.scaleAndAdd(self.separation, self.separation, self.spare, 1 / dist);
-				}
-
-				count++;
-			}
-		}
-
-		if(count > 0){
-			vec3.scale(this.cohesion, this.cohesion, 1 / count);
-			vec3.subtract(this.cohesion, this.cohesion, parent.position);
-			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.cohesion, COHESION_WEIGHT);
-
-			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.align, ALIGN_WEIGHT / count);
-
-			vec3.scaleAndAdd(parent.velocity, parent.velocity, this.separation, SEPARATION_WEIGHT / count);
-
-			var mag = vec3.length(parent.velocity);
-			if(mag > MAX_SPEED){
-				vec3.scale(parent.velocity, parent.velocity, MAX_SPEED / mag);
-			}
-		}
-	};
+	IGE.Components.FlockingComponent.NEIGHBOUR_RADIUS = 80;
+	IGE.Components.FlockingComponent.SEPARATION_RADIUS = 30;
+	IGE.Components.FlockingComponent.SEPARATION_WEIGHT = 6.125 / 30;
 
 
-	var GameObject = GE.GameObject,
-			GameComponent = GE.GameComponent,
-			GEC = GE.Comp,
+	var GameObject = IGE.GameObject,
+			GameComponent = IGE.GameComponent,
+			GEC = IGE.Components,
 
-			canvas = $('#surface'),
-			context = canvas[0].getContext("2d"),
-			canvasWidth = canvas.width(),
-			canvasHeight = canvas.height(),
-			gameRoot = new GE.GameObjectManager(),
-			flock = new GE.GameObjectManager(),
+			canvas = document.getElementById('surface'),
+			context = canvas.getContext("2d"),
+			canvasWidth = canvas.offsetWidth,
+			canvasHeight = canvas.offsetHeight,
+			gameRoot = new IGE.GameObjectManager(),
+			flock = new IGE.GameObjectManager(),
 			inputSystem,
 			cameraSystem,
 			renderSystem,
@@ -143,7 +94,7 @@ $(function() {
 
 			mouseLine,
 
-			moveComponent = new GEC.MoveComponent(),
+			moveComponent = new IGE.Components.MoveComponent(),
 			worldComponent,
 			switchComponent,
 			rotateToHeadingComponent,
@@ -163,57 +114,51 @@ $(function() {
 				rotate: false,
 				flocking: true,
 				cameraTrack: false
-			},
+			};
 
-			NEIGHBOUR_RADIUS = 80,
-			SEPARATION_RADIUS = 35,
-			MAX_SPEED = 0.1,
-			COHESION_WEIGHT = 0.1 * MAX_SPEED / NEIGHBOUR_RADIUS,
-			ALIGN_WEIGHT = 30 * MAX_SPEED / NEIGHBOUR_RADIUS,
-			SEPARATION_WEIGHT = 6.125 / SEPARATION_RADIUS;
-
-	GE.DEBUG = false;
+	var DEBUG = false;
 
 	function initCanvas(width,height){
 		// canvas.removeAttr("width");
 		// canvas.removeAttr("height");
 		// canvasWidth = width||canvas.width();
 		// canvasHeight = height||canvas.height();
-		canvas[0].width = canvasWidth;
-		canvas[0].height = canvasHeight;
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
 	}
 
 	initCanvas();
 
-	$('#fullscr-btn').on("click", function(){
-		canvas[0].webkitRequestFullscreen();
-		canvasWidth = window.innerWidth;
-		canvasHeight = window.innerHeight;
-		initCanvas();
-	});
+	// $('#fullscr-btn').on("click", function(){
+	// 	canvas[0].webkitRequestFullscreen();
+	// 	canvasWidth = window.innerWidth;
+	// 	canvasHeight = window.innerHeight;
+	// 	initCanvas();
+	// });
 
-	$(window).on("resize", function(){
-		canvasWidth = canvas.width();
-		canvasHeight = canvas.height();
-		initCanvas();
-	});
+	// $(window).on("resize", function(){
+	// 	canvasWidth = canvas.width();
+	// 	canvasHeight = canvas.height();
+	// 	initCanvas();
+	// });
 
-	canvas.on("mousedown", function(e){
-		var v = GE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
+	canvas.addEventListener("mousedown", function(e){
+		var v = IGE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
 		if(mouseLine){
 			backgroundSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
 		mouseLine = v;
-	})
-	.on('mousemove', function(e){
+	});
+
+	canvas.addEventListener('mousemove', function(e){
 		if(mouseLine){
-			var v = GE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
+			var v = IGE.InputSystem.screenToWorld(inputSystem, e.offsetX, e.offsetY);
 			temporaryBackgroundCollisionSystem.clearSurfaces();
 			temporaryBackgroundCollisionSystem.addSurface([mouseLine[0], mouseLine[1], v[0], v[1]]);
 		}
 	});
 
-	$(document.body).on("keyup", function(e){
+	document.addEventListener("keyup", function(e){
 		if(e.which == 13){ // enter
 			mouseLine = null;
 			temporaryBackgroundCollisionSystem.clearSurfaces();
@@ -252,22 +197,22 @@ $(function() {
 		-500, 500														// MinZ, MaxZ
 	];
 	// worldBounds = [-500, -500, 500, 500];
-	worldSystem = new GE.WorldSystem(worldBounds);
+	worldSystem = new IGE.WorldSystem(worldBounds);
 
-	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-	renderSystem1 = new GE.CanvasRenderSystem(context, cameraSystem);
+	cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+	renderSystem = new IGE.CanvasRenderSystem(context, cameraSystem);
 
-	inputSystem = new GE.InputSystem(canvas, document, cameraSystem);
+	inputSystem = new IGE.InputSystem(canvas, document, cameraSystem);
 
-	renderSystem = new GE.MultiRenderSystem();
-	renderSystem.addRenderSystem(renderSystem1);
+	// renderSystem = new IGE.MultiRenderSystem();
+	// renderSystem.addRenderSystem(renderSystem1);
 
 	cameraSystem.setScale(1);
 
-	worldSystem.addComponent(new GEC.DrawBoundsComponent(renderSystem));
+	worldSystem.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
 	// cameraSystem.setRotation(-Math.PI/4);
 	// cameraSystem.addComponent(new GEC.RotationComponent(0.00005));
-	backgroundSystem = new GE.BackgroundCollisionSystem();
+	backgroundSystem = new IGE.Collision.BackgroundCollisionSystem();
 
 	var backgrounds = [
 		// 0: worldBounds
@@ -288,10 +233,10 @@ $(function() {
 
 	backgroundSystem.addSurfaces(backgrounds[2]);
 
-	temporaryBackgroundCollisionSystem = new GE.BackgroundCollisionSystem(renderSystem);
-	surfacesRenderComponent = new GEC.DrawSurfacesComponent(renderSystem);
+	temporaryBackgroundCollisionSystem = new IGE.Collision.BackgroundCollisionSystem(renderSystem);
+	surfacesRenderComponent = new IGE.Debug.DebugDrawSurfacesComponent(renderSystem);
 	backgroundSystem.addComponent(surfacesRenderComponent);
-	temporaryBackgroundCollisionSystem.addComponent(new GEC.DrawSurfacesComponent(renderSystem, '#88f'));
+	temporaryBackgroundCollisionSystem.addComponent(new IGE.Debug.DebugDrawSurfacesComponent(renderSystem, '#88f'));
 
 	gridSquareRenderingComponent = new GridSquareRenderingComponent(renderSystem);
 	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
@@ -303,7 +248,7 @@ $(function() {
   rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
   rotationInterpolatorComponent = new GEC.RotationInterpolatorComponent();
 
-	flockingComponent = new FlockingComponent();
+	flockingComponent = new IGE.Components.FlockingComponent(particles);
 
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
 	flockingSwitchComponent.addComponents(
@@ -330,13 +275,13 @@ $(function() {
 	for(var i = 0; i < boxSize; i++){
 		for(var j = 0; j < boxSize; j++){
 			var x = j * particleSep + offsetX,
-				y = i * particleSep + offsetY,
-				vecNorm = vec2.fromValues(-y , x),
-				len = vec2.length(vecNorm)*0.0001;
-			vec2.scale(vecNorm, vecNorm, len);
+				y = i * particleSep + offsetY;
+			// 	vecNorm = vec2.fromValues(-y , x),
+			// 	len = vec2.length(vecNorm)*0.0001;
+			// vec2.scale(vecNorm, vecNorm, len);
 			particle = new GameObject();
 			particle.setPosition(-x,-y,0);
-			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
+			particle.setVelocity(-x*0.001, -y*0.001, 0);
 			particle.mass = 0.01;
 
 			// Red + Blue
@@ -382,4 +327,4 @@ $(function() {
 	}
 	loop(0);
 
-});
+}());

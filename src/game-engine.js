@@ -21,6 +21,9 @@ for(let name in basic) {
   Components[name] = basic[name];
 }
 
+import FlockingComponent from './behaviour/FlockingComponent';
+Components['FlockingComponent'] = FlockingComponent;
+
 import GravityComponent from './behaviour/GravityComponent';
 Components['GravityComponent'] = GravityComponent;
 
