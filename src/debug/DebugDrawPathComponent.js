@@ -1,5 +1,8 @@
 import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+
+const PATH_SIZE = 1000;
 
 /**
  * Component which traces out the path of an object
@@ -8,73 +11,71 @@ import GameComponent from '../core/GameComponent';
  * @param {RenderSystem} renderSystem - Where to draw the path
  */
 export default class DebugDrawPathComponent extends GameComponent {
-    constructor (renderSystem, object){
+    constructor (renderSystem){
         super();
 
         this.path = [];
-        this.pathSize = 1000;
-        this.pathIndex = 0;
+        this.currIndex = 0;
         this.lastVx = 0;
         this.lastVy = 0;
         this.renderSystem = renderSystem;
-        if(object instanceof GameObject)
-            this.relativeTo = object.position;
-        else
-            this.relativeTo = vec2.create();
+
+        this.path.length = PATH_SIZE;
     }
 
     update (parent, delta) {
-        if(GE.DEBUG){
-            var px = parent.position[0],
-                py = parent.position[1],
-                vx = parent.velocity[0],
-                vy = parent.velocity[1],
-                ax = (vx - this.lastVx)/delta,
-                ay = (vy - this.lastVy)/delta,
-                rx = this.relativeTo[0],
-                ry = this.relativeTo[1],
-                skip = this.pathIndex % this.pathSize,
-                path = [px, py],
-                i,
-                index;
 
-            // Draw Path
-            // TODO: 1. Check for jumps, don't show
-            // TODO: 2. Don't use strokePath helper -- very inefficient
-            if(this.pathIndex > this.pathSize){
-                for(i = this.pathSize-1;i>=0;i--){
-                    index = (i + skip + this.pathSize) % this.pathSize;
-                    path.push(
-                        this.path[index][0]+rx,
-                        this.path[index][1]+ry
-                    );
+        const px = parent.position[0],
+            py = parent.position[1],
+            vx = parent.velocity[0],
+            vy = parent.velocity[1],
+            ax = (vx - this.lastVx)/delta,
+            ay = (vy - this.lastVy)/delta,
+            p = this.path,
+            prevIndex = (this.currIndex - 2 + PATH_SIZE) % PATH_SIZE,
+            dx = Math.abs(p[prevIndex] - px),
+            dy = Math.abs(p[prevIndex+1] - py);
+
+        if(dx > 100 || dy > 100){
+            p[this.currIndex] = NaN;
+            p[this.currIndex+1] = NaN;
+            this.currIndex = (this.currIndex + 2) % PATH_SIZE;
+        }
+
+        p[this.currIndex] = px;
+        p[this.currIndex + 1] = py;
+
+        // Draw Path
+
+        this.renderSystem.push(ctx => {
+            ctx.beginPath();
+
+            ctx.moveTo(p[this.currIndex], p[this.currIndex+1]);
+
+            for(let i = 2; i < PATH_SIZE; i += 2){
+                let index = (this.currIndex + i) % PATH_SIZE;
+                if(p[index]) {
+                    ctx.lineTo(p[index], p[index+1]);
                 }
-            }else{
-                for(i = this.pathIndex-1;i>=0;i--){
-                    path.push(
-                        this.path[i][0]+rx,
-                        this.path[i][1]+ry
-                    );
+                else {
+                    i += 2;
+                    index = (this.currIndex + i) % PATH_SIZE;
+                    ctx.moveTo(p[index], p[index+1]);
                 }
             }
 
-            if(rx || ry)
-                this.renderSystem.strokePath(path,"#CCF",0);
-            else
-                this.renderSystem.strokePath(path,"#CCC",0);
+            ctx.strokeStyle = "#CCC";
+            ctx.stroke();
+        });
 
-            this.pathIndex++;
-            this.path[skip] = [px-rx,py-ry];
+        this.currIndex = (this.currIndex + 2) % PATH_SIZE;
 
-            // Draw Velocity
-            this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
+        // Draw Velocity
+        this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
 
-            // Draw Acceleration
-            this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
-            this.lastVx = vx;
-            this.lastVy = vy;
-        }else{
-            this.pathIndex = 0;
-        }
+        // Draw Acceleration
+        this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
+        this.lastVx = vx;
+        this.lastVy = vy;
     }
 }
