@@ -1,6 +1,6 @@
 import GameComponent from '../core/GameComponent';
 
-export default class DotRenderComponent extends GameComponent {
+export default class RectangleRenderComponent extends GameComponent {
     constructor (renderSystem, color = "#000") {
         super();
 
@@ -18,9 +18,8 @@ export default class DotRenderComponent extends GameComponent {
             ctx.beginPath();
             ctx.fillStyle = c;
             ctx.translate(p[0], p[1]);
-            if(b) ctx.scale(b[2] - b[0], b[3] - b[1]);
-            else if(s) ctx.scale(s, s);
-            ctx.arc(0, 0, 0.5, 0, Math.PI*2, false);
+            if(b) ctx.rect(b[0], b[1], b[2] - b[0], b[3] - b[1]);
+            else if(s) ctx.rect(-s/2, -s/2, s, s);
             ctx.fill();
         });
     }

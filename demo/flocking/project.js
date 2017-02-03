@@ -2,20 +2,6 @@
 
 	"use strict";
 
-	function ParticleRenderingComponent(renderSystem){
-		this.renderSystem = renderSystem;
-	}
-	ParticleRenderingComponent.prototype = new IGE.GameComponent();
-	ParticleRenderingComponent.prototype.update = function(parent, delta) {
-		this.renderSystem.push(function(context){
-			context.fillStyle = parent.colour || "#000000";
-			context.beginPath();
-			context.arc(parent.position[0],parent.position[1],2,0,Math.PI*2,false);
-			context.fill();
-		});
-	};
-
-
 	function GridSquareRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
 		this.snap = true;
@@ -243,7 +229,7 @@
 	temporaryBackgroundCollisionSystem.addComponent(new IGE.Debug.DebugDrawSurfacesComponent(renderSystem, '#88f'));
 
 	gridSquareRenderingComponent = new GridSquareRenderingComponent(renderSystem);
-	particleRenderingComponent = new ParticleRenderingComponent(renderSystem);
+	particleRenderingComponent = new GEC.DotRenderComponent(renderSystem);
 	arrowRenderingComponent = new ArrowRenderingComponent(renderSystem);
 
 	worldBounceComponent = new GEC.WorldBounceComponent(worldSystem, 0, 0, 10);
@@ -271,6 +257,7 @@
     ],
     [particleRenderingComponent]);
 
+	cameraSystem.size = 4;
 	cameraSystem.addComponent(cameraTrackSwitchComponent);
 	cameraSystem.addComponent(worldWrapComponent);
 	// cameraSystem.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));

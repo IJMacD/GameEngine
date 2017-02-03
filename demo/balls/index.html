@@ -23,9 +23,11 @@
         autosize: true,
         score: 10
       });
+      const falling = false;
 
       const renderSystem = game.getDefaultRenderer();
       // renderSystem.context.globalCompositeOperation = "screen";
+      let collisionSystem;
 
       // ScoreRenderComponent
       game.root.addComponent((parent, delta) => {
@@ -37,14 +39,15 @@
         }, -1);
       });
 
-      const collisionSystem = new IGE.Collision.BackgroundCollisionSystem();
-      collisionSystem.addSurface([game.width * 0.25, game.height / 2 + 100, game.width / 2, game.height * 0.2, game.width * 0.75, game.height / 2 + 100]);
-      collisionSystem.addSurface([0, game.height * 0.75, game.width * 0.25, game.height]);
-      collisionSystem.addSurface([game.width, game.height * 0.75, game.width * 0.75, game.height]);
-      // collisionSystem.addComponent(new IGE.Debug.DebugDrawSurfacesComponent(renderSystem));
+      if(falling) {
+        collisionSystem = new IGE.Collision.BackgroundCollisionSystem();
+        collisionSystem.addSurface([game.width * 0.25, game.height / 2 + 100, game.width / 2, game.height * 0.2, game.width * 0.75, game.height / 2 + 100]);
+        collisionSystem.addSurface([0, game.height * 0.75, game.width * 0.25, game.height]);
+        collisionSystem.addSurface([game.width, game.height * 0.75, game.width * 0.75, game.height]);
 
-      IGE.Components.BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
-      IGE.Components.BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.95;
+        IGE.Components.BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
+        IGE.Components.BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.95;
+      }
 
       function ballFactory (game, renderSystem, color) {
         const ball = new IGE.GameObject();
@@ -53,13 +56,21 @@
         const rx = Math.random() * 20 + 20;
         const ry = Math.random() * 20 + 20;
         ball.setBounds(-rx, -ry, rx, ry);
-        ball.addComponent(new IGE.Components.GravityComponent());
-        ball.addComponent(new IGE.Components.TerminalVelocityComponent(0.5));
-        ball.addComponent(new IGE.Components.MoveComponent());
-        ball.addComponent(new IGE.Components.WorldWrapComponent(game.getDefaultWorld()));
-        ball.addComponent(new IGE.Components.BackgroundCollisionComponent(collisionSystem));
-        ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
-        // ball.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
+
+        if (falling) {
+          ball.addComponent(new IGE.Components.GravityComponent());
+          ball.addComponent(new IGE.Components.TerminalVelocityComponent(0.5));
+          ball.addComponent(new IGE.Components.MoveComponent());
+          ball.addComponent(new IGE.Components.WorldWrapComponent(game.getDefaultWorld()));
+          ball.addComponent(new IGE.Components.BackgroundCollisionComponent(collisionSystem));
+          ball.addComponent(new IGE.Components.RectangleRenderComponent(renderSystem, color));
+        } else {
+          ball.addComponent(new IGE.Components.MoveComponent());
+          ball.addComponent(new IGE.Components.WorldBounceComponent(game.getDefaultWorld()));
+          ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
+        }
+
+
         return ball;
       }
 
@@ -73,7 +84,11 @@
       }
 
       game.root.addObject(ballBag);
-      game.root.addObject(collisionSystem);
+
+      if (falling) {
+        game.root.addObject(collisionSystem);
+      }
+
       game.root.addObject(renderSystem);
 
       game.start();

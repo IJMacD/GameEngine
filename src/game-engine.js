@@ -60,9 +60,15 @@ Components['BackgroundCollisionComponent'] = BackgroundCollisionComponent;
 import SolidComponent from './collision/SolidComponent';
 Components['SolidComponent'] = SolidComponent;
 
-// Export render
+// Export render namespace
+import * as render from './render';
+export { render as Render };
+
 import DotRenderComponent from './render/DotRenderComponent';
 Components['DotRenderComponent'] = DotRenderComponent;
+
+import RectangleRenderComponent from './render/RectangleRenderComponent';
+Components['RectangleRenderComponent'] = RectangleRenderComponent;
 
 // Export debug
 import * as debug from './debug';
