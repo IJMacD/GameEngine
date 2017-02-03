@@ -113,7 +113,8 @@
 			controlObj = {
 				rotate: false,
 				flocking: true,
-				cameraTrack: false
+				cameraTrack: false,
+				debug: false
 			};
 
 	var DEBUG = false;
@@ -172,6 +173,9 @@
 		}
 		else if(e.which == 67){ // c
 			backgroundSystem.clearSurfaces();
+		}
+		else if(e.which == 68){ // d
+			controlObj.debug = !controlObj.debug;
 		}
 		else if(e.which == 71){ // g
 			controlObj.flocking = !controlObj.flocking;
@@ -302,6 +306,14 @@
 			//particle.addComponent(worldComponent);
 			particle.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
 			//particle.addComponent(new GEC.BackgroundCollisionComponent(temporaryBackgroundCollisionSystem));
+
+			if(i+j == 0) {
+				particle.colour = "rgba(0,128,0,0.5)";
+				const switcher = new IGE.Components.SwitchComponent(controlObj, "debug");
+				switcher.addComponent(new IGE.Debug.DebugDrawPathComponent(renderSystem));
+				switcher.addComponent(new IGE.Debug.DebugFlockingComponent(renderSystem));
+				particle.addComponent(switcher);
+			}
 
 			flock.addObject(particle);
 			particles.push(particle);
