@@ -5,21 +5,21 @@
         img.src = "img/buoy.png";
         img.src = "img/buoyOff.png";
 }());
-$(function() {
-    var GameObject = GE.GameObject,
-        GameComponent = GE.GameComponent,
-        GEC = GE.Comp,
+(function() {
+    var GameObject = IGE.GameObject,
+        GameComponent = IGE.GameComponent,
+        GEC = IGE.Components,
 
-        canvas = $('#surface'),
-        context = canvas[0].getContext("experimental-webgl"),
+        canvas = document.getElementById('surface'),
+        context = canvas.getContext("experimental-webgl"),
         gl = context,
-        canvasWidth = canvas.width(),
-        canvasHeight = canvas.height(),
-        canvas2 = $('#surface2'),
-        context2 = canvas2[0].getContext("2d"),
-        canvas2Width = canvas2.width(),
-        canvas2Height = canvas2.height(),
-        gameRoot = new GE.GameObjectManager(),
+        canvasWidth = canvas.offsetWidth,
+        canvasHeight = canvas.offsetHeight,
+        canvas2 = document.getElementById('surface2'),
+        context2 = canvas2.getContext("2d"),
+        canvas2Width = canvas2.offsetWidth,
+        canvas2Height = canvas2.offsetHeight,
+        gameRoot = new IGE.GameObjectManager(),
         cameraSystem,
         renderSystem,
         renderSystem2,
@@ -32,12 +32,12 @@ $(function() {
         // canvas.removeAttr("height");
         // canvasWidth = width||canvas.width();
         // canvasHeight = height||canvas.height();
-        canvas[0].width = canvasWidth;
-        canvas[0].height = canvasHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
         gl.viewportWidth = canvasWidth;
         gl.viewportHeight = canvasHeight,
-        canvas2[0].width = canvas2Width;
-        canvas2[0].height = canvas2Height;
+        canvas2.width = canvas2Width;
+        canvas2.height = canvas2Height;
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
         renderSystem2 && renderSystem2.setCanvasSize(canvas2Width, canvas2Height);
@@ -113,7 +113,7 @@ $(function() {
         chestTexture.image.onload = function() {
             handleLoadedTexture(chestTexture)
         }
-        chestTexture.image.src = "img/chest.gif";
+        chestTexture.image.src = "img/crate.png";
 
         sunTexture = gl.createTexture();
         sunTexture.image = new Image();
@@ -143,14 +143,14 @@ $(function() {
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-    $('#fullscr-btn').on("click", function(){
+    document.getElementById('fullscr-btn').addEventListener("click", function(){
         canvas[0].webkitRequestFullscreen();
         canvasWidth = window.innerWidth;
         canvasHeight = window.innerHeight;
         initCanvas();
     });
 
-    $(window).on("resize", function(){
+    window.addEventListener("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
         canvas2Width = canvas2.width();
@@ -158,7 +158,7 @@ $(function() {
         initCanvas();
     });
 
-    GE.DEBUG = true;
+    var DEBUG = true;
 
     function RedBallRenderingComponent(renderSystem){
             this.renderSystem = renderSystem;
@@ -187,21 +187,22 @@ $(function() {
         });
     };
 
-    cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-    renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
-    renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem);
-    cameraSystem.setScale(1);
-    cameraSystem.setPosition(0,0,100);
+    cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+    renderSystem = new IGE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
+    renderSystem2 = new IGE.CanvasRenderSystem(context2, cameraSystem);
+    // Only CanvasRender uses scale so we flip vertical direction to match WebGLRender
+    cameraSystem.setScale(1, -1);
+    cameraSystem.setPosition(0,0,800);
 
     // cameraSystem.addComponent(new GEC.RotationComponent(0.0003));
 
     sun = new GameObject();
     sun.mass = 1;
-    sun.size = vec3.fromValues(15,15,15);
-    sun.rotationAxis = vec3.fromValues(0,1,0);
+    sun.size = [15,15,15];
+    sun.rotationAxis = [0,1,0];
     sun.addComponent({update:function(p){renderSystem2.push(function(c){c.fillStyle="black";c.beginPath();c.arc(p.position[0],p.position[1],2,0,Math.PI*2);c.fill();})}});
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(GEC.PolyShapeRenderingComponent.createSphere(renderSystem, 30, 30));
+    sun.addComponent(IGE.Render.PolyShapeRenderComponent.createSphere(renderSystem, 30, 30));
     sun.texture = sunTexture;
 
     gameRoot.addObject(sun);
@@ -213,14 +214,16 @@ $(function() {
     var buoyOffImg = new Image();
     buoyOffImg.src = "img/buoyOff.png";
 
-    var cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem);
+    // Bug: Cube Render does not work
+    // var cubeRenderer = IGE.Render.PolyShapeRenderComponent.createCube(renderSystem);
+    var cubeRenderer = IGE.Render.PolyShapeRenderComponent.createSphere(renderSystem, 30, 30);
 
     for(var i = 0; i < 10; i++){
         redBall = new GameObject();
         redBall.setPosition(Math.random()*200-100,Math.random()*200-100,Math.random()*50-25);
         redBall.setVelocity(Math.random()*0.3-0.15,Math.random()*0.3-0.15,Math.random()*0.3-0.15);
-        redBall.size = vec3.fromValues(10,10,10);
-        redBall.rotationAxis = vec3.fromValues(1,1,1);
+        redBall.size = [10,10,10];
+        redBall.rotationAxis = [1,1,1];
 
         redBall.addComponent(new GEC.MoveComponent());
         redBall.addComponent(new GEC.PointGravityComponent(sun));
@@ -231,12 +234,12 @@ $(function() {
         var r = Math.random();
         if(r < 0.2){
             redBall.sprite = chestImg;
-            redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.addComponent(new IGE.Render.CanvasSpriteRenderingComponent(renderSystem2));
         }
         else if(r < 0.4){
             redBall.sprite = buoyOffImg;
-            redBall.addComponent(new GEC.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-            redBall.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.addComponent(new IGE.Render.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
+            redBall.addComponent(new IGE.Render.CanvasSpriteRenderingComponent(renderSystem2));
         }
         else if(r < 0.5) {
             redBall.addComponent(new RedBallRenderingComponent(renderSystem2));
@@ -266,4 +269,4 @@ $(function() {
     }
     loop(0);
 
-});
+}());
