@@ -1,31 +1,19 @@
-$(function() {
+(function() {
 
   "use strict";
 
-  function ParticleRenderingComponent(renderSystem){
-    this.renderSystem = renderSystem;
-  }
-  ParticleRenderingComponent.prototype = new GE.GameComponent();
-  ParticleRenderingComponent.prototype.update = function(parent, delta) {
-    this.renderSystem.push(function(context){
-      context.fillStyle = parent.colour || "#000000";
-      context.beginPath();
-      context.arc(parent.position[0],parent.position[1],2,0,Math.PI*2,false);
-      context.fill();
-    });
-  };
-
-  var GEC = GE.Comp,
+  var GEC = IGE.Components,
 
       /* Constants */
       GAME_WIDTH = 1280,
       GAME_HEIGHT = 960,
+      DURATION = 3000,
 
       /* Bootstrap */
-      canvas = $('#surface')[0],
+      canvas = document.getElementById("surface"),
       context = canvas.getContext("2d"),
 
-      game = new GE.Game({
+      game = new IGE.Game({
         canvas: canvas,
         width: GAME_WIDTH,
         height: GAME_HEIGHT
@@ -37,27 +25,32 @@ $(function() {
       inputSystem = game.getDefaultInput(),
 
       // Shared Components
-      particleRenderingComponent = new ParticleRenderingComponent(renderSystem),
+      particleRenderingComponent = new IGE.Components.DotRenderComponent(renderSystem),
 
       particle,
       particleCount = 200,
-      particleSep = GAME_WIDTH / particleCount,
-      particleManager = new GE.GameObjectManager();
+      particleManager = new IGE.GameObjectManager();
 
   function addParticleSet(easing, colour) {
     var particle,
-        particleSet = new GE.GameObjectManager(),
+        particleSet = new IGE.GameObjectManager(),
+        piComponent,
         i, t, x, y;
 
     for(i = 0; i <= particleCount; i++){
       t = i / particleCount;
       x = t * GAME_WIDTH;
       y = easing(t) * GAME_HEIGHT;
+      piComponent = new GEC.PositionInterpolatorComponent(DURATION, easing);
 
-      particle = new GE.GameObject();
-      particle.setPosition(x,y,0);
+      particle = new IGE.GameObject();
+      particle.setPosition(x, 0, 0);
       particle.colour = colour;
+      particle.size = i == particleCount ? 20 : 4;
 
+      piComponent.setPosition(x, y);
+
+      particle.addComponent(piComponent);
       particle.addComponent(particleRenderingComponent);
 
       particleSet.addObject(particle);
@@ -66,14 +59,20 @@ $(function() {
     particleManager.addObject(particleSet);
   }
 
-  addParticleSet(GEC.PositionInterpolatorComponent.linear, "#000000");
-  addParticleSet(GEC.PositionInterpolatorComponent.quadOut, "#0000FF");
-  addParticleSet(GEC.PositionInterpolatorComponent.backIn, "#0080FF");
-  addParticleSet(GEC.PositionInterpolatorComponent.backOut, "#00FFFF");
-  addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
-  addParticleSet(GEC.PositionInterpolatorComponent.elasticIn, "#FF8000");
-  addParticleSet(GEC.PositionInterpolatorComponent.elasticOut, "#FF0000");
-  addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
+  function reset () {
+    particleManager.removeAll();
+
+    addParticleSet(GEC.PositionInterpolatorComponent.linear, "#000000");
+    addParticleSet(GEC.PositionInterpolatorComponent.quadOut, "#0000FF");
+    addParticleSet(GEC.PositionInterpolatorComponent.backIn, "#0080FF");
+    addParticleSet(GEC.PositionInterpolatorComponent.backOut, "#00FFFF");
+    addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
+    addParticleSet(GEC.PositionInterpolatorComponent.elasticIn, "#FF8000");
+    addParticleSet(GEC.PositionInterpolatorComponent.elasticOut, "#FF0000");
+    addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
+  }
+
+  reset();
 
   cameraSystem.setScale(0.8);
 
@@ -87,4 +86,8 @@ $(function() {
 
   game.start();
 
-});
+  canvas.addEventListener("click", () => {
+    reset();
+  });
+
+}());
