@@ -158,14 +158,14 @@ export class TerminalVelocityComponent extends GameComponent {
 	constructor (velocity) {
 		super();
 
-		this.velocity = velocity;
+		this.velocityMagnitude = velocity;
 	}
 
 	update (parent, delta) {
 		const v = vec3.length(parent.velocity);
 
-		if(v > this.velocity){
-			const scale = this.velocity / v;
+		if(v > this.velocityMagnitude){
+			const scale = this.velocityMagnitude / v;
 			vec3.scale(parent.velocity, parent.velocity, scale);
 		}
 	}

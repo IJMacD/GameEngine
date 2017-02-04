@@ -1,15 +1,15 @@
-/* global vec2 */
-/* global GE */
-/// <reference path="../../typings/jquery/jquery.d.ts"/>
-$(function() {
+(function() {
 	"use strict";
 
-	GE.GameComponent.create(function DisplayScoreComponent(renderSystem) {
-		this.frameCount = 0;
-		this.renderSystem = renderSystem;
-	},
-	{
-		update: function (parent, delta) {
+	class DisplayScoreComponent extends IGE.GameComponent {
+		constructor (renderSystem) {
+			super();
+
+			this.frameCount = 0;
+			this.renderSystem = renderSystem;
+		}
+
+		update (parent, delta) {
 
 			var score = this.frameCount;
 			this.frameCount++;
@@ -24,11 +24,11 @@ $(function() {
 			}, -1); // -1 is a special layer rendered at the end independant of camera
 
 		}
-	});
+	}
 
-	var GameObject = GE.GameObject,
-		GameComponent = GE.GameComponent,
-		GEC = GE.Comp,
+	var GameObject = IGE.GameObject,
+		GameComponent = IGE.GameComponent,
+		GEC = IGE.Components,
 
 		/* Constants */
 		GROUND_HEIGHT = 128,
@@ -40,13 +40,13 @@ $(function() {
 		GRAVITATIONAL_CONSTANT = 0.00055,
 
 		/* Bootstrap */
-		canvas = $('#surface'),
-		context = canvas[0].getContext("2d"),
-		canvasWidth = canvas.width(),
-		canvasHeight = canvas.height(),
+		canvas = document.getElementById('surface'),
+		context = canvas.getContext("2d"),
+		canvasWidth = canvas.offsetWidth,
+		canvasHeight = canvas.offsetHeight,
 
 		/* Game Objects */
-		gameRoot = new GE.GameObjectManager(),
+		gameRoot = new IGE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
 		worldSystem,
@@ -74,19 +74,19 @@ $(function() {
 
 		lastTime = 0;
 
-	GE.GRAVITATIONAL_CONSTANT = GRAVITATIONAL_CONSTANT;
+	IGE.GRAVITATIONAL_CONSTANT = GRAVITATIONAL_CONSTANT;
 
-	GE.DEBUG = true;
+	IGE.DEBUG = true;
 
 	initCanvas();
 
 	initTextures();
 
 	function initCanvas(width,height){
-		canvasWidth = width || canvas.width()
-		canvasHeight = height || canvas.height()
-		canvas[0].width = canvasWidth;
-		canvas[0].height = canvasHeight;
+		canvasWidth = width || canvas.offsetWidth;
+		canvasHeight = height || canvas.offsetHeight;
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
 	}
 
     function initTextures() {
@@ -107,14 +107,14 @@ $(function() {
         });
     }
 
-	$(window).on("resize", function(){
+	window.addEventListener("resize", function(){
 		initCanvas();
 	});
 
-	canvas.on("click", function name() {
+	canvas.addEventListener("click", function () {
 		if(gameState == STATE_PLAYING){
 			// TODO: add player component to check if on ground first
-			vec2.set(playerObject.impulse, 0, CLICK_IMPULSE);
+			playerObject.impulse[1] = CLICK_IMPULSE;
 		}
 		else if (gameState == STATE_DEAD){
 			gameReset();
@@ -127,24 +127,20 @@ $(function() {
 
 	worldBounds = [-canvasWidth/2, -canvasHeight/2, canvasWidth/2, canvasHeight/2 - GROUND_HEIGHT + 10];
 
-	worldSystem = new GE.WorldSystem(worldBounds);
+	worldSystem = new IGE.WorldSystem(worldBounds);
 
-	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
+	cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+	renderSystem = new IGE.CanvasRenderSystem(context, cameraSystem);
 
-	displayScoreComponent = new GEC.DisplayScoreComponent(renderSystem);
+	displayScoreComponent = new DisplayScoreComponent(renderSystem);
 
-	function collisionCallback(attack, vulnerable) {
-		// We hit a crate
-		gameOver();
-	}
-	collisionSystem = new GE.CollisionSystem(collisionCallback);
+	collisionSystem = new IGE.Collision.CollisionSystem();
 
 	var skyObject = new GameObject(),
 		skySprite = textures[5];
 	skyObject.setVelocity(gameSpeed / 16,0);
 	skyObject.addComponent(moveComponent);
-	skyObject.addComponent(new GEC.TileComponent(renderSystem, skySprite, worldBounds));
+	skyObject.addComponent(new IGE.Render.TileComponent(renderSystem, skySprite, worldBounds));
 
 	gameRoot.addObject(skyObject);
 
@@ -154,7 +150,7 @@ $(function() {
 		treeSprite = textures[4];
 	treeObject.setVelocity(gameSpeed / 4,0);
 	treeObject.addComponent(moveComponent);
-	treeObject.addComponent(new GEC.TileComponent(renderSystem, treeSprite, treeBounds));
+	treeObject.addComponent(new IGE.Render.TileComponent(renderSystem, treeSprite, treeBounds));
 
 	gameRoot.addObject(treeObject);
 
@@ -163,7 +159,7 @@ $(function() {
 		grassSprite = textures[1];
 	tileObject.setVelocity(gameSpeed,0);
 	tileObject.addComponent(moveComponent);
-	tileObject.addComponent(new GEC.TileComponent(renderSystem, grassSprite, groundBounds));
+	tileObject.addComponent(new IGE.Render.TileComponent(renderSystem, grassSprite, groundBounds));
 
 	gameRoot.addObject(tileObject);
 
@@ -187,7 +183,7 @@ $(function() {
 		playerObject.bounds = playerBounds;
 		playerObject.sprite = playerSprites[0];
 		playerObject.sprites = playerSprites;
-		playerObject.impulse = vec2.create();
+		playerObject.impulse = [0,0];
 		playerObject.addComponent(moveComponent);
 		playerObject.addComponent(new GEC.GravityComponent());
 		playerObject.addComponent(new GEC.PhysicsComponent());
@@ -195,15 +191,19 @@ $(function() {
 		worldBounceComponent.cRestitution = 0.4;
 		worldBounceComponent.cFriction = 0.9;
 		playerObject.addComponent(worldBounceComponent);
-		playerObject.addComponent(new GEC.SpriteAnimationComponent(66));
-		playerObject.addComponent(new GEC.SpriteRenderingComponent(renderSystem));
-		playerObject.addComponent(new GEC.VulnerableCollisionComponent(collisionSystem));
-		// playerObject.addComponent(new GEC.DrawBoundsComponent(renderSystem));
+		playerObject.addComponent(new IGE.Render.SpriteAnimationComponent(66));
+		playerObject.addComponent(new IGE.Render.SpriteRenderingComponent(renderSystem));
+		playerObject.addComponent(new GEC.CollisionComponent(collisionSystem, false, true));
+		playerObject.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
+		playerObject.on("attackedBy", (attack, vulnerable) => {
+			// We hit a crate
+			gameOver();
+		});
 
 		gameRoot.addObject(playerObject);
 	}
 
-	var crates = new GE.GameObjectManager();
+	var crates = new IGE.GameObjectManager();
 
 	function KillCratesComponent (){};
 	KillCratesComponent.prototype = new GameComponent();
@@ -213,7 +213,7 @@ $(function() {
 		}
 	};
 	var killCratesComponent = new KillCratesComponent(),
-		attackComponent = new GEC.AttackCollisionComponent(collisionSystem);
+		attackComponent = new GEC.CollisionComponent(collisionSystem, true);
 
 	addCrate();
 
@@ -221,13 +221,13 @@ $(function() {
 		var crate = new GameObject();
 		crate.setPosition(worldBounds[2]+100,worldBounds[3] - 32);
 		crate.setVelocity(gameSpeed, 0);
-		crate.sprite = textures[2].image;
+		crate.sprite = {t: textures[2],x:0,y:0,w:64,h:64,ox:32,oy:32 };
 		crate.bounds = [-24,-24,24,24];
 		crate.addComponent(moveComponent);
-		crate.addComponent(new GEC.CanvasSpriteRenderingComponent(renderSystem));
+		crate.addComponent(new IGE.Render.SpriteRenderingComponent(renderSystem));
 		crate.addComponent(KillCratesComponent);
 		crate.addComponent(attackComponent);
-		//crate.addComponent(new GEC.DrawBoundsComponent(renderSystem));
+		crate.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
 		crates.addObject(crate);
 
 		var timeout = Math.random() * gameDifficulty + (gameDifficulty / 2);
@@ -282,4 +282,4 @@ $(function() {
 	function gameOver(){
 		gameState = STATE_DEAD;
 	}
-});
+}());

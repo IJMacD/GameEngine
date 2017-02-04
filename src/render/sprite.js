@@ -1,4 +1,4 @@
-import { GameComponent } from '../core';
+import GameComponent from '../core/GameComponent';
 
   /**
    * Component for rendering backgrounds for example.
