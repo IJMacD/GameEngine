@@ -15,17 +15,11 @@ export { default as Game } from './core/Game';
 
 export const Components = {};
 
-// Export basic behavioural components
-import * as basic from './behaviour/basic';
+// Export basic components
+import * as basic from './basic';
 for(let name in basic) {
   Components[name] = basic[name];
 }
-
-import FlockingComponent from './behaviour/FlockingComponent';
-Components['FlockingComponent'] = FlockingComponent;
-
-import GravityComponent from './behaviour/GravityComponent';
-Components['GravityComponent'] = GravityComponent;
 
 // Export world namespace
 import * as world from './world';

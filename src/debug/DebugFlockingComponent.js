@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import FlockingComponent from '../behaviour/FlockingComponent';
+import FlockingComponent from '../basic/FlockingComponent';
 
 /**
  * Class to draw NEIGHBOUR_RADIUS and SEPARATION_RADIUS around objects
