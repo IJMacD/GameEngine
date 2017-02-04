@@ -12,21 +12,21 @@
     img.src = "img/saturn-rings.png";
     img.src = "img/moon.jpg";
 }());
-$(function() {
-    var GameObject = GE.GameObject,
-        GameComponent = GE.GameComponent,
-        GEC = GE.Comp,
+(function() {
+    var GameObject = IGE.GameObject,
+        GameComponent = IGE.GameComponent,
+        GEC = IGE.Components,
 
-        canvas = $('#surface'),
-        context = canvas[0].getContext("experimental-webgl"),
-        canvas2 = $('#surface2'),
-        context2 = canvas2[0].getContext("2d"),
+        canvas = document.getElementById('surface'),
+        context = canvas.getContext("experimental-webgl"),
+        canvas2 = document.getElementById('surface2'),
+        context2 = canvas2.getContext("2d"),
         gl = context,
-        canvasWidth = canvas.width(),
-        canvasHeight = canvas.height(),
-        canvas2Width = canvas2.width(),
-        canvas2Height = canvas2.height(),
-        gameRoot = new GE.GameObjectManager(),
+        canvasWidth = canvas.offsetWidth,
+        canvasHeight = canvas.offsetHeight,
+        canvas2Width = 300,
+        canvas2Height = 300,
+        gameRoot = new IGE.GameObjectManager(),
         cameraSystem,
         renderSystem,
         renderSystem2,
@@ -35,17 +35,19 @@ $(function() {
         sun,
         cameraDistance,
         cameraDistance2 = 0.1,
-        lastTime = 0;
+        lastTime = 0,
+        debugBtn = document.getElementById('debug-btn'),
+        DEBUG = false;
 
     function initCanvas(){
-        canvas[0].width = canvasWidth;
-        canvas[0].height = canvasHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
         gl.viewportWidth = canvasWidth;
         gl.viewportHeight = canvasHeight;
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
-        canvas2[0].width = canvas2Width;
-        canvas2[0].height = canvas2Height;
+        canvas2.width = canvas2Width;
+        canvas2.height = canvas2Height;
         renderSystem2 && renderSystem2.setCanvasSize(canvas2Width, canvas2Height);
     }
 
@@ -135,7 +137,7 @@ $(function() {
             "img/moon.jpg"
         ];
     function initTextures() {
-        $.each(texturePaths, function(i,path){
+        texturePaths.forEach(function(path, i){
             var texture = gl.createTexture();
             texture.image = new Image();
             texture.image.onload = function() {
@@ -169,45 +171,47 @@ $(function() {
     gl.enable(gl.BLEND);
 
     function goFullscreen(){
-        canvas[0].webkitRequestFullscreen();
+        canvas.webkitRequestFullscreen();
         canvasWidth = window.innerWidth;
         canvasHeight = window.innerHeight;
         initCanvas();
     }
 
     function toggleDebug(){
-        GE.DEBUG = !GE.DEBUG;
-        debugBtn.toggleClass("active", GE.DEBUG);
-        if(GE.DEBUG){
+        DEBUG = !DEBUG;
+        debugBtn.classList.toggle("active", DEBUG);
+        if(DEBUG){
             gameRoot.addObject(renderSystem2);
-            canvas2.show();
+            canvas2.style.display = "block";
         }
         else {
             gameRoot.removeObject(renderSystem2);
-            canvas2.hide();
+            canvas2.style.display = "none";
         }
     }
 
-    $('#fullscr-btn').on("click", goFullscreen);
+    document.getElementById('fullscr-btn').addEventListener("click", goFullscreen);
 
-    var debugBtn = $('#debug-btn').on("click", toggleDebug);
+    debugBtn.addEventListener("click", toggleDebug);
     var mousedown,
         cameraPosition = [0,-100,cameraDistance],
         cameraAngleStart,
         cameraAngle = 0;
 
-    $(window).on("resize", function(){
+    window.addEventListener("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
         canvas2Width = canvas2.width();
         canvas2Height = canvas2.height();
         initCanvas();
-    }).on("keyup", function(e){
+    });
+    window.addEventListener("keyup", function(e){
         if(e.which == 122){ // F11
             goFullscreen();
             e.preventDefault();
         }
-    }).on("keydown", function(e){
+    });
+    window.addEventListener("keydown", function(e){
         if(e.which == 38){ // UP
           cameraDistance = Math.min(Math.max(cameraDistance - 50, 300), 6000);
           cameraSystem.setPosition(0,-100,cameraDistance);
@@ -218,11 +222,12 @@ $(function() {
         }
     });
 
-    canvas.on("mousedown", function(e){
+    canvas.addEventListener("mousedown", function(e){
       mousedown = {x: e.pageX, y: e.pageY};
       cameraPosition[2] = cameraDistance;
       cameraAngleStart = cameraAngle;
-    }).on("mousemove", function(e){
+    });
+    canvas.addEventListener("mousemove", function(e){
       var diffX,
           diffY;
       if(mousedown){
@@ -235,33 +240,38 @@ $(function() {
         cameraSystem.setPosition(0,newY, newZ);
         cameraSystem.rotation = cameraAngle*12;
       }
-    }).on("mouseup", function(){
+    });
+    canvas.addEventListener("mouseup", function(){
       mousedown = null;
-    }).on("mousewheel", function(e){
-        cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 300), 6000);
+    });
+    canvas.addEventListener("mousewheel", function(e){
+        cameraDistance = Math.min(Math.max(cameraDistance + e.deltaY, 300), 6000);
         cameraSystem.setPosition(0,-100,cameraDistance);
     });
 
-    canvas2.on("mousewheel", function(e){
-        cameraDistance2 = Math.min(Math.max(cameraDistance2 - e.originalEvent.deltaY*0.0005, 0.1), 1);
+    canvas2.addEventListener("mousewheel", function(e){
+        cameraDistance2 = Math.min(Math.max(cameraDistance2 - e.deltaY*0.0005, 0.01), 3);
         cameraSystem2.setScale(cameraDistance2);
     });
 
-    GameComponent.create(function FlippedDebugDrawPathComponent (renderSystem, object){
-		this.path = [];
-		this.pathSize = 1000;
-		this.pathIndex = 0;
-		this.lastVx = 0;
-		this.lastVy = 0;
-		this.renderSystem = renderSystem;
-		if(object instanceof GE.GameObject)
-			this.relativeTo = object.position;
-		else
-			this.relativeTo = vec2.create();
-	},
-    {
-        update: function(parent, delta) {
-    		if(GE.DEBUG){
+    class FlippedDebugDrawPathComponent extends GameComponent {
+        constructor (renderSystem, object){
+            super();
+
+            this.path = [];
+            this.pathSize = 1000;
+            this.pathIndex = 0;
+            this.lastVx = 0;
+            this.lastVy = 0;
+            this.renderSystem = renderSystem;
+            if(object instanceof GameObject)
+                this.relativeTo = object.position;
+            else
+                this.relativeTo = [0,0];
+        }
+
+        update (parent, delta) {
+    		if(DEBUG){
     			var px = parent.position[0],
     				py = -parent.position[2],
     				vx = parent.velocity[0],
@@ -314,12 +324,12 @@ $(function() {
     			this.pathIndex = 0;
     		}
         }
-	});
+	}
 
-    cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-    renderSystem = new GE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
-    cameraSystem2 = new GE.CameraSystem(canvas2Width, canvas2Height);
-    renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
+    cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+    renderSystem = new IGE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
+    cameraSystem2 = new IGE.CameraSystem(canvas2Width, canvas2Height);
+    renderSystem2 = new IGE.CanvasRenderSystem(context2, cameraSystem2);
     cameraSystem.setScale(1.0);
     cameraDistance = 800;
     cameraSystem.setPosition(0,-100,cameraDistance);
@@ -335,21 +345,22 @@ $(function() {
     DotRenderingComponent.prototype = new GameComponent();
     DotRenderingComponent.prototype.update = function(parent, delta) {
         var color = this.color;
+        const size = parent.size && (parent.size[0] || parent.size) || 2;
         this.renderSystem.push(function(context){
             context.fillStyle = color;
             context.beginPath();
-            context.arc(parent.position[0],-parent.position[2],2,0,Math.PI*2,false);
+            context.arc(parent.position[0],-parent.position[2],size,0,Math.PI*2,false);
             context.fill();
         });
     };
 
     sun = new GameObject();
 
-    var sphereRenderer = GEC.PolyShapeRenderingComponent.createSphere(renderSystem,30,30),
-        cubeRenderer = GEC.PolyShapeRenderingComponent.createCube(renderSystem),
+    var sphereRenderer = IGE.Render.PolyShapeRenderComponent.createSphere(renderSystem,30,30),
+        cubeRenderer = IGE.Render.PolyShapeRenderComponent.createCube(renderSystem),
         moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        dotRenderer = new DotRenderingComponent(renderSystem2),
+        dotRenderer = new DotRenderingComponent(renderSystem2, "#00f"),
         // http://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
         sizes = [0.383,0.949,1,0.532,11.21,9.45,4.01,3.88],
         masses = [0.0553,0.815,1,0.107,317.8,95.2,14.5,17.1],
@@ -361,14 +372,15 @@ $(function() {
         sunSize = scaleSize(109.2);
 
     sun.mass = 1;
-    sun.size = vec3.fromValues(sunSize,sunSize,sunSize);
-    sun.rotationAxis = vec3.fromValues(0,1,0);
+    sun.size = [sunSize,sunSize,sunSize];
+    sun.rotationAxis = [0,1,0];
     sun.addComponent(new GEC.RotationComponent(-0.001));
     sun.addComponent(sphereRenderer);
-    sun.addComponent(dotRenderer);
+    sun.addComponent(new DotRenderingComponent(renderSystem2,"#f00"));
     sun.texture = textures[0];
 
-    cameraSystem.addComponent(new DotRenderingComponent(renderSystem2,"#f00"));
+    cameraSystem.size = 10;
+    cameraSystem.addComponent(new DotRenderingComponent(renderSystem2,"#ff0"));
 
     // sphereRenderer.lighting = true;
     // cubeRenderer.lighting = true;
@@ -388,14 +400,13 @@ $(function() {
 
     gameRoot.addObject(sun);
 
-    var satellite = new GE.GameObject();
-    satellite = new GameObject();
+    var satellite = new GameObject();
     var p = scaleDist(distances[2] + 0.00257),
         v = posToVelocity(p),
         s = scaleSize(0.25);
     satellite.setPosition(p, 0, 0);
     satellite.setVelocity(0, 0, v);
-    satellite.size = vec3.fromValues(s,s,s);
+    satellite.size = [s,s,s];
     satellite.texture = textures[10];
 
     satellite.addComponent(moveComponent);
@@ -403,7 +414,7 @@ $(function() {
     satellite.addComponent(sphereRenderer);
 
     satellite.addComponent(dotRenderer);
-    satellite.addComponent(new GEC.FlippedDebugDrawPathComponent(renderSystem2));
+    satellite.addComponent(new FlippedDebugDrawPathComponent(renderSystem2));
 
     gameRoot.addObject(satellite);
 
@@ -415,8 +426,8 @@ $(function() {
         planet = new GameObject();
         planet.setPosition(p, 0, 0);
         planet.setVelocity(0, 0, v);
-        planet.size = vec3.fromValues(s,s,s);
-        planet.rotationAxis = vec3.fromValues(0,1,0);
+        planet.size = [s,s,s];
+        planet.rotationAxis = [0,1,0];
         planet.mass = masses[i] * 3e-6 * sun.mass; // Mass of Earth / Mass of Sun = 3.003467 x 10^-6
 
         planet.texture = textures[i+1];
@@ -452,13 +463,13 @@ $(function() {
                     0, 1, 2,
                     1, 2, 3
                 ],
-                ringsRenderComponent = new GEC.PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices);
+                ringsRenderComponent = new IGE.Render.PolyShapeRenderComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices);
                 ringsRenderComponent.texture = textures[9];
             planet.addComponent(ringsRenderComponent);
         }
 
         planet.addComponent(dotRenderer);
-        planet.addComponent(new GEC.FlippedDebugDrawPathComponent(renderSystem2));
+        planet.addComponent(new FlippedDebugDrawPathComponent(renderSystem2));
 
         gameRoot.addObject(planet);
 
@@ -476,4 +487,4 @@ $(function() {
     }
     loop(0);
 
-});
+}());

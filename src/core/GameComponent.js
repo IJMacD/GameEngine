@@ -62,9 +62,6 @@ GameComponent.create = function(constructor, properties){
 		name = constructor.toString().match(/^function ([a-z_]+)/i)[1];
 		constructor.name = name;
 	}
-	if(name){
-		GEC[name] = constructor;
-	}
 	return constructor;
 };
 

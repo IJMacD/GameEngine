@@ -34,9 +34,9 @@ hr {
 #surface2 {
   border: 1px solid #999;
   display: none;
-  height: 50%;
+  height: 300px;
   position: absolute;
   right: 5%;
   top: 10%;
-  width: 25%;
+  width: 300px;
 }
