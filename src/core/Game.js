@@ -295,13 +295,13 @@ class Game {
      * this game instance.
      * @return {InputSystem}
      */
-    getDefaultInput (screen) {
+    getDefaultInput () {
         if (!this.inputSystem) {
             if (!this.cameraSystem) {
                 this.getDefaultCamera();
             }
             // params are: (screen, keyboard, camera)
-            this.inputSystem = new InputSystem(screen, document, this.cameraSystem);
+            this.inputSystem = new InputSystem(this.canvas, document, this.cameraSystem);
         }
         return this.inputSystem;
     }
