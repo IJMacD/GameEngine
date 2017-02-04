@@ -21,6 +21,9 @@ for(let name in basic) {
   Components[name] = basic[name];
 }
 
+import * as easing from './Easing';
+export { easing as Easing };
+
 // Export world namespace
 import * as world from './world';
 export { world as World };

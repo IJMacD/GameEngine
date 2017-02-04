@@ -62,14 +62,16 @@
   function reset () {
     particleManager.removeAll();
 
-    addParticleSet(GEC.PositionInterpolatorComponent.linear, "#000000");
-    addParticleSet(GEC.PositionInterpolatorComponent.quadOut, "#0000FF");
-    addParticleSet(GEC.PositionInterpolatorComponent.backIn, "#0080FF");
-    addParticleSet(GEC.PositionInterpolatorComponent.backOut, "#00FFFF");
-    addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
-    addParticleSet(GEC.PositionInterpolatorComponent.elasticIn, "#FF8000");
-    addParticleSet(GEC.PositionInterpolatorComponent.elasticOut, "#FF0000");
-    addParticleSet(GEC.PositionInterpolatorComponent.backInOut, "#FFFF00");
+    addParticleSet(IGE.Easing.Linear, "#000000");
+    addParticleSet(IGE.Easing.QuadIn, "#0080FF");
+    addParticleSet(IGE.Easing.QuadOut, "#0000FF");
+    addParticleSet(IGE.Easing.Smooth, "#8000FF");
+    addParticleSet(IGE.Easing.BackIn, "#0080FF");
+    addParticleSet(IGE.Easing.BackOut, "#00FFFF");
+    addParticleSet(IGE.Easing.BackInOut, "#FFFF00");
+    addParticleSet(IGE.Easing.ElasticIn, "#FF8000");
+    addParticleSet(IGE.Easing.ElasticOut, "#FF0000");
+    addParticleSet(IGE.Easing.ElasticInOut, "#80FF00");
   }
 
   reset();

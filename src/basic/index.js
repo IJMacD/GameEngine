@@ -10,6 +10,14 @@ export { default as PositionInterpolatorComponent } from './PositionInterpolator
 
 export { default as SwitchComponent } from './SwitchComponent';
 
+export { default as PropertyAnimationComponent } from './PropertyAnimationComponent';
+
+export { default as PositionAnimationComponent } from './PositionAnimationComponent';
+
+export { default as BoundsAnimationComponent } from './BoundsAnimationComponent';
+
+export { default as ColorAnimationComponent } from './ColorAnimationComponent';
+
 /**
  * @namespace Basic
  */

@@ -32,3 +32,34 @@ export function simplifyPaths(paths){
   }
   return out;
 }
+
+const hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
+const hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
+const rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
+
+export function parseColor (str) {
+
+  let match = str.match(hexColor) || str.match(hexColorShort);
+  if (match) {
+    const out = [
+      parseInt(match[1], 16),
+      parseInt(match[2], 16),
+      parseInt(match[3], 16),
+      1
+    ];
+    out.format = "hex";
+    return out;
+  }
+
+  match = str.match(rgbRegex);
+  if (match) {
+    const out = [
+      parseInt(match[1], 10),
+      parseInt(match[2], 10),
+      parseInt(match[3], 10),
+      match[4] ? parseFloat(match[4]) : 1,
+    ];
+    out.format = "rgb";
+    return out;
+  }
+}

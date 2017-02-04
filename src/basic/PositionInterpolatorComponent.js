@@ -53,43 +53,4 @@ export class PositionInterpolatorComponent extends GameComponent {
   }
 }
 
-let PIC = PositionInterpolatorComponent;
-PIC.linear = function (t) { return t };
-PIC.quadIn = function (t) { return t*t };
-PIC.quadOut = function (t) { return -t*(t-2) };
-PIC.circIn = function (t) { return 1-Math.sqrt(1-t*t) };
-PIC.circOut = function (t) { return Math.sqrt(1-(t-1)*(t-1)) };
-PIC.smooth = function (t) { return t*t*(3-2*t) };
-// Stolen from Dojo:
-// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-PIC.backIn = function (t) {
-  var s = 1.70158;
-  return t * t * ((s + 1) * t - s);
-};
-PIC.backOut = function (t) {
-  var s = 1.70158;
-  t = t - 1;
-  return t*t*((s+1)*t + s) + 1;
-};
-PIC.backInOut = function (t) {
-  var s = 1.70158 * 1.525;
-  t = t * 2;
-  if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
-  t-=2;
-  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-};
-PIC.elasticIn = function(n){
-  if(n == 0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  n = n - 1;
-  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-};
-PIC.elasticOut = function(n){
-  if(n==0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-};
-
 export default PositionInterpolatorComponent;
