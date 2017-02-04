@@ -1,17 +1,17 @@
-$(function() {
-	var GameObject = GE.GameObject,
-		GameComponent = GE.GameComponent,
-		GEC = GE.Comp,
+(function() {
+	var GameObject = IGE.GameObject,
+		GameComponent = IGE.GameComponent,
+		GEC = IGE.Components,
 
-		canvas = $('#surface'),
-		context = canvas[0].getContext("2d"),
-		canvas2 = $('#surface2'),
-		context2 = canvas2[0].getContext("2d"),
-		canvasWidth = canvas.width(),
-		canvasHeight = canvas.height(),
-		canvas2Width = canvas2.width(),
-		canvas2Height = canvas2.height(),
-		gameRoot = new GE.GameObjectManager(),
+		canvas = document.getElementById('surface'),
+		context = canvas.getContext("2d"),
+		canvas2 = document.getElementById('surface2'),
+		context2 = canvas2.getContext("2d"),
+		canvasWidth = canvas.offsetWidth,
+		canvasHeight = canvas.offsetHeight,
+		canvas2Width = canvas2.offsetWidth,
+		canvas2Height = canvas2.offsetHeight,
+		gameRoot = new IGE.GameObjectManager(),
 		cameraSystem,
 		renderSystem,
 		cameraSystem2,
@@ -29,40 +29,31 @@ $(function() {
 		// canvas.removeAttr("height");
 		// canvasWidth = width||canvas.width();
 		// canvasHeight = height||canvas.height();
-		canvas[0].width = canvasWidth;
-		canvas[0].height = canvasHeight;
-		canvas2[0].width = canvas2Width;
-		canvas2[0].height = canvas2Height;
-		if(cameraSystem){
-			cameraSystem.setScreenSize(canvasWidth, canvasHeight);
-		}
-		if(cameraSystem2){
-			cameraSystem2.setScreenSize(canvas2Width, canvas2Height);
-		}
-		if(renderSystem){
-			renderSystem.setCanvasSize(canvasWidth,canvasHeight);
-		}
-		if(renderSystem2){
-			renderSystem2.setCanvasSize(canvas2Width,canvas2Height);
-		}
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
+		canvas2.width = canvas2Width;
+		canvas2.height = canvas2Height;
 	}
 
 	initCanvas();
 
-	$('#fullscr-btn').on("click", function(){
-		canvas[0].webkitRequestFullscreen();
-		canvasWidth = window.innerWidth;
-		canvasHeight = window.innerHeight;
+	document.getElementById('fullscr-btn').addEventListener("click", function(){
+		canvas.webkitRequestFullscreen();
+	});
+
+	document.addEventListener("webkitfullscreenchange", () => {
+		canvasWidth = canvas.offsetWidth;
+		canvasHeight = canvas.offsetHeight;
 		initCanvas();
 	});
 
-	$(window).on("resize", function(){
-		canvasWidth = canvas.width();
-		canvasHeight = canvas.height();
+	window.addEventListener("resize", function(){
+		canvasWidth = canvas.offsetWidth;
+		canvasHeight = canvas.offsetHeight;
 		initCanvas();
 	});
 
-	GE.DEBUG = true;
+	var DEBUG = true;
 
 	function ParticleRenderingComponent(renderSystem){
 		this.renderSystem = renderSystem;
@@ -99,14 +90,15 @@ $(function() {
 	}
 	EnergyMonitorComponent.prototype = new GameComponent();
 	EnergyMonitorComponent.prototype.update = function(parent, delta) {
-		this.energySystem.add(0.5 * parent.mass * vec2.squaredLength(parent.velocity));
+		const len2 = parent.velocity[0] * parent.velocity[0] + parent.velocity[1] * parent.velocity[1];
+		this.energySystem.add(0.5 * parent.mass * len2);
 	};
 
-	cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-	renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
+	cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+	renderSystem = new IGE.CanvasRenderSystem(context, cameraSystem);
 	cameraSystem.setScale(1);
-	cameraSystem2 = new GE.CameraSystem(canvas2Width, canvas2Height);
-	renderSystem2 = new GE.CanvasRenderSystem(context2, cameraSystem2);
+	cameraSystem2 = new IGE.CameraSystem(canvas2Width, canvas2Height);
+	renderSystem2 = new IGE.CanvasRenderSystem(context2, cameraSystem2);
 	cameraSystem2.setScale(0.05);
 	energySystem = new EnergySystem(renderSystem);
 	energyMonitorComponent = new EnergyMonitorComponent(energySystem);
@@ -117,13 +109,10 @@ $(function() {
 	for(var i = 0; i < boxSize; i++){
 		for(var j = 0; j < boxSize; j++){
 			var x = j * particleSep + offsetX,
-				y = i * particleSep + offsetY,
-				vecNorm = vec2.fromValues(-y , x),
-				len = vec2.length(vecNorm)*0.000001;
-			vec2.scale(vecNorm, vecNorm, len);
+				y = i * particleSep + offsetY;
 			particle = new GameObject();
 			particle.setPosition(-x,-y,0);
-			particle.setVelocity(vecNorm[0], vecNorm[1], 0);
+			particle.setVelocity(-y*0.00028, x*0.00028, 0);
 			particle.mass = 0.01;
 
 			particle.addComponent(new GEC.MoveComponent());
@@ -135,7 +124,7 @@ $(function() {
 			particle.addComponent(energyMonitorComponent);
 
 			if(i == 0 && j == 0){
-				particle.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+				particle.addComponent(new IGE.Debug.DebugDrawPathComponent(renderSystem));
 			}
 
 			particle.addComponent(new ParticleRenderingComponent(renderSystem));
@@ -159,4 +148,4 @@ $(function() {
 	}
 	loop(0);
 
-});
+}());
