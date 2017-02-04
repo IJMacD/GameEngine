@@ -1,23 +1,24 @@
-$(function() {
-    var GameObject = GE.GameObject,
-        GameComponent = GE.GameComponent,
-        GEC = GE.Comp,
+(function() {
+    var GameObject = IGE.GameObject,
+        GameComponent = IGE.GameComponent,
+        GEC = IGE.Components,
 
-        canvas = $('#surface'),
-        context = canvas[0].getContext("2d"),
-        canvasWidth = canvas.width(),
-        canvasHeight = canvas.height(),
-        gameRoot = new GE.GameObjectManager(),
+        canvas = document.getElementById('surface'),
+        context = canvas.getContext("2d"),
+        canvasWidth = canvas.offsetWidth,
+        canvasHeight = canvas.offsetHeight,
+        gameRoot = new IGE.GameObjectManager(),
         cameraSystem,
         renderSystem,
         planet,
         sun,
         cameraDistance,
-        lastTime = 0;
+        lastTime = 0,
+        DEBUG = false;
 
     function initCanvas(){
-        canvas[0].width = canvasWidth;
-        canvas[0].height = canvasHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
         cameraSystem && cameraSystem.setScreenSize(canvasWidth, canvasHeight);
         renderSystem && renderSystem.setCanvasSize(canvasWidth, canvasHeight);
     }
@@ -25,34 +26,37 @@ $(function() {
     initCanvas();
 
     function goFullscreen(){
-        canvas[0].webkitRequestFullscreen();
+        canvas.webkitRequestFullscreen();
         canvasWidth = window.innerWidth;
         canvasHeight = window.innerHeight;
         initCanvas();
     }
 
     function toggleDebug(){
-        GE.DEBUG = !GE.DEBUG;
-        debugBtn.toggleClass("active", GE.DEBUG);
+        DEBUG = !DEBUG;
+        debugBtn.toggleClass("active", DEBUG);
     }
 
-    $('#fullscr-btn').on("click", goFullscreen);
+    document.getElementById('fullscr-btn').addEventListener("click", goFullscreen);
 
-    var debugBtn = $('#debug-btn').on("click", toggleDebug);
+    var debugBtn = document.getElementById('debug-btn').addEventListener("click", toggleDebug);
 
-    $(window).on("resize", function(){
+    window.addEventListener("resize", function(){
         canvasWidth = canvas.width();
         canvasHeight = canvas.height();
         initCanvas();
-    }).on("mousewheel", function(e){
+    });
+    window.addEventListener("mousewheel", function(e){
         cameraDistance = Math.min(Math.max(cameraDistance + e.originalEvent.deltaY, 100), 1000);
         cameraSystem.setScale(cameraDistance*0.001);
-    }).on("keyup", function(e){
+    });
+    window.addEventListener("keyup", function(e){
         if(e.which == 122){ // F11
             goFullscreen();
             e.preventDefault();
         }
-    }).on("keydown", function(e){
+    });
+    window.addEventListener("keydown", function(e){
         if(e.which == 38){ // UP
         cameraDistance = Math.min(Math.max(cameraDistance - 50, 300), 6000);
             cameraSystem.setPosition(0,-100,cameraDistance);
@@ -63,40 +67,25 @@ $(function() {
         }
     });
 
-    cameraSystem = new GE.CameraSystem(canvasWidth, canvasHeight);
-    renderSystem = new GE.CanvasRenderSystem(context, cameraSystem);
+    cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
+    renderSystem = new IGE.CanvasRenderSystem(context, cameraSystem);
     cameraSystem.setScale(0.2);
     cameraDistance = 0;
     cameraSystem.setPosition(0,0,cameraDistance);
     cameraSystem.rotation = 20*Math.PI/180;
     cameraSystem.rotationAxis = [1,0,0];
 
-    function DotRenderingComponent(renderSystem, color){
-        this.renderSystem = renderSystem;
-        this.color = color || "#000";
-    }
-    DotRenderingComponent.prototype = new GameComponent();
-    DotRenderingComponent.prototype.update = function(parent, delta) {
-        var color = this.color;
-        this.renderSystem.push(function(context){
-            context.fillStyle = color;
-            context.beginPath();
-            context.arc(parent.position[0],parent.position[1],10,0,Math.PI*2,false);
-            context.fill();
-        });
-    };
-
     sun = new GameObject();
 
     var moveComponent = new GEC.MoveComponent(),
         pointGravityComponent = new GEC.PointGravityComponent(sun),
-        dotRenderer = new DotRenderingComponent(renderSystem);
+        dotRenderer = new IGE.Render.DotRenderComponent(renderSystem);
 
     sun.mass = 1000;
-    sun.size = vec3.fromValues(30,30,30);
-    sun.rotationAxis = vec3.fromValues(0,1,0);
+    sun.size = 60;
+    sun.rotationAxis = [0,1,0];
     sun.addComponent(new GEC.RotationComponent(0.001));
-    sun.addComponent(new DotRenderingComponent(renderSystem, "#ff0"));
+    sun.addComponent(new IGE.Render.DotRenderComponent(renderSystem, "#ff0"));
 
     // sphereRenderer.lighting = true;
     // cubeRenderer.lighting = true;
@@ -111,13 +100,14 @@ $(function() {
         planet = new GameObject();
         planet.setPosition(r, 0, 0);
         planet.setVelocity(0, v, 0);
-        planet.rotationAxis = vec3.fromValues(0,1,0);
+        planet.rotationAxis = [0,1,0];
         planet.mass = 10;
+        planet.size = 20;
 
         planet.addComponent(moveComponent);
         planet.addComponent(pointGravityComponent);
         planet.addComponent(dotRenderer);
-        planet.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+        planet.addComponent(new IGE.Debug.DebugDrawPathComponent(renderSystem));
 
         gameRoot.addObject(planet);
 
@@ -128,12 +118,13 @@ $(function() {
         lagrange = new GameObject();
         lagrange.setPosition(l1, 0, 0);
         lagrange.setVelocity(0, v1, 0);
+        lagrange.size = 10;
 
         lagrange.addComponent(moveComponent);
         lagrange.addComponent(pointGravityComponent);
         lagrange.addComponent(new GEC.PointGravityComponent(planet));
-        lagrange.addComponent(new DotRenderingComponent(renderSystem, "#f00"));
-        lagrange.addComponent(new GEC.DebugDrawPathComponent(renderSystem));
+        lagrange.addComponent(new IGE.Render.DotRenderComponent(renderSystem, "#f00"));
+        lagrange.addComponent(new IGE.Debug.DebugDrawPathComponent(renderSystem));
 
         gameRoot.addObject(lagrange);
 
@@ -150,4 +141,4 @@ $(function() {
     }
     loop(0);
 
-});
+}());
