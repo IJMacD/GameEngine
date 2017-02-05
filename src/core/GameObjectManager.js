@@ -75,10 +75,7 @@ class GameObjectManager extends GameObject {
   			j = 0;
 
   		for(i=0;i<l;i++){
-  			if(this.objects[i].life)
-  				this.objects[i].update(delta);
-  			else
-  				this.removeObject(this.objects[i]);
+				this.objects[i].update(delta);
   		}
 
   		m = this.objectsToBeRemoved.length;
