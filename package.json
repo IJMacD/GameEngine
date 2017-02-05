@@ -10,14 +10,16 @@
     "gl-matrix": "^2.3.2"
   },
   "devDependencies": {
+    "babel-core": "^6.22.1",
     "ink-docstrap": "^1.1.4",
     "jsdoc": "^3.4.3",
+    "mocha": "^3.2.0",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony",
     "uglifyjs-webpack-plugin": "^0.1.2",
     "webpack": "^2.2.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --compilers js:babel-core/register --recursive",
     "docs": "jsdoc -t ./node_modules/ink-docstrap/template -R README.md -r -d docs src",
     "build": "webpack",
     "build-min": "webpack --config webpack.config.min.js",
