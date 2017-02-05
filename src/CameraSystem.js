@@ -8,11 +8,8 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
  * @param {number} height
  */
 class CameraSystem extends GameObject {
-	constructor (width, height) {
+	constructor () {
 		super();
-
-		this.width = width;
-		this.height = height;
 
 		this.pruneList = [];
 		this.suspendedObjects = [];

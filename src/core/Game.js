@@ -113,6 +113,9 @@ class Game {
         this._loaded = 0;
 
         this._autosizeCallback = () => {
+
+            if (!this.canvas) return;
+
             const width = this.canvas.offsetWidth;
             const height = this.canvas.offsetHeight;
 
@@ -138,17 +141,21 @@ class Game {
     /**
      * Replace the canvas of this game.
      *
-     * <p>It will re-initialise width and height based on canvas size.
+     * <p>If there is a height and width set the new canvas will be intialised with them.
+     *
+     * <p>If height and width are unset they will be taken from the canvas size.
      * @param {HTMLCanvasElement} canvas - New canvas
      */
     setCanvas (canvas) {
         this.canvas = canvas;
 
-        this.width = this.width || this.canvas.width;
-        this.height = this.height || this.canvas.height;
+        if (this.canvas){
+            this.width = this.width || this.canvas.width;
+            this.height = this.height || this.canvas.height;
 
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+        }
     }
 
     /**
@@ -247,10 +254,8 @@ class Game {
      */
     getDefaultCamera () {
         if (!this.cameraSystem) {
-            var width = this.canvas.width,
-                height = this.canvas.height;
-            this.cameraSystem = new CameraSystem(width, height);
-            this.cameraSystem.setPosition(width / 2, height / 2);
+            this.cameraSystem = new CameraSystem();
+            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
         }
         return this.cameraSystem;
     }
@@ -266,7 +271,11 @@ class Game {
                 this.getDefaultCamera();
             }
 
-            var context = this.canvas.getContext("2d");
+            let context;
+
+            if (this.canvas)
+                context = this.canvas.getContext("2d");
+
             this.renderSystem = new CanvasRenderSystem(context, this.cameraSystem);
         }
         return this.renderSystem;
@@ -280,7 +289,7 @@ class Game {
      * @return {WorldSystem}
      */
     getDefaultWorld (paddingX = 0, paddingY = paddingX) {
-        const bounds = [-paddingX, -paddingY, this.canvas.width + paddingX, this.canvas.height + paddingY];
+        const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
         if (!this.worldSystem) {
             this.worldSystem = new WorldSystem(bounds);
         }
@@ -337,15 +346,18 @@ class Game {
     }
 
     /**
-     * Set the size of the game. This will set the intrinsic size of the canvas.
+     * Set the size of the game. This will also set the canvas size.
      * @param {number} width - Size in pixels
      * @param {number} height - Size in pixels
      */
     setSize (width, height) {
         this.width = width;
         this.height = height;
-        this.canvas.width = width;
-        this.canvas.height = height;
+
+        if(this.canvas){
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
     }
 
     /**
