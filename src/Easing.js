@@ -1,6 +1,6 @@
 export const Linear = t => t;
 export const QuadIn = t => t * t;
-export const QuadOut = t => -t * (t * 2);
+export const QuadOut = t => -t * (t - 2);
 export const CircIn = t => 1-Math.sqrt(1-t*t);
 export const CircOut = t => Math.sqrt(1-(t-1)*(t-1));
 export const Smooth = t => t*t*(3-2*t);
