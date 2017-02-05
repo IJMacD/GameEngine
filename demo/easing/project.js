@@ -31,6 +31,8 @@
       particleCount = 200,
       particleManager = new IGE.GameObjectManager();
 
+  let row = 0;
+
   function addParticleSet(easing, colour) {
     var particle,
         particleSet = new IGE.GameObjectManager(),
@@ -57,10 +59,15 @@
     }
 
     particleManager.addObject(particleSet);
+
+    particleManager.addComponent(new GEC.TextRenderComponent(renderSystem, easing.name, -150, row * 32, "30px sans-serif", colour));
+    row++;
   }
 
   function reset () {
     particleManager.removeAll();
+    particleManager.removeComponentByName("TextRenderComponent");
+    row = 0;
 
     addParticleSet(IGE.Easing.Linear, "#000000");
     addParticleSet(IGE.Easing.QuadIn, "#0080FF");
