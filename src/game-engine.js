@@ -69,6 +69,9 @@ Components['DotRenderComponent'] = DotRenderComponent;
 import RectangleRenderComponent from './render/RectangleRenderComponent';
 Components['RectangleRenderComponent'] = RectangleRenderComponent;
 
+import TextRenderComponent from './render/TextRenderComponent';
+Components['TextRenderComponent'] = TextRenderComponent;
+
 // Export debug
 import * as debug from './debug';
 export { debug as Debug };
