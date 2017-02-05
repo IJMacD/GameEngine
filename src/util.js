@@ -63,3 +63,29 @@ export function parseColor (str) {
     return out;
   }
 }
+
+export function eventMixin (constructor) {
+
+    function on (event, callback) {
+        if (!this._events) this._events = {};
+        if (!this._events[event]){
+            this._events[event] = [];
+        }
+        this._events[event].push(callback);
+        return this;
+    }
+
+    function fire (event, ...params) {
+        if (!this._events) this._events = {};
+        var callbacks = this._events[event];
+
+        if (callbacks && callbacks.length){
+            callbacks.forEach(callback => {
+                callback.apply(this, params);
+            });
+        }
+    }
+
+    constructor.prototype.on = on;
+    constructor.prototype.fire = fire;
+}

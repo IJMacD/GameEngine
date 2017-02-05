@@ -5,6 +5,7 @@ import CameraSystem from '../CameraSystem';
 import CanvasRenderSystem from '../render/CanvasRenderSystem';
 import WorldSystem from '../world/WorldSystem';
 import InputSystem from '../input/InputSystem';
+import { eventMixin } from '../util';
 
 var STATE_PAUSED = 0,
     STATE_PLAYING = 1,
@@ -109,7 +110,6 @@ class Game {
         this._toLoad = 0;
 
         this._lastTime = 0;
-        this._events = {};
         this._loaded = 0;
 
         this._autosizeCallback = () => {
@@ -320,13 +320,13 @@ class Game {
      */
     setScore (score) {
         this.score = score;
-        _fire(this, "score", this.score);
+        this.fire("score", this.score);
     }
 
     /** Move to the next level */
     nextLevel () {
         this.level++;
-        _fire(this, "loadLevel", this.level);
+        this.fire("loadLevel", this.level);
     }
 
     /** Specify a level to jump to.
@@ -334,7 +334,7 @@ class Game {
      */
     setLevel (level) {
         this.level = level;
-        _fire(this, "loadLevel", this.level);
+        this.fire("loadLevel", this.level);
     }
 
     /**
@@ -342,7 +342,7 @@ class Game {
      * <p>This does not automatically move to the next level.
      */
     completeLevel () {
-        _fire(this, "levelComplete", this.level);
+        this.fire("levelComplete", this.level);
     }
 
     /**
@@ -371,40 +371,11 @@ class Game {
             window.removeEventListener("resize", this._autosizeCallback);
         }
     }
-
-    /**
-     * Attach an event listener for certain game events.
-     * @param {string} event - Event name to attach to
-     * @param {function} callback - Listener to be called on event
-     */
-    on (event, callback) {
-        if(!this._events[event]){
-            this._events[event] = [];
-        }
-        this._events[event].push(callback);
-        return this;
-    }
-
-    /**
-     * Fire an event on the game.
-     */
-    fire (event) {
-        _fire(this, event);
-    }
 }
 
 export default Game;
 
-function _fire(self, event) {
-    var callbacks = self._events[event],
-        args = [].slice.call(arguments, 2);
-
-    if(callbacks && callbacks.length){
-        callbacks.forEach(function(callback){
-            callback.apply(self, args);
-        });
-    }
-}
+eventMixin(Game);
 
 function _loop(self) {
 
@@ -434,8 +405,8 @@ function _loop(self) {
 
 function _resourceLoaded(self, resource) {
   self._loaded++;
-  _fire(self, "resourcesProgress", self._loaded / self._toLoad);
+  self.fire("resourcesProgress", self._loaded / self._toLoad);
   if(self._toLoad - self._loaded <= 0){
-    _fire(self, "resourcesLoaded");
+    self.fire("resourcesLoaded");
   }
 };

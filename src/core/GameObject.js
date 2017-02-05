@@ -1,4 +1,5 @@
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import { eventMixin } from '../util';
 
 /**
  * The base object in the GameEngine. Most objects managed by the system
@@ -33,13 +34,6 @@ class GameObject {
           * @type {array}
           */
         this._toBeRemoved = [];
-
-        /**
-          * Event handlers.
-          * @private
-          * @type {array}
-          */
-        this._events = {};
     }
 
     /**
@@ -244,21 +238,11 @@ class GameObject {
         }
         return html;
     }
-
-    on (eventType, fn) {
-        // TODO: support multiple events
-        console.log("If you are trying to add multiple events to the same object, it has not been implemented yet.");
-        this._events[eventType] = fn;
-    }
-
-    fire (eventType) {
-        if(this._events[eventType]) {
-            this._events[eventType].apply(this, [].slice.call(arguments, 1));
-        }
-    }
 }
 
 export default GameObject;
+
+eventMixin(GameObject);
 
 function arrayRemoveItem(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);
