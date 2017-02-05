@@ -9,6 +9,7 @@ class GameObject {
         /** Array of components which update this GameObject.
          * @type {array} */
         this.components = [];
+        this.components.remove = arrayRemoveItem;
 
         /** Position of this object in the world.
          * @type {vec3} */
@@ -22,27 +23,22 @@ class GameObject {
          * @type {number} */
         this.rotation = 0;
 
-        /** Current speed of rotation.
+        /** Rotation axis of this object.
          * @type {number} */
-        this.rotationSpeed = 0;
+        this.rotationAxis = vec3.fromValues(0, 0, 1);
 
         /**
           * List of components which will be removed on next update.
           * @private
           * @type {array}
           */
-        this.toBeRemoved = [];
+        this._toBeRemoved = [];
 
-        /** Integer representing the number of lives remaining for this object.
-         * @type {number} */
-        this.life = 1;
-
-        /** Integer representing the team this object belongs to.
-         * @type {number} */
-        this.team = 0;
-
-        this.components.remove = arrayRemoveItem;
-
+        /**
+          * Event handlers.
+          * @private
+          * @type {array}
+          */
         this._events = {};
     }
 
@@ -81,14 +77,15 @@ class GameObject {
      * @return {GameObject} Returns a reference to this for chainability
      */
     removeComponent (component){
-        this.toBeRemoved.push(component);
+        this._toBeRemoved.push(component);
         return this;
     }
 
     removeComponentByName (name){
         for(var i = 0; i < this.components.length; i++){
-            if(this.components[i].name == name)
-                this.toBeRemoved.push(this.components[i]);
+            const c = this.components[i];
+            if(c.name == name || c.constructor.name == name)
+                this._toBeRemoved.push(c);
         }
         return this;
     }
@@ -96,7 +93,7 @@ class GameObject {
     removeComponentByTest (test){
         for(var i = 0; i < this.components.length; i++){
             if(test(this.components[i]))
-                this.toBeRemoved.push(this.components[i]);
+                this._toBeRemoved.push(this.components[i]);
         }
         return this;
     }
@@ -211,16 +208,16 @@ class GameObject {
         var i = 0,
             l = this.components.length,
             j = 0,
-            m = this.toBeRemoved.length;
+            m = this._toBeRemoved.length;
         for(;j<m;j++){
             for(i=0;i<l;i++){
-                if(this.components[i] == this.toBeRemoved[j]){
+                if(this.components[i] == this._toBeRemoved[j]){
                     this.components.remove(i);
                     break;
                 }
             }
         }
-        this.toBeRemoved.length = 0;
+        this._toBeRemoved.length = 0;
 
         l = this.components.length;
         for(i=0;i<l;i++){
@@ -250,7 +247,7 @@ class GameObject {
 
     on (eventType, fn) {
         // TODO: support multiple events
-        console.debug("If you are trying to add multiple events to the same object, it has not been implemented yet.");
+        console.log("If you are trying to add multiple events to the same object, it has not been implemented yet.");
         this._events[eventType] = fn;
     }
 
