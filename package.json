@@ -20,7 +20,7 @@
     "webpack": "^2.2.0"
   },
   "scripts": {
-    "test": "mocha --require babel-register --recursive",
+    "test": "npm run build && mocha --require babel-register --recursive",
     "docs": "jsdoc -t ./node_modules/ink-docstrap/template -R README.md -r -d docs src",
     "build": "webpack",
     "build-min": "webpack --config webpack.config.min.js",

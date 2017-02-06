@@ -1,7 +1,6 @@
 import assert from 'assert';
 
-import GameObject from '../../src/core/GameObject';
-import GameComponent from '../../src/core/GameComponent';
+import { GameObject, GameComponent } from '../../dist/ijmacd-game-engine';
 
 describe('GameObject', function() {
   describe('#constructor()', function() {
