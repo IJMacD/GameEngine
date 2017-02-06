@@ -9,13 +9,15 @@ class GameObjectManager extends GameObject {
   		super();
 
   		this.objects = [];
-  		this.objectsToBeRemoved = [];
+
+  		this._objectsToBeRemoved = [];
 
   		this.objects.remove = arrayRemoveItem;
   	}
 
 	/**
-	 * Add an object to be updated as children of this manager
+	 * Add an object to be updated as children of this manager. Children are given a
+	 * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
 	 * @param {GameObject} object - Game object to be attached to this node in the tree
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
@@ -29,11 +31,11 @@ class GameObjectManager extends GameObject {
 	/**
 	 * Add an object to be updated as children of this manager at particular place
 	 * in the list of children.
-	 * @param {number} index - Position in the list
 	 * @param {GameObject} object - Game object to be attached to this node in the tree
+	 * @param {number} index - Position in the list
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
-  	addObjectAt (index, object){
+  	addObjectAt (object, index){
   		if(object instanceof GameObject)
   			this.objects.splice(index,0,object);
   		object.parent = this;
@@ -47,7 +49,7 @@ class GameObjectManager extends GameObject {
 	 */
   	removeObject (object){
   		if(object instanceof GameObject)
-  			this.objectsToBeRemoved.push(object);
+  			this._objectsToBeRemoved.push(object);
   		if(object.parent == this) { object.parent = null; }
   		return this;
   	}
@@ -67,7 +69,7 @@ class GameObjectManager extends GameObject {
 	 * @param {number} delta - Time since last frame in milliseconds
 	 */
   	update (delta) {
-  		GameObject.prototype.update.call(this, delta);
+  		super.update(delta);
 
   		var i = 0,
   			l = this.objects.length,
@@ -75,22 +77,22 @@ class GameObjectManager extends GameObject {
   			j = 0;
 
   		for(i=0;i<l;i++){
-				this.objects[i].update(delta);
+			this.objects[i].update(delta);
   		}
 
-  		m = this.objectsToBeRemoved.length;
+  		m = this._objectsToBeRemoved.length;
 
   		for(;j<m;j++){
   			i = 0;
   			for(;i<l;i++){
-  				if(this.objects[i] == this.objectsToBeRemoved[j]){
+  				if(this.objects[i] == this._objectsToBeRemoved[j]){
   					this.objects.remove(i);
   					l--;
   					break;
   				}
   			}
   		}
-  		this.objectsToBeRemoved.length = 0;
+  		this._objectsToBeRemoved.length = 0;
   	}
 
 	/**
