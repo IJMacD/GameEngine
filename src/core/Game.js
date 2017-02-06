@@ -176,8 +176,12 @@ class Game {
         this._toLoad += texturePaths.length;
         var self = this;
         return texturePaths.map(function(path){
-            var texture = {};
-            texture.image = new Image();
+            var texture = {
+                image: new Image(),
+                width: 0,
+                height: 0,
+                loaded: false
+            };
             texture.image.onload = function() {
                 texture.width = texture.image.width;
                 texture.height = texture.image.height;
