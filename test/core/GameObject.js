@@ -251,12 +251,21 @@ describe('GameObject', function() {
   describe('events', function() {
     const go = new GameObject();
     let called = false;
+    let called2 = false;
 
     go.on("event", () => called = true);
     go.fire("event");
 
     it('should register callback and fire event', function() {
       assert(called);
+    });
+
+    it('should register and call multiple callbacks', function() {
+      called = false;
+      go.on("event", () => called2 = true);
+      go.fire("event");
+      assert(called);
+      assert(called2);
     });
   });
 });
