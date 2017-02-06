@@ -1361,6 +1361,8 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
 
     this.screen = screen;
     this.keyboard = keyboard;
+    this.camera = cameraSystem;
+    /** @deprecated */
     this.cameraSystem = cameraSystem;
 
     this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
@@ -1424,7 +1426,7 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
    * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
    */
   screenToWorld (screenX, screenY){
-    const cam = this.cameraSystem,
+    const cam = this.camera,
         camWidth = cam.width,
         camHeight = cam.height,
         screen = this.screen,
@@ -1461,6 +1463,8 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
  * @private
  */
 function initScreen () {
+  if (!this.screen) return;
+
   TouchClick(this.screen, e => {
     const offsetLeft = this.screen.offsetLeft,
         offsetTop = this.screen.offsetTop,
@@ -1479,6 +1483,8 @@ function initScreen () {
  * @private
  */
 function initKeyboard () {
+  if (!this.keyboard) return;
+
   this.keyboard.addEventListener("keydown", e => {
     this._nextKey = e.which;
   });
@@ -1569,6 +1575,9 @@ class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__[
 
 		this.context = context;
 		this.canvas = context && context.canvas;
+		this.camera = cameraSystem;
+
+		/** @deprecated */
 		this.cameraSystem = cameraSystem;
 
 		this.renderQueue = [];
@@ -1605,7 +1614,7 @@ class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__[
 
 		this.context.save();
 
-		var p = this.cameraSystem.position,
+		var p = this.camera.position,
 			q = this.canvas.width / 2,
 			r = this.canvas.height / 2,
 			i,
@@ -1614,12 +1623,12 @@ class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__[
 			n;
 
 		this.context.translate(q,r);
-		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
-		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
+		// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+		this.context.scale(this.camera.scaleX, this.camera.scaleY);
 
 		// Only rotation around the Z-axis makes sense for canvas rendering
-		if(this.cameraSystem.rotationAxis[2] == 1){
-			this.context.rotate(-this.cameraSystem.rotation);
+		if(this.camera.rotationAxis[2] == 1){
+			this.context.rotate(-this.camera.rotation);
 		}
 
 		this.context.translate(-p[0],-p[1]);
@@ -2941,7 +2950,7 @@ class GameObjectManager extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /*
 	 * @param {number} delta - Time since last frame in milliseconds
 	 */
   	update (delta) {
-  		__WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */].prototype.update.call(this, delta);
+  		super.update(delta);
 
   		var i = 0,
   			l = this.objects.length,
@@ -2949,7 +2958,7 @@ class GameObjectManager extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /*
   			j = 0;
 
   		for(i=0;i<l;i++){
-				this.objects[i].update(delta);
+			this.objects[i].update(delta);
   		}
 
   		m = this._objectsToBeRemoved.length;
@@ -5957,13 +5966,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var STATE_PAUSED = 0,
-    STATE_PLAYING = 1,
-    STATE_STOPPED = 2,
-    STATE_DEAD = 3,
+const STATE_PAUSED = 0;
+const STATE_PLAYING = 1;
+const STATE_STOPPED = 2;
+const STATE_DEAD = 3;
 
-    _lastTime = 0,
-    _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
+let _lastTime = 0;
+const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
         var currTime = new Date().getTime();
         var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
         var id = setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
@@ -5986,22 +5995,27 @@ var STATE_PAUSED = 0,
  * @param {number} options.lives - Initial lives
  */
 class Game {
-    constructor (options) {
+    constructor (options={}) {
+
         /**
-         * Canvas this game will rener to.
+         * Canvas this game will render to.
          * @type {HTMLCanvasElement}
          */
         this.canvas = options.canvas;
 
-        /** Width of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Width of game canvas. Use {@link Game#setSize} to change.
+         * Explicit width takes priority.
          * @readonly
          */
-        this.width = options.width || (this.canvas && this.canvas.width);
+        this.width = options.width || (this.canvas && this.canvas.width) || 0;
 
-        /** Height of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Height of game canvas. Use {@link Game#setSize} to change.
+         * Explicit height takes priority.
          * @readonly
          */
-        this.height = options.height || (this.canvas && this.canvas.height);
+        this.height = options.height || (this.canvas && this.canvas.height) || 0;
 
         if(this.canvas){
             this.canvas.width = this.width;
@@ -6126,8 +6140,12 @@ class Game {
         this._toLoad += texturePaths.length;
         var self = this;
         return texturePaths.map(function(path){
-            var texture = {};
-            texture.image = new Image();
+            var texture = {
+                image: new Image(),
+                width: 0,
+                height: 0,
+                loaded: false
+            };
             texture.image.onload = function() {
                 texture.width = texture.image.width;
                 texture.height = texture.image.height;
@@ -6161,17 +6179,20 @@ class Game {
         this._toLoad += audioPaths.length;
         var self = this;
         return audioPaths.map(function(path){
-            var sound = {};
-            sound.audio = new Audio();
+            var sound = {
+                audio: new Audio(),
+                length: 0,
+                laoded: false
+            };
             sound.audio.addEventListener("canplaythrough", () => {
-            if(!sound.loaded){
-                sound.length = sound.audio.duration;
-                sound.loaded = true;
-                _resourceLoaded(self, sound);
-            }
+                if(!sound.loaded){
+                    sound.length = sound.audio.duration;
+                    sound.loaded = true;
+                    _resourceLoaded(self, sound);
+                }
             });
             sound.audio.onerror = function(){
-            throw new Error("Failed to load a sound: " + path);
+                throw new Error("Failed to load a sound: " + path);
             };
             sound.audio.src = path;
             self.sounds.push(sound);
@@ -6259,7 +6280,7 @@ class Game {
                 this.getDefaultCamera();
             }
             // params are: (screen, keyboard, camera)
-            this.inputSystem = new __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a" /* default */](this.canvas, document, this.cameraSystem);
+            this.inputSystem = new __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a" /* default */](this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
         }
         return this.inputSystem;
     }
@@ -6325,6 +6346,12 @@ class Game {
 /* harmony default export */ __webpack_exports__["a"] = Game;
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__util__["b" /* eventMixin */])(Game);
+
+// Export constants
+Game.STATE_PAUSED   = STATE_PAUSED;
+Game.STATE_PLAYING  = STATE_PLAYING;
+Game.STATE_STOPPED  = STATE_STOPPED;
+Game.STATE_DEAD     = STATE_DEAD;
 
 function _loop(self) {
 
