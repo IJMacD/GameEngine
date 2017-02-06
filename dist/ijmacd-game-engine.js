@@ -5959,11 +5959,10 @@ var STATE_PAUSED = 0,
     STATE_DEAD = 3,
 
     _lastTime = 0,
-    _raf = (this.window && this.window.requestAnimationFrame) || function(callback, element) {
+    _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
         var currTime = new Date().getTime();
         var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
-        var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-          timeToCall);
+        var id = setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
         _lastTime = currTime + timeToCall;
         return id;
     };

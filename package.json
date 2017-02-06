@@ -10,6 +10,7 @@
     "gl-matrix": "^2.3.2"
   },
   "devDependencies": {
+    "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
     "babel-register": "^6.22.0",
     "ink-docstrap": "^1.1.4",
@@ -24,7 +25,8 @@
     "docs": "jsdoc -t ./node_modules/ink-docstrap/template -R README.md -r -d docs src",
     "build": "webpack",
     "build-min": "webpack --config webpack.config.min.js",
-    "build-all": "webpack && npm run build-min && npm run docs"
+    "build-es5": "webpack --config webpack.config.es5.js",
+    "build-all": "webpack && npm run build-min && npm run build-es5 && npm run docs"
   },
   "repository": {
     "type": "git",
