@@ -7,6 +7,7 @@ let	DebugDrawGraphComponentMax = 0;
 
 export default class DebugDrawGraphComponent extends GameComponent {
     constructor (context, evaluate) {
+        super();
         if(typeof evaluate != "function")
             evaluate = function(object){return object.x};
         this.context = context;
