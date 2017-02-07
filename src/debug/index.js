@@ -9,3 +9,5 @@ export { default as DebugDrawPathComponent } from './DebugDrawPathComponent';
 export { default as DebugDrawSurfacesComponent } from './DebugDrawSurfacesComponent';
 
 export { default as DebugFlockingComponent } from './DebugFlockingComponent';
+
+export { default as PositionRenderComponent } from './PositionRenderComponent';

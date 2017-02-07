@@ -30,8 +30,8 @@ describe('Game', function() {
       assert.strictEqual(game.width, 0);
       assert.strictEqual(game.height, 0);
       assert(game.root instanceof GameObjectManager);
-      assert(game.textures);
-      assert(game.sounds);
+      assert(Array.isArray(game.textures));
+      assert(Array.isArray(game.sounds));
       assert.strictEqual(game.frame, 0);
       assert.strictEqual(game.time, 0);
       assert.strictEqual(game.score, 0);
@@ -45,7 +45,8 @@ describe('Game', function() {
         height: 200,
         score: 300,
         lives: 400,
-        level: 500
+        level: 500,
+        /* autosize: true, */
       });
 
       assert(game instanceof Game);
@@ -374,5 +375,26 @@ describe('Game', function() {
     });
 
   });
+
+  // Can't test due to window
+  // describe('#setAutosize()', function() {
+  //   const canvas = new CanvasMock(100, 200);
+  //   const game = new Game({
+  //     canvas
+  //   });
+
+  //   game.setAutosize(true);
+
+  //   canvas.width = 300;
+  //   canvas.height = 400;
+
+  //   window.fire("resize");
+
+  //   it('should set game size', function() {
+  //     assert.equal(game.width, 300);
+  //     assert.equal(game.height, 400);
+  //   });
+
+  // });
 
 });

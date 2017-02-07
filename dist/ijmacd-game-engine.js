@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 50);
+/******/ 	return __webpack_require__(__webpack_require__.s = 51);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -6402,11 +6402,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(47);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(48);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
 // export { default as DebugDrawDataComponent } from './DebugDrawDataComponent';
 
 // export { default as DebugDrawGraphComponent } from './DebugDrawGraphComponent';
+
+
 
 
 
@@ -6446,9 +6450,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(49);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(50);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
@@ -8347,6 +8351,47 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+  constructor (renderSystem, font = "10px sans-serif", color = "#000") {
+    super();
+    this.renderSystem = renderSystem;
+    this.font = font;
+    this.color = color;
+    // Font should start with an integer we can use as a size for the crosshairs
+    this.size = parseInt(font, 10);
+  }
+  update (parent, delta) {
+    const p = parent.position;
+    const size = this.size;
+
+    this.renderSystem.push(ctx => {
+      ctx.translate(p[0], p[1]);
+      ctx.strokeStyle = "#888";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-size, 0);
+      ctx.lineTo(size, 0);
+      ctx.moveTo(0, -size);
+      ctx.lineTo(0, size);
+      ctx.stroke();
+      ctx.fillStyle = this.color;
+      ctx.font = this.font;
+      ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
+    });
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PositionRenderComponent;
+
+
+
+/***/ }),
+/* 49 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
@@ -8636,7 +8681,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8897,7 +8942,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

@@ -261,6 +261,7 @@
 	cameraSystem.addComponent(cameraTrackSwitchComponent);
 	cameraSystem.addComponent(worldWrapComponent);
 	// cameraSystem.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
+	cameraSystem.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
 	particles.push(cameraSystem);
 
 	for(var i = 0; i < boxSize; i++){
