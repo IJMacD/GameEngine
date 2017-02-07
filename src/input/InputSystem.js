@@ -24,6 +24,8 @@ class InputSystem extends GameObject {
 
     this.screen = screen;
     this.keyboard = keyboard;
+    this.camera = cameraSystem;
+    /** @deprecated */
     this.cameraSystem = cameraSystem;
 
     this._nextClick = vec2.create();
@@ -87,7 +89,7 @@ class InputSystem extends GameObject {
    * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
    */
   screenToWorld (screenX, screenY){
-    const cam = this.cameraSystem,
+    const cam = this.camera,
         camWidth = cam.width,
         camHeight = cam.height,
         screen = this.screen,
@@ -124,6 +126,8 @@ export default InputSystem;
  * @private
  */
 function initScreen () {
+  if (!this.screen) return;
+
   TouchClick(this.screen, e => {
     const offsetLeft = this.screen.offsetLeft,
         offsetTop = this.screen.offsetTop,
@@ -142,6 +146,8 @@ function initScreen () {
  * @private
  */
 function initKeyboard () {
+  if (!this.keyboard) return;
+
   this.keyboard.addEventListener("keydown", e => {
     this._nextKey = e.which;
   });

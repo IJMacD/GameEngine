@@ -7,13 +7,13 @@ import WorldSystem from '../world/WorldSystem';
 import InputSystem from '../input/InputSystem';
 import { eventMixin } from '../util';
 
-var STATE_PAUSED = 0,
-    STATE_PLAYING = 1,
-    STATE_STOPPED = 2,
-    STATE_DEAD = 3,
+const STATE_PAUSED = 0;
+const STATE_PLAYING = 1;
+const STATE_STOPPED = 2;
+const STATE_DEAD = 3;
 
-    _lastTime = 0,
-    _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
+let _lastTime = 0;
+const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
         var currTime = new Date().getTime();
         var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
         var id = setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
@@ -36,22 +36,27 @@ var STATE_PAUSED = 0,
  * @param {number} options.lives - Initial lives
  */
 class Game {
-    constructor (options) {
+    constructor (options={}) {
+
         /**
-         * Canvas this game will rener to.
+         * Canvas this game will render to.
          * @type {HTMLCanvasElement}
          */
         this.canvas = options.canvas;
 
-        /** Width of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Width of game canvas. Use {@link Game#setSize} to change.
+         * Explicit width takes priority.
          * @readonly
          */
-        this.width = options.width || (this.canvas && this.canvas.width);
+        this.width = options.width || (this.canvas && this.canvas.width) || 0;
 
-        /** Height of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Height of game canvas. Use {@link Game#setSize} to change.
+         * Explicit height takes priority.
          * @readonly
          */
-        this.height = options.height || (this.canvas && this.canvas.height);
+        this.height = options.height || (this.canvas && this.canvas.height) || 0;
 
         if(this.canvas){
             this.canvas.width = this.width;
@@ -215,17 +220,20 @@ class Game {
         this._toLoad += audioPaths.length;
         var self = this;
         return audioPaths.map(function(path){
-            var sound = {};
-            sound.audio = new Audio();
+            var sound = {
+                audio: new Audio(),
+                length: 0,
+                laoded: false
+            };
             sound.audio.addEventListener("canplaythrough", () => {
-            if(!sound.loaded){
-                sound.length = sound.audio.duration;
-                sound.loaded = true;
-                _resourceLoaded(self, sound);
-            }
+                if(!sound.loaded){
+                    sound.length = sound.audio.duration;
+                    sound.loaded = true;
+                    _resourceLoaded(self, sound);
+                }
             });
             sound.audio.onerror = function(){
-            throw new Error("Failed to load a sound: " + path);
+                throw new Error("Failed to load a sound: " + path);
             };
             sound.audio.src = path;
             self.sounds.push(sound);
@@ -313,7 +321,7 @@ class Game {
                 this.getDefaultCamera();
             }
             // params are: (screen, keyboard, camera)
-            this.inputSystem = new InputSystem(this.canvas, document, this.cameraSystem);
+            this.inputSystem = new InputSystem(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
         }
         return this.inputSystem;
     }
@@ -379,6 +387,12 @@ class Game {
 export default Game;
 
 eventMixin(Game);
+
+// Export constants
+Game.STATE_PAUSED   = STATE_PAUSED;
+Game.STATE_PLAYING  = STATE_PLAYING;
+Game.STATE_STOPPED  = STATE_STOPPED;
+Game.STATE_DEAD     = STATE_DEAD;
 
 function _loop(self) {
 

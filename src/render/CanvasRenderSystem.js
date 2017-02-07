@@ -16,6 +16,9 @@ class CanvasRenderSystem extends GameObject {
 
 		this.context = context;
 		this.canvas = context && context.canvas;
+		this.camera = cameraSystem;
+
+		/** @deprecated */
 		this.cameraSystem = cameraSystem;
 
 		this.renderQueue = [];
@@ -52,7 +55,7 @@ class CanvasRenderSystem extends GameObject {
 
 		this.context.save();
 
-		var p = this.cameraSystem.position,
+		var p = this.camera.position,
 			q = this.canvas.width / 2,
 			r = this.canvas.height / 2,
 			i,
@@ -61,12 +64,12 @@ class CanvasRenderSystem extends GameObject {
 			n;
 
 		this.context.translate(q,r);
-		// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
-		this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
+		// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+		this.context.scale(this.camera.scaleX, this.camera.scaleY);
 
 		// Only rotation around the Z-axis makes sense for canvas rendering
-		if(this.cameraSystem.rotationAxis[2] == 1){
-			this.context.rotate(-this.cameraSystem.rotation);
+		if(this.camera.rotationAxis[2] == 1){
+			this.context.rotate(-this.camera.rotation);
 		}
 
 		this.context.translate(-p[0],-p[1]);
