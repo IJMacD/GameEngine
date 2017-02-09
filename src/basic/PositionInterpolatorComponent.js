@@ -1,11 +1,16 @@
 import GameComponent from '../core/GameComponent';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import * as Easing from '../Easing';
 
-export class PositionInterpolatorComponent extends GameComponent {
+/**
+ * Use more generic [X]AnimationComponents
+ * @deprecated
+ */
+export default class PositionInterpolatorComponent extends GameComponent {
   constructor (duration, easing) {
     super();
     this.duration = duration;
-    this.easing = easing || PositionInterpolatorComponent.linear;
+    this.easing = easing || Easing.Linear;
     this.elapsed = 0;
     this.running = false;
     this.starting = false;
@@ -52,5 +57,3 @@ export class PositionInterpolatorComponent extends GameComponent {
     this.starting = true;
   }
 }
-
-export default PositionInterpolatorComponent;

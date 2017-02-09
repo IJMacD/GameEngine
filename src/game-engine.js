@@ -21,6 +21,12 @@ for(let name in basic) {
   Components[name] = basic[name];
 }
 
+// Export animation components
+import * as animation from './animation';
+for(let name in animation) {
+  Components[name] = animation[name];
+}
+
 import * as easing from './Easing';
 export { easing as Easing };
 
