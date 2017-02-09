@@ -77,8 +77,8 @@
     addParticleSet(IGE.Easing.BackOut, "#00FFFF");
     addParticleSet(IGE.Easing.BackInOut, "#FFFF00");
     addParticleSet(IGE.Easing.ElasticIn, "#FF8000");
-    addParticleSet(IGE.Easing.ElasticOut, "#FF0000");
-    addParticleSet(IGE.Easing.ElasticInOut, "#80FF00");
+    addParticleSet(IGE.Easing.ElasticOut, "#80FF00");
+    addParticleSet(IGE.Easing.DampedOscillation, "#FF0000");
   }
 
   reset();

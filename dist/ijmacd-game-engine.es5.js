@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 50);
+/******/ 	return __webpack_require__(__webpack_require__.s = 65);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -89,7 +89,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -166,6 +166,7 @@ var GameComponent = function (_GameObject) {
  * This static helper method reduces the boiler plate of subclassing
  * GameComponent.
  * @static
+ * @deprecated Use ES6 classes instead
  * @param {function} constructor - The constructor of the subclass. This should
  * be a named function expression or a reference to a function statement so that
  * magic can happen using the function's name for component identification.
@@ -194,332 +195,6 @@ exports.default = GameComponent;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _vec = __webpack_require__(2);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-var _util = __webpack_require__(8);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/**
- * The base object in the GameEngine. Most objects managed by the system
- * will be based on this class.
- */
-var GameObject = function () {
-    function GameObject() {
-        _classCallCheck(this, GameObject);
-
-        /** Array of components which update this GameObject.
-         * @type {array} */
-        this.components = [];
-        this.components.remove = arrayRemoveItem;
-
-        /** Position of this object in the world.
-         * @type {vec3} */
-        this.position = _vec2.default.create();
-
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
-        this.velocity = _vec2.default.create();
-
-        /** Current rotation of this object.
-         * @type {number} */
-        this.rotation = 0;
-
-        /** Rotation axis of this object.
-         * @type {number} */
-        this.rotationAxis = _vec2.default.fromValues(0, 0, 1);
-
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
-        this._toBeRemoved = [];
-    }
-
-    /**
-     * <p>This method is used to add a {@link GameComponent} to this object.
-     *
-     * <p>GameComponents give objects particular behaviours. This method ensures
-     * that each component added will have a chance to update once per frame
-     * for this object.
-     * @param {GameComponent} component - The component to be added to this object
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-
-
-    _createClass(GameObject, [{
-        key: 'addComponent',
-        value: function addComponent(component) {
-
-            // Allow syntactic sugar of addComponent(function() {...}) which is a
-            // shorthand for specifying a simple component with only an update method
-            if (isFunction(component)) {
-                component = { update: component };
-            }
-
-            this.components.push(component);
-
-            // If the component has an init method call it when added so that the
-            // component can add properties to the parent object
-            if (component.init) {
-                component.init(this);
-            }
-
-            return this;
-        }
-
-        /**
-         * Remove a particular {@link GameComponent} which had previously been added
-         * to this object.
-         * @param {GameComponent} component - The component to be removed from this object
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'removeComponent',
-        value: function removeComponent(component) {
-            this._toBeRemoved.push(component);
-            return this;
-        }
-    }, {
-        key: 'removeComponentByName',
-        value: function removeComponentByName(name) {
-            for (var i = 0; i < this.components.length; i++) {
-                var c = this.components[i];
-                if (c.name == name || c.constructor.name == name) this._toBeRemoved.push(c);
-            }
-            return this;
-        }
-    }, {
-        key: 'removeComponentByTest',
-        value: function removeComponentByTest(test) {
-            for (var i = 0; i < this.components.length; i++) {
-                if (test(this.components[i])) this._toBeRemoved.push(this.components[i]);
-            }
-            return this;
-        }
-
-        /**
-         * <p>Protective method to set position of the object in world-units.
-         *
-         * <p>The native units are world-units. i.e. If a 2D camera is
-         * used with the scale set to 1x and the canvas is not scaled in the webpage,
-         * 1 unit in the world will equate to 1 pixel on the screen.
-         *
-         * <p>This method will preserve position on axes which you leave undefined
-         * in the call to this method.
-         *
-         * @example <caption>This will only affect the y co-ordinate, leaving x and
-         * z at their original values.</caption>
-         * // Set y = 20
-         * gameObject.setPosition(undefined, 20);
-         * @param {number} x - x component of position vector
-         * @param {number} y - y component of position vector
-         * @param {number} z - z component of position vector
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'setPosition',
-        value: function setPosition(x, y, z) {
-            if (x == undefined) {
-                x = this.position[0];
-            }
-            if (y == undefined) {
-                y = this.position[1];
-            }
-            if (z == undefined) {
-                z = this.position[2];
-            }
-            _vec2.default.set(this.position, x, y, z);
-            return this;
-        }
-
-        /**
-         * <p>Protective method to set velocity of the object.
-         *
-         * <p>The native units are world-units per millisecond. i.e. If a 2D camera
-         * is used with the scale set to 1x and the canvas is not scaled in the webpage,
-         * 1 unit in the world will equate to 1 pixel on the screen. In this common
-         * case the units of velocity will be equivelant to pixels-per-millisecond.
-         *
-         * <p>This method will preserve position on axes which you leave undefined
-         * in the call to this method.
-         *
-         * @example <caption>This will only affect the velocity parallel to the y-axis
-         * co-ordinate, leaving vx and vz unaffected.</caption>
-         * // Set vy = 20px per second
-         * gameObject.setVelocity(undefined, 0.02);
-         * @param {number} x - x component of velocity vector
-         * @param {number} y - y component of velocity vector
-         * @param {number} z - z component of velocity vector
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'setVelocity',
-        value: function setVelocity(vx, vy, vz) {
-            if (vx == undefined) {
-                vx = this.velocity[0];
-            }
-            if (vy == undefined) {
-                vy = this.velocity[1];
-            }
-            if (vz == undefined) {
-                vz = this.velocity[2];
-            }
-            _vec2.default.set(this.velocity, vx, vy, vz);
-            return this;
-        }
-
-        /**
-         * Set the bounds of the component relative to its position.
-         * @param {number} minX
-         * @param {number} minY
-         * @param {number} maxX
-         * @param {number} maxY
-         * @param {number} minZ - Optional
-         * @param {number} maxZ - Optional
-         * @return this
-         */
-
-    }, {
-        key: 'setBounds',
-        value: function setBounds() {
-            for (var _len = arguments.length, bounds = Array(_len), _key = 0; _key < _len; _key++) {
-                bounds[_key] = arguments[_key];
-            }
-
-            this.bounds = bounds;
-            return this;
-        }
-
-        /**
-         * Set object rotation
-         * @param {number} rotation - Rotation in radians
-         * @param {vec3} rotationAxis - 3D rotations require rotation axis.
-         * @return this
-         */
-
-    }, {
-        key: 'setRotation',
-        value: function setRotation(rotation, rotationAxis) {
-            this.rotation = rotation;
-            if (rotationAxis && rotationAxis.length == 3) {
-                _vec2.default.normalize(this.rotationAxis, rotationAxis);
-            }
-            return this;
-        }
-
-        /**
-         * @deprecated
-         */
-
-    }, {
-        key: 'hit',
-        value: function hit(victim) {
-            if (this.hitVictim == null) this.hitVictim = victim;
-        }
-
-        /**
-         * @deprecated
-         */
-
-    }, {
-        key: 'hitBy',
-        value: function hitBy(attacker) {
-            if (this.attackerHit == null) this.attackerHit = attacker;
-        }
-
-        /**
-         * This method is called once per frame. GameObjects will usually only need
-         * to call update on each of its components in this method passing a reference
-         * to itself.
-         * @param {number} delta - Time since last frame in milliseconds
-         */
-
-    }, {
-        key: 'update',
-        value: function update(delta) {
-            var i = 0,
-                l = this.components.length,
-                j = 0,
-                m = this._toBeRemoved.length;
-            for (; j < m; j++) {
-                for (i = 0; i < l; i++) {
-                    if (this.components[i] == this._toBeRemoved[j]) {
-                        this.components.remove(i);
-                        break;
-                    }
-                }
-            }
-            this._toBeRemoved.length = 0;
-
-            l = this.components.length;
-            for (i = 0; i < l; i++) {
-                this.components[i].update(this, delta);
-            }
-        }
-
-        /**
-         * This method is used to produce a html representation of the object for
-         * things such as debugging trees. It will include components in its rendering.
-         * Similar to the toString method.
-         * @return {string} Representation of this component in HTML
-         */
-
-    }, {
-        key: 'toHTML',
-        value: function toHTML() {
-            var html = this.name,
-                i;
-            if (typeof this.position.x == "number") html += " " + this.position;
-            if (this.components.length) {
-                html += "<ul>";
-                for (i = 0; i < this.components.length; i++) {
-                    html += "<li>" + this.components[i].toHTML();
-                }html += "</ul>";
-            }
-            return html;
-        }
-    }]);
-
-    return GameObject;
-}();
-
-exports.default = GameObject;
-
-
-(0, _util.eventMixin)(GameObject);
-
-function arrayRemoveItem(from, to) {
-    var rest = this.slice((to || from) + 1 || this.length);
-    this.length = from < 0 ? this.length + from : from;
-    return this.push.apply(this, rest);
-}
-
-function isFunction(a) {
-    return a instanceof Function;
-}
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -540,7 +215,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(3);
+var glMatrix = __webpack_require__(4);
 
 /**
  * @class 3 Dimensional Vector
@@ -1300,7 +975,453 @@ module.exports = vec3;
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+var _util = __webpack_require__(9);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * The base object in the GameEngine. Most objects managed by the system
+ * will be based on this class.
+ */
+var GameObject = function () {
+    function GameObject() {
+        _classCallCheck(this, GameObject);
+
+        /** Array of components which update this GameObject.
+         * @type {array} */
+        this.components = [];
+        this.components.remove = arrayRemoveItem;
+
+        /** Position of this object in the world.
+         * @type {vec3} */
+        this.position = _vec2.default.create();
+
+        /** Velocity of this object moving through the world.
+         * @type {vec3} */
+        this.velocity = _vec2.default.create();
+
+        /** Current rotation of this object.
+         * @type {number} */
+        this.rotation = 0;
+
+        /** Rotation axis of this object.
+         * @type {number} */
+        this.rotationAxis = _vec2.default.fromValues(0, 0, 1);
+
+        /**
+          * List of components which will be removed on next update.
+          * @private
+          * @type {array}
+          */
+        this._toBeRemoved = [];
+    }
+
+    /**
+     * <p>This method is used to add a {@link GameComponent} to this object.
+     *
+     * <p>GameComponents give objects particular behaviours. This method ensures
+     * that each component added will have a chance to update once per frame
+     * for this object.
+     * @param {GameComponent} component - The component to be added to this object
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+
+
+    _createClass(GameObject, [{
+        key: 'addComponent',
+        value: function addComponent(component) {
+
+            // Allow syntactic sugar of addComponent(function() {...}) which is a
+            // shorthand for specifying a simple component with only an update method
+            if (isFunction(component)) {
+                component = { update: component };
+            }
+
+            this.components.push(component);
+
+            // If the component has an init method call it when added so that the
+            // component can add properties to the parent object
+            if (component.init) {
+                component.init(this);
+            }
+
+            return this;
+        }
+
+        /**
+         * Remove a particular {@link GameComponent} which had previously been added
+         * to this object.
+         * @param {GameComponent} component - The component to be removed from this object
+         * @return {GameObject} Returns a reference to this for chainability
+         */
+
+    }, {
+        key: 'removeComponent',
+        value: function removeComponent(component) {
+            this._toBeRemoved.push(component);
+            return this;
+        }
+    }, {
+        key: 'removeComponentByName',
+        value: function removeComponentByName(name) {
+            for (var i = 0; i < this.components.length; i++) {
+                var c = this.components[i];
+                if (c.name == name || c.constructor.name == name) this._toBeRemoved.push(c);
+            }
+            return this;
+        }
+    }, {
+        key: 'removeComponentByTest',
+        value: function removeComponentByTest(test) {
+            for (var i = 0; i < this.components.length; i++) {
+                if (test(this.components[i])) this._toBeRemoved.push(this.components[i]);
+            }
+            return this;
+        }
+
+        /**
+         * <p>Protective method to set position of the object in world-units.
+         *
+         * <p>The native units are world-units. i.e. If a 2D camera is
+         * used with the scale set to 1x and the canvas is not scaled in the webpage,
+         * 1 unit in the world will equate to 1 pixel on the screen.
+         *
+         * <p>This method will preserve position on axes which you leave undefined
+         * in the call to this method.
+         *
+         * @example <caption>This will only affect the y co-ordinate, leaving x and
+         * z at their original values.</caption>
+         * // Set y = 20
+         * gameObject.setPosition(undefined, 20);
+         * @param {number} x - x component of position vector
+         * @param {number} y - y component of position vector
+         * @param {number} z - z component of position vector
+         * @return {GameObject} Returns a reference to this for chainability
+         */
+
+    }, {
+        key: 'setPosition',
+        value: function setPosition(x, y, z) {
+            if (x == undefined) {
+                x = this.position[0];
+            }
+            if (y == undefined) {
+                y = this.position[1];
+            }
+            if (z == undefined) {
+                z = this.position[2];
+            }
+            _vec2.default.set(this.position, x, y, z);
+            return this;
+        }
+
+        /**
+         * <p>Protective method to set velocity of the object.
+         *
+         * <p>The native units are world-units per millisecond. i.e. If a 2D camera
+         * is used with the scale set to 1x and the canvas is not scaled in the webpage,
+         * 1 unit in the world will equate to 1 pixel on the screen. In this common
+         * case the units of velocity will be equivelant to pixels-per-millisecond.
+         *
+         * <p>This method will preserve position on axes which you leave undefined
+         * in the call to this method.
+         *
+         * @example <caption>This will only affect the velocity parallel to the y-axis
+         * co-ordinate, leaving vx and vz unaffected.</caption>
+         * // Set vy = 20px per second
+         * gameObject.setVelocity(undefined, 0.02);
+         * @param {number} x - x component of velocity vector
+         * @param {number} y - y component of velocity vector
+         * @param {number} z - z component of velocity vector
+         * @return {GameObject} Returns a reference to this for chainability
+         */
+
+    }, {
+        key: 'setVelocity',
+        value: function setVelocity(vx, vy, vz) {
+            if (vx == undefined) {
+                vx = this.velocity[0];
+            }
+            if (vy == undefined) {
+                vy = this.velocity[1];
+            }
+            if (vz == undefined) {
+                vz = this.velocity[2];
+            }
+            _vec2.default.set(this.velocity, vx, vy, vz);
+            return this;
+        }
+
+        /**
+         * Set the bounds of the component relative to its position.
+         * @param {number} minX
+         * @param {number} minY
+         * @param {number} maxX
+         * @param {number} maxY
+         * @param {number} minZ - Optional
+         * @param {number} maxZ - Optional
+         * @return this
+         */
+
+    }, {
+        key: 'setBounds',
+        value: function setBounds() {
+            for (var _len = arguments.length, bounds = Array(_len), _key = 0; _key < _len; _key++) {
+                bounds[_key] = arguments[_key];
+            }
+
+            this.bounds = bounds;
+            return this;
+        }
+
+        /**
+         * Set object rotation
+         * @param {number} rotation - Rotation in radians
+         * @param {vec3} rotationAxis - 3D rotations require rotation axis.
+         * @return this
+         */
+
+    }, {
+        key: 'setRotation',
+        value: function setRotation(rotation, rotationAxis) {
+            this.rotation = rotation;
+            if (rotationAxis && rotationAxis.length == 3) {
+                _vec2.default.normalize(this.rotationAxis, rotationAxis);
+            }
+            return this;
+        }
+
+        /**
+         * @deprecated
+         */
+
+    }, {
+        key: 'hit',
+        value: function hit(victim) {
+            if (this.hitVictim == null) this.hitVictim = victim;
+        }
+
+        /**
+         * @deprecated
+         */
+
+    }, {
+        key: 'hitBy',
+        value: function hitBy(attacker) {
+            if (this.attackerHit == null) this.attackerHit = attacker;
+        }
+
+        /**
+         * This method is called once per frame. GameObjects will usually only need
+         * to call update on each of its components in this method passing a reference
+         * to itself.
+         * @param {number} delta - Time since last frame in milliseconds
+         */
+
+    }, {
+        key: 'update',
+        value: function update(delta) {
+            var i = 0,
+                l = this.components.length,
+                j = 0,
+                m = this._toBeRemoved.length;
+            for (; j < m; j++) {
+                for (i = 0; i < l; i++) {
+                    if (this.components[i] == this._toBeRemoved[j]) {
+                        this.components.remove(i);
+                        break;
+                    }
+                }
+            }
+            this._toBeRemoved.length = 0;
+
+            l = this.components.length;
+            for (i = 0; i < l; i++) {
+                this.components[i].update(this, delta);
+            }
+        }
+
+        /**
+         * This method is used to produce a html representation of the object for
+         * things such as debugging trees. It will include components in its rendering.
+         * Similar to the toString method.
+         * @return {string} Representation of this component in HTML
+         */
+
+    }, {
+        key: 'toHTML',
+        value: function toHTML() {
+            var html = this.name,
+                i;
+            if (typeof this.position.x == "number") html += " " + this.position;
+            if (this.components.length) {
+                html += "<ul>";
+                for (i = 0; i < this.components.length; i++) {
+                    html += "<li>" + this.components[i].toHTML();
+                }html += "</ul>";
+            }
+            return html;
+        }
+    }]);
+
+    return GameObject;
+}();
+
+exports.default = GameObject;
+
+
+(0, _util.eventMixin)(GameObject);
+
+function arrayRemoveItem(from, to) {
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+}
+
+function isFunction(a) {
+    return a instanceof Function;
+}
+
+/***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _Easing = __webpack_require__(5);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Animate arbritarty properties
+ * @param {number} loop - 0: no loop, 1: loop animation, 2: loop reverse
+ */
+var PropertyAnimationComponent = function (_GameComponent) {
+  _inherits(PropertyAnimationComponent, _GameComponent);
+
+  function PropertyAnimationComponent(outputter, start, end) {
+    var duration = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1000;
+    var easing = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _Easing.Linear;
+    var loop = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 2;
+
+    _classCallCheck(this, PropertyAnimationComponent);
+
+    var _this = _possibleConstructorReturn(this, (PropertyAnimationComponent.__proto__ || Object.getPrototypeOf(PropertyAnimationComponent)).call(this));
+
+    if (!Array.isArray(start)) {
+      start = [start];
+    }
+    if (!Array.isArray(end)) {
+      end = [end];
+    }
+    start.length = 4;
+    end.length = 4;
+
+    _this.outputter = outputter;
+    _this.start = start;
+    _this.end = end;
+    _this.duration = duration;
+    _this.easing = easing;
+    _this.loop = loop;
+
+    _this.elapsed = 0;
+    _this.direction = 1;
+    _this.out = Array(4);
+    return _this;
+  }
+
+  _createClass(PropertyAnimationComponent, [{
+    key: 'reset',
+    value: function reset() {
+      this.elapsed = 0;
+    }
+  }, {
+    key: 'start',
+    value: function start() {
+      this.direction = 1;
+    }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      this.direction = 0;
+    }
+  }, {
+    key: 'stop',
+    value: function stop() {
+      this.pause();
+      this.reset();
+    }
+  }, {
+    key: 'update',
+    value: function update(parent, delta) {
+      var t = this.easing(this.elapsed / this.duration);
+      var a0 = this.start[0];
+      var a1 = this.start[1];
+      var a2 = this.start[2];
+      var a3 = this.start[3];
+
+      this.out[0] = a0 + t * (this.end[0] - a0);
+      this.out[1] = a1 + t * (this.end[1] - a1);
+      this.out[2] = a2 + t * (this.end[2] - a2);
+      this.out[3] = a3 + t * (this.end[3] - a3);
+
+      this.outputter(parent, this.out);
+
+      this.elapsed += delta * this.direction;
+
+      if (this.elapsed > this.duration || this.elapsed < 0) {
+        if (this.loop == 2) {
+          this.direction *= -1;
+        } else if (this.loop == 1) {
+          this.elapsed = 0;
+        }
+        this.elapsed = Math.min(Math.max(this.elapsed, 0), this.duration);
+      }
+    }
+  }]);
+
+  return PropertyAnimationComponent;
+}(_GameComponent3.default);
+
+exports.default = PropertyAnimationComponent;
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -1376,7 +1497,7 @@ module.exports = glMatrix;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1385,77 +1506,97 @@ module.exports = glMatrix;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
-var _Easing = __webpack_require__(11);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var PropertyAnimationComponent = function (_GameComponent) {
-  _inherits(PropertyAnimationComponent, _GameComponent);
-
-  function PropertyAnimationComponent(outputter, start, end) {
-    var duration = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1000;
-    var easing = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _Easing.Linear;
-
-    _classCallCheck(this, PropertyAnimationComponent);
-
-    var _this = _possibleConstructorReturn(this, (PropertyAnimationComponent.__proto__ || Object.getPrototypeOf(PropertyAnimationComponent)).call(this));
-
-    _this.outputter = outputter;
-    _this.start = start;
-    _this.end = end;
-    _this.duration = duration;
-    _this.easing = easing;
-    _this.elapsed = 0;
-    _this.direction = 1;
-    _this.out = [];
-    return _this;
+exports.BackIn = BackIn;
+exports.BackOut = BackOut;
+exports.BackInOut = BackInOut;
+exports.ElasticIn = ElasticIn;
+exports.ElasticOut = ElasticOut;
+exports.ElasticInOut = ElasticInOut;
+exports.DampedOscillation = DampedOscillation;
+var Linear = exports.Linear = function Linear(t) {
+  return t;
+};
+var QuadIn = exports.QuadIn = function QuadIn(t) {
+  return t * t;
+};
+var QuadOut = exports.QuadOut = function QuadOut(t) {
+  return -t * (t - 2);
+};
+var CircIn = exports.CircIn = function CircIn(t) {
+  return 1 - Math.sqrt(1 - t * t);
+};
+var CircOut = exports.CircOut = function CircOut(t) {
+  return Math.sqrt(1 - (t - 1) * (t - 1));
+};
+var Smooth = exports.Smooth = function Smooth(t) {
+  return t * t * (3 - 2 * t);
+};
+// Stolen from Dojo:
+// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+var SineIn = exports.SineIn = function SineIn(t) {
+  return -1 * Math.cos(t * (Math.PI / 2)) + 1;
+};
+var SineOut = exports.SineOut = function SineOut(t) {
+  return Math.sin(t * (Math.PI / 2));
+};
+var SineInOut = exports.SineInOut = function SineInOut(t) {
+  return -1 * (Math.cos(Math.PI * t) - 1) / 2;
+};
+function BackIn(t) {
+  var s = 1.70158;
+  return t * t * ((s + 1) * t - s);
+};
+function BackOut(t) {
+  var s = 1.70158;
+  t = t - 1;
+  return t * t * ((s + 1) * t + s) + 1;
+};
+function BackInOut(t) {
+  var s = 1.70158 * 1.525;
+  t = t * 2;
+  if (t < 1) {
+    return Math.pow(t, 2) * ((s + 1) * t - s) / 2;
   }
-
-  _createClass(PropertyAnimationComponent, [{
-    key: 'update',
-    value: function update(parent, delta) {
-      var t = this.easing(this.elapsed / this.duration);
-      var a0 = this.start[0];
-      var a1 = this.start[1];
-      var a2 = this.start[2];
-      var a3 = this.start[3];
-
-      this.out[0] = a0 + t * (this.end[0] - a0);
-      this.out[1] = a1 + t * (this.end[1] - a1);
-      this.out[2] = a2 + t * (this.end[2] - a2);
-      this.out[3] = a3 + t * (this.end[3] - a3);
-
-      this.outputter(parent, this.out);
-
-      this.elapsed += delta * this.direction;
-
-      if (this.elapsed > this.duration || this.elapsed < 0) {
-        this.direction *= -1;
-        this.elapsed = Math.min(Math.max(this.elapsed, 0), this.duration);
-      }
-    }
-  }]);
-
-  return PropertyAnimationComponent;
-}(_GameComponent3.default);
-
-exports.default = PropertyAnimationComponent;
+  t -= 2;
+  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+};
+function ElasticIn(n) {
+  if (n == 0 || n == 1) {
+    return n;
+  }
+  var p = .3;
+  var s = p / 4;
+  n = n - 1;
+  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+};
+function ElasticOut(n) {
+  if (n == 0 || n == 1) {
+    return n;
+  }
+  var p = .3;
+  var s = p / 4;
+  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+};
+function ElasticInOut(n) {
+  if (n == 0) return 0;
+  n = n * 2;
+  if (n == 2) return 1;
+  var p = .3 * 1.5;
+  var s = p / 4;
+  if (n < 1) {
+    n -= 1;
+    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
+  }
+  n -= 1;
+  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
+};
+function DampedOscillation(n) {
+  var oscillations = 5;
+  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
+}
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1469,15 +1610,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _vec = __webpack_require__(9);
+var _vec = __webpack_require__(10);
 
 var _vec2 = _interopRequireDefault(_vec);
 
-var _mat = __webpack_require__(48);
+var _mat = __webpack_require__(63);
 
 var _mat2 = _interopRequireDefault(_mat);
 
@@ -1516,6 +1657,8 @@ var InputSystem = function (_GameObject) {
 
     _this.screen = screen;
     _this.keyboard = keyboard;
+    _this.camera = cameraSystem;
+    /** @deprecated */
     _this.cameraSystem = cameraSystem;
 
     _this._nextClick = _vec2.default.create();
@@ -1588,7 +1731,7 @@ var InputSystem = function (_GameObject) {
   }, {
     key: 'screenToWorld',
     value: function screenToWorld(screenX, screenY) {
-      var cam = this.cameraSystem,
+      var cam = this.camera,
           camWidth = cam.width,
           camHeight = cam.height,
           screen = this.screen,
@@ -1629,6 +1772,8 @@ exports.default = InputSystem;
 function initScreen() {
   var _this2 = this;
 
+  if (!this.screen) return;
+
   TouchClick(this.screen, function (e) {
     var offsetLeft = _this2.screen.offsetLeft,
         offsetTop = _this2.screen.offsetTop,
@@ -1648,6 +1793,8 @@ function initScreen() {
  */
 function initKeyboard() {
   var _this3 = this;
+
+  if (!this.keyboard) return;
 
   this.keyboard.addEventListener("keydown", function (e) {
     _this3._nextKey = e.which;
@@ -1714,7 +1861,7 @@ InputSystem.Keys = {
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1726,7 +1873,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -1760,6 +1907,9 @@ var CanvasRenderSystem = function (_GameObject) {
 
 		_this.context = context;
 		_this.canvas = context && context.canvas;
+		_this.camera = cameraSystem;
+
+		/** @deprecated */
 		_this.cameraSystem = cameraSystem;
 
 		_this.renderQueue = [];
@@ -1802,7 +1952,7 @@ var CanvasRenderSystem = function (_GameObject) {
 
 			this.context.save();
 
-			var p = this.cameraSystem.position,
+			var p = this.camera.position,
 			    q = this.canvas.width / 2,
 			    r = this.canvas.height / 2,
 			    i,
@@ -1811,12 +1961,12 @@ var CanvasRenderSystem = function (_GameObject) {
 			    n;
 
 			this.context.translate(q, r);
-			// this.context.transform(this.cameraSystem.skewX,1,1,this.cameraSystem.skewY,0,0);
-			this.context.scale(this.cameraSystem.scaleX, this.cameraSystem.scaleY);
+			// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+			this.context.scale(this.camera.scaleX, this.camera.scaleY);
 
 			// Only rotation around the Z-axis makes sense for canvas rendering
-			if (this.cameraSystem.rotationAxis[2] == 1) {
-				this.context.rotate(-this.cameraSystem.rotation);
+			if (this.camera.rotationAxis[2] == 1) {
+				this.context.rotate(-this.camera.rotation);
 			}
 
 			this.context.translate(-p[0], -p[1]);
@@ -1884,7 +2034,7 @@ function _renderQueue(renderSystem, layer) {
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1894,7 +2044,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -1932,7 +2082,7 @@ var WorldSystem = function (_GameObject) {
 exports.default = WorldSystem;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2003,6 +2153,7 @@ function eventMixin(constructor) {
 
   function on(event, callback) {
     if (!this._events) this._events = {};
+
     if (!this._events[event]) {
       this._events[event] = [];
     }
@@ -2018,6 +2169,7 @@ function eventMixin(constructor) {
     }
 
     if (!this._events) this._events = {};
+
     var callbacks = this._events[event];
 
     if (callbacks && callbacks.length) {
@@ -2032,7 +2184,7 @@ function eventMixin(constructor) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -2055,7 +2207,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(3);
+var glMatrix = __webpack_require__(4);
 
 /**
  * @class 2 Dimensional Vector
@@ -2625,7 +2777,7 @@ module.exports = vec2;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2639,11 +2791,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _vec = __webpack_require__(2);
+var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -2762,100 +2914,6 @@ var CameraSystem = function (_GameObject) {
 exports.default = CameraSystem;
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BackIn = BackIn;
-exports.BackOut = BackOut;
-exports.BackInOut = BackInOut;
-exports.ElasticIn = ElasticIn;
-exports.ElasticOut = ElasticOut;
-exports.ElasticInOut = ElasticInOut;
-var Linear = exports.Linear = function Linear(t) {
-  return t;
-};
-var QuadIn = exports.QuadIn = function QuadIn(t) {
-  return t * t;
-};
-var QuadOut = exports.QuadOut = function QuadOut(t) {
-  return -t * (t - 2);
-};
-var CircIn = exports.CircIn = function CircIn(t) {
-  return 1 - Math.sqrt(1 - t * t);
-};
-var CircOut = exports.CircOut = function CircOut(t) {
-  return Math.sqrt(1 - (t - 1) * (t - 1));
-};
-var Smooth = exports.Smooth = function Smooth(t) {
-  return t * t * (3 - 2 * t);
-};
-// Stolen from Dojo:
-// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-var SineIn = exports.SineIn = function SineIn(t) {
-  return -1 * Math.cos(t * (Math.PI / 2)) + 1;
-};
-var SineOut = exports.SineOut = function SineOut(t) {
-  return Math.sin(t * (Math.PI / 2));
-};
-var SineInOut = exports.SineInOut = function SineInOut(t) {
-  return -1 * (Math.cos(Math.PI * t) - 1) / 2;
-};
-function BackIn(t) {
-  var s = 1.70158;
-  return t * t * ((s + 1) * t - s);
-};
-function BackOut(t) {
-  var s = 1.70158;
-  t = t - 1;
-  return t * t * ((s + 1) * t + s) + 1;
-};
-function BackInOut(t) {
-  var s = 1.70158 * 1.525;
-  t = t * 2;
-  if (t < 1) {
-    return Math.pow(t, 2) * ((s + 1) * t - s) / 2;
-  }
-  t -= 2;
-  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-};
-function ElasticIn(n) {
-  if (n == 0 || n == 1) {
-    return n;
-  }
-  var p = .3;
-  var s = p / 4;
-  n = n - 1;
-  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-};
-function ElasticOut(n) {
-  if (n == 0 || n == 1) {
-    return n;
-  }
-  var p = .3;
-  var s = p / 4;
-  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-};
-function ElasticInOut(n) {
-  if (n == 0) return 0;
-  n = n * 2;
-  if (n == 2) return 1;
-  var p = .3 * 1.5;
-  var s = p / 4;
-  if (n < 1) {
-    n -= 1;
-    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
-  }
-  n -= 1;
-  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
-};
-
-/***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2872,7 +2930,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(9);
+var _vec = __webpack_require__(10);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -3001,7 +3059,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(2);
+var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -3254,7 +3312,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -3279,14 +3339,16 @@ var GameObjectManager = function (_GameObject) {
     var _this = _possibleConstructorReturn(this, (GameObjectManager.__proto__ || Object.getPrototypeOf(GameObjectManager)).call(this));
 
     _this.objects = [];
-    _this.objectsToBeRemoved = [];
+
+    _this._objectsToBeRemoved = [];
 
     _this.objects.remove = arrayRemoveItem;
     return _this;
   }
 
   /**
-   * Add an object to be updated as children of this manager
+   * Add an object to be updated as children of this manager. Children are given a
+   * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
    * @param {GameObject} object - Game object to be attached to this node in the tree
    * @return {GameObjectManager} Returns a reference to this for chainability
    */
@@ -3303,14 +3365,14 @@ var GameObjectManager = function (_GameObject) {
     /**
      * Add an object to be updated as children of this manager at particular place
      * in the list of children.
-     * @param {number} index - Position in the list
      * @param {GameObject} object - Game object to be attached to this node in the tree
+     * @param {number} index - Position in the list
      * @return {GameObjectManager} Returns a reference to this for chainability
      */
 
   }, {
     key: "addObjectAt",
-    value: function addObjectAt(index, object) {
+    value: function addObjectAt(object, index) {
       if (object instanceof _GameObject3.default) this.objects.splice(index, 0, object);
       object.parent = this;
       return this;
@@ -3325,7 +3387,7 @@ var GameObjectManager = function (_GameObject) {
   }, {
     key: "removeObject",
     value: function removeObject(object) {
-      if (object instanceof _GameObject3.default) this.objectsToBeRemoved.push(object);
+      if (object instanceof _GameObject3.default) this._objectsToBeRemoved.push(object);
       if (object.parent == this) {
         object.parent = null;
       }
@@ -3353,7 +3415,7 @@ var GameObjectManager = function (_GameObject) {
   }, {
     key: "update",
     value: function update(delta) {
-      _GameObject3.default.prototype.update.call(this, delta);
+      _get(GameObjectManager.prototype.__proto__ || Object.getPrototypeOf(GameObjectManager.prototype), "update", this).call(this, delta);
 
       var i = 0,
           l = this.objects.length,
@@ -3364,19 +3426,19 @@ var GameObjectManager = function (_GameObject) {
         this.objects[i].update(delta);
       }
 
-      m = this.objectsToBeRemoved.length;
+      m = this._objectsToBeRemoved.length;
 
       for (; j < m; j++) {
         i = 0;
         for (; i < l; i++) {
-          if (this.objects[i] == this.objectsToBeRemoved[j]) {
+          if (this.objects[i] == this._objectsToBeRemoved[j]) {
             this.objects.remove(i);
             l--;
             break;
           }
         }
       }
-      this.objectsToBeRemoved.length = 0;
+      this._objectsToBeRemoved.length = 0;
     }
 
     /**
@@ -3688,11 +3750,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _vec = __webpack_require__(2);
+var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -4009,7 +4071,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(2);
+var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -4145,7 +4207,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(3);
+var glMatrix = __webpack_require__(4);
 
 /**
  * @class 4x4 Matrix
@@ -6276,7 +6338,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -6334,408 +6396,27 @@ exports.default = AudioSystem;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.TerminalVelocityComponent = exports.CounterRotationComponent = exports.TrackRotationComponent = exports.FollowAtDistanceComponent = exports.FollowComponent = exports.RotationInterpolatorComponent = exports.RotateToHeadingComponent = exports.RotationComponent = exports.RandomMotionComponent = exports.PhysicsComponent = exports.MoveComponent = exports.PointGravityComponent = exports.ColorAnimationComponent = exports.BoundsAnimationComponent = exports.PositionAnimationComponent = exports.PropertyAnimationComponent = exports.SwitchComponent = exports.PositionInterpolatorComponent = exports.GravityComponent = exports.FlockingComponent = undefined;
+var _PropertyAnimationComponent = __webpack_require__(3);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _FlockingComponent = __webpack_require__(24);
-
-Object.defineProperty(exports, 'FlockingComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_FlockingComponent).default;
-	}
-});
-
-var _GravityComponent = __webpack_require__(36);
-
-Object.defineProperty(exports, 'GravityComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_GravityComponent).default;
-	}
-});
-
-var _PositionInterpolatorComponent = __webpack_require__(38);
-
-Object.defineProperty(exports, 'PositionInterpolatorComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_PositionInterpolatorComponent).default;
-	}
-});
-
-var _SwitchComponent = __webpack_require__(39);
-
-Object.defineProperty(exports, 'SwitchComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_SwitchComponent).default;
-	}
-});
-
-var _PropertyAnimationComponent = __webpack_require__(4);
-
-Object.defineProperty(exports, 'PropertyAnimationComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_PropertyAnimationComponent).default;
-	}
-});
+var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
 var _PositionAnimationComponent = __webpack_require__(37);
 
-Object.defineProperty(exports, 'PositionAnimationComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_PositionAnimationComponent).default;
-	}
-});
+var _PositionAnimationComponent2 = _interopRequireDefault(_PositionAnimationComponent);
 
-var _BoundsAnimationComponent = __webpack_require__(34);
+var _BoundsAnimationComponent = __webpack_require__(35);
 
-Object.defineProperty(exports, 'BoundsAnimationComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_BoundsAnimationComponent).default;
-	}
-});
+var _BoundsAnimationComponent2 = _interopRequireDefault(_BoundsAnimationComponent);
 
-var _ColorAnimationComponent = __webpack_require__(35);
+var _ColorAnimationComponent = __webpack_require__(36);
 
-Object.defineProperty(exports, 'ColorAnimationComponent', {
-	enumerable: true,
-	get: function get() {
-		return _interopRequireDefault(_ColorAnimationComponent).default;
-	}
-});
+var _ColorAnimationComponent2 = _interopRequireDefault(_ColorAnimationComponent);
 
-var _GameObject = __webpack_require__(1);
+var _RotationAnimationComponent = __webpack_require__(38);
 
-var _GameObject2 = _interopRequireDefault(_GameObject);
-
-var _GameComponent13 = __webpack_require__(0);
-
-var _GameComponent14 = _interopRequireDefault(_GameComponent13);
-
-var _vec = __webpack_require__(2);
-
-var _vec2 = _interopRequireDefault(_vec);
+var _RotationAnimationComponent2 = _interopRequireDefault(_RotationAnimationComponent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * @namespace Basic
- */
-
-var PointGravityComponent = exports.PointGravityComponent = function (_GameComponent) {
-	_inherits(PointGravityComponent, _GameComponent);
-
-	function PointGravityComponent(target) {
-		_classCallCheck(this, PointGravityComponent);
-
-		var _this = _possibleConstructorReturn(this, (PointGravityComponent.__proto__ || Object.getPrototypeOf(PointGravityComponent)).call(this));
-
-		_this.target = target;
-		_this.vector = _vec2.default.create();
-		return _this;
-	}
-
-	_createClass(PointGravityComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			_vec2.default.subtract(this.vector, this.target.position, parent.position);
-			var scale = this.target.mass * delta / _vec2.default.squaredLength(this.vector);
-			_vec2.default.normalize(this.vector, this.vector);
-			_vec2.default.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
-		}
-	}]);
-
-	return PointGravityComponent;
-}(_GameComponent14.default);
-
-/**
- * Objects cannot move without this component.
-	 * @extends {GameComponent}
- */
-
-
-var MoveComponent = exports.MoveComponent = function (_GameComponent2) {
-	_inherits(MoveComponent, _GameComponent2);
-
-	function MoveComponent() {
-		_classCallCheck(this, MoveComponent);
-
-		return _possibleConstructorReturn(this, (MoveComponent.__proto__ || Object.getPrototypeOf(MoveComponent)).apply(this, arguments));
-	}
-
-	_createClass(MoveComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			_vec2.default.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
-		}
-	}]);
-
-	return MoveComponent;
-}(_GameComponent14.default);
-
-/**
- * This component allows objects to respond to impulses.
- *
-	* @example <caption>If parent has an impulse vector its contents will be added to the velocity.</caption>
-	* // Apply impulse of 0.05 pixels per second in direction of x-axis
-	* vec3.set(gameObject.impulse, 0.05, 0, 0);
-	* @extends {GameComponent}
-	*/
-
-
-var PhysicsComponent = exports.PhysicsComponent = function (_GameComponent3) {
-	_inherits(PhysicsComponent, _GameComponent3);
-
-	function PhysicsComponent() {
-		_classCallCheck(this, PhysicsComponent);
-
-		return _possibleConstructorReturn(this, (PhysicsComponent.__proto__ || Object.getPrototypeOf(PhysicsComponent)).apply(this, arguments));
-	}
-
-	_createClass(PhysicsComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			if (parent.impulse) {
-				_vec2.default.add(parent.velocity, parent.velocity, parent.impulse);
-				_vec2.default.set(parent.impulse, 0, 0, 0);
-			}
-		}
-	}]);
-
-	return PhysicsComponent;
-}(_GameComponent14.default);
-
-var RandomMotionComponent = exports.RandomMotionComponent = function (_GameComponent4) {
-	_inherits(RandomMotionComponent, _GameComponent4);
-
-	function RandomMotionComponent() {
-		_classCallCheck(this, RandomMotionComponent);
-
-		return _possibleConstructorReturn(this, (RandomMotionComponent.__proto__ || Object.getPrototypeOf(RandomMotionComponent)).apply(this, arguments));
-	}
-
-	_createClass(RandomMotionComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			if (Math.random() < 0.001) _vec2.default.random(parent.velocity, Math.random());
-		}
-	}]);
-
-	return RandomMotionComponent;
-}(_GameComponent14.default);
-
-var RotationComponent = exports.RotationComponent = function (_GameComponent5) {
-	_inherits(RotationComponent, _GameComponent5);
-
-	function RotationComponent(dth) {
-		_classCallCheck(this, RotationComponent);
-
-		var _this5 = _possibleConstructorReturn(this, (RotationComponent.__proto__ || Object.getPrototypeOf(RotationComponent)).call(this));
-
-		_this5.rotationSpeed = dth;
-		return _this5;
-	}
-
-	_createClass(RotationComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			var w = parent.rotationSpeed || this.rotationSpeed || 0;
-			parent.setRotation(parent.rotation + w * delta);
-		}
-	}]);
-
-	return RotationComponent;
-}(_GameComponent14.default);
-
-var RotateToHeadingComponent = exports.RotateToHeadingComponent = function (_GameComponent6) {
-	_inherits(RotateToHeadingComponent, _GameComponent6);
-
-	function RotateToHeadingComponent() {
-		_classCallCheck(this, RotateToHeadingComponent);
-
-		return _possibleConstructorReturn(this, (RotateToHeadingComponent.__proto__ || Object.getPrototypeOf(RotateToHeadingComponent)).apply(this, arguments));
-	}
-
-	_createClass(RotateToHeadingComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
-		}
-	}]);
-
-	return RotateToHeadingComponent;
-}(_GameComponent14.default);
-
-var RotationInterpolatorComponent = exports.RotationInterpolatorComponent = function (_GameComponent7) {
-	_inherits(RotationInterpolatorComponent, _GameComponent7);
-
-	function RotationInterpolatorComponent() {
-		_classCallCheck(this, RotationInterpolatorComponent);
-
-		return _possibleConstructorReturn(this, (RotationInterpolatorComponent.__proto__ || Object.getPrototypeOf(RotationInterpolatorComponent)).apply(this, arguments));
-	}
-
-	_createClass(RotationInterpolatorComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			var rotation = parent.rotation,
-			    target = parent.targetRotation,
-			    diff = target - rotation,
-			    speed = 0.01;
-			if (diff > Math.PI) {
-				diff -= Math.PI * 2;
-			} else if (diff < -Math.PI) {
-				diff += Math.PI * 2;
-			}
-			parent.rotation = rotation + diff * delta * speed;
-		}
-	}]);
-
-	return RotationInterpolatorComponent;
-}(_GameComponent14.default);
-
-var FollowComponent = exports.FollowComponent = function (_GameComponent8) {
-	_inherits(FollowComponent, _GameComponent8);
-
-	function FollowComponent(object) {
-		_classCallCheck(this, FollowComponent);
-
-		var _this8 = _possibleConstructorReturn(this, (FollowComponent.__proto__ || Object.getPrototypeOf(FollowComponent)).call(this));
-
-		_this8.target = object;
-		return _this8;
-	}
-
-	_createClass(FollowComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			if (this.target) _vec2.default.copy(parent.position, this.target.position);
-		}
-	}, {
-		key: 'setTarget',
-		value: function setTarget(object) {
-			this.target = object;
-		}
-	}]);
-
-	return FollowComponent;
-}(_GameComponent14.default);
-
-var FollowAtDistanceComponent = exports.FollowAtDistanceComponent = function (_GameComponent9) {
-	_inherits(FollowAtDistanceComponent, _GameComponent9);
-
-	function FollowAtDistanceComponent(object, distance) {
-		_classCallCheck(this, FollowAtDistanceComponent);
-
-		var _this9 = _possibleConstructorReturn(this, (FollowAtDistanceComponent.__proto__ || Object.getPrototypeOf(FollowAtDistanceComponent)).call(this));
-
-		_this9.target = object;
-		_this9.distance = distance;
-		return _this9;
-	}
-
-	_createClass(FollowAtDistanceComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			_vec2.default.add(parent.position, this.target.position, this.distance);
-		}
-	}]);
-
-	return FollowAtDistanceComponent;
-}(_GameComponent14.default);
-
-var TrackRotationComponent = exports.TrackRotationComponent = function (_GameComponent10) {
-	_inherits(TrackRotationComponent, _GameComponent10);
-
-	function TrackRotationComponent(object) {
-		_classCallCheck(this, TrackRotationComponent);
-
-		var _this10 = _possibleConstructorReturn(this, (TrackRotationComponent.__proto__ || Object.getPrototypeOf(TrackRotationComponent)).call(this));
-
-		_this10.target = object;
-		return _this10;
-	}
-
-	_createClass(TrackRotationComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			parent.rotation = this.target.rotation + Math.PI;
-		}
-	}]);
-
-	return TrackRotationComponent;
-}(_GameComponent14.default);
-
-var CounterRotationComponent = exports.CounterRotationComponent = function (_GameComponent11) {
-	_inherits(CounterRotationComponent, _GameComponent11);
-
-	function CounterRotationComponent(object) {
-		_classCallCheck(this, CounterRotationComponent);
-
-		var _this11 = _possibleConstructorReturn(this, (CounterRotationComponent.__proto__ || Object.getPrototypeOf(CounterRotationComponent)).call(this));
-
-		_this11.target = object;
-		return _this11;
-	}
-
-	_createClass(CounterRotationComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			parent.rotation = -this.target.rotation;
-		}
-	}]);
-
-	return CounterRotationComponent;
-}(_GameComponent14.default);
-
-/**
- * Limit the velocity of an object.
- * @extends {GameComponent}
- * @param {number} velocity - Scalar maximum velocity.
- */
-
-
-var TerminalVelocityComponent = exports.TerminalVelocityComponent = function (_GameComponent12) {
-	_inherits(TerminalVelocityComponent, _GameComponent12);
-
-	function TerminalVelocityComponent(velocity) {
-		_classCallCheck(this, TerminalVelocityComponent);
-
-		var _this12 = _possibleConstructorReturn(this, (TerminalVelocityComponent.__proto__ || Object.getPrototypeOf(TerminalVelocityComponent)).call(this));
-
-		_this12.velocityMagnitude = velocity;
-		return _this12;
-	}
-
-	_createClass(TerminalVelocityComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			var v = _vec2.default.length(parent.velocity);
-
-			if (v > this.velocityMagnitude) {
-				var scale = this.velocityMagnitude / v;
-				_vec2.default.scale(parent.velocity, parent.velocity, scale);
-			}
-		}
-	}]);
-
-	return TerminalVelocityComponent;
-}(_GameComponent14.default);
 
 /***/ }),
 /* 28 */
@@ -6748,7 +6429,164 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CollisionSystem = __webpack_require__(41);
+var _MoveComponent = __webpack_require__(41);
+
+Object.defineProperty(exports, 'MoveComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_MoveComponent).default;
+  }
+});
+
+var _PhysicsComponent = __webpack_require__(42);
+
+Object.defineProperty(exports, 'PhysicsComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_PhysicsComponent).default;
+  }
+});
+
+var _GravityComponent = __webpack_require__(40);
+
+Object.defineProperty(exports, 'GravityComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_GravityComponent).default;
+  }
+});
+
+var _PointGravityComponent = __webpack_require__(43);
+
+Object.defineProperty(exports, 'PointGravityComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_PointGravityComponent).default;
+  }
+});
+
+var _TerminalVelocityComponent = __webpack_require__(52);
+
+Object.defineProperty(exports, 'TerminalVelocityComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_TerminalVelocityComponent).default;
+  }
+});
+
+var _FollowComponent = __webpack_require__(39);
+
+Object.defineProperty(exports, 'FollowComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_FollowComponent).default;
+  }
+});
+
+var _RotationComponent = __webpack_require__(49);
+
+Object.defineProperty(exports, 'RotationComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RotationComponent).default;
+  }
+});
+
+var _RotateToHeadingComponent = __webpack_require__(48);
+
+Object.defineProperty(exports, 'RotateToHeadingComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RotateToHeadingComponent).default;
+  }
+});
+
+var _TrackRotationComponent = __webpack_require__(53);
+
+Object.defineProperty(exports, 'TrackRotationComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_TrackRotationComponent).default;
+  }
+});
+
+var _RandomPositionComponent = __webpack_require__(46);
+
+Object.defineProperty(exports, 'RandomPositionComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RandomPositionComponent).default;
+  }
+});
+
+var _RandomVelocityComponent = __webpack_require__(47);
+
+Object.defineProperty(exports, 'RandomVelocityComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RandomVelocityComponent).default;
+  }
+});
+
+var _RandomImpulseComponent = __webpack_require__(45);
+
+Object.defineProperty(exports, 'RandomImpulseComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RandomImpulseComponent).default;
+  }
+});
+
+var _FlockingComponent = __webpack_require__(24);
+
+Object.defineProperty(exports, 'FlockingComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_FlockingComponent).default;
+  }
+});
+
+var _SwitchComponent = __webpack_require__(51);
+
+Object.defineProperty(exports, 'SwitchComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_SwitchComponent).default;
+  }
+});
+
+var _PositionInterpolatorComponent = __webpack_require__(44);
+
+Object.defineProperty(exports, 'PositionInterpolatorComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_PositionInterpolatorComponent).default;
+  }
+});
+
+var _RotationInterpolatorComponent = __webpack_require__(50);
+
+Object.defineProperty(exports, 'RotationInterpolatorComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_RotationInterpolatorComponent).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _CollisionSystem = __webpack_require__(55);
 
 Object.defineProperty(exports, 'CollisionSystem', {
   enumerable: true,
@@ -6775,7 +6613,7 @@ Object.defineProperty(exports, 'BounceComponent', {
   }
 });
 
-var _BackgroundCollisionSystem = __webpack_require__(40);
+var _BackgroundCollisionSystem = __webpack_require__(54);
 
 Object.defineProperty(exports, 'BackgroundCollisionSystem', {
   enumerable: true,
@@ -6805,7 +6643,7 @@ Object.defineProperty(exports, 'SolidComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6817,7 +6655,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject = __webpack_require__(1);
+var _GameObject = __webpack_require__(2);
 
 var _GameObject2 = _interopRequireDefault(_GameObject);
 
@@ -6829,34 +6667,35 @@ var _GameComponent = __webpack_require__(0);
 
 var _GameComponent2 = _interopRequireDefault(_GameComponent);
 
-var _CameraSystem = __webpack_require__(10);
+var _CameraSystem = __webpack_require__(11);
 
 var _CameraSystem2 = _interopRequireDefault(_CameraSystem);
 
-var _CanvasRenderSystem = __webpack_require__(6);
+var _CanvasRenderSystem = __webpack_require__(7);
 
 var _CanvasRenderSystem2 = _interopRequireDefault(_CanvasRenderSystem);
 
-var _WorldSystem = __webpack_require__(7);
+var _WorldSystem = __webpack_require__(8);
 
 var _WorldSystem2 = _interopRequireDefault(_WorldSystem);
 
-var _InputSystem = __webpack_require__(5);
+var _InputSystem = __webpack_require__(6);
 
 var _InputSystem2 = _interopRequireDefault(_InputSystem);
 
-var _util = __webpack_require__(8);
+var _util = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var STATE_PAUSED = 0,
-    STATE_PLAYING = 1,
-    STATE_STOPPED = 2,
-    STATE_DEAD = 3,
-    _lastTime = 0,
-    _raf = typeof window !== "undefined" && window.requestAnimationFrame || function (callback, element) {
+var STATE_PAUSED = 0;
+var STATE_PLAYING = 1;
+var STATE_STOPPED = 2;
+var STATE_DEAD = 3;
+
+var _lastTime = 0;
+var _raf = typeof window !== "undefined" && window.requestAnimationFrame || function (callback, element) {
     var currTime = new Date().getTime();
     var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
     var id = setTimeout(function () {
@@ -6882,26 +6721,32 @@ var STATE_PAUSED = 0,
  */
 
 var Game = function () {
-    function Game(options) {
+    function Game() {
         var _this = this;
+
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         _classCallCheck(this, Game);
 
         /**
-         * Canvas this game will rener to.
+         * Canvas this game will render to.
          * @type {HTMLCanvasElement}
          */
         this.canvas = options.canvas;
 
-        /** Width of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Width of game canvas. Use {@link Game#setSize} to change.
+         * Explicit width takes priority.
          * @readonly
          */
-        this.width = options.width || this.canvas && this.canvas.width;
+        this.width = options.width || this.canvas && this.canvas.width || 0;
 
-        /** Height of game canvas. Use {@link Game#setSize} to change.
+        /**
+         * Height of game canvas. Use {@link Game#setSize} to change.
+         * Explicit height takes priority.
          * @readonly
          */
-        this.height = options.height || this.canvas && this.canvas.height;
+        this.height = options.height || this.canvas && this.canvas.height || 0;
 
         if (this.canvas) {
             this.canvas.width = this.width;
@@ -7033,8 +6878,12 @@ var Game = function () {
             this._toLoad += texturePaths.length;
             var self = this;
             return texturePaths.map(function (path) {
-                var texture = {};
-                texture.image = new Image();
+                var texture = {
+                    image: new Image(),
+                    width: 0,
+                    height: 0,
+                    loaded: false
+                };
                 texture.image.onload = function () {
                     texture.width = texture.image.width;
                     texture.height = texture.image.height;
@@ -7071,8 +6920,11 @@ var Game = function () {
             this._toLoad += audioPaths.length;
             var self = this;
             return audioPaths.map(function (path) {
-                var sound = {};
-                sound.audio = new Audio();
+                var sound = {
+                    audio: new Audio(),
+                    length: 0,
+                    laoded: false
+                };
                 sound.audio.addEventListener("canplaythrough", function () {
                     if (!sound.loaded) {
                         sound.length = sound.audio.duration;
@@ -7190,7 +7042,7 @@ var Game = function () {
                     this.getDefaultCamera();
                 }
                 // params are: (screen, keyboard, camera)
-                this.inputSystem = new _InputSystem2.default(this.canvas, document, this.cameraSystem);
+                this.inputSystem = new _InputSystem2.default(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
             }
             return this.inputSystem;
         }
@@ -7279,6 +7131,12 @@ exports.default = Game;
 
 (0, _util.eventMixin)(Game);
 
+// Export constants
+Game.STATE_PAUSED = STATE_PAUSED;
+Game.STATE_PLAYING = STATE_PLAYING;
+Game.STATE_STOPPED = STATE_STOPPED;
+Game.STATE_DEAD = STATE_DEAD;
+
 function _loop(self) {
 
     loop(self._lastTime);
@@ -7314,55 +7172,6 @@ function _resourceLoaded(self, resource) {
 };
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _DebugDrawBoundsComponent = __webpack_require__(42);
-
-Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_DebugDrawBoundsComponent).default;
-  }
-});
-
-var _DebugDrawPathComponent = __webpack_require__(43);
-
-Object.defineProperty(exports, 'DebugDrawPathComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_DebugDrawPathComponent).default;
-  }
-});
-
-var _DebugDrawSurfacesComponent = __webpack_require__(44);
-
-Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_DebugDrawSurfacesComponent).default;
-  }
-});
-
-var _DebugFlockingComponent = __webpack_require__(45);
-
-Object.defineProperty(exports, 'DebugFlockingComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_DebugFlockingComponent).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7373,7 +7182,65 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _InputSystem = __webpack_require__(5);
+var _DebugDrawBoundsComponent = __webpack_require__(56);
+
+Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_DebugDrawBoundsComponent).default;
+  }
+});
+
+var _DebugDrawPathComponent = __webpack_require__(57);
+
+Object.defineProperty(exports, 'DebugDrawPathComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_DebugDrawPathComponent).default;
+  }
+});
+
+var _DebugDrawSurfacesComponent = __webpack_require__(58);
+
+Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_DebugDrawSurfacesComponent).default;
+  }
+});
+
+var _DebugFlockingComponent = __webpack_require__(59);
+
+Object.defineProperty(exports, 'DebugFlockingComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_DebugFlockingComponent).default;
+  }
+});
+
+var _PositionRenderComponent = __webpack_require__(60);
+
+Object.defineProperty(exports, 'PositionRenderComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_PositionRenderComponent).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _InputSystem = __webpack_require__(6);
 
 Object.defineProperty(exports, 'InputSystem', {
   enumerable: true,
@@ -7394,7 +7261,7 @@ Object.defineProperty(exports, 'ClickComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7404,7 +7271,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CanvasRenderSystem = __webpack_require__(6);
+var _CanvasRenderSystem = __webpack_require__(7);
 
 Object.defineProperty(exports, 'CanvasRenderSystem', {
   enumerable: true,
@@ -7449,7 +7316,7 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _PolyShapeRenderComponent = __webpack_require__(46);
+var _PolyShapeRenderComponent = __webpack_require__(61);
 
 Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   enumerable: true,
@@ -7458,7 +7325,7 @@ Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   }
 });
 
-var _sprite = __webpack_require__(47);
+var _sprite = __webpack_require__(62);
 
 Object.keys(_sprite).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -7473,7 +7340,7 @@ Object.keys(_sprite).forEach(function (key) {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7483,7 +7350,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _WorldSystem = __webpack_require__(7);
+var _WorldSystem = __webpack_require__(8);
 
 Object.defineProperty(exports, 'WorldSystem', {
   enumerable: true,
@@ -7513,7 +7380,7 @@ Object.defineProperty(exports, 'WorldWrapComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7523,7 +7390,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _PropertyAnimationComponent = __webpack_require__(4);
+var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
@@ -7559,7 +7426,7 @@ var BoundsAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = BoundsAnimationComponent;
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7569,11 +7436,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _PropertyAnimationComponent = __webpack_require__(4);
+var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
-var _util = __webpack_require__(8);
+var _util = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7605,7 +7472,184 @@ var ColorAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = ColorAnimationComponent;
 
 /***/ }),
-/* 36 */
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _PropertyAnimationComponent = __webpack_require__(3);
+
+var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var positionFormatter = function positionFormatter(parent, out) {
+  parent.setPosition.apply(parent, _toConsumableArray(out));
+};
+
+var PositionAnimationComponent = function (_PropertyAnimationCom) {
+  _inherits(PositionAnimationComponent, _PropertyAnimationCom);
+
+  function PositionAnimationComponent(start, end) {
+    var duration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
+
+    _classCallCheck(this, PositionAnimationComponent);
+
+    return _possibleConstructorReturn(this, (PositionAnimationComponent.__proto__ || Object.getPrototypeOf(PositionAnimationComponent)).call(this, positionFormatter, start, end, duration, easing));
+  }
+
+  return PositionAnimationComponent;
+}(_PropertyAnimationComponent2.default);
+
+exports.default = PositionAnimationComponent;
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _PropertyAnimationComponent = __webpack_require__(3);
+
+var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var rotationFormatter = function rotationFormatter(parent, out) {
+  parent.setRotation(out[0]);
+};
+
+var RotationAnimationComponent = function (_PropertyAnimationCom) {
+  _inherits(RotationAnimationComponent, _PropertyAnimationCom);
+
+  function RotationAnimationComponent(start, end) {
+    var duration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
+    var loop = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : undefined;
+
+    _classCallCheck(this, RotationAnimationComponent);
+
+    return _possibleConstructorReturn(this, (RotationAnimationComponent.__proto__ || Object.getPrototypeOf(RotationAnimationComponent)).call(this, rotationFormatter, start, end, duration, easing, loop));
+  }
+
+  _createClass(RotationAnimationComponent, [{
+    key: 'update',
+    value: function update(parent, delta) {
+      this.end[0] = this.rotation;
+
+      _get(RotationAnimationComponent.prototype.__proto__ || Object.getPrototypeOf(RotationAnimationComponent.prototype), 'update', this).call(this, parent, delta);
+    }
+  }, {
+    key: 'setRotation',
+    value: function setRotation(rotation) {
+      this.start[0] = this.rotation;
+      this.end[0] = rotation;
+
+      this.reset();
+
+      _get(RotationAnimationComponent.prototype.__proto__ || Object.getPrototypeOf(RotationAnimationComponent.prototype), 'setRotation', this).call(this, rotation);
+    }
+  }]);
+
+  return RotationAnimationComponent;
+}(_PropertyAnimationComponent2.default);
+
+exports.default = RotationAnimationComponent;
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Track another object's position
+ * Also works like old FollowAtDistnaceComponent by setting a position on this component
+ * @param {GameObject} object - Target object to follow
+ */
+var FollowComponent = function (_GameComponent) {
+    _inherits(FollowComponent, _GameComponent);
+
+    function FollowComponent(object) {
+        _classCallCheck(this, FollowComponent);
+
+        var _this = _possibleConstructorReturn(this, (FollowComponent.__proto__ || Object.getPrototypeOf(FollowComponent)).call(this));
+
+        _this.target = object;
+        return _this;
+    }
+
+    _createClass(FollowComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            _vec2.default.add(parent.position, this.target.position, this.position);
+        }
+    }, {
+        key: 'setTarget',
+        value: function setTarget(object) {
+            this.target = object;
+        }
+    }]);
+
+    return FollowComponent;
+}(_GameComponent3.default);
+
+exports.default = FollowComponent;
+
+/***/ }),
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7661,72 +7705,23 @@ exports.default = GravityComponent;
 GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
 
 /***/ }),
-/* 37 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
-
-var _PropertyAnimationComponent = __webpack_require__(4);
-
-var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var positionFormatter = function positionFormatter(parent, out) {
-  parent.setPosition.apply(parent, _toConsumableArray(out));
-};
-
-var PositionAnimationComponent = function (_PropertyAnimationCom) {
-  _inherits(PositionAnimationComponent, _PropertyAnimationCom);
-
-  function PositionAnimationComponent(start, end) {
-    var duration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-    var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
-
-    _classCallCheck(this, PositionAnimationComponent);
-
-    return _possibleConstructorReturn(this, (PositionAnimationComponent.__proto__ || Object.getPrototypeOf(PositionAnimationComponent)).call(this, positionFormatter, start, end, duration, easing));
-  }
-
-  return PositionAnimationComponent;
-}(_PropertyAnimationComponent2.default);
-
-exports.default = PositionAnimationComponent;
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.PositionInterpolatorComponent = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(2);
+var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -7738,7 +7733,194 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var PositionInterpolatorComponent = exports.PositionInterpolatorComponent = function (_GameComponent) {
+/**
+ * Objects cannot move without this component.
+ * @extends {GameComponent}
+ */
+var MoveComponent = function (_GameComponent) {
+    _inherits(MoveComponent, _GameComponent);
+
+    function MoveComponent() {
+        _classCallCheck(this, MoveComponent);
+
+        return _possibleConstructorReturn(this, (MoveComponent.__proto__ || Object.getPrototypeOf(MoveComponent)).apply(this, arguments));
+    }
+
+    _createClass(MoveComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            _vec2.default.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
+        }
+    }]);
+
+    return MoveComponent;
+}(_GameComponent3.default);
+
+exports.default = MoveComponent;
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * This component allows objects to respond to impulses.
+ *
+ * @example <caption>If parent has an impulse vector its contents will be added to the velocity.</caption>
+ * // Apply impulse of 0.05 pixels per second in direction of x-axis
+ * vec3.set(gameObject.impulse, 0.05, 0, 0);
+ * @extends {GameComponent}
+ */
+var PhysicsComponent = function (_GameComponent) {
+    _inherits(PhysicsComponent, _GameComponent);
+
+    function PhysicsComponent() {
+        _classCallCheck(this, PhysicsComponent);
+
+        return _possibleConstructorReturn(this, (PhysicsComponent.__proto__ || Object.getPrototypeOf(PhysicsComponent)).apply(this, arguments));
+    }
+
+    _createClass(PhysicsComponent, [{
+        key: 'init',
+        value: function init(parent) {
+            parent.impulse = _vec2.default.create();
+        }
+    }, {
+        key: 'update',
+        value: function update(parent, delta) {
+            _vec2.default.add(parent.velocity, parent.velocity, parent.impulse);
+            _vec2.default.set(parent.impulse, 0, 0, 0);
+        }
+    }]);
+
+    return PhysicsComponent;
+}(_GameComponent3.default);
+
+exports.default = PhysicsComponent;
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var PointGravityComponent = function (_GameComponent) {
+    _inherits(PointGravityComponent, _GameComponent);
+
+    function PointGravityComponent(target) {
+        _classCallCheck(this, PointGravityComponent);
+
+        var _this = _possibleConstructorReturn(this, (PointGravityComponent.__proto__ || Object.getPrototypeOf(PointGravityComponent)).call(this));
+
+        _this.target = target;
+        _this.vector = _vec2.default.create();
+        return _this;
+    }
+
+    _createClass(PointGravityComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            _vec2.default.subtract(this.vector, this.target.position, parent.position);
+            var scale = this.target.mass * delta / _vec2.default.squaredLength(this.vector);
+            _vec2.default.normalize(this.vector, this.vector);
+            _vec2.default.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
+        }
+    }]);
+
+    return PointGravityComponent;
+}(_GameComponent3.default);
+
+exports.default = PointGravityComponent;
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+var _Easing = __webpack_require__(5);
+
+var Easing = _interopRequireWildcard(_Easing);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Use more generic [X]AnimationComponents
+ * @deprecated
+ */
+var PositionInterpolatorComponent = function (_GameComponent) {
   _inherits(PositionInterpolatorComponent, _GameComponent);
 
   function PositionInterpolatorComponent(duration, easing) {
@@ -7747,7 +7929,7 @@ var PositionInterpolatorComponent = exports.PositionInterpolatorComponent = func
     var _this = _possibleConstructorReturn(this, (PositionInterpolatorComponent.__proto__ || Object.getPrototypeOf(PositionInterpolatorComponent)).call(this));
 
     _this.duration = duration;
-    _this.easing = easing || PositionInterpolatorComponent.linear;
+    _this.easing = easing || Easing.Linear;
     _this.elapsed = 0;
     _this.running = false;
     _this.starting = false;
@@ -7804,7 +7986,343 @@ var PositionInterpolatorComponent = exports.PositionInterpolatorComponent = func
 exports.default = PositionInterpolatorComponent;
 
 /***/ }),
-/* 39 */
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RandomImpulseComponent = function (_GameComponent) {
+    _inherits(RandomImpulseComponent, _GameComponent);
+
+    function RandomImpulseComponent() {
+        var probability = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.001;
+        var maximumImpulse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.1;
+
+        _classCallCheck(this, RandomImpulseComponent);
+
+        var _this = _possibleConstructorReturn(this, (RandomImpulseComponent.__proto__ || Object.getPrototypeOf(RandomImpulseComponent)).call(this));
+
+        _this.probability = probability;
+        _this.maximumImpulse = maximumImpulse;
+        return _this;
+    }
+
+    _createClass(RandomImpulseComponent, [{
+        key: 'init',
+        value: function init(parent) {
+            parent.impulse = parent.impulse || _vec2.default.create();
+        }
+    }, {
+        key: 'update',
+        value: function update(parent, delta) {
+            if (Math.random() < this.probability) _vec2.default.random(parent.impulse, Math.random() * this.maximumImpulse);
+        }
+    }]);
+
+    return RandomImpulseComponent;
+}(_GameComponent3.default);
+
+exports.default = RandomImpulseComponent;
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RandomPositionComponent = function (_GameComponent) {
+    _inherits(RandomPositionComponent, _GameComponent);
+
+    function RandomPositionComponent(world) {
+        var probability = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.001;
+
+        _classCallCheck(this, RandomPositionComponent);
+
+        var _this = _possibleConstructorReturn(this, (RandomPositionComponent.__proto__ || Object.getPrototypeOf(RandomPositionComponent)).call(this));
+
+        _this.world = world;
+        _this.probability = probability;
+        return _this;
+    }
+
+    _createClass(RandomPositionComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            if (Math.random() < this.probability) {
+                var b = this.world.bounds;
+                var x = Math.random() * (b[2] - b[0]);
+                var y = Math.random() * (b[3] - b[1]);
+                var z = Math.random() * (b[5] - b[4]);
+                _vec2.default.set(parent.position, x, y, z);
+            }
+        }
+    }]);
+
+    return RandomPositionComponent;
+}(_GameComponent3.default);
+
+exports.default = RandomPositionComponent;
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RandomVelocityComponent = function (_GameComponent) {
+    _inherits(RandomVelocityComponent, _GameComponent);
+
+    function RandomVelocityComponent() {
+        var probability = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.001;
+        var maximumVelocity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.1;
+
+        _classCallCheck(this, RandomVelocityComponent);
+
+        var _this = _possibleConstructorReturn(this, (RandomVelocityComponent.__proto__ || Object.getPrototypeOf(RandomVelocityComponent)).call(this));
+
+        _this.probability = probability;
+        _this.maximumVelocity = maximumVelocity;
+        return _this;
+    }
+
+    _createClass(RandomVelocityComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            if (Math.random() < this.probability) _vec2.default.random(parent.velocity, Math.random() * this.maximumVelocity);
+        }
+    }]);
+
+    return RandomVelocityComponent;
+}(_GameComponent3.default);
+
+exports.default = RandomVelocityComponent;
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RotateToHeadingComponent = function (_GameComponent) {
+    _inherits(RotateToHeadingComponent, _GameComponent);
+
+    function RotateToHeadingComponent() {
+        _classCallCheck(this, RotateToHeadingComponent);
+
+        return _possibleConstructorReturn(this, (RotateToHeadingComponent.__proto__ || Object.getPrototypeOf(RotateToHeadingComponent)).apply(this, arguments));
+    }
+
+    _createClass(RotateToHeadingComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            parent.setRotation(Math.atan2(parent.velocity[0], -parent.velocity[1]));
+        }
+    }]);
+
+    return RotateToHeadingComponent;
+}(_GameComponent3.default);
+
+exports.default = RotateToHeadingComponent;
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RotationComponent = function (_GameComponent) {
+    _inherits(RotationComponent, _GameComponent);
+
+    function RotationComponent(dth) {
+        _classCallCheck(this, RotationComponent);
+
+        var _this = _possibleConstructorReturn(this, (RotationComponent.__proto__ || Object.getPrototypeOf(RotationComponent)).call(this));
+
+        _this.rotationSpeed = dth;
+        return _this;
+    }
+
+    _createClass(RotationComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            var w = parent.rotationSpeed || this.rotationSpeed || 0;
+            parent.setRotation(parent.rotation + w * delta);
+        }
+    }]);
+
+    return RotationComponent;
+}(_GameComponent3.default);
+
+exports.default = RotationComponent;
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Use generic [*]AnimationComponents instead
+ * @deprecated
+ */
+var RotationInterpolatorComponent = function (_GameComponent) {
+    _inherits(RotationInterpolatorComponent, _GameComponent);
+
+    function RotationInterpolatorComponent() {
+        _classCallCheck(this, RotationInterpolatorComponent);
+
+        return _possibleConstructorReturn(this, (RotationInterpolatorComponent.__proto__ || Object.getPrototypeOf(RotationInterpolatorComponent)).apply(this, arguments));
+    }
+
+    _createClass(RotationInterpolatorComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            var rotation = parent.rotation,
+                target = this.rotation,
+                diff = target - rotation,
+                speed = 0.01;
+            if (diff > Math.PI) {
+                diff -= Math.PI * 2;
+            } else if (diff < -Math.PI) {
+                diff += Math.PI * 2;
+            }
+            parent.rotation = rotation + diff * delta * speed;
+        }
+    }]);
+
+    return RotationInterpolatorComponent;
+}(_GameComponent3.default);
+
+exports.default = RotationInterpolatorComponent;
+
+/***/ }),
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7816,7 +8334,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject = __webpack_require__(1);
+var _GameObject = __webpack_require__(2);
 
 var _GameObject2 = _interopRequireDefault(_GameObject);
 
@@ -7968,7 +8486,129 @@ var SwitchComponent = function (_GameComponent) {
 exports.default = SwitchComponent;
 
 /***/ }),
-/* 40 */
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Limit the velocity of an object.
+ * @extends {GameComponent}
+ * @param {number} velocity - Scalar maximum velocity.
+ */
+var TerminalVelocityComponent = function (_GameComponent) {
+	_inherits(TerminalVelocityComponent, _GameComponent);
+
+	function TerminalVelocityComponent(velocity) {
+		_classCallCheck(this, TerminalVelocityComponent);
+
+		var _this = _possibleConstructorReturn(this, (TerminalVelocityComponent.__proto__ || Object.getPrototypeOf(TerminalVelocityComponent)).call(this));
+
+		_this.velocityMagnitude = velocity;
+		return _this;
+	}
+
+	_createClass(TerminalVelocityComponent, [{
+		key: 'update',
+		value: function update(parent, delta) {
+			var v = _vec2.default.length(parent.velocity);
+
+			if (v > this.velocityMagnitude) {
+				var scale = this.velocityMagnitude / v;
+				_vec2.default.scale(parent.velocity, parent.velocity, scale);
+			}
+		}
+	}]);
+
+	return TerminalVelocityComponent;
+}(_GameComponent3.default);
+
+exports.default = TerminalVelocityComponent;
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+var _vec = __webpack_require__(1);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Match a target object's rotation
+ *
+ * Rotation can bbe offset by setting this component's rotation as well
+ * @param {GameObject} object - Target object
+ */
+var TrackRotationComponent = function (_GameComponent) {
+    _inherits(TrackRotationComponent, _GameComponent);
+
+    function TrackRotationComponent(object) {
+        _classCallCheck(this, TrackRotationComponent);
+
+        var _this = _possibleConstructorReturn(this, (TrackRotationComponent.__proto__ || Object.getPrototypeOf(TrackRotationComponent)).call(this));
+
+        _this.target = object;
+        return _this;
+    }
+
+    _createClass(TrackRotationComponent, [{
+        key: 'update',
+        value: function update(parent, delta) {
+            parent.rotation = this.target.rotation + this.rotation;
+        }
+    }]);
+
+    return TrackRotationComponent;
+}(_GameComponent3.default);
+
+exports.default = TrackRotationComponent;
+
+/***/ }),
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7982,7 +8622,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -8077,7 +8717,7 @@ var BackgroundCollisionSystem = function (_GameObject) {
 exports.default = BackgroundCollisionSystem;
 
 /***/ }),
-/* 41 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8089,7 +8729,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(1);
+var _GameObject2 = __webpack_require__(2);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -8187,7 +8827,7 @@ var CollisionSystem = function (_GameObject) {
 exports.default = CollisionSystem;
 
 /***/ }),
-/* 42 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8251,7 +8891,7 @@ var DebugDrawBoundsComponent = function (_GameComponent) {
 exports.default = DebugDrawBoundsComponent;
 
 /***/ }),
-/* 43 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8263,7 +8903,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject = __webpack_require__(1);
+var _GameObject = __webpack_require__(2);
 
 var _GameObject2 = _interopRequireDefault(_GameObject);
 
@@ -8271,7 +8911,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(9);
+var _vec = __webpack_require__(10);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -8375,7 +9015,7 @@ var DebugDrawPathComponent = function (_GameComponent) {
 exports.default = DebugDrawPathComponent;
 
 /***/ }),
-/* 44 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8459,7 +9099,7 @@ var DebugDrawSurfacesComponent = function (_GameComponent) {
 exports.default = DebugDrawSurfacesComponent;
 
 /***/ }),
-/* 45 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8528,7 +9168,81 @@ var DebugFlockingComponent = function (_GameComponent) {
 exports.default = DebugFlockingComponent;
 
 /***/ }),
-/* 46 */
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameComponent2 = __webpack_require__(0);
+
+var _GameComponent3 = _interopRequireDefault(_GameComponent2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var PositionRenderComponent = function (_GameComponent) {
+  _inherits(PositionRenderComponent, _GameComponent);
+
+  function PositionRenderComponent(renderSystem) {
+    var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "10px sans-serif";
+    var color = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
+
+    _classCallCheck(this, PositionRenderComponent);
+
+    var _this = _possibleConstructorReturn(this, (PositionRenderComponent.__proto__ || Object.getPrototypeOf(PositionRenderComponent)).call(this));
+
+    _this.renderSystem = renderSystem;
+    _this.font = font;
+    _this.color = color;
+    // Font should start with an integer we can use as a size for the crosshairs
+    _this.size = parseInt(font, 10);
+    return _this;
+  }
+
+  _createClass(PositionRenderComponent, [{
+    key: "update",
+    value: function update(parent, delta) {
+      var _this2 = this;
+
+      var p = parent.position;
+      var size = this.size;
+
+      this.renderSystem.push(function (ctx) {
+        ctx.translate(p[0], p[1]);
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-size, 0);
+        ctx.lineTo(size, 0);
+        ctx.moveTo(0, -size);
+        ctx.lineTo(0, size);
+        ctx.stroke();
+        ctx.fillStyle = _this2.color;
+        ctx.font = _this2.font;
+        ctx.fillText((p[0] | 0) + ", " + (p[1] | 0), size / 2, -size / 2);
+      });
+    }
+  }]);
+
+  return PositionRenderComponent;
+}(_GameComponent3.default);
+
+exports.default = PositionRenderComponent;
+
+/***/ }),
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8544,7 +9258,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _mat = __webpack_require__(49);
+var _mat = __webpack_require__(64);
 
 var _mat2 = _interopRequireDefault(_mat);
 
@@ -8798,7 +9512,7 @@ PolyShapeRenderingComponent.createSphere = function (renderSystem, latitudeBands
 };
 
 /***/ }),
-/* 47 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9119,7 +9833,7 @@ CanvasSpriteRenderingComponent.prototype.update = function (parent, delta) {
 };
 
 /***/ }),
-/* 48 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -9142,7 +9856,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(3);
+var glMatrix = __webpack_require__(4);
 
 /**
  * @class 2x2 Matrix
@@ -9561,7 +10275,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 49 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -9584,7 +10298,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(3);
+var glMatrix = __webpack_require__(4);
 
 /**
  * @class 3x3 Matrix
@@ -10313,7 +11027,7 @@ module.exports = mat3;
 
 
 /***/ }),
-/* 50 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10324,7 +11038,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Debug = exports.WebGLRenderSystem = exports.Render = exports.Collision = exports.Input = exports.World = exports.Easing = exports.Components = exports.Game = exports.AudioSystem = exports.InputSystem = exports.WorldSystem = exports.CanvasRenderSystem = exports.CameraSystem = exports.GameComponent = exports.GameObjectManager = exports.GameObject = undefined;
 
-var _GameObject = __webpack_require__(1);
+var _GameObject = __webpack_require__(2);
 
 Object.defineProperty(exports, 'GameObject', {
   enumerable: true,
@@ -10351,7 +11065,7 @@ Object.defineProperty(exports, 'GameComponent', {
   }
 });
 
-var _CameraSystem = __webpack_require__(10);
+var _CameraSystem = __webpack_require__(11);
 
 Object.defineProperty(exports, 'CameraSystem', {
   enumerable: true,
@@ -10360,7 +11074,7 @@ Object.defineProperty(exports, 'CameraSystem', {
   }
 });
 
-var _CanvasRenderSystem = __webpack_require__(6);
+var _CanvasRenderSystem = __webpack_require__(7);
 
 Object.defineProperty(exports, 'CanvasRenderSystem', {
   enumerable: true,
@@ -10369,7 +11083,7 @@ Object.defineProperty(exports, 'CanvasRenderSystem', {
   }
 });
 
-var _WorldSystem = __webpack_require__(7);
+var _WorldSystem = __webpack_require__(8);
 
 Object.defineProperty(exports, 'WorldSystem', {
   enumerable: true,
@@ -10378,7 +11092,7 @@ Object.defineProperty(exports, 'WorldSystem', {
   }
 });
 
-var _InputSystem = __webpack_require__(5);
+var _InputSystem = __webpack_require__(6);
 
 Object.defineProperty(exports, 'InputSystem', {
   enumerable: true,
@@ -10396,7 +11110,7 @@ Object.defineProperty(exports, 'AudioSystem', {
   }
 });
 
-var _Game = __webpack_require__(29);
+var _Game = __webpack_require__(30);
 
 Object.defineProperty(exports, 'Game', {
   enumerable: true,
@@ -10414,15 +11128,19 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _basic = __webpack_require__(27);
+var _basic = __webpack_require__(28);
 
 var basic = _interopRequireWildcard(_basic);
 
-var _Easing = __webpack_require__(11);
+var _animation = __webpack_require__(27);
+
+var animation = _interopRequireWildcard(_animation);
+
+var _Easing = __webpack_require__(5);
 
 var easing = _interopRequireWildcard(_Easing);
 
-var _world = __webpack_require__(33);
+var _world = __webpack_require__(34);
 
 var world = _interopRequireWildcard(_world);
 
@@ -10434,7 +11152,7 @@ var _WorldWrapComponent = __webpack_require__(23);
 
 var _WorldWrapComponent2 = _interopRequireDefault(_WorldWrapComponent);
 
-var _input = __webpack_require__(31);
+var _input = __webpack_require__(32);
 
 var input = _interopRequireWildcard(_input);
 
@@ -10442,7 +11160,7 @@ var _ClickComponent = __webpack_require__(17);
 
 var _ClickComponent2 = _interopRequireDefault(_ClickComponent);
 
-var _collision = __webpack_require__(28);
+var _collision = __webpack_require__(29);
 
 var collision = _interopRequireWildcard(_collision);
 
@@ -10462,7 +11180,7 @@ var _SolidComponent = __webpack_require__(15);
 
 var _SolidComponent2 = _interopRequireDefault(_SolidComponent);
 
-var _render = __webpack_require__(32);
+var _render = __webpack_require__(33);
 
 var render = _interopRequireWildcard(_render);
 
@@ -10478,7 +11196,7 @@ var _TextRenderComponent = __webpack_require__(20);
 
 var _TextRenderComponent2 = _interopRequireDefault(_TextRenderComponent);
 
-var _debug = __webpack_require__(30);
+var _debug = __webpack_require__(31);
 
 var debug = _interopRequireWildcard(_debug);
 
@@ -10492,6 +11210,12 @@ var Components = exports.Components = {};
 
 for (var name in basic) {
   Components[name] = basic[name];
+}
+
+// Export animation components
+
+for (var _name in animation) {
+  Components[_name] = animation[_name];
 }
 
 exports.Easing = easing;

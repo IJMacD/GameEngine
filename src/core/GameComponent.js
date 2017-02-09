@@ -45,6 +45,7 @@ class GameComponent extends GameObject {
  * This static helper method reduces the boiler plate of subclassing
  * GameComponent.
  * @static
+ * @deprecated Use ES6 classes instead
  * @param {function} constructor - The constructor of the subclass. This should
  * be a named function expression or a reference to a function statement so that
  * magic can happen using the function's name for component identification.

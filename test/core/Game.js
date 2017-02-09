@@ -293,7 +293,7 @@ describe('Game', function() {
 
     game.setScore(10);
 
-    it('should set score and fire callback', function() {
+    it('should set score', function() {
       assert.equal(game.score, 10);
     });
 
@@ -312,7 +312,7 @@ describe('Game', function() {
 
     game.nextLevel();
 
-    it('should set score and fire callback', function() {
+    it('should set level', function() {
       assert.equal(game.level, 1);
     });
 
@@ -331,7 +331,7 @@ describe('Game', function() {
 
     game.setLevel(10);
 
-    it('should set score and fire callback', function() {
+    it('should set level', function() {
       assert.equal(game.level, 10);
     });
 

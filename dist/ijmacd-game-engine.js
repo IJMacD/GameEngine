@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 51);
+/******/ 	return __webpack_require__(__webpack_require__.s = 64);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
 
 
 /**
@@ -129,6 +129,7 @@ class GameComponent extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* def
  * This static helper method reduces the boiler plate of subclassing
  * GameComponent.
  * @static
+ * @deprecated Use ES6 classes instead
  * @param {function} constructor - The constructor of the subclass. This should
  * be a named function expression or a reference to a function statement so that
  * magic can happen using the function's name for component identification.
@@ -154,271 +155,6 @@ GameComponent.create = function(constructor, properties){
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(9);
-
-
-
-/**
- * The base object in the GameEngine. Most objects managed by the system
- * will be based on this class.
- */
-class GameObject {
-    constructor () {
-        /** Array of components which update this GameObject.
-         * @type {array} */
-        this.components = [];
-        this.components.remove = arrayRemoveItem;
-
-        /** Position of this object in the world.
-         * @type {vec3} */
-        this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
-
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
-        this.velocity = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
-
-        /** Current rotation of this object.
-         * @type {number} */
-        this.rotation = 0;
-
-        /** Rotation axis of this object.
-         * @type {number} */
-        this.rotationAxis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.fromValues(0, 0, 1);
-
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
-        this._toBeRemoved = [];
-    }
-
-    /**
-     * <p>This method is used to add a {@link GameComponent} to this object.
-     *
-     * <p>GameComponents give objects particular behaviours. This method ensures
-     * that each component added will have a chance to update once per frame
-     * for this object.
-     * @param {GameComponent} component - The component to be added to this object
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-    addComponent (component){
-
-        // Allow syntactic sugar of addComponent(function() {...}) which is a
-        // shorthand for specifying a simple component with only an update method
-        if(isFunction(component)){
-            component = { update: component };
-        }
-
-        this.components.push(component);
-
-        // If the component has an init method call it when added so that the
-        // component can add properties to the parent object
-        if(component.init){
-            component.init(this);
-        }
-
-        return this;
-    }
-
-    /**
-     * Remove a particular {@link GameComponent} which had previously been added
-     * to this object.
-     * @param {GameComponent} component - The component to be removed from this object
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-    removeComponent (component){
-        this._toBeRemoved.push(component);
-        return this;
-    }
-
-    removeComponentByName (name){
-        for(var i = 0; i < this.components.length; i++){
-            const c = this.components[i];
-            if(c.name == name || c.constructor.name == name)
-                this._toBeRemoved.push(c);
-        }
-        return this;
-    }
-
-    removeComponentByTest (test){
-        for(var i = 0; i < this.components.length; i++){
-            if(test(this.components[i]))
-                this._toBeRemoved.push(this.components[i]);
-        }
-        return this;
-    }
-
-    /**
-     * <p>Protective method to set position of the object in world-units.
-     *
-     * <p>The native units are world-units. i.e. If a 2D camera is
-     * used with the scale set to 1x and the canvas is not scaled in the webpage,
-     * 1 unit in the world will equate to 1 pixel on the screen.
-     *
-     * <p>This method will preserve position on axes which you leave undefined
-     * in the call to this method.
-     *
-     * @example <caption>This will only affect the y co-ordinate, leaving x and
-     * z at their original values.</caption>
-     * // Set y = 20
-     * gameObject.setPosition(undefined, 20);
-     * @param {number} x - x component of position vector
-     * @param {number} y - y component of position vector
-     * @param {number} z - z component of position vector
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-    setPosition (x,y,z) {
-        if(x == undefined) { x = this.position[0]; }
-        if(y == undefined) { y = this.position[1]; }
-        if(z == undefined) { z = this.position[2]; }
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.position, x, y, z);
-        return this;
-    }
-
-    /**
-     * <p>Protective method to set velocity of the object.
-     *
-     * <p>The native units are world-units per millisecond. i.e. If a 2D camera
-     * is used with the scale set to 1x and the canvas is not scaled in the webpage,
-     * 1 unit in the world will equate to 1 pixel on the screen. In this common
-     * case the units of velocity will be equivelant to pixels-per-millisecond.
-     *
-     * <p>This method will preserve position on axes which you leave undefined
-     * in the call to this method.
-     *
-     * @example <caption>This will only affect the velocity parallel to the y-axis
-     * co-ordinate, leaving vx and vz unaffected.</caption>
-     * // Set vy = 20px per second
-     * gameObject.setVelocity(undefined, 0.02);
-     * @param {number} x - x component of velocity vector
-     * @param {number} y - y component of velocity vector
-     * @param {number} z - z component of velocity vector
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-    setVelocity (vx,vy,vz) {
-        if(vx == undefined) { vx = this.velocity[0]; }
-        if(vy == undefined) { vy = this.velocity[1]; }
-        if(vz == undefined) { vz = this.velocity[2]; }
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.velocity, vx, vy, vz);
-        return this;
-    }
-
-    /**
-     * Set the bounds of the component relative to its position.
-     * @param {number} minX
-     * @param {number} minY
-     * @param {number} maxX
-     * @param {number} maxY
-     * @param {number} minZ - Optional
-     * @param {number} maxZ - Optional
-     * @return this
-     */
-    setBounds (...bounds) {
-        this.bounds = bounds;
-        return this;
-    }
-
-    /**
-     * Set object rotation
-     * @param {number} rotation - Rotation in radians
-     * @param {vec3} rotationAxis - 3D rotations require rotation axis.
-     * @return this
-     */
-    setRotation (rotation, rotationAxis){
-        this.rotation = rotation;
-        if(rotationAxis && rotationAxis.length == 3){
-            __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.normalize(this.rotationAxis, rotationAxis);
-        }
-        return this;
-    }
-
-    /**
-     * @deprecated
-     */
-    hit (victim) {
-        if(this.hitVictim == null)
-            this.hitVictim = victim;
-    }
-
-    /**
-     * @deprecated
-     */
-    hitBy (attacker) {
-        if(this.attackerHit == null)
-            this.attackerHit = attacker;
-    }
-
-    /**
-     * This method is called once per frame. GameObjects will usually only need
-     * to call update on each of its components in this method passing a reference
-     * to itself.
-     * @param {number} delta - Time since last frame in milliseconds
-     */
-    update (delta){
-        var i = 0,
-            l = this.components.length,
-            j = 0,
-            m = this._toBeRemoved.length;
-        for(;j<m;j++){
-            for(i=0;i<l;i++){
-                if(this.components[i] == this._toBeRemoved[j]){
-                    this.components.remove(i);
-                    break;
-                }
-            }
-        }
-        this._toBeRemoved.length = 0;
-
-        l = this.components.length;
-        for(i=0;i<l;i++){
-            this.components[i].update(this, delta);
-        }
-    }
-
-    /**
-     * This method is used to produce a html representation of the object for
-     * things such as debugging trees. It will include components in its rendering.
-     * Similar to the toString method.
-     * @return {string} Representation of this component in HTML
-     */
-    toHTML () {
-        var html = this.name,
-            i;
-        if(typeof this.position.x == "number")
-            html += " " + this.position;
-        if(this.components.length){
-            html += "<ul>";
-            for(i=0;i<this.components.length;i++)
-                html += "<li>"+this.components[i].toHTML();
-            html += "</ul>";
-        }
-        return html;
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = GameObject;
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* eventMixin */])(GameObject);
-
-function arrayRemoveItem(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
-}
-
-function isFunction(a) {
-  return (a instanceof Function);
-}
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -1201,6 +937,271 @@ module.exports = vec3;
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(10);
+
+
+
+/**
+ * The base object in the GameEngine. Most objects managed by the system
+ * will be based on this class.
+ */
+class GameObject {
+    constructor () {
+        /** Array of components which update this GameObject.
+         * @type {array} */
+        this.components = [];
+        this.components.remove = arrayRemoveItem;
+
+        /** Position of this object in the world.
+         * @type {vec3} */
+        this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
+
+        /** Velocity of this object moving through the world.
+         * @type {vec3} */
+        this.velocity = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
+
+        /** Current rotation of this object.
+         * @type {number} */
+        this.rotation = 0;
+
+        /** Rotation axis of this object.
+         * @type {number} */
+        this.rotationAxis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.fromValues(0, 0, 1);
+
+        /**
+          * List of components which will be removed on next update.
+          * @private
+          * @type {array}
+          */
+        this._toBeRemoved = [];
+    }
+
+    /**
+     * <p>This method is used to add a {@link GameComponent} to this object.
+     *
+     * <p>GameComponents give objects particular behaviours. This method ensures
+     * that each component added will have a chance to update once per frame
+     * for this object.
+     * @param {GameComponent} component - The component to be added to this object
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    addComponent (component){
+
+        // Allow syntactic sugar of addComponent(function() {...}) which is a
+        // shorthand for specifying a simple component with only an update method
+        if(isFunction(component)){
+            component = { update: component };
+        }
+
+        this.components.push(component);
+
+        // If the component has an init method call it when added so that the
+        // component can add properties to the parent object
+        if(component.init){
+            component.init(this);
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove a particular {@link GameComponent} which had previously been added
+     * to this object.
+     * @param {GameComponent} component - The component to be removed from this object
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    removeComponent (component){
+        this._toBeRemoved.push(component);
+        return this;
+    }
+
+    removeComponentByName (name){
+        for(var i = 0; i < this.components.length; i++){
+            const c = this.components[i];
+            if(c.name == name || c.constructor.name == name)
+                this._toBeRemoved.push(c);
+        }
+        return this;
+    }
+
+    removeComponentByTest (test){
+        for(var i = 0; i < this.components.length; i++){
+            if(test(this.components[i]))
+                this._toBeRemoved.push(this.components[i]);
+        }
+        return this;
+    }
+
+    /**
+     * <p>Protective method to set position of the object in world-units.
+     *
+     * <p>The native units are world-units. i.e. If a 2D camera is
+     * used with the scale set to 1x and the canvas is not scaled in the webpage,
+     * 1 unit in the world will equate to 1 pixel on the screen.
+     *
+     * <p>This method will preserve position on axes which you leave undefined
+     * in the call to this method.
+     *
+     * @example <caption>This will only affect the y co-ordinate, leaving x and
+     * z at their original values.</caption>
+     * // Set y = 20
+     * gameObject.setPosition(undefined, 20);
+     * @param {number} x - x component of position vector
+     * @param {number} y - y component of position vector
+     * @param {number} z - z component of position vector
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    setPosition (x,y,z) {
+        if(x == undefined) { x = this.position[0]; }
+        if(y == undefined) { y = this.position[1]; }
+        if(z == undefined) { z = this.position[2]; }
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.position, x, y, z);
+        return this;
+    }
+
+    /**
+     * <p>Protective method to set velocity of the object.
+     *
+     * <p>The native units are world-units per millisecond. i.e. If a 2D camera
+     * is used with the scale set to 1x and the canvas is not scaled in the webpage,
+     * 1 unit in the world will equate to 1 pixel on the screen. In this common
+     * case the units of velocity will be equivelant to pixels-per-millisecond.
+     *
+     * <p>This method will preserve position on axes which you leave undefined
+     * in the call to this method.
+     *
+     * @example <caption>This will only affect the velocity parallel to the y-axis
+     * co-ordinate, leaving vx and vz unaffected.</caption>
+     * // Set vy = 20px per second
+     * gameObject.setVelocity(undefined, 0.02);
+     * @param {number} x - x component of velocity vector
+     * @param {number} y - y component of velocity vector
+     * @param {number} z - z component of velocity vector
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    setVelocity (vx,vy,vz) {
+        if(vx == undefined) { vx = this.velocity[0]; }
+        if(vy == undefined) { vy = this.velocity[1]; }
+        if(vz == undefined) { vz = this.velocity[2]; }
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.velocity, vx, vy, vz);
+        return this;
+    }
+
+    /**
+     * Set the bounds of the component relative to its position.
+     * @param {number} minX
+     * @param {number} minY
+     * @param {number} maxX
+     * @param {number} maxY
+     * @param {number} minZ - Optional
+     * @param {number} maxZ - Optional
+     * @return this
+     */
+    setBounds (...bounds) {
+        this.bounds = bounds;
+        return this;
+    }
+
+    /**
+     * Set object rotation
+     * @param {number} rotation - Rotation in radians
+     * @param {vec3} rotationAxis - 3D rotations require rotation axis.
+     * @return this
+     */
+    setRotation (rotation, rotationAxis){
+        this.rotation = rotation;
+        if(rotationAxis && rotationAxis.length == 3){
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.normalize(this.rotationAxis, rotationAxis);
+        }
+        return this;
+    }
+
+    /**
+     * @deprecated
+     */
+    hit (victim) {
+        if(this.hitVictim == null)
+            this.hitVictim = victim;
+    }
+
+    /**
+     * @deprecated
+     */
+    hitBy (attacker) {
+        if(this.attackerHit == null)
+            this.attackerHit = attacker;
+    }
+
+    /**
+     * This method is called once per frame. GameObjects will usually only need
+     * to call update on each of its components in this method passing a reference
+     * to itself.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    update (delta){
+        var i = 0,
+            l = this.components.length,
+            j = 0,
+            m = this._toBeRemoved.length;
+        for(;j<m;j++){
+            for(i=0;i<l;i++){
+                if(this.components[i] == this._toBeRemoved[j]){
+                    this.components.remove(i);
+                    break;
+                }
+            }
+        }
+        this._toBeRemoved.length = 0;
+
+        l = this.components.length;
+        for(i=0;i<l;i++){
+            this.components[i].update(this, delta);
+        }
+    }
+
+    /**
+     * This method is used to produce a html representation of the object for
+     * things such as debugging trees. It will include components in its rendering.
+     * Similar to the toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    toHTML () {
+        var html = this.name,
+            i;
+        if(typeof this.position.x == "number")
+            html += " " + this.position;
+        if(this.components.length){
+            html += "<ul>";
+            for(i=0;i<this.components.length;i++)
+                html += "<li>"+this.components[i].toHTML();
+            html += "</ul>";
+        }
+        return html;
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = GameObject;
+
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* eventMixin */])(GameObject);
+
+function arrayRemoveItem(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+}
+
+function isFunction(a) {
+  return (a instanceof Function);
+}
+
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
@@ -1282,21 +1283,50 @@ module.exports = glMatrix;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(5);
 
 
 
+/**
+ * Animate arbritarty properties
+ * @param {number} loop - 0: no loop, 1: loop animation, 2: loop reverse
+ */
 class PropertyAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-  constructor (outputter, start, end, duration=1000, easing=__WEBPACK_IMPORTED_MODULE_1__Easing__["Linear"]) {
+  constructor (outputter, start, end, duration=1000, easing=__WEBPACK_IMPORTED_MODULE_1__Easing__["Linear"], loop=2) {
     super();
+
+    if (!Array.isArray(start)) { start = [start] }
+    if (!Array.isArray(end)) { end = [end] }
+    start.length = 4;
+    end.length = 4;
+
     this.outputter = outputter;
     this.start = start;
     this.end = end;
     this.duration = duration;
     this.easing = easing;
+    this.loop = loop;
+
     this.elapsed = 0;
     this.direction = 1;
-    this.out = [];
+    this.out = Array(4);
+  }
+
+  reset () {
+    this.elapsed = 0;
+  }
+
+  start () {
+    this.direction = 1;
+  }
+
+  pause () {
+    this.direction = 0;
+  }
+
+  stop () {
+    this.pause();
+    this.reset();
   }
 
   update (parent, delta) {
@@ -1316,7 +1346,12 @@ class PropertyAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
     this.elapsed += delta * this.direction;
 
     if (this.elapsed > this.duration || this.elapsed < 0) {
-      this.direction *= -1;
+      if (this.loop == 2) {
+        this.direction *= -1;
+      }
+      else if (this.loop == 1) {
+        this.elapsed = 0;
+      }
       this.elapsed = Math.min(Math.max(this.elapsed, 0), this.duration);
     }
   }
@@ -1330,10 +1365,100 @@ class PropertyAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(8);
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["BackIn"] = BackIn;
+/* harmony export (immutable) */ __webpack_exports__["BackOut"] = BackOut;
+/* harmony export (immutable) */ __webpack_exports__["BackInOut"] = BackInOut;
+/* harmony export (immutable) */ __webpack_exports__["ElasticIn"] = ElasticIn;
+/* harmony export (immutable) */ __webpack_exports__["ElasticOut"] = ElasticOut;
+/* harmony export (immutable) */ __webpack_exports__["ElasticInOut"] = ElasticInOut;
+/* harmony export (immutable) */ __webpack_exports__["DampedOscillation"] = DampedOscillation;
+const Linear = t => t;
+/* harmony export (immutable) */ __webpack_exports__["Linear"] = Linear;
+
+const QuadIn = t => t * t;
+/* harmony export (immutable) */ __webpack_exports__["QuadIn"] = QuadIn;
+
+const QuadOut = t => -t * (t - 2);
+/* harmony export (immutable) */ __webpack_exports__["QuadOut"] = QuadOut;
+
+const CircIn = t => 1-Math.sqrt(1-t*t);
+/* harmony export (immutable) */ __webpack_exports__["CircIn"] = CircIn;
+
+const CircOut = t => Math.sqrt(1-(t-1)*(t-1));
+/* harmony export (immutable) */ __webpack_exports__["CircOut"] = CircOut;
+
+const Smooth = t => t*t*(3-2*t);
+/* harmony export (immutable) */ __webpack_exports__["Smooth"] = Smooth;
+
+// Stolen from Dojo:
+// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+const SineIn = t => -1 * Math.cos(t * (Math.PI / 2)) + 1;
+/* harmony export (immutable) */ __webpack_exports__["SineIn"] = SineIn;
+
+const SineOut = t => Math.sin(t * (Math.PI / 2));
+/* harmony export (immutable) */ __webpack_exports__["SineOut"] = SineOut;
+
+const SineInOut = t => -1 * (Math.cos(Math.PI * t) - 1) / 2;
+/* harmony export (immutable) */ __webpack_exports__["SineInOut"] = SineInOut;
+
+function BackIn (t) {
+  var s = 1.70158;
+  return t * t * ((s + 1) * t - s);
+};
+function BackOut (t) {
+  var s = 1.70158;
+  t = t - 1;
+  return t*t*((s+1)*t + s) + 1;
+};
+function BackInOut (t) {
+  var s = 1.70158 * 1.525;
+  t = t * 2;
+  if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
+  t-=2;
+  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+};
+function ElasticIn (n) {
+  if(n == 0 || n == 1){ return n; }
+  var p = .3;
+  var s = p / 4;
+  n = n - 1;
+  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+};
+function ElasticOut (n) {
+  if(n==0 || n == 1){ return n; }
+  var p = .3;
+  var s = p / 4;
+  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+};
+function ElasticInOut (n) {
+  if(n == 0) return 0;
+  n = n * 2;
+  if(n == 2) return 1;
+  var p = .3 * 1.5;
+  var s = p / 4;
+  if(n < 1){
+    n -= 1;
+    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
+  }
+  n -= 1;
+  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
+};
+function DampedOscillation (n) {
+  const oscillations = 5;
+  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
+}
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__);
 
 
@@ -1551,11 +1676,11 @@ InputSystem.Keys = {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
 
 
@@ -1689,11 +1814,11 @@ function _renderQueue (renderSystem, layer) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 
 
 /** @namespace World */
@@ -1715,7 +1840,7 @@ class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -2308,7 +2433,7 @@ module.exports = vec2;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2411,12 +2536,12 @@ function eventMixin (constructor) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
@@ -2512,96 +2637,12 @@ class CameraSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /*
 
 
 /***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["BackIn"] = BackIn;
-/* harmony export (immutable) */ __webpack_exports__["BackOut"] = BackOut;
-/* harmony export (immutable) */ __webpack_exports__["BackInOut"] = BackInOut;
-/* harmony export (immutable) */ __webpack_exports__["ElasticIn"] = ElasticIn;
-/* harmony export (immutable) */ __webpack_exports__["ElasticOut"] = ElasticOut;
-/* harmony export (immutable) */ __webpack_exports__["ElasticInOut"] = ElasticInOut;
-const Linear = t => t;
-/* harmony export (immutable) */ __webpack_exports__["Linear"] = Linear;
-
-const QuadIn = t => t * t;
-/* harmony export (immutable) */ __webpack_exports__["QuadIn"] = QuadIn;
-
-const QuadOut = t => -t * (t - 2);
-/* harmony export (immutable) */ __webpack_exports__["QuadOut"] = QuadOut;
-
-const CircIn = t => 1-Math.sqrt(1-t*t);
-/* harmony export (immutable) */ __webpack_exports__["CircIn"] = CircIn;
-
-const CircOut = t => Math.sqrt(1-(t-1)*(t-1));
-/* harmony export (immutable) */ __webpack_exports__["CircOut"] = CircOut;
-
-const Smooth = t => t*t*(3-2*t);
-/* harmony export (immutable) */ __webpack_exports__["Smooth"] = Smooth;
-
-// Stolen from Dojo:
-// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-const SineIn = t => -1 * Math.cos(t * (Math.PI / 2)) + 1;
-/* harmony export (immutable) */ __webpack_exports__["SineIn"] = SineIn;
-
-const SineOut = t => Math.sin(t * (Math.PI / 2));
-/* harmony export (immutable) */ __webpack_exports__["SineOut"] = SineOut;
-
-const SineInOut = t => -1 * (Math.cos(Math.PI * t) - 1) / 2;
-/* harmony export (immutable) */ __webpack_exports__["SineInOut"] = SineInOut;
-
-function BackIn (t) {
-  var s = 1.70158;
-  return t * t * ((s + 1) * t - s);
-};
-function BackOut (t) {
-  var s = 1.70158;
-  t = t - 1;
-  return t*t*((s+1)*t + s) + 1;
-};
-function BackInOut (t) {
-  var s = 1.70158 * 1.525;
-  t = t * 2;
-  if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
-  t-=2;
-  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-};
-function ElasticIn (n) {
-  if(n == 0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  n = n - 1;
-  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-};
-function ElasticOut (n) {
-  if(n==0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-};
-function ElasticInOut (n) {
-  if(n == 0) return 0;
-  n = n * 2;
-  if(n == 2) return 1;
-  var p = .3 * 1.5;
-  var s = p / 4;
-  if(n < 1){
-    n -= 1;
-    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
-  }
-  n -= 1;
-  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
-};
-
-/***/ }),
 /* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
 
 
@@ -2703,7 +2744,7 @@ function cross(a, b){
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
@@ -2878,7 +2919,7 @@ class SolidComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
 
 
 /**
@@ -3161,8 +3202,8 @@ class TextRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponen
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
@@ -5551,7 +5592,7 @@ module.exports = mat4;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
@@ -5650,7 +5691,7 @@ FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 
 
 /**
@@ -5688,26 +5729,11 @@ class AudioSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__FlockingComponent__ = __webpack_require__(25);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__FlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__GravityComponent__ = __webpack_require__(38);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__GravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PositionInterpolatorComponent__ = __webpack_require__(40);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PositionInterpolatorComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__SwitchComponent__ = __webpack_require__(41);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__SwitchComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__PropertyAnimationComponent__ = __webpack_require__(4);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PropertyAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__PropertyAnimationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__PositionAnimationComponent__ = __webpack_require__(39);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__PositionAnimationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__BoundsAnimationComponent__ = __webpack_require__(36);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BoundsAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__BoundsAnimationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ColorAnimationComponent__ = __webpack_require__(37);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ColorAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_10__ColorAnimationComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(40);
 
 
 
@@ -5717,200 +5743,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/**
- * @namespace Basic
- */
-
-	class PointGravityComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor (target) {
-			super();
-			this.target = target;
-			this.vector = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.create();
-		}
-
-		update (parent, delta) {
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.subtract(this.vector, this.target.position, parent.position);
-			var scale = this.target.mass*delta/__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.squaredLength(this.vector);
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.normalize(this.vector, this.vector);
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["PointGravityComponent"] = PointGravityComponent;
-
-
-	/**
-	 * Objects cannot move without this component.
- 	 * @extends {GameComponent}
-	 */
-	class MoveComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		update (parent, delta) {
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["MoveComponent"] = MoveComponent;
-
-
-/**
- * This component allows objects to respond to impulses.
- *
-	* @example <caption>If parent has an impulse vector its contents will be added to the velocity.</caption>
-	* // Apply impulse of 0.05 pixels per second in direction of x-axis
-	* vec3.set(gameObject.impulse, 0.05, 0, 0);
-	* @extends {GameComponent}
-	*/
-	class PhysicsComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		update (parent, delta) {
-			if(parent.impulse){
-				__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.add(parent.velocity, parent.velocity, parent.impulse);
-				__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.set(parent.impulse, 0, 0, 0);
-			}
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["PhysicsComponent"] = PhysicsComponent;
-
-
-	class RandomMotionComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		update (parent, delta) {
-			if(Math.random()<0.001)
-				__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.random(parent.velocity, Math.random());
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["RandomMotionComponent"] = RandomMotionComponent;
-
-
-
-	class RotationComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor (dth) {
-			super();
-			this.rotationSpeed = dth;
-		}
-
-		update (parent, delta) {
-			var w = parent.rotationSpeed || this.rotationSpeed || 0;
-			parent.setRotation(parent.rotation + w * delta);
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["RotationComponent"] = RotationComponent;
-
-
-	class RotateToHeadingComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		update (parent, delta) {
-			parent.targetRotation = Math.atan2(parent.velocity[0], -parent.velocity[1]);
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["RotateToHeadingComponent"] = RotateToHeadingComponent;
-
-
-
-	class RotationInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		update (parent, delta) {
-			var rotation = parent.rotation,
-					target = parent.targetRotation,
-					diff = target - rotation,
-					speed = 0.01;
-			if(diff > Math.PI){
-				diff -= Math.PI * 2;
-			} else if (diff < -Math.PI){
-				diff += Math.PI * 2;
-			}
-			parent.rotation = rotation + diff * delta * speed;
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["RotationInterpolatorComponent"] = RotationInterpolatorComponent;
-
-
-	class FollowComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor (object) {
-			super();
-			this.target = object;
-		}
-
-		update (parent, delta) {
-			if(this.target) __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.copy(parent.position, this.target.position);
-		}
-
-		setTarget (object) {
-			this.target = object;
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["FollowComponent"] = FollowComponent;
-
-
-	class FollowAtDistanceComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor(object, distance) {
-			super();
-			this.target = object;
-			this.distance = distance;
-		}
-
-		update (parent, delta) {
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.add(parent.position, this.target.position, this.distance);
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["FollowAtDistanceComponent"] = FollowAtDistanceComponent;
-
-
-	class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor (object) {
-			super();
-			this.target = object;
-		}
-
-		update (parent, delta) {
-			parent.rotation = this.target.rotation + Math.PI;
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["TrackRotationComponent"] = TrackRotationComponent;
-
-
-	class CounterRotationComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-		constructor (object) {
-			super();
-			this.target = object;
-		}
-
-		update (parent, delta) {
-			parent.rotation = -this.target.rotation;
-		}
-	}
-/* harmony export (immutable) */ __webpack_exports__["CounterRotationComponent"] = CounterRotationComponent;
-
-
-
-/**
- * Limit the velocity of an object.
- * @extends {GameComponent}
- * @param {number} velocity - Scalar maximum velocity.
- */
-class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__["a" /* default */] {
-
-	constructor (velocity) {
-		super();
-
-		this.velocityMagnitude = velocity;
-	}
-
-	update (parent, delta) {
-		const v = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.length(parent.velocity);
-
-		if(v > this.velocityMagnitude){
-			const scale = this.velocityMagnitude / v;
-			__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec3___default.a.scale(parent.velocity, parent.velocity, scale);
-		}
-	}
-}
-/* harmony export (immutable) */ __webpack_exports__["TerminalVelocityComponent"] = TerminalVelocityComponent;
 
 
 /***/ }),
@@ -5919,13 +5751,86 @@ class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCo
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__MoveComponent__ = __webpack_require__(43);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MoveComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__MoveComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__ = __webpack_require__(44);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PhysicsComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GravityComponent__ = __webpack_require__(42);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__GravityComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(45);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PointGravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(53);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TerminalVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(41);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FollowComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__FollowComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(65);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__RotationComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(50);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotateToHeadingComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(54);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TrackRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(48);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__ = __webpack_require__(49);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__ = __webpack_require__(47);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomImpulseComponent", function() { return __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(25);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(52);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(46);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(51);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__["a"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/** @deprecated */
+
+
+/** @deprecated */
+
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(56);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(55);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(12);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__["a"]; });
@@ -5945,18 +5850,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util__ = __webpack_require__(10);
 
 
 
@@ -6389,20 +6294,20 @@ function _resourceLoaded(self, resource) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawBoundsComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(58);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawPathComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(59);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(60);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(61);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
@@ -6420,12 +6325,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(6);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__InputSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ClickComponent__ = __webpack_require__(17);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ClickComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__ClickComponent__["a"]; });
@@ -6435,12 +6340,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__ = __webpack_require__(18);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DotRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__["a"]; });
@@ -6450,9 +6355,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(62);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(63);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
@@ -6475,12 +6380,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__WorldSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__ = __webpack_require__(22);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldBounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__["a"]; });
@@ -6494,7 +6399,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -6936,7 +6841,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -7688,7 +7593,7 @@ module.exports = mat3;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7701,17 +7606,17 @@ class BoundsAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnim
     super(boundsFormatter, start, end, duration, easing);
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = BoundsAnimationComponent;
+/* unused harmony export default */
 
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(10);
 
 
 
@@ -7724,12 +7629,97 @@ class ColorAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnima
     super(colorFormatter, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* parseColor */])(start), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* parseColor */])(end), duration, easing);
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ColorAnimationComponent;
+/* unused harmony export default */
 
 
 
 /***/ }),
-/* 38 */
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
+
+
+const positionFormatter = (parent, out) => { parent.setPosition(...out); };
+class PositionAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a" /* default */] {
+  constructor (start, end, duration=undefined, easing=undefined) {
+    super(positionFormatter, start, end, duration, easing);
+  }
+}
+/* unused harmony export default */
+
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
+
+
+const rotationFormatter = (parent, out) => { parent.setRotation(out[0]); };
+class RotationAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a" /* default */] {
+  constructor (start, end, duration=undefined, easing=undefined, loop=undefined) {
+    super(rotationFormatter, start, end, duration, easing, loop);
+  }
+
+  update (parent, delta) {
+    this.end[0] = this.rotation;
+
+    super.update(parent, delta);
+  }
+
+  setRotation (rotation) {
+    this.start[0] = this.rotation;
+    this.end[0] = rotation;
+
+    this.reset();
+
+    super.setRotation(rotation);
+  }
+}
+/* unused harmony export default */
+
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+/**
+ * Track another object's position
+ * Also works like old FollowAtDistnaceComponent by setting a position on this component
+ * @param {GameObject} object - Target object to follow
+ */
+class FollowComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (object) {
+        super();
+        this.target = object;
+    }
+
+    update (parent, delta) {
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.add(parent.position, this.target.position, this.position);
+    }
+
+    setTarget (object) {
+        this.target = object;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FollowComponent;
+
+
+
+/***/ }),
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7756,39 +7746,113 @@ GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
 
 
 /***/ }),
-/* 39 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
-
-
-const positionFormatter = (parent, out) => { parent.setPosition(...out); };
-class PositionAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a" /* default */] {
-  constructor (start, end, duration=undefined, easing=undefined) {
-    super(positionFormatter, start, end, duration, easing);
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PositionAnimationComponent;
-
-
-
-/***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
 
+/**
+ * Objects cannot move without this component.
+ * @extends {GameComponent}
+ */
+class MoveComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    update (parent, delta) {
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.position, parent.position, parent.velocity, delta);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = MoveComponent;
+
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+/**
+ * This component allows objects to respond to impulses.
+ *
+ * @example <caption>If parent has an impulse vector its contents will be added to the velocity.</caption>
+ * // Apply impulse of 0.05 pixels per second in direction of x-axis
+ * vec3.set(gameObject.impulse, 0.05, 0, 0);
+ * @extends {GameComponent}
+ */
+class PhysicsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    init (parent) {
+        parent.impulse = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+    }
+
+    update (parent, delta) {
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.add(parent.velocity, parent.velocity, parent.impulse);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(parent.impulse, 0, 0, 0);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PhysicsComponent;
+
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+class PointGravityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (target) {
+        super();
+        this.target = target;
+        this.vector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+    }
+
+    update (parent, delta) {
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.subtract(this.vector, this.target.position, parent.position);
+        var scale = this.target.mass * delta / __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.squaredLength(this.vector);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.normalize(this.vector, this.vector);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.velocity, parent.velocity, this.vector, scale);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PointGravityComponent;
+
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Easing__ = __webpack_require__(5);
+
+
+
+
+/**
+ * Use more generic [X]AnimationComponents
+ * @deprecated
+ */
 class PositionInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
   constructor (duration, easing) {
     super();
     this.duration = duration;
-    this.easing = easing || PositionInterpolatorComponent.linear;
+    this.easing = easing || __WEBPACK_IMPORTED_MODULE_2__Easing__["Linear"];
     this.elapsed = 0;
     this.running = false;
     this.starting = false;
@@ -7835,18 +7899,156 @@ class PositionInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_Ga
     this.starting = true;
   }
 }
-/* unused harmony export PositionInterpolatorComponent */
+/* harmony export (immutable) */ __webpack_exports__["a"] = PositionInterpolatorComponent;
 
-
-/* harmony default export */ __webpack_exports__["a"] = PositionInterpolatorComponent;
 
 
 /***/ }),
-/* 41 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+class RandomImpulseComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (probability=0.001, maximumImpulse = 0.1) {
+        super();
+
+        this.probability = probability;
+        this.maximumImpulse = maximumImpulse;
+    }
+
+    init (parent) {
+        parent.impulse = parent.impulse || __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+    }
+
+    update (parent, delta) {
+        if(Math.random()<this.probability)
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.random(parent.impulse, Math.random() * this.maximumImpulse);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RandomImpulseComponent;
+
+
+
+/***/ }),
+/* 48 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+class RandomPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (world, probability=0.001) {
+        super();
+
+        this.world = world;
+        this.probability = probability;
+    }
+
+    update (parent, delta) {
+        if(Math.random() < this.probability) {
+            const b = this.world.bounds;
+            const x = Math.random() * (b[2] - b[0]);
+            const y = Math.random() * (b[3] - b[1]);
+            const z = Math.random() * (b[5] - b[4]);
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(parent.position, x, y, z);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RandomPositionComponent;
+
+
+
+/***/ }),
+/* 49 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+class RandomVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (probability=0.001, maximumVelocity = 0.1) {
+        super();
+
+        this.probability = probability;
+        this.maximumVelocity = maximumVelocity;
+    }
+
+    update (parent, delta) {
+        if(Math.random()<this.probability)
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.random(parent.velocity, Math.random() * this.maximumVelocity);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RandomVelocityComponent;
+
+
+
+/***/ }),
+/* 50 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class RotateToHeadingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    update (parent, delta) {
+        parent.setRotation(Math.atan2(parent.velocity[0], -parent.velocity[1]));
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RotateToHeadingComponent;
+
+
+
+/***/ }),
+/* 51 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+/**
+ * Use generic [*]AnimationComponents instead
+ * @deprecated
+ */
+class RotationInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    update (parent, delta) {
+        var rotation = parent.rotation,
+            target = this.rotation,
+            diff = target - rotation,
+            speed = 0.01;
+        if(diff > Math.PI){
+            diff -= Math.PI * 2;
+        } else if (diff < -Math.PI){
+            diff += Math.PI * 2;
+        }
+        parent.rotation = rotation + diff * delta * speed;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RotationInterpolatorComponent;
+
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
 
 
@@ -7958,11 +8160,79 @@ class SwitchComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__[
 
 
 /***/ }),
-/* 42 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+/**
+ * Limit the velocity of an object.
+ * @extends {GameComponent}
+ * @param {number} velocity - Scalar maximum velocity.
+ */
+class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+
+	constructor (velocity) {
+		super();
+
+		this.velocityMagnitude = velocity;
+	}
+
+	update (parent, delta) {
+		const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.length(parent.velocity);
+
+		if(v > this.velocityMagnitude){
+			const scale = this.velocityMagnitude / v;
+			__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scale(parent.velocity, parent.velocity, scale);
+		}
+	}
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TerminalVelocityComponent;
+
+
+
+/***/ }),
+/* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
+
+
+
+/**
+ * Match a target object's rotation
+ *
+ * Rotation can bbe offset by setting this component's rotation as well
+ * @param {GameObject} object - Target object
+ */
+class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (object) {
+        super();
+        this.target = object;
+    }
+
+    update (parent, delta) {
+        parent.rotation = this.target.rotation + this.rotation;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TrackRotationComponent;
+
+
+
+/***/ }),
+/* 55 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 
 
 /**
@@ -8026,11 +8296,11 @@ class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameOb
 
 
 /***/ }),
-/* 43 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 
 
 /** @namespace Collision */
@@ -8118,7 +8388,7 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
 
 
 /***/ }),
-/* 44 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8156,13 +8426,13 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 45 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__);
 
 
@@ -8249,7 +8519,7 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 
 
 /***/ }),
-/* 46 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8304,7 +8574,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 
 /***/ }),
-/* 47 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8346,7 +8616,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 48 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8387,12 +8657,12 @@ class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 49 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
@@ -8681,7 +8951,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 50 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8942,54 +9212,55 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 51 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObject", function() { return __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__ = __webpack_require__(16);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObjectManager", function() { return __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__ = __webpack_require__(0);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(11);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__CameraSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(6);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__AudioSystem__ = __webpack_require__(26);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AudioSystem", function() { return __WEBPACK_IMPORTED_MODULE_7__AudioSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(30);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return __WEBPACK_IMPORTED_MODULE_8__core_Game__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Easing__ = __webpack_require__(11);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Easing", function() { return __WEBPACK_IMPORTED_MODULE_10__Easing__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__world__ = __webpack_require__(33);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "World", function() { return __WEBPACK_IMPORTED_MODULE_11__world__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__world_WorldBounceComponent__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldWrapComponent__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__input__ = __webpack_require__(31);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Input", function() { return __WEBPACK_IMPORTED_MODULE_14__input__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__input_ClickComponent__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__collision__ = __webpack_require__(28);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Collision", function() { return __WEBPACK_IMPORTED_MODULE_16__collision__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__collision_CollisionComponent__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision_BounceComponent__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_BackgroundCollisionComponent__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_SolidComponent__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__render__ = __webpack_require__(32);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Render", function() { return __WEBPACK_IMPORTED_MODULE_21__render__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__render_WebGLRenderSystem__ = __webpack_require__(21);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_22__render_WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__render_DotRenderComponent__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_RectangleRenderComponent__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_TextRenderComponent__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__debug__ = __webpack_require__(30);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Debug", function() { return __WEBPACK_IMPORTED_MODULE_26__debug__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__animation__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__Easing__ = __webpack_require__(5);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Easing", function() { return __WEBPACK_IMPORTED_MODULE_11__Easing__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__world__ = __webpack_require__(34);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "World", function() { return __WEBPACK_IMPORTED_MODULE_12__world__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__input__ = __webpack_require__(32);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Input", function() { return __WEBPACK_IMPORTED_MODULE_15__input__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__collision__ = __webpack_require__(29);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Collision", function() { return __WEBPACK_IMPORTED_MODULE_17__collision__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision_CollisionComponent__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_BounceComponent__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_BackgroundCollisionComponent__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__collision_SolidComponent__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__render__ = __webpack_require__(33);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Render", function() { return __WEBPACK_IMPORTED_MODULE_22__render__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__render_WebGLRenderSystem__ = __webpack_require__(21);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_23__render_WebGLRenderSystem__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_DotRenderComponent__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_RectangleRenderComponent__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__render_TextRenderComponent__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__debug__ = __webpack_require__(31);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Debug", function() { return __WEBPACK_IMPORTED_MODULE_27__debug__; });
 // Export core classes. GameObject, GameComponent etc.
 
 
@@ -9015,6 +9286,12 @@ for(let name in __WEBPACK_IMPORTED_MODULE_9__basic__) {
   Components[name] = __WEBPACK_IMPORTED_MODULE_9__basic__[name];
 }
 
+// Export animation components
+
+for(let name in __WEBPACK_IMPORTED_MODULE_10__animation__) {
+  Components[name] = __WEBPACK_IMPORTED_MODULE_10__animation__[name];
+}
+
 
 
 
@@ -9023,33 +9300,33 @@ for(let name in __WEBPACK_IMPORTED_MODULE_9__basic__) {
 
 
 
-Components['WorldBounceComponent'] = __WEBPACK_IMPORTED_MODULE_12__world_WorldBounceComponent__["a" /* default */];
+Components['WorldBounceComponent'] = __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__["a" /* default */];
 
 
-Components['WorldWrapComponent'] = __WEBPACK_IMPORTED_MODULE_13__world_WorldWrapComponent__["a" /* default */];
+Components['WorldWrapComponent'] = __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__["a" /* default */];
 
 // Export input namespace
 
 
 
 
-Components['ClickComponent'] = __WEBPACK_IMPORTED_MODULE_15__input_ClickComponent__["a" /* default */];
+Components['ClickComponent'] = __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__["a" /* default */];
 
 // Export collision namespace
 
 
 
 
-Components['CollisionComponent'] = __WEBPACK_IMPORTED_MODULE_17__collision_CollisionComponent__["a" /* default */];
+Components['CollisionComponent'] = __WEBPACK_IMPORTED_MODULE_18__collision_CollisionComponent__["a" /* default */];
 
 
-Components['BounceComponent'] = __WEBPACK_IMPORTED_MODULE_18__collision_BounceComponent__["a" /* default */];
+Components['BounceComponent'] = __WEBPACK_IMPORTED_MODULE_19__collision_BounceComponent__["a" /* default */];
 
 
-Components['BackgroundCollisionComponent'] = __WEBPACK_IMPORTED_MODULE_19__collision_BackgroundCollisionComponent__["a" /* default */];
+Components['BackgroundCollisionComponent'] = __WEBPACK_IMPORTED_MODULE_20__collision_BackgroundCollisionComponent__["a" /* default */];
 
 
-Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_20__collision_SolidComponent__["a" /* default */];
+Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_21__collision_SolidComponent__["a" /* default */];
 
 // Export render namespace
 
@@ -9058,16 +9335,39 @@ Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_20__collision_SolidComp
 
 
 
-Components['DotRenderComponent'] = __WEBPACK_IMPORTED_MODULE_23__render_DotRenderComponent__["a" /* default */];
+Components['DotRenderComponent'] = __WEBPACK_IMPORTED_MODULE_24__render_DotRenderComponent__["a" /* default */];
 
 
-Components['RectangleRenderComponent'] = __WEBPACK_IMPORTED_MODULE_24__render_RectangleRenderComponent__["a" /* default */];
+Components['RectangleRenderComponent'] = __WEBPACK_IMPORTED_MODULE_25__render_RectangleRenderComponent__["a" /* default */];
 
 
-Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_25__render_TextRenderComponent__["a" /* default */];
+Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_26__render_TextRenderComponent__["a" /* default */];
 
 // Export debug
 
+
+
+
+/***/ }),
+/* 65 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (dth) {
+        super();
+        this.rotationSpeed = dth;
+    }
+
+    update (parent, delta) {
+        var w = parent.rotationSpeed || this.rotationSpeed || 0;
+        parent.setRotation(parent.rotation + w * delta);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RotationComponent;
 
 
 

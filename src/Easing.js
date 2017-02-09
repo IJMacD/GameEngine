@@ -51,3 +51,7 @@ export function ElasticInOut (n) {
   n -= 1;
   return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
 };
+export function DampedOscillation (n) {
+  const oscillations = 5;
+  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
+}
