@@ -28,7 +28,7 @@ class InputSystem extends GameObject {
     /** @deprecated */
     this.cameraSystem = cameraSystem;
 
-    this._nextClick = vec2.create();
+    this._nextClick = vec2.fromValues(NaN, NaN);
 
     // These values will persist for exactly one frame
 
@@ -67,10 +67,18 @@ class InputSystem extends GameObject {
     vec2.set(this._nextClick, NaN, NaN);
     this.hasClick = !isNaN(this.lastClick[0]);
 
+    if (this.hasClick) {
+      this.fire("click", this.lastClick)
+    }
+
     // Keypress
     this.lastKey = this._nextKey;
     // Consumers should interpret (null) as no keypress
     this._nextKey = null;
+
+    if (this.lastKey) {
+      this.fire("keypress", this.lastKey);
+    }
   }
 
   /**
@@ -78,6 +86,10 @@ class InputSystem extends GameObject {
    * @param {Element} screen - New screen
    */
   setScreen (screen) {
+    if (this.screen) {
+      destroyScreen.call(this);
+    }
+
     this.screen = screen;
 
     initScreen.call(this);
@@ -95,14 +107,11 @@ class InputSystem extends GameObject {
         camHeight = cam.height,
         screen = this.screen,
         screenWidth = screen.offsetWidth,
-        screenHeight = screen.offsetHeight,
-        screenScale = camWidth / screenWidth;
+        screenHeight = screen.offsetHeight;
 
     vec2.set(v,
         screenX - screenWidth / 2,
         screenY - screenHeight / 2);
-
-    vec2.scale(v, v, screenScale);
 
     vec2.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
 
@@ -178,8 +187,7 @@ function TouchClick(sel, fnc) {
   };
 
   // Remove previous handler in case this is element being re-initialised
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
+  OffTouchClick(sel);
 
   // Add new handler
   sel.addEventListener('touchstart', handle);
@@ -187,6 +195,20 @@ function TouchClick(sel, fnc) {
 
   // We need to keep track of this handler in order to be able to remove it later.
   sel.touchClick = handle;
+}
+
+function destroyScreen () {
+  const screen = this.screen;
+
+  if(screen) {
+    OffTouchClick(screen);
+  }
+}
+
+function OffTouchClick (sel) {
+  // Remove previous handlers
+  sel.removeEventListener('touchstart', sel.touchClick);
+  sel.removeEventListener('click', sel.touchClick);
 }
 
 // function worldToScreen(inputSystem, worldX, worldY){
