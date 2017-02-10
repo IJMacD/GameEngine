@@ -5,5 +5,16 @@ module.exports = {
     filename: 'ijmacd-game-engine.js',
     library: 'IGE',
     libraryTarget: 'umd'
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader'
+      }
+    ]
   }
 };

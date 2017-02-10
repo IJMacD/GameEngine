@@ -37,6 +37,7 @@ class InputSystem extends GameObject {
      * @type {vec2}
      */
     this.lastClick = vec2.create();
+
     /**
      * Boolean to indicate if a click has been registered during the last frame.
      * @type {boolean}

@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 65);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1283,7 +1283,7 @@ module.exports = glMatrix;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(6);
 
 
 
@@ -1362,485 +1362,6 @@ class PropertyAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 /***/ }),
 /* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["BackIn"] = BackIn;
-/* harmony export (immutable) */ __webpack_exports__["BackOut"] = BackOut;
-/* harmony export (immutable) */ __webpack_exports__["BackInOut"] = BackInOut;
-/* harmony export (immutable) */ __webpack_exports__["ElasticIn"] = ElasticIn;
-/* harmony export (immutable) */ __webpack_exports__["ElasticOut"] = ElasticOut;
-/* harmony export (immutable) */ __webpack_exports__["ElasticInOut"] = ElasticInOut;
-/* harmony export (immutable) */ __webpack_exports__["DampedOscillation"] = DampedOscillation;
-const Linear = t => t;
-/* harmony export (immutable) */ __webpack_exports__["Linear"] = Linear;
-
-const QuadIn = t => t * t;
-/* harmony export (immutable) */ __webpack_exports__["QuadIn"] = QuadIn;
-
-const QuadOut = t => -t * (t - 2);
-/* harmony export (immutable) */ __webpack_exports__["QuadOut"] = QuadOut;
-
-const CircIn = t => 1-Math.sqrt(1-t*t);
-/* harmony export (immutable) */ __webpack_exports__["CircIn"] = CircIn;
-
-const CircOut = t => Math.sqrt(1-(t-1)*(t-1));
-/* harmony export (immutable) */ __webpack_exports__["CircOut"] = CircOut;
-
-const Smooth = t => t*t*(3-2*t);
-/* harmony export (immutable) */ __webpack_exports__["Smooth"] = Smooth;
-
-// Stolen from Dojo:
-// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-const SineIn = t => -1 * Math.cos(t * (Math.PI / 2)) + 1;
-/* harmony export (immutable) */ __webpack_exports__["SineIn"] = SineIn;
-
-const SineOut = t => Math.sin(t * (Math.PI / 2));
-/* harmony export (immutable) */ __webpack_exports__["SineOut"] = SineOut;
-
-const SineInOut = t => -1 * (Math.cos(Math.PI * t) - 1) / 2;
-/* harmony export (immutable) */ __webpack_exports__["SineInOut"] = SineInOut;
-
-function BackIn (t) {
-  var s = 1.70158;
-  return t * t * ((s + 1) * t - s);
-};
-function BackOut (t) {
-  var s = 1.70158;
-  t = t - 1;
-  return t*t*((s+1)*t + s) + 1;
-};
-function BackInOut (t) {
-  var s = 1.70158 * 1.525;
-  t = t * 2;
-  if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
-  t-=2;
-  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-};
-function ElasticIn (n) {
-  if(n == 0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  n = n - 1;
-  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-};
-function ElasticOut (n) {
-  if(n==0 || n == 1){ return n; }
-  var p = .3;
-  var s = p / 4;
-  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-};
-function ElasticInOut (n) {
-  if(n == 0) return 0;
-  n = n * 2;
-  if(n == 2) return 1;
-  var p = .3 * 1.5;
-  var s = p / 4;
-  if(n < 1){
-    n -= 1;
-    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
-  }
-  n -= 1;
-  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
-};
-function DampedOscillation (n) {
-  const oscillations = 5;
-  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
-}
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__);
-
-
-
-
-// Create some spare vectors for use in screenToWorld method
-const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const rotMat = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.create();
-
-/**
- * InputSystem's job is to keep track of most recent user input to provide
- * filtering and rate-limiting etc. Inputs should be passed on the the rest
- * of game in World co-ordinates rather than screen co-ordinates so the
- * InputSystem is responsible for mapping between the two.
- *
- * @todo Right now this is very 2D orientated. Try to make more generic
- * @extends {GameObject}
- * @param {Element} screen - Should be a DOMElement to get size information from
- * @param {any} keyboard - Something to watch for keyboard events on e.g. document
- * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
- */
-class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-  constructor (screen, keyboard, cameraSystem) {
-    super();
-
-    this.screen = screen;
-    this.keyboard = keyboard;
-    this.camera = cameraSystem;
-    /** @deprecated */
-    this.cameraSystem = cameraSystem;
-
-    this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    this.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    this.hasClick = false;
-
-    this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    this.lastKey = null;
-
-    initScreen.call(this);
-    initKeyboard.call(this);
-  }
-
-  update (delta) {
-    super.update(delta);
-
-    // Cycle the next event to last event property here so that
-    // last event persists for exactly one frame.
-
-    // Click
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this.lastClick, this._nextClick);
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(this._nextClick, NaN, NaN);
-    this.hasClick = !isNaN(this.lastClick[0]);
-
-    // Keypress
-    this.lastKey = this._nextKey;
-    // Consumers should interpret (null) as no keypress
-    this._nextKey = null;
-  }
-
-  /**
-   * Set a new screen object and initialse event listening on it.
-   * @param {Element} screen - New screen
-   */
-  setScreen (screen) {
-    this.screen = screen;
-
-    initScreen.call(this);
-  }
-
-  /**
-   * Convert screen co-ordinates to world co-ordinates.
-   * @param {number} screenX - X co-ordinate on screen.
-   * @param {number} screenY - Y co-ordinate on screen.
-   * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
-   */
-  screenToWorld (screenX, screenY){
-    const cam = this.camera,
-        camWidth = cam.width,
-        camHeight = cam.height,
-        screen = this.screen,
-        screenWidth = screen.offsetWidth,
-        screenHeight = screen.offsetHeight,
-        screenScale = camWidth / screenWidth;
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v,
-        screenX - screenWidth / 2,
-        screenY - screenHeight / 2);
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(v, v, screenScale);
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
-
-    // Rotation in 2D only makes sense around the Z-axis so that is
-    // all that is handled here.
-    if(cam.rotationAxis[2] == 1){
-      __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.rotate(rotMat, rotMat, -cam.rotation);
-      __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.transformMat2(v, v, rotMat);
-    }
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.add(v, v, cam.position);
-    return v;
-  }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = InputSystem;
-
-/**
- * Private method to initialse touch events on screen.
- *
- * Should be invoked as initScreen.call(this);
- * @private
- */
-function initScreen () {
-  if (!this.screen) return;
-
-  TouchClick(this.screen, e => {
-    const offsetLeft = this.screen.offsetLeft,
-        offsetTop = this.screen.offsetTop,
-        touch = e.touches && e.touches[0],
-        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
-        y = (touch ? touch.pageY : e.pageY) - offsetTop;
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this._nextClick, this.screenToWorld(x, y));
-  });
-}
-
-/**
- * Initialse keyboard events
- *
- * Should be invoked as initKeyboard.call(this);
- * @private
- */
-function initKeyboard () {
-  if (!this.keyboard) return;
-
-  this.keyboard.addEventListener("keydown", e => {
-    this._nextKey = e.which;
-  });
-}
-
-/**
- * @callback TouchClickCallback
- * @param {object} event - Generic event object which will be relevant to event type.
- */
-
-/**
- * Helper function to handle both touches and clicks consistently
- * @private
- * @param {Element} sel - Element on which we should look for input
- * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
- */
-function TouchClick(sel, fnc) {
-  const handle = function(event){
-    event.stopPropagation();
-    event.preventDefault();
-    if(event.handled !== true) {
-        fnc(event);
-        event.handled = true;
-    } else {
-        return false;
-    }
-  };
-
-  // Remove previous handler in case this is element being re-initialised
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
-
-  // Add new handler
-  sel.addEventListener('touchstart', handle);
-  sel.addEventListener('click', handle);
-
-  // We need to keep track of this handler in order to be able to remove it later.
-  sel.touchClick = handle;
-}
-
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
-
-
-
-/**
- * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
- * will get rendered to the canvas.
- * <p>It supports render layers as well.
- * @extends {GameObject}
- * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
- * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
- */
-class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-
-	constructor (context, cameraSystem) {
-		super();
-
-		this.context = context;
-		this.canvas = context && context.canvas;
-		this.camera = cameraSystem;
-
-		/** @deprecated */
-		this.cameraSystem = cameraSystem;
-
-		this.renderQueue = [];
-
-		/**
-		 * Should the renderer clear the screen before drawing a frame or just overdraw.
-		 * @type {boolean}
-		 */
-		this.clearScreen = true;
-	}
-
-	/**
-	 * @callback CanvasRenderable
-	 * @param {CanvasRenderingContext2D} context
-	 */
-
-	/**
-	 * Add a renderable to the draw queue
-	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
-	 * @param {number} layer - Layer to add this drawable to. Default: 1
-	 */
-	push (renderable, layer) {
-		layer = layer == undefined ? 1 : layer;
-		if(!this.renderQueue[layer]) {
-			this.renderQueue[layer] = [];
-		}
-		this.renderQueue[layer].push(renderable);
-	}
-
-	update (delta) {
-		if(this.clearScreen){
-			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
-		}
-
-		this.context.save();
-
-		var p = this.camera.position,
-			q = this.canvas.width / 2,
-			r = this.canvas.height / 2,
-			i,
-			l,
-			j,
-			n;
-
-		this.context.translate(q,r);
-		// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
-		this.context.scale(this.camera.scaleX, this.camera.scaleY);
-
-		// Only rotation around the Z-axis makes sense for canvas rendering
-		if(this.camera.rotationAxis[2] == 1){
-			this.context.rotate(-this.camera.rotation);
-		}
-
-		this.context.translate(-p[0],-p[1]);
-
-		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			_renderQueue(this, i);
-		}
-
-		this.context.restore();
-
-		// Special case layer renders on top independant of camera
-		_renderQueue(this, -1);
-	}
-
-	drawPath (context, path){
-		var i = 2,
-				l = path.length;
-		context.beginPath();
-		context.moveTo(path[0],path[1]);
-		for(;i<l-1;i+=2){
-			context.lineTo(path[i],path[i+1]);
-		}
-	}
-
-	/**
-	 * Convenience method to stroke a path with the given style and to the given layer.
-	 * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
-	 * @param {string} style - Colour of line to draw. Default: #000
-	 * @param {number} layer - Layer this should be drawn on. Default: 1
-	 */
-	strokePath (path, style, layer) {
-		if(typeof style == "undefined")
-			style = '#000';
-	 	if(typeof layer == "undefined")
-			layer = 1;
-		this.push(function(context){
-			context.strokeStyle = style;
-			this.drawPath(context, path);
-			context.stroke();
-		}, layer);
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = CanvasRenderSystem;
-
-function _renderQueue (renderSystem, layer) {
-	const { context, renderQueue } = renderSystem;
-	const queue = renderQueue[layer];
-	if(queue){
-		for(let j = 0, n = queue.length; j < n; j++){
-			context.save();
-			queue[j].call(renderSystem, context);
-			context.restore();
-		}
-		queue.length = 0;
-	}
-}
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-
-
-/** @namespace World */
-
-/**
- * Generic way to access a 'world' with intrinsic bounds.
- * @extends {GameObject}
- * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
- * @memberof World
- */
-class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-    constructor (bounds) {
-        super();
-        this.bounds = bounds;
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = WorldSystem;
-
-
-/***/ }),
-/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -2433,6 +1954,486 @@ module.exports = vec2;
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["BackIn"] = BackIn;
+/* harmony export (immutable) */ __webpack_exports__["BackOut"] = BackOut;
+/* harmony export (immutable) */ __webpack_exports__["BackInOut"] = BackInOut;
+/* harmony export (immutable) */ __webpack_exports__["ElasticIn"] = ElasticIn;
+/* harmony export (immutable) */ __webpack_exports__["ElasticOut"] = ElasticOut;
+/* harmony export (immutable) */ __webpack_exports__["ElasticInOut"] = ElasticInOut;
+/* harmony export (immutable) */ __webpack_exports__["DampedOscillation"] = DampedOscillation;
+const Linear = t => t;
+/* harmony export (immutable) */ __webpack_exports__["Linear"] = Linear;
+
+const QuadIn = t => t * t;
+/* harmony export (immutable) */ __webpack_exports__["QuadIn"] = QuadIn;
+
+const QuadOut = t => -t * (t - 2);
+/* harmony export (immutable) */ __webpack_exports__["QuadOut"] = QuadOut;
+
+const CircIn = t => 1-Math.sqrt(1-t*t);
+/* harmony export (immutable) */ __webpack_exports__["CircIn"] = CircIn;
+
+const CircOut = t => Math.sqrt(1-(t-1)*(t-1));
+/* harmony export (immutable) */ __webpack_exports__["CircOut"] = CircOut;
+
+const Smooth = t => t*t*(3-2*t);
+/* harmony export (immutable) */ __webpack_exports__["Smooth"] = Smooth;
+
+// Stolen from Dojo:
+// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+const SineIn = t => -1 * Math.cos(t * (Math.PI / 2)) + 1;
+/* harmony export (immutable) */ __webpack_exports__["SineIn"] = SineIn;
+
+const SineOut = t => Math.sin(t * (Math.PI / 2));
+/* harmony export (immutable) */ __webpack_exports__["SineOut"] = SineOut;
+
+const SineInOut = t => -1 * (Math.cos(Math.PI * t) - 1) / 2;
+/* harmony export (immutable) */ __webpack_exports__["SineInOut"] = SineInOut;
+
+function BackIn (t) {
+  var s = 1.70158;
+  return t * t * ((s + 1) * t - s);
+};
+function BackOut (t) {
+  var s = 1.70158;
+  t = t - 1;
+  return t*t*((s+1)*t + s) + 1;
+};
+function BackInOut (t) {
+  var s = 1.70158 * 1.525;
+  t = t * 2;
+  if(t < 1){ return (Math.pow(t, 2) * ((s + 1) * t - s)) / 2; }
+  t-=2;
+  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+};
+function ElasticIn (n) {
+  if(n == 0 || n == 1){ return n; }
+  var p = .3;
+  var s = p / 4;
+  n = n - 1;
+  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+};
+function ElasticOut (n) {
+  if(n==0 || n == 1){ return n; }
+  var p = .3;
+  var s = p / 4;
+  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+};
+function ElasticInOut (n) {
+  if(n == 0) return 0;
+  n = n * 2;
+  if(n == 2) return 1;
+  var p = .3 * 1.5;
+  var s = p / 4;
+  if(n < 1){
+    n -= 1;
+    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
+  }
+  n -= 1;
+  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
+};
+function DampedOscillation (n) {
+  const oscillations = 5;
+  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
+}
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__);
+
+
+
+
+// Create some spare vectors for use in screenToWorld method
+const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const rotMat = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.create();
+
+/**
+ * InputSystem's job is to keep track of most recent user input to provide
+ * filtering and rate-limiting etc. Inputs should be passed on the the rest
+ * of game in World co-ordinates rather than screen co-ordinates so the
+ * InputSystem is responsible for mapping between the two.
+ *
+ * @todo Right now this is very 2D orientated. Try to make more generic
+ * @extends {GameObject}
+ * @param {Element} screen - Should be a DOMElement to get size information from
+ * @param {any} keyboard - Something to watch for keyboard events on e.g. document
+ * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
+ */
+class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+  constructor (screen, keyboard, cameraSystem) {
+    super();
+
+    this.screen = screen;
+    this.keyboard = keyboard;
+    this.camera = cameraSystem;
+    /** @deprecated */
+    this.cameraSystem = cameraSystem;
+
+    this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+
+    // These values will persist for exactly one frame
+
+    /**
+     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
+     * @type {vec2}
+     */
+    this.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+
+    /**
+     * Boolean to indicate if a click has been registered during the last frame.
+     * @type {boolean}
+     */
+    this.hasClick = false;
+
+    this._nextKey = null;
+
+    /**
+     * The most recent key press if one occured during the previous frame.
+     * @type {boolean}
+     */
+    this.lastKey = null;
+
+    initScreen.call(this);
+    initKeyboard.call(this);
+  }
+
+  update (delta) {
+    super.update(delta);
+
+    // Cycle the next event to last event property here so that
+    // last event persists for exactly one frame.
+
+    // Click
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this.lastClick, this._nextClick);
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(this._nextClick, NaN, NaN);
+    this.hasClick = !isNaN(this.lastClick[0]);
+
+    // Keypress
+    this.lastKey = this._nextKey;
+    // Consumers should interpret (null) as no keypress
+    this._nextKey = null;
+  }
+
+  /**
+   * Set a new screen object and initialse event listening on it.
+   * @param {Element} screen - New screen
+   */
+  setScreen (screen) {
+    this.screen = screen;
+
+    initScreen.call(this);
+  }
+
+  /**
+   * Convert screen co-ordinates to world co-ordinates.
+   * @param {number} screenX - X co-ordinate on screen.
+   * @param {number} screenY - Y co-ordinate on screen.
+   * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
+   */
+  screenToWorld (screenX, screenY){
+    const cam = this.camera,
+        camWidth = cam.width,
+        camHeight = cam.height,
+        screen = this.screen,
+        screenWidth = screen.offsetWidth,
+        screenHeight = screen.offsetHeight,
+        screenScale = camWidth / screenWidth;
+
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v,
+        screenX - screenWidth / 2,
+        screenY - screenHeight / 2);
+
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(v, v, screenScale);
+
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+
+    // Rotation in 2D only makes sense around the Z-axis so that is
+    // all that is handled here.
+    if(cam.rotationAxis[2] == 1){
+      __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.rotate(rotMat, rotMat, -cam.rotation);
+      __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.transformMat2(v, v, rotMat);
+    }
+
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.add(v, v, cam.position);
+    return v;
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = InputSystem;
+
+/**
+ * Private method to initialse touch events on screen.
+ *
+ * Should be invoked as initScreen.call(this);
+ * @private
+ */
+function initScreen () {
+  if (!this.screen) return;
+
+  TouchClick(this.screen, e => {
+    const offsetLeft = this.screen.offsetLeft,
+        offsetTop = this.screen.offsetTop,
+        touch = e.touches && e.touches[0],
+        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
+        y = (touch ? touch.pageY : e.pageY) - offsetTop;
+
+    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this._nextClick, this.screenToWorld(x, y));
+  });
+}
+
+/**
+ * Initialse keyboard events
+ *
+ * Should be invoked as initKeyboard.call(this);
+ * @private
+ */
+function initKeyboard () {
+  if (!this.keyboard) return;
+
+  this.keyboard.addEventListener("keydown", e => {
+    this._nextKey = e.which;
+  });
+}
+
+/**
+ * @callback TouchClickCallback
+ * @param {object} event - Generic event object which will be relevant to event type.
+ */
+
+/**
+ * Helper function to handle both touches and clicks consistently
+ * @private
+ * @param {Element} sel - Element on which we should look for input
+ * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
+ */
+function TouchClick(sel, fnc) {
+  const handle = function(event){
+    event.stopPropagation();
+    event.preventDefault();
+    if(event.handled !== true) {
+        fnc(event);
+        event.handled = true;
+    } else {
+        return false;
+    }
+  };
+
+  // Remove previous handler in case this is element being re-initialised
+  sel.removeEventListener('touchstart', sel.touchClick);
+  sel.removeEventListener('click', sel.touchClick);
+
+  // Add new handler
+  sel.addEventListener('touchstart', handle);
+  sel.addEventListener('click', handle);
+
+  // We need to keep track of this handler in order to be able to remove it later.
+  sel.touchClick = handle;
+}
+
+// function worldToScreen(inputSystem, worldX, worldY){
+//   // TODO: Check whether or not this code is outdated
+//   var cam = inputSystem.cameraSystem,
+//       screen = inputSystem.screen,
+//       v = cam.worldVec.set(worldX, worldY);
+//   v.subtract(cam.position);
+//   v.leftMultiply(cam.shearMatrix);
+//   v.leftMultiply(cam.scaleMatrix);
+//   v.leftMultiply(cam.rotMat);
+//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
+//   return v;
+// };
+
+/**
+ * Reference object to convert keys to keycodes
+ * @static
+ * @type {object}
+ */
+InputSystem.Keys = {
+  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
+
+
+
+/**
+ * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
+ * will get rendered to the canvas.
+ * <p>It supports render layers as well.
+ * @extends {GameObject}
+ * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
+ * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
+ */
+class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+
+	constructor (context, cameraSystem) {
+		super();
+
+		this.context = context;
+		this.canvas = context && context.canvas;
+		this.camera = cameraSystem;
+
+		/** @deprecated */
+		this.cameraSystem = cameraSystem;
+
+		this.renderQueue = [];
+
+		/**
+		 * Should the renderer clear the screen before drawing a frame or just overdraw.
+		 * @type {boolean}
+		 */
+		this.clearScreen = true;
+	}
+
+	/**
+	 * @callback CanvasRenderable
+	 * @param {CanvasRenderingContext2D} context
+	 */
+
+	/**
+	 * Add a renderable to the draw queue
+	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
+	 * @param {number} layer - Layer to add this drawable to. Default: 1
+	 */
+	push (renderable, layer) {
+		layer = layer == undefined ? 1 : layer;
+		if(!this.renderQueue[layer]) {
+			this.renderQueue[layer] = [];
+		}
+		this.renderQueue[layer].push(renderable);
+	}
+
+	update (delta) {
+		if(this.clearScreen){
+			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+		}
+
+		this.context.save();
+
+		var p = this.camera.position,
+			q = this.canvas.width / 2,
+			r = this.canvas.height / 2,
+			i,
+			l,
+			j,
+			n;
+
+		this.context.translate(q,r);
+		// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+		this.context.scale(this.camera.scaleX, this.camera.scaleY);
+
+		// Only rotation around the Z-axis makes sense for canvas rendering
+		if(this.camera.rotationAxis[2] == 1){
+			this.context.rotate(-this.camera.rotation);
+		}
+
+		this.context.translate(-p[0],-p[1]);
+
+		for(i = 0, l = this.renderQueue.length; i < l; i++){
+			_renderQueue(this, i);
+		}
+
+		this.context.restore();
+
+		// Special case layer renders on top independant of camera
+		_renderQueue(this, -1);
+	}
+
+	drawPath (context, path){
+		var i = 2,
+				l = path.length;
+		context.beginPath();
+		context.moveTo(path[0],path[1]);
+		for(;i<l-1;i+=2){
+			context.lineTo(path[i],path[i+1]);
+		}
+	}
+
+	/**
+	 * Convenience method to stroke a path with the given style and to the given layer.
+	 * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
+	 * @param {string} style - Colour of line to draw. Default: #000
+	 * @param {number} layer - Layer this should be drawn on. Default: 1
+	 */
+	strokePath (path, style, layer) {
+		if(typeof style == "undefined")
+			style = '#000';
+	 	if(typeof layer == "undefined")
+			layer = 1;
+		this.push(function(context){
+			context.strokeStyle = style;
+			this.drawPath(context, path);
+			context.stroke();
+		}, layer);
+	}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = CanvasRenderSystem;
+
+function _renderQueue (renderSystem, layer) {
+	const { context, renderQueue } = renderSystem;
+	const queue = renderQueue[layer];
+	if(queue){
+		for(let j = 0, n = queue.length; j < n; j++){
+			context.save();
+			queue[j].call(renderSystem, context);
+			context.restore();
+		}
+		queue.length = 0;
+	}
+}
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+
+
+/** @namespace World */
+
+/**
+ * Generic way to access a 'world' with intrinsic bounds.
+ * @extends {GameObject}
+ * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
+ * @memberof World
+ */
+class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor (bounds) {
+        super();
+        this.bounds = bounds;
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = WorldSystem;
+
+
+/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2540,6 +2541,31 @@ function eventMixin (constructor) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
+
+
+class MoveToClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor(input) {
+        super();
+        this.input = input;
+    }
+    update(parent, delta) {
+        if (this.input.hasClick) {
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(parent.position, this.input.lastClick);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = MoveToClickComponent;
+
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
@@ -2637,12 +2663,12 @@ class CameraSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /*
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
 
 
@@ -2739,7 +2765,7 @@ function cross(a, b){
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2829,7 +2855,7 @@ class BounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__[
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2868,7 +2894,7 @@ class CollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2915,7 +2941,7 @@ class SolidComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3054,7 +3080,7 @@ function arrayRemoveItem(from, to) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3094,7 +3120,7 @@ class ClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3131,7 +3157,7 @@ class DotRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3167,7 +3193,7 @@ class RectangleRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3198,14 +3224,14 @@ class TextRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponen
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
 
 
@@ -3270,7 +3296,7 @@ class WebGLRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3380,7 +3406,7 @@ class WorldBounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompone
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3445,7 +3471,7 @@ class WorldWrapComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -5587,7 +5613,7 @@ module.exports = mat4;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5687,7 +5713,7 @@ FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5724,16 +5750,16 @@ class AudioSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(41);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PropertyAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BoundsAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__["a"]; });
@@ -5753,42 +5779,42 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__MoveComponent__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__MoveComponent__ = __webpack_require__(44);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MoveComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__MoveComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__ = __webpack_require__(45);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PhysicsComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GravityComponent__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GravityComponent__ = __webpack_require__(43);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__GravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(46);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PointGravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(55);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TerminalVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(42);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FollowComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__FollowComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(52);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__RotationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(51);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotateToHeadingComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(56);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TrackRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(49);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__ = __webpack_require__(50);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__ = __webpack_require__(48);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomImpulseComponent", function() { return __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(26);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(54);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(47);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(53);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__["a"]; });
 
 
@@ -5826,22 +5852,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(58);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(15);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__SolidComponent__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__SolidComponent__ = __webpack_require__(16);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SolidComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__SolidComponent__["a"]; });
 
 
@@ -5857,17 +5883,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util__ = __webpack_require__(10);
 
 
@@ -6301,20 +6327,20 @@ function _resourceLoaded(self, resource) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(59);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawBoundsComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(60);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawPathComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(61);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(62);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(63);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
@@ -6332,39 +6358,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__InputSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ClickComponent__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ClickComponent__ = __webpack_require__(18);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ClickComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__ClickComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__MoveToClickComponent__ = __webpack_require__(11);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MoveToClickComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__MoveToClickComponent__["a"]; });
+
+
 
 
 
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__ = __webpack_require__(19);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DotRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__ = __webpack_require__(20);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RectangleRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(22);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(64);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(65);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
@@ -6387,16 +6417,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(9);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__WorldSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__ = __webpack_require__(23);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldBounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__ = __webpack_require__(24);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldWrapComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__["a"]; });
 
 
@@ -6406,7 +6436,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -6848,7 +6878,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -7600,7 +7630,7 @@ module.exports = mat3;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7618,7 +7648,7 @@ class BoundsAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnim
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7641,7 +7671,7 @@ class ColorAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnima
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7659,7 +7689,7 @@ class PositionAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7692,7 +7722,7 @@ class RotationAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7726,7 +7756,7 @@ class FollowComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__[
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7753,7 +7783,7 @@ GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7777,7 +7807,7 @@ class MoveComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7810,7 +7840,7 @@ class PhysicsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7839,14 +7869,14 @@ class PointGravityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompon
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Easing__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Easing__ = __webpack_require__(6);
 
 
 
@@ -7911,7 +7941,7 @@ class PositionInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_Ga
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7943,7 +7973,7 @@ class RandomImpulseComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7976,7 +8006,7 @@ class RandomPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8004,7 +8034,7 @@ class RandomVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8021,7 +8051,7 @@ class RotateToHeadingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8044,7 +8074,7 @@ class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8074,7 +8104,7 @@ class RotationInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_Ga
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8190,7 +8220,7 @@ class SwitchComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__[
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8227,7 +8257,7 @@ class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCo
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8258,7 +8288,7 @@ class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8326,7 +8356,7 @@ class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameOb
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8418,7 +8448,7 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8456,13 +8486,13 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_vec2__);
 
 
@@ -8549,7 +8579,7 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8604,12 +8634,12 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__basic_FlockingComponent__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__basic_FlockingComponent__ = __webpack_require__(26);
 
 
 
@@ -8646,7 +8676,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8687,14 +8717,14 @@ class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_mat3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
 
 
@@ -8981,7 +9011,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9242,55 +9272,56 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObject", function() { return __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__ = __webpack_require__(17);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObjectManager", function() { return __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__ = __webpack_require__(0);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(12);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__CameraSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(9);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__AudioSystem__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__AudioSystem__ = __webpack_require__(27);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AudioSystem", function() { return __WEBPACK_IMPORTED_MODULE_7__AudioSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(31);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return __WEBPACK_IMPORTED_MODULE_8__core_Game__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__animation__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__Easing__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__animation__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__Easing__ = __webpack_require__(6);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Easing", function() { return __WEBPACK_IMPORTED_MODULE_11__Easing__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__world__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__world__ = __webpack_require__(35);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "World", function() { return __WEBPACK_IMPORTED_MODULE_12__world__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__input__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__input__ = __webpack_require__(33);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Input", function() { return __WEBPACK_IMPORTED_MODULE_15__input__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__collision__ = __webpack_require__(29);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Collision", function() { return __WEBPACK_IMPORTED_MODULE_17__collision__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision_CollisionComponent__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_BounceComponent__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_BackgroundCollisionComponent__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__collision_SolidComponent__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__render__ = __webpack_require__(33);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Render", function() { return __WEBPACK_IMPORTED_MODULE_22__render__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__render_WebGLRenderSystem__ = __webpack_require__(21);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_23__render_WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_DotRenderComponent__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_RectangleRenderComponent__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__render_TextRenderComponent__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__debug__ = __webpack_require__(31);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Debug", function() { return __WEBPACK_IMPORTED_MODULE_27__debug__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__input_MoveToClickComponent__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision__ = __webpack_require__(30);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Collision", function() { return __WEBPACK_IMPORTED_MODULE_18__collision__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_CollisionComponent__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_BounceComponent__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__collision_BackgroundCollisionComponent__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__collision_SolidComponent__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__render__ = __webpack_require__(34);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Render", function() { return __WEBPACK_IMPORTED_MODULE_23__render__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_WebGLRenderSystem__ = __webpack_require__(22);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_24__render_WebGLRenderSystem__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_DotRenderComponent__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__render_RectangleRenderComponent__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__render_TextRenderComponent__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__debug__ = __webpack_require__(32);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Debug", function() { return __WEBPACK_IMPORTED_MODULE_28__debug__; });
 // Export core classes. GameObject, GameComponent etc.
 
 
@@ -9342,21 +9373,24 @@ Components['WorldWrapComponent'] = __WEBPACK_IMPORTED_MODULE_14__world_WorldWrap
 
 Components['ClickComponent'] = __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__["a" /* default */];
 
+
+Components['MoveToClickComponent'] = __WEBPACK_IMPORTED_MODULE_17__input_MoveToClickComponent__["a" /* default */];
+
 // Export collision namespace
 
 
 
 
-Components['CollisionComponent'] = __WEBPACK_IMPORTED_MODULE_18__collision_CollisionComponent__["a" /* default */];
+Components['CollisionComponent'] = __WEBPACK_IMPORTED_MODULE_19__collision_CollisionComponent__["a" /* default */];
 
 
-Components['BounceComponent'] = __WEBPACK_IMPORTED_MODULE_19__collision_BounceComponent__["a" /* default */];
+Components['BounceComponent'] = __WEBPACK_IMPORTED_MODULE_20__collision_BounceComponent__["a" /* default */];
 
 
-Components['BackgroundCollisionComponent'] = __WEBPACK_IMPORTED_MODULE_20__collision_BackgroundCollisionComponent__["a" /* default */];
+Components['BackgroundCollisionComponent'] = __WEBPACK_IMPORTED_MODULE_21__collision_BackgroundCollisionComponent__["a" /* default */];
 
 
-Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_21__collision_SolidComponent__["a" /* default */];
+Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_22__collision_SolidComponent__["a" /* default */];
 
 // Export render namespace
 
@@ -9365,13 +9399,13 @@ Components['SolidComponent'] = __WEBPACK_IMPORTED_MODULE_21__collision_SolidComp
 
 
 
-Components['DotRenderComponent'] = __WEBPACK_IMPORTED_MODULE_24__render_DotRenderComponent__["a" /* default */];
+Components['DotRenderComponent'] = __WEBPACK_IMPORTED_MODULE_25__render_DotRenderComponent__["a" /* default */];
 
 
-Components['RectangleRenderComponent'] = __WEBPACK_IMPORTED_MODULE_25__render_RectangleRenderComponent__["a" /* default */];
+Components['RectangleRenderComponent'] = __WEBPACK_IMPORTED_MODULE_26__render_RectangleRenderComponent__["a" /* default */];
 
 
-Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_26__render_TextRenderComponent__["a" /* default */];
+Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_27__render_TextRenderComponent__["a" /* default */];
 
 // Export debug
 

@@ -47,6 +47,9 @@ export { input as Input };
 import ClickComponent from './input/ClickComponent';
 Components['ClickComponent'] = ClickComponent;
 
+import MoveToClickComponent from './input/MoveToClickComponent';
+Components['MoveToClickComponent'] = MoveToClickComponent;
+
 // Export collision namespace
 import * as collision from './collision';
 export { collision as Collision };

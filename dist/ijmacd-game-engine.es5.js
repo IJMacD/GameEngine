@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 65);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -991,7 +991,7 @@ var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
-var _util = __webpack_require__(9);
+var _util = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1317,7 +1317,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _Easing = __webpack_require__(5);
+var _Easing = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1498,693 +1498,6 @@ module.exports = glMatrix;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BackIn = BackIn;
-exports.BackOut = BackOut;
-exports.BackInOut = BackInOut;
-exports.ElasticIn = ElasticIn;
-exports.ElasticOut = ElasticOut;
-exports.ElasticInOut = ElasticInOut;
-exports.DampedOscillation = DampedOscillation;
-var Linear = exports.Linear = function Linear(t) {
-  return t;
-};
-var QuadIn = exports.QuadIn = function QuadIn(t) {
-  return t * t;
-};
-var QuadOut = exports.QuadOut = function QuadOut(t) {
-  return -t * (t - 2);
-};
-var CircIn = exports.CircIn = function CircIn(t) {
-  return 1 - Math.sqrt(1 - t * t);
-};
-var CircOut = exports.CircOut = function CircOut(t) {
-  return Math.sqrt(1 - (t - 1) * (t - 1));
-};
-var Smooth = exports.Smooth = function Smooth(t) {
-  return t * t * (3 - 2 * t);
-};
-// Stolen from Dojo:
-// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
-var SineIn = exports.SineIn = function SineIn(t) {
-  return -1 * Math.cos(t * (Math.PI / 2)) + 1;
-};
-var SineOut = exports.SineOut = function SineOut(t) {
-  return Math.sin(t * (Math.PI / 2));
-};
-var SineInOut = exports.SineInOut = function SineInOut(t) {
-  return -1 * (Math.cos(Math.PI * t) - 1) / 2;
-};
-function BackIn(t) {
-  var s = 1.70158;
-  return t * t * ((s + 1) * t - s);
-};
-function BackOut(t) {
-  var s = 1.70158;
-  t = t - 1;
-  return t * t * ((s + 1) * t + s) + 1;
-};
-function BackInOut(t) {
-  var s = 1.70158 * 1.525;
-  t = t * 2;
-  if (t < 1) {
-    return Math.pow(t, 2) * ((s + 1) * t - s) / 2;
-  }
-  t -= 2;
-  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
-};
-function ElasticIn(n) {
-  if (n == 0 || n == 1) {
-    return n;
-  }
-  var p = .3;
-  var s = p / 4;
-  n = n - 1;
-  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
-};
-function ElasticOut(n) {
-  if (n == 0 || n == 1) {
-    return n;
-  }
-  var p = .3;
-  var s = p / 4;
-  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
-};
-function ElasticInOut(n) {
-  if (n == 0) return 0;
-  n = n * 2;
-  if (n == 2) return 1;
-  var p = .3 * 1.5;
-  var s = p / 4;
-  if (n < 1) {
-    n -= 1;
-    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
-  }
-  n -= 1;
-  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
-};
-function DampedOscillation(n) {
-  var oscillations = 5;
-  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
-}
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _vec = __webpack_require__(10);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-var _mat = __webpack_require__(63);
-
-var _mat2 = _interopRequireDefault(_mat);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// Create some spare vectors for use in screenToWorld method
-var v = _vec2.default.create();
-var rotMat = _mat2.default.create();
-
-/**
- * InputSystem's job is to keep track of most recent user input to provide
- * filtering and rate-limiting etc. Inputs should be passed on the the rest
- * of game in World co-ordinates rather than screen co-ordinates so the
- * InputSystem is responsible for mapping between the two.
- *
- * @todo Right now this is very 2D orientated. Try to make more generic
- * @extends {GameObject}
- * @param {Element} screen - Should be a DOMElement to get size information from
- * @param {any} keyboard - Something to watch for keyboard events on e.g. document
- * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
- */
-
-var InputSystem = function (_GameObject) {
-  _inherits(InputSystem, _GameObject);
-
-  function InputSystem(screen, keyboard, cameraSystem) {
-    _classCallCheck(this, InputSystem);
-
-    var _this = _possibleConstructorReturn(this, (InputSystem.__proto__ || Object.getPrototypeOf(InputSystem)).call(this));
-
-    _this.screen = screen;
-    _this.keyboard = keyboard;
-    _this.camera = cameraSystem;
-    /** @deprecated */
-    _this.cameraSystem = cameraSystem;
-
-    _this._nextClick = _vec2.default.create();
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    _this.lastClick = _vec2.default.create();
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    _this.hasClick = false;
-
-    _this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    _this.lastKey = null;
-
-    initScreen.call(_this);
-    initKeyboard.call(_this);
-    return _this;
-  }
-
-  _createClass(InputSystem, [{
-    key: 'update',
-    value: function update(delta) {
-      _get(InputSystem.prototype.__proto__ || Object.getPrototypeOf(InputSystem.prototype), 'update', this).call(this, delta);
-
-      // Cycle the next event to last event property here so that
-      // last event persists for exactly one frame.
-
-      // Click
-      _vec2.default.copy(this.lastClick, this._nextClick);
-      _vec2.default.set(this._nextClick, NaN, NaN);
-      this.hasClick = !isNaN(this.lastClick[0]);
-
-      // Keypress
-      this.lastKey = this._nextKey;
-      // Consumers should interpret (null) as no keypress
-      this._nextKey = null;
-    }
-
-    /**
-     * Set a new screen object and initialse event listening on it.
-     * @param {Element} screen - New screen
-     */
-
-  }, {
-    key: 'setScreen',
-    value: function setScreen(screen) {
-      this.screen = screen;
-
-      initScreen.call(this);
-    }
-
-    /**
-     * Convert screen co-ordinates to world co-ordinates.
-     * @param {number} screenX - X co-ordinate on screen.
-     * @param {number} screenY - Y co-ordinate on screen.
-     * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
-     */
-
-  }, {
-    key: 'screenToWorld',
-    value: function screenToWorld(screenX, screenY) {
-      var cam = this.camera,
-          camWidth = cam.width,
-          camHeight = cam.height,
-          screen = this.screen,
-          screenWidth = screen.offsetWidth,
-          screenHeight = screen.offsetHeight,
-          screenScale = camWidth / screenWidth;
-
-      _vec2.default.set(v, screenX - screenWidth / 2, screenY - screenHeight / 2);
-
-      _vec2.default.scale(v, v, screenScale);
-
-      _vec2.default.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
-
-      // Rotation in 2D only makes sense around the Z-axis so that is
-      // all that is handled here.
-      if (cam.rotationAxis[2] == 1) {
-        _mat2.default.rotate(rotMat, rotMat, -cam.rotation);
-        _vec2.default.transformMat2(v, v, rotMat);
-      }
-
-      _vec2.default.add(v, v, cam.position);
-      return v;
-    }
-  }]);
-
-  return InputSystem;
-}(_GameObject3.default);
-
-exports.default = InputSystem;
-
-/**
- * Private method to initialse touch events on screen.
- *
- * Should be invoked as initScreen.call(this);
- * @private
- */
-
-function initScreen() {
-  var _this2 = this;
-
-  if (!this.screen) return;
-
-  TouchClick(this.screen, function (e) {
-    var offsetLeft = _this2.screen.offsetLeft,
-        offsetTop = _this2.screen.offsetTop,
-        touch = e.touches && e.touches[0],
-        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
-        y = (touch ? touch.pageY : e.pageY) - offsetTop;
-
-    _vec2.default.copy(_this2._nextClick, _this2.screenToWorld(x, y));
-  });
-}
-
-/**
- * Initialse keyboard events
- *
- * Should be invoked as initKeyboard.call(this);
- * @private
- */
-function initKeyboard() {
-  var _this3 = this;
-
-  if (!this.keyboard) return;
-
-  this.keyboard.addEventListener("keydown", function (e) {
-    _this3._nextKey = e.which;
-  });
-}
-
-/**
- * @callback TouchClickCallback
- * @param {object} event - Generic event object which will be relevant to event type.
- */
-
-/**
- * Helper function to handle both touches and clicks consistently
- * @private
- * @param {Element} sel - Element on which we should look for input
- * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
- */
-function TouchClick(sel, fnc) {
-  var handle = function handle(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    if (event.handled !== true) {
-      fnc(event);
-      event.handled = true;
-    } else {
-      return false;
-    }
-  };
-
-  // Remove previous handler in case this is element being re-initialised
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
-
-  // Add new handler
-  sel.addEventListener('touchstart', handle);
-  sel.addEventListener('click', handle);
-
-  // We need to keep track of this handler in order to be able to remove it later.
-  sel.touchClick = handle;
-}
-
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _GameComponent = __webpack_require__(0);
-
-var _GameComponent2 = _interopRequireDefault(_GameComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
- * will get rendered to the canvas.
- * <p>It supports render layers as well.
- * @extends {GameObject}
- * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
- * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
- */
-var CanvasRenderSystem = function (_GameObject) {
-	_inherits(CanvasRenderSystem, _GameObject);
-
-	function CanvasRenderSystem(context, cameraSystem) {
-		_classCallCheck(this, CanvasRenderSystem);
-
-		var _this = _possibleConstructorReturn(this, (CanvasRenderSystem.__proto__ || Object.getPrototypeOf(CanvasRenderSystem)).call(this));
-
-		_this.context = context;
-		_this.canvas = context && context.canvas;
-		_this.camera = cameraSystem;
-
-		/** @deprecated */
-		_this.cameraSystem = cameraSystem;
-
-		_this.renderQueue = [];
-
-		/**
-   * Should the renderer clear the screen before drawing a frame or just overdraw.
-   * @type {boolean}
-   */
-		_this.clearScreen = true;
-		return _this;
-	}
-
-	/**
-  * @callback CanvasRenderable
-  * @param {CanvasRenderingContext2D} context
-  */
-
-	/**
-  * Add a renderable to the draw queue
-  * @param {CanvasRenderable} renderable - Function which will receive drawing context
-  * @param {number} layer - Layer to add this drawable to. Default: 1
-  */
-
-
-	_createClass(CanvasRenderSystem, [{
-		key: 'push',
-		value: function push(renderable, layer) {
-			layer = layer == undefined ? 1 : layer;
-			if (!this.renderQueue[layer]) {
-				this.renderQueue[layer] = [];
-			}
-			this.renderQueue[layer].push(renderable);
-		}
-	}, {
-		key: 'update',
-		value: function update(delta) {
-			if (this.clearScreen) {
-				this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-			}
-
-			this.context.save();
-
-			var p = this.camera.position,
-			    q = this.canvas.width / 2,
-			    r = this.canvas.height / 2,
-			    i,
-			    l,
-			    j,
-			    n;
-
-			this.context.translate(q, r);
-			// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
-			this.context.scale(this.camera.scaleX, this.camera.scaleY);
-
-			// Only rotation around the Z-axis makes sense for canvas rendering
-			if (this.camera.rotationAxis[2] == 1) {
-				this.context.rotate(-this.camera.rotation);
-			}
-
-			this.context.translate(-p[0], -p[1]);
-
-			for (i = 0, l = this.renderQueue.length; i < l; i++) {
-				_renderQueue(this, i);
-			}
-
-			this.context.restore();
-
-			// Special case layer renders on top independant of camera
-			_renderQueue(this, -1);
-		}
-	}, {
-		key: 'drawPath',
-		value: function drawPath(context, path) {
-			var i = 2,
-			    l = path.length;
-			context.beginPath();
-			context.moveTo(path[0], path[1]);
-			for (; i < l - 1; i += 2) {
-				context.lineTo(path[i], path[i + 1]);
-			}
-		}
-
-		/**
-   * Convenience method to stroke a path with the given style and to the given layer.
-   * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
-   * @param {string} style - Colour of line to draw. Default: #000
-   * @param {number} layer - Layer this should be drawn on. Default: 1
-   */
-
-	}, {
-		key: 'strokePath',
-		value: function strokePath(path, style, layer) {
-			if (typeof style == "undefined") style = '#000';
-			if (typeof layer == "undefined") layer = 1;
-			this.push(function (context) {
-				context.strokeStyle = style;
-				this.drawPath(context, path);
-				context.stroke();
-			}, layer);
-		}
-	}]);
-
-	return CanvasRenderSystem;
-}(_GameObject3.default);
-
-exports.default = CanvasRenderSystem;
-
-
-function _renderQueue(renderSystem, layer) {
-	var context = renderSystem.context,
-	    renderQueue = renderSystem.renderQueue;
-
-	var queue = renderQueue[layer];
-	if (queue) {
-		for (var j = 0, n = queue.length; j < n; j++) {
-			context.save();
-			queue[j].call(renderSystem, context);
-			context.restore();
-		}
-		queue.length = 0;
-	}
-}
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/** @namespace World */
-
-/**
- * Generic way to access a 'world' with intrinsic bounds.
- * @extends {GameObject}
- * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
- * @memberof World
- */
-var WorldSystem = function (_GameObject) {
-    _inherits(WorldSystem, _GameObject);
-
-    function WorldSystem(bounds) {
-        _classCallCheck(this, WorldSystem);
-
-        var _this = _possibleConstructorReturn(this, (WorldSystem.__proto__ || Object.getPrototypeOf(WorldSystem)).call(this));
-
-        _this.bounds = bounds;
-        return _this;
-    }
-
-    return WorldSystem;
-}(_GameObject3.default);
-
-exports.default = WorldSystem;
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.simplifyPaths = simplifyPaths;
-exports.parseColor = parseColor;
-exports.eventMixin = eventMixin;
-/**
- * This function simplifies paths which are really just path segments
- * by joining up adjacent segments.
- * @param {array} paths - Array of arrays of numbers
- * @return {array} Array of arrays of numbers
- */
-function simplifyPaths(paths) {
-  var out = [],
-      current,
-      x,
-      y;
-  paths.forEach(function (path) {
-    if (path.length == 4) {
-      if (path[0] == x && path[1] == y) {
-        x = path[2];
-        y = path[3];
-        current.push(x, y);
-      } else {
-        if (current) {
-          out.push(current);
-        }
-
-        current = path.slice(0);
-        x = path[2];
-        y = path[3];
-      }
-    }
-  });
-  if (current) {
-    out.push(current);
-  }
-  return out;
-}
-
-var hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
-var hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
-var rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
-
-function parseColor(str) {
-
-  var match = str.match(hexColor) || str.match(hexColorShort);
-  if (match) {
-    var out = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16), 1];
-    out.format = "hex";
-    return out;
-  }
-
-  match = str.match(rgbRegex);
-  if (match) {
-    var _out = [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10), match[4] ? parseFloat(match[4]) : 1];
-    _out.format = "rgb";
-    return _out;
-  }
-}
-
-function eventMixin(constructor) {
-
-  function on(event, callback) {
-    if (!this._events) this._events = {};
-
-    if (!this._events[event]) {
-      this._events[event] = [];
-    }
-    this._events[event].push(callback);
-    return this;
-  }
-
-  function fire(event) {
-    var _this = this;
-
-    for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      params[_key - 1] = arguments[_key];
-    }
-
-    if (!this._events) this._events = {};
-
-    var callbacks = this._events[event];
-
-    if (callbacks && callbacks.length) {
-      callbacks.forEach(function (callback) {
-        callback.apply(_this, params);
-      });
-    }
-  }
-
-  constructor.prototype.on = on;
-  constructor.prototype.fire = fire;
-}
-
-/***/ }),
-/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -2777,6 +2090,694 @@ module.exports = vec2;
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BackIn = BackIn;
+exports.BackOut = BackOut;
+exports.BackInOut = BackInOut;
+exports.ElasticIn = ElasticIn;
+exports.ElasticOut = ElasticOut;
+exports.ElasticInOut = ElasticInOut;
+exports.DampedOscillation = DampedOscillation;
+var Linear = exports.Linear = function Linear(t) {
+  return t;
+};
+var QuadIn = exports.QuadIn = function QuadIn(t) {
+  return t * t;
+};
+var QuadOut = exports.QuadOut = function QuadOut(t) {
+  return -t * (t - 2);
+};
+var CircIn = exports.CircIn = function CircIn(t) {
+  return 1 - Math.sqrt(1 - t * t);
+};
+var CircOut = exports.CircOut = function CircOut(t) {
+  return Math.sqrt(1 - (t - 1) * (t - 1));
+};
+var Smooth = exports.Smooth = function Smooth(t) {
+  return t * t * (3 - 2 * t);
+};
+// Stolen from Dojo:
+// https://github.com/dojo/dwb/blob/master/src/main/webapp/js/build/amd_loader/fx/easing.js
+var SineIn = exports.SineIn = function SineIn(t) {
+  return -1 * Math.cos(t * (Math.PI / 2)) + 1;
+};
+var SineOut = exports.SineOut = function SineOut(t) {
+  return Math.sin(t * (Math.PI / 2));
+};
+var SineInOut = exports.SineInOut = function SineInOut(t) {
+  return -1 * (Math.cos(Math.PI * t) - 1) / 2;
+};
+function BackIn(t) {
+  var s = 1.70158;
+  return t * t * ((s + 1) * t - s);
+};
+function BackOut(t) {
+  var s = 1.70158;
+  t = t - 1;
+  return t * t * ((s + 1) * t + s) + 1;
+};
+function BackInOut(t) {
+  var s = 1.70158 * 1.525;
+  t = t * 2;
+  if (t < 1) {
+    return Math.pow(t, 2) * ((s + 1) * t - s) / 2;
+  }
+  t -= 2;
+  return (Math.pow(t, 2) * ((s + 1) * t + s) + 2) / 2;
+};
+function ElasticIn(n) {
+  if (n == 0 || n == 1) {
+    return n;
+  }
+  var p = .3;
+  var s = p / 4;
+  n = n - 1;
+  return -1 * Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p);
+};
+function ElasticOut(n) {
+  if (n == 0 || n == 1) {
+    return n;
+  }
+  var p = .3;
+  var s = p / 4;
+  return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+};
+function ElasticInOut(n) {
+  if (n == 0) return 0;
+  n = n * 2;
+  if (n == 2) return 1;
+  var p = .3 * 1.5;
+  var s = p / 4;
+  if (n < 1) {
+    n -= 1;
+    return -.5 * (Math.pow(2, 10 * n) * Math.sin((n - s) * (2 * Math.PI) / p));
+  }
+  n -= 1;
+  return .5 * (Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p)) + 1;
+};
+function DampedOscillation(n) {
+  var oscillations = 5;
+  return 1 - Math.cos(n * 2 * Math.PI * oscillations) * (1 - QuadOut(n));
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameObject2 = __webpack_require__(2);
+
+var _GameObject3 = _interopRequireDefault(_GameObject2);
+
+var _vec = __webpack_require__(5);
+
+var _vec2 = _interopRequireDefault(_vec);
+
+var _mat = __webpack_require__(64);
+
+var _mat2 = _interopRequireDefault(_mat);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Create some spare vectors for use in screenToWorld method
+var v = _vec2.default.create();
+var rotMat = _mat2.default.create();
+
+/**
+ * InputSystem's job is to keep track of most recent user input to provide
+ * filtering and rate-limiting etc. Inputs should be passed on the the rest
+ * of game in World co-ordinates rather than screen co-ordinates so the
+ * InputSystem is responsible for mapping between the two.
+ *
+ * @todo Right now this is very 2D orientated. Try to make more generic
+ * @extends {GameObject}
+ * @param {Element} screen - Should be a DOMElement to get size information from
+ * @param {any} keyboard - Something to watch for keyboard events on e.g. document
+ * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
+ */
+
+var InputSystem = function (_GameObject) {
+  _inherits(InputSystem, _GameObject);
+
+  function InputSystem(screen, keyboard, cameraSystem) {
+    _classCallCheck(this, InputSystem);
+
+    var _this = _possibleConstructorReturn(this, (InputSystem.__proto__ || Object.getPrototypeOf(InputSystem)).call(this));
+
+    _this.screen = screen;
+    _this.keyboard = keyboard;
+    _this.camera = cameraSystem;
+    /** @deprecated */
+    _this.cameraSystem = cameraSystem;
+
+    _this._nextClick = _vec2.default.create();
+
+    // These values will persist for exactly one frame
+
+    /**
+     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
+     * @type {vec2}
+     */
+    _this.lastClick = _vec2.default.create();
+
+    /**
+     * Boolean to indicate if a click has been registered during the last frame.
+     * @type {boolean}
+     */
+    _this.hasClick = false;
+
+    _this._nextKey = null;
+
+    /**
+     * The most recent key press if one occured during the previous frame.
+     * @type {boolean}
+     */
+    _this.lastKey = null;
+
+    initScreen.call(_this);
+    initKeyboard.call(_this);
+    return _this;
+  }
+
+  _createClass(InputSystem, [{
+    key: 'update',
+    value: function update(delta) {
+      _get(InputSystem.prototype.__proto__ || Object.getPrototypeOf(InputSystem.prototype), 'update', this).call(this, delta);
+
+      // Cycle the next event to last event property here so that
+      // last event persists for exactly one frame.
+
+      // Click
+      _vec2.default.copy(this.lastClick, this._nextClick);
+      _vec2.default.set(this._nextClick, NaN, NaN);
+      this.hasClick = !isNaN(this.lastClick[0]);
+
+      // Keypress
+      this.lastKey = this._nextKey;
+      // Consumers should interpret (null) as no keypress
+      this._nextKey = null;
+    }
+
+    /**
+     * Set a new screen object and initialse event listening on it.
+     * @param {Element} screen - New screen
+     */
+
+  }, {
+    key: 'setScreen',
+    value: function setScreen(screen) {
+      this.screen = screen;
+
+      initScreen.call(this);
+    }
+
+    /**
+     * Convert screen co-ordinates to world co-ordinates.
+     * @param {number} screenX - X co-ordinate on screen.
+     * @param {number} screenY - Y co-ordinate on screen.
+     * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
+     */
+
+  }, {
+    key: 'screenToWorld',
+    value: function screenToWorld(screenX, screenY) {
+      var cam = this.camera,
+          camWidth = cam.width,
+          camHeight = cam.height,
+          screen = this.screen,
+          screenWidth = screen.offsetWidth,
+          screenHeight = screen.offsetHeight,
+          screenScale = camWidth / screenWidth;
+
+      _vec2.default.set(v, screenX - screenWidth / 2, screenY - screenHeight / 2);
+
+      _vec2.default.scale(v, v, screenScale);
+
+      _vec2.default.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+
+      // Rotation in 2D only makes sense around the Z-axis so that is
+      // all that is handled here.
+      if (cam.rotationAxis[2] == 1) {
+        _mat2.default.rotate(rotMat, rotMat, -cam.rotation);
+        _vec2.default.transformMat2(v, v, rotMat);
+      }
+
+      _vec2.default.add(v, v, cam.position);
+      return v;
+    }
+  }]);
+
+  return InputSystem;
+}(_GameObject3.default);
+
+exports.default = InputSystem;
+
+/**
+ * Private method to initialse touch events on screen.
+ *
+ * Should be invoked as initScreen.call(this);
+ * @private
+ */
+
+function initScreen() {
+  var _this2 = this;
+
+  if (!this.screen) return;
+
+  TouchClick(this.screen, function (e) {
+    var offsetLeft = _this2.screen.offsetLeft,
+        offsetTop = _this2.screen.offsetTop,
+        touch = e.touches && e.touches[0],
+        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
+        y = (touch ? touch.pageY : e.pageY) - offsetTop;
+
+    _vec2.default.copy(_this2._nextClick, _this2.screenToWorld(x, y));
+  });
+}
+
+/**
+ * Initialse keyboard events
+ *
+ * Should be invoked as initKeyboard.call(this);
+ * @private
+ */
+function initKeyboard() {
+  var _this3 = this;
+
+  if (!this.keyboard) return;
+
+  this.keyboard.addEventListener("keydown", function (e) {
+    _this3._nextKey = e.which;
+  });
+}
+
+/**
+ * @callback TouchClickCallback
+ * @param {object} event - Generic event object which will be relevant to event type.
+ */
+
+/**
+ * Helper function to handle both touches and clicks consistently
+ * @private
+ * @param {Element} sel - Element on which we should look for input
+ * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
+ */
+function TouchClick(sel, fnc) {
+  var handle = function handle(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (event.handled !== true) {
+      fnc(event);
+      event.handled = true;
+    } else {
+      return false;
+    }
+  };
+
+  // Remove previous handler in case this is element being re-initialised
+  sel.removeEventListener('touchstart', sel.touchClick);
+  sel.removeEventListener('click', sel.touchClick);
+
+  // Add new handler
+  sel.addEventListener('touchstart', handle);
+  sel.addEventListener('click', handle);
+
+  // We need to keep track of this handler in order to be able to remove it later.
+  sel.touchClick = handle;
+}
+
+// function worldToScreen(inputSystem, worldX, worldY){
+//   // TODO: Check whether or not this code is outdated
+//   var cam = inputSystem.cameraSystem,
+//       screen = inputSystem.screen,
+//       v = cam.worldVec.set(worldX, worldY);
+//   v.subtract(cam.position);
+//   v.leftMultiply(cam.shearMatrix);
+//   v.leftMultiply(cam.scaleMatrix);
+//   v.leftMultiply(cam.rotMat);
+//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
+//   return v;
+// };
+
+/**
+ * Reference object to convert keys to keycodes
+ * @static
+ * @type {object}
+ */
+InputSystem.Keys = {
+  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+};
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameObject2 = __webpack_require__(2);
+
+var _GameObject3 = _interopRequireDefault(_GameObject2);
+
+var _GameComponent = __webpack_require__(0);
+
+var _GameComponent2 = _interopRequireDefault(_GameComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
+ * will get rendered to the canvas.
+ * <p>It supports render layers as well.
+ * @extends {GameObject}
+ * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
+ * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
+ */
+var CanvasRenderSystem = function (_GameObject) {
+	_inherits(CanvasRenderSystem, _GameObject);
+
+	function CanvasRenderSystem(context, cameraSystem) {
+		_classCallCheck(this, CanvasRenderSystem);
+
+		var _this = _possibleConstructorReturn(this, (CanvasRenderSystem.__proto__ || Object.getPrototypeOf(CanvasRenderSystem)).call(this));
+
+		_this.context = context;
+		_this.canvas = context && context.canvas;
+		_this.camera = cameraSystem;
+
+		/** @deprecated */
+		_this.cameraSystem = cameraSystem;
+
+		_this.renderQueue = [];
+
+		/**
+   * Should the renderer clear the screen before drawing a frame or just overdraw.
+   * @type {boolean}
+   */
+		_this.clearScreen = true;
+		return _this;
+	}
+
+	/**
+  * @callback CanvasRenderable
+  * @param {CanvasRenderingContext2D} context
+  */
+
+	/**
+  * Add a renderable to the draw queue
+  * @param {CanvasRenderable} renderable - Function which will receive drawing context
+  * @param {number} layer - Layer to add this drawable to. Default: 1
+  */
+
+
+	_createClass(CanvasRenderSystem, [{
+		key: 'push',
+		value: function push(renderable, layer) {
+			layer = layer == undefined ? 1 : layer;
+			if (!this.renderQueue[layer]) {
+				this.renderQueue[layer] = [];
+			}
+			this.renderQueue[layer].push(renderable);
+		}
+	}, {
+		key: 'update',
+		value: function update(delta) {
+			if (this.clearScreen) {
+				this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			}
+
+			this.context.save();
+
+			var p = this.camera.position,
+			    q = this.canvas.width / 2,
+			    r = this.canvas.height / 2,
+			    i,
+			    l,
+			    j,
+			    n;
+
+			this.context.translate(q, r);
+			// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+			this.context.scale(this.camera.scaleX, this.camera.scaleY);
+
+			// Only rotation around the Z-axis makes sense for canvas rendering
+			if (this.camera.rotationAxis[2] == 1) {
+				this.context.rotate(-this.camera.rotation);
+			}
+
+			this.context.translate(-p[0], -p[1]);
+
+			for (i = 0, l = this.renderQueue.length; i < l; i++) {
+				_renderQueue(this, i);
+			}
+
+			this.context.restore();
+
+			// Special case layer renders on top independant of camera
+			_renderQueue(this, -1);
+		}
+	}, {
+		key: 'drawPath',
+		value: function drawPath(context, path) {
+			var i = 2,
+			    l = path.length;
+			context.beginPath();
+			context.moveTo(path[0], path[1]);
+			for (; i < l - 1; i += 2) {
+				context.lineTo(path[i], path[i + 1]);
+			}
+		}
+
+		/**
+   * Convenience method to stroke a path with the given style and to the given layer.
+   * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
+   * @param {string} style - Colour of line to draw. Default: #000
+   * @param {number} layer - Layer this should be drawn on. Default: 1
+   */
+
+	}, {
+		key: 'strokePath',
+		value: function strokePath(path, style, layer) {
+			if (typeof style == "undefined") style = '#000';
+			if (typeof layer == "undefined") layer = 1;
+			this.push(function (context) {
+				context.strokeStyle = style;
+				this.drawPath(context, path);
+				context.stroke();
+			}, layer);
+		}
+	}]);
+
+	return CanvasRenderSystem;
+}(_GameObject3.default);
+
+exports.default = CanvasRenderSystem;
+
+
+function _renderQueue(renderSystem, layer) {
+	var context = renderSystem.context,
+	    renderQueue = renderSystem.renderQueue;
+
+	var queue = renderQueue[layer];
+	if (queue) {
+		for (var j = 0, n = queue.length; j < n; j++) {
+			context.save();
+			queue[j].call(renderSystem, context);
+			context.restore();
+		}
+		queue.length = 0;
+	}
+}
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _GameObject2 = __webpack_require__(2);
+
+var _GameObject3 = _interopRequireDefault(_GameObject2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/** @namespace World */
+
+/**
+ * Generic way to access a 'world' with intrinsic bounds.
+ * @extends {GameObject}
+ * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
+ * @memberof World
+ */
+var WorldSystem = function (_GameObject) {
+    _inherits(WorldSystem, _GameObject);
+
+    function WorldSystem(bounds) {
+        _classCallCheck(this, WorldSystem);
+
+        var _this = _possibleConstructorReturn(this, (WorldSystem.__proto__ || Object.getPrototypeOf(WorldSystem)).call(this));
+
+        _this.bounds = bounds;
+        return _this;
+    }
+
+    return WorldSystem;
+}(_GameObject3.default);
+
+exports.default = WorldSystem;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.simplifyPaths = simplifyPaths;
+exports.parseColor = parseColor;
+exports.eventMixin = eventMixin;
+/**
+ * This function simplifies paths which are really just path segments
+ * by joining up adjacent segments.
+ * @param {array} paths - Array of arrays of numbers
+ * @return {array} Array of arrays of numbers
+ */
+function simplifyPaths(paths) {
+  var out = [],
+      current,
+      x,
+      y;
+  paths.forEach(function (path) {
+    if (path.length == 4) {
+      if (path[0] == x && path[1] == y) {
+        x = path[2];
+        y = path[3];
+        current.push(x, y);
+      } else {
+        if (current) {
+          out.push(current);
+        }
+
+        current = path.slice(0);
+        x = path[2];
+        y = path[3];
+      }
+    }
+  });
+  if (current) {
+    out.push(current);
+  }
+  return out;
+}
+
+var hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
+var hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
+var rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
+
+function parseColor(str) {
+
+  var match = str.match(hexColor) || str.match(hexColorShort);
+  if (match) {
+    var out = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16), 1];
+    out.format = "hex";
+    return out;
+  }
+
+  match = str.match(rgbRegex);
+  if (match) {
+    var _out = [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10), match[4] ? parseFloat(match[4]) : 1];
+    _out.format = "rgb";
+    return _out;
+  }
+}
+
+function eventMixin(constructor) {
+
+  function on(event, callback) {
+    if (!this._events) this._events = {};
+
+    if (!this._events[event]) {
+      this._events[event] = [];
+    }
+    this._events[event].push(callback);
+    return this;
+  }
+
+  function fire(event) {
+    var _this = this;
+
+    for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      params[_key - 1] = arguments[_key];
+    }
+
+    if (!this._events) this._events = {};
+
+    var callbacks = this._events[event];
+
+    if (callbacks && callbacks.length) {
+      callbacks.forEach(function (callback) {
+        callback.apply(_this, params);
+      });
+    }
+  }
+
+  constructor.prototype.on = on;
+  constructor.prototype.fire = fire;
+}
+
+/***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2930,7 +2931,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(10);
+var _vec = __webpack_require__(5);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -3758,7 +3759,7 @@ var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
-var _mat = __webpack_require__(25);
+var _mat = __webpack_require__(26);
 
 var _mat2 = _interopRequireDefault(_mat);
 
@@ -4060,6 +4061,37 @@ exports.default = WorldWrapComponent;
 
 "use strict";
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+var vec2_1 = __webpack_require__(5);
+var MoveToClickComponent = (function (_super) {
+    __extends(MoveToClickComponent, _super);
+    function MoveToClickComponent(input) {
+        var _this = _super.call(this) || this;
+        _this.input = input;
+        return _this;
+    }
+    MoveToClickComponent.prototype.update = function (parent, delta) {
+        if (this.input.hasClick) {
+            vec2_1.default.copy(parent.position, this.input.lastClick);
+        }
+    };
+    return MoveToClickComponent;
+}(GameComponent_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = MoveToClickComponent;
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -4184,7 +4216,7 @@ FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComp
 FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -6326,7 +6358,7 @@ module.exports = mat4;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6390,7 +6422,7 @@ var AudioSystem = function (_GameObject) {
 exports.default = AudioSystem;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6405,19 +6437,19 @@ var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
-var _PositionAnimationComponent = __webpack_require__(37);
+var _PositionAnimationComponent = __webpack_require__(38);
 
 var _PositionAnimationComponent2 = _interopRequireDefault(_PositionAnimationComponent);
 
-var _BoundsAnimationComponent = __webpack_require__(35);
+var _BoundsAnimationComponent = __webpack_require__(36);
 
 var _BoundsAnimationComponent2 = _interopRequireDefault(_BoundsAnimationComponent);
 
-var _ColorAnimationComponent = __webpack_require__(36);
+var _ColorAnimationComponent = __webpack_require__(37);
 
 var _ColorAnimationComponent2 = _interopRequireDefault(_ColorAnimationComponent);
 
-var _RotationAnimationComponent = __webpack_require__(38);
+var _RotationAnimationComponent = __webpack_require__(39);
 
 var _RotationAnimationComponent2 = _interopRequireDefault(_RotationAnimationComponent);
 
@@ -6430,7 +6462,7 @@ exports.ColorAnimationComponent = _ColorAnimationComponent2.default;
 exports.RotationAnimationComponent = _RotationAnimationComponent2.default;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6440,7 +6472,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _MoveComponent = __webpack_require__(41);
+var _MoveComponent = __webpack_require__(42);
 
 Object.defineProperty(exports, 'MoveComponent', {
   enumerable: true,
@@ -6449,7 +6481,7 @@ Object.defineProperty(exports, 'MoveComponent', {
   }
 });
 
-var _PhysicsComponent = __webpack_require__(42);
+var _PhysicsComponent = __webpack_require__(43);
 
 Object.defineProperty(exports, 'PhysicsComponent', {
   enumerable: true,
@@ -6458,7 +6490,7 @@ Object.defineProperty(exports, 'PhysicsComponent', {
   }
 });
 
-var _GravityComponent = __webpack_require__(40);
+var _GravityComponent = __webpack_require__(41);
 
 Object.defineProperty(exports, 'GravityComponent', {
   enumerable: true,
@@ -6467,7 +6499,7 @@ Object.defineProperty(exports, 'GravityComponent', {
   }
 });
 
-var _PointGravityComponent = __webpack_require__(43);
+var _PointGravityComponent = __webpack_require__(44);
 
 Object.defineProperty(exports, 'PointGravityComponent', {
   enumerable: true,
@@ -6476,7 +6508,7 @@ Object.defineProperty(exports, 'PointGravityComponent', {
   }
 });
 
-var _TerminalVelocityComponent = __webpack_require__(52);
+var _TerminalVelocityComponent = __webpack_require__(53);
 
 Object.defineProperty(exports, 'TerminalVelocityComponent', {
   enumerable: true,
@@ -6485,7 +6517,7 @@ Object.defineProperty(exports, 'TerminalVelocityComponent', {
   }
 });
 
-var _FollowComponent = __webpack_require__(39);
+var _FollowComponent = __webpack_require__(40);
 
 Object.defineProperty(exports, 'FollowComponent', {
   enumerable: true,
@@ -6494,7 +6526,7 @@ Object.defineProperty(exports, 'FollowComponent', {
   }
 });
 
-var _RotationComponent = __webpack_require__(49);
+var _RotationComponent = __webpack_require__(50);
 
 Object.defineProperty(exports, 'RotationComponent', {
   enumerable: true,
@@ -6503,7 +6535,7 @@ Object.defineProperty(exports, 'RotationComponent', {
   }
 });
 
-var _RotateToHeadingComponent = __webpack_require__(48);
+var _RotateToHeadingComponent = __webpack_require__(49);
 
 Object.defineProperty(exports, 'RotateToHeadingComponent', {
   enumerable: true,
@@ -6512,7 +6544,7 @@ Object.defineProperty(exports, 'RotateToHeadingComponent', {
   }
 });
 
-var _TrackRotationComponent = __webpack_require__(53);
+var _TrackRotationComponent = __webpack_require__(54);
 
 Object.defineProperty(exports, 'TrackRotationComponent', {
   enumerable: true,
@@ -6521,7 +6553,7 @@ Object.defineProperty(exports, 'TrackRotationComponent', {
   }
 });
 
-var _RandomPositionComponent = __webpack_require__(46);
+var _RandomPositionComponent = __webpack_require__(47);
 
 Object.defineProperty(exports, 'RandomPositionComponent', {
   enumerable: true,
@@ -6530,7 +6562,7 @@ Object.defineProperty(exports, 'RandomPositionComponent', {
   }
 });
 
-var _RandomVelocityComponent = __webpack_require__(47);
+var _RandomVelocityComponent = __webpack_require__(48);
 
 Object.defineProperty(exports, 'RandomVelocityComponent', {
   enumerable: true,
@@ -6539,7 +6571,7 @@ Object.defineProperty(exports, 'RandomVelocityComponent', {
   }
 });
 
-var _RandomImpulseComponent = __webpack_require__(45);
+var _RandomImpulseComponent = __webpack_require__(46);
 
 Object.defineProperty(exports, 'RandomImpulseComponent', {
   enumerable: true,
@@ -6548,7 +6580,7 @@ Object.defineProperty(exports, 'RandomImpulseComponent', {
   }
 });
 
-var _FlockingComponent = __webpack_require__(24);
+var _FlockingComponent = __webpack_require__(25);
 
 Object.defineProperty(exports, 'FlockingComponent', {
   enumerable: true,
@@ -6557,7 +6589,7 @@ Object.defineProperty(exports, 'FlockingComponent', {
   }
 });
 
-var _SwitchComponent = __webpack_require__(51);
+var _SwitchComponent = __webpack_require__(52);
 
 Object.defineProperty(exports, 'SwitchComponent', {
   enumerable: true,
@@ -6566,7 +6598,7 @@ Object.defineProperty(exports, 'SwitchComponent', {
   }
 });
 
-var _PositionInterpolatorComponent = __webpack_require__(44);
+var _PositionInterpolatorComponent = __webpack_require__(45);
 
 Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   enumerable: true,
@@ -6575,7 +6607,7 @@ Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   }
 });
 
-var _RotationInterpolatorComponent = __webpack_require__(50);
+var _RotationInterpolatorComponent = __webpack_require__(51);
 
 Object.defineProperty(exports, 'RotationInterpolatorComponent', {
   enumerable: true,
@@ -6587,7 +6619,7 @@ Object.defineProperty(exports, 'RotationInterpolatorComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6597,7 +6629,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CollisionSystem = __webpack_require__(55);
+var _CollisionSystem = __webpack_require__(56);
 
 Object.defineProperty(exports, 'CollisionSystem', {
   enumerable: true,
@@ -6624,7 +6656,7 @@ Object.defineProperty(exports, 'BounceComponent', {
   }
 });
 
-var _BackgroundCollisionSystem = __webpack_require__(54);
+var _BackgroundCollisionSystem = __webpack_require__(55);
 
 Object.defineProperty(exports, 'BackgroundCollisionSystem', {
   enumerable: true,
@@ -6654,7 +6686,7 @@ Object.defineProperty(exports, 'SolidComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6682,19 +6714,19 @@ var _CameraSystem = __webpack_require__(11);
 
 var _CameraSystem2 = _interopRequireDefault(_CameraSystem);
 
-var _CanvasRenderSystem = __webpack_require__(7);
+var _CanvasRenderSystem = __webpack_require__(8);
 
 var _CanvasRenderSystem2 = _interopRequireDefault(_CanvasRenderSystem);
 
-var _WorldSystem = __webpack_require__(8);
+var _WorldSystem = __webpack_require__(9);
 
 var _WorldSystem2 = _interopRequireDefault(_WorldSystem);
 
-var _InputSystem = __webpack_require__(6);
+var _InputSystem = __webpack_require__(7);
 
 var _InputSystem2 = _interopRequireDefault(_InputSystem);
 
-var _util = __webpack_require__(9);
+var _util = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7183,7 +7215,7 @@ function _resourceLoaded(self, resource) {
 };
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7193,7 +7225,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _DebugDrawBoundsComponent = __webpack_require__(56);
+var _DebugDrawBoundsComponent = __webpack_require__(57);
 
 Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   enumerable: true,
@@ -7202,7 +7234,7 @@ Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   }
 });
 
-var _DebugDrawPathComponent = __webpack_require__(57);
+var _DebugDrawPathComponent = __webpack_require__(58);
 
 Object.defineProperty(exports, 'DebugDrawPathComponent', {
   enumerable: true,
@@ -7211,7 +7243,7 @@ Object.defineProperty(exports, 'DebugDrawPathComponent', {
   }
 });
 
-var _DebugDrawSurfacesComponent = __webpack_require__(58);
+var _DebugDrawSurfacesComponent = __webpack_require__(59);
 
 Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   enumerable: true,
@@ -7220,7 +7252,7 @@ Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   }
 });
 
-var _DebugFlockingComponent = __webpack_require__(59);
+var _DebugFlockingComponent = __webpack_require__(60);
 
 Object.defineProperty(exports, 'DebugFlockingComponent', {
   enumerable: true,
@@ -7229,7 +7261,7 @@ Object.defineProperty(exports, 'DebugFlockingComponent', {
   }
 });
 
-var _PositionRenderComponent = __webpack_require__(60);
+var _PositionRenderComponent = __webpack_require__(61);
 
 Object.defineProperty(exports, 'PositionRenderComponent', {
   enumerable: true,
@@ -7241,7 +7273,7 @@ Object.defineProperty(exports, 'PositionRenderComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7251,7 +7283,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _InputSystem = __webpack_require__(6);
+var _InputSystem = __webpack_require__(7);
 
 Object.defineProperty(exports, 'InputSystem', {
   enumerable: true,
@@ -7269,10 +7301,19 @@ Object.defineProperty(exports, 'ClickComponent', {
   }
 });
 
+var _MoveToClickComponent = __webpack_require__(24);
+
+Object.defineProperty(exports, 'MoveToClickComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_MoveToClickComponent).default;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7282,7 +7323,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CanvasRenderSystem = __webpack_require__(7);
+var _CanvasRenderSystem = __webpack_require__(8);
 
 Object.defineProperty(exports, 'CanvasRenderSystem', {
   enumerable: true,
@@ -7327,7 +7368,7 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _PolyShapeRenderComponent = __webpack_require__(61);
+var _PolyShapeRenderComponent = __webpack_require__(62);
 
 Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   enumerable: true,
@@ -7336,7 +7377,7 @@ Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   }
 });
 
-var _sprite = __webpack_require__(62);
+var _sprite = __webpack_require__(63);
 
 Object.keys(_sprite).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -7351,7 +7392,7 @@ Object.keys(_sprite).forEach(function (key) {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7361,7 +7402,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _WorldSystem = __webpack_require__(8);
+var _WorldSystem = __webpack_require__(9);
 
 Object.defineProperty(exports, 'WorldSystem', {
   enumerable: true,
@@ -7391,7 +7432,7 @@ Object.defineProperty(exports, 'WorldWrapComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7437,7 +7478,7 @@ var BoundsAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = BoundsAnimationComponent;
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7451,7 +7492,7 @@ var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
-var _util = __webpack_require__(9);
+var _util = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7483,7 +7524,7 @@ var ColorAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = ColorAnimationComponent;
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7529,7 +7570,7 @@ var PositionAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = PositionAnimationComponent;
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7597,7 +7638,7 @@ var RotationAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = RotationAnimationComponent;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7660,7 +7701,7 @@ var FollowComponent = function (_GameComponent) {
 exports.default = FollowComponent;
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7716,7 +7757,7 @@ exports.default = GravityComponent;
 GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7770,7 +7811,7 @@ var MoveComponent = function (_GameComponent) {
 exports.default = MoveComponent;
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7834,7 +7875,7 @@ var PhysicsComponent = function (_GameComponent) {
 exports.default = PhysicsComponent;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7891,7 +7932,7 @@ var PointGravityComponent = function (_GameComponent) {
 exports.default = PointGravityComponent;
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7913,7 +7954,7 @@ var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
-var _Easing = __webpack_require__(5);
+var _Easing = __webpack_require__(6);
 
 var Easing = _interopRequireWildcard(_Easing);
 
@@ -7997,7 +8038,7 @@ var PositionInterpolatorComponent = function (_GameComponent) {
 exports.default = PositionInterpolatorComponent;
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8059,7 +8100,7 @@ var RandomImpulseComponent = function (_GameComponent) {
 exports.default = RandomImpulseComponent;
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8121,7 +8162,7 @@ var RandomPositionComponent = function (_GameComponent) {
 exports.default = RandomPositionComponent;
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8178,7 +8219,7 @@ var RandomVelocityComponent = function (_GameComponent) {
 exports.default = RandomVelocityComponent;
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8224,7 +8265,7 @@ var RotateToHeadingComponent = function (_GameComponent) {
 exports.default = RotateToHeadingComponent;
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8274,7 +8315,7 @@ var RotationComponent = function (_GameComponent) {
 exports.default = RotationComponent;
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8333,7 +8374,7 @@ var RotationInterpolatorComponent = function (_GameComponent) {
 exports.default = RotationInterpolatorComponent;
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8497,7 +8538,7 @@ var SwitchComponent = function (_GameComponent) {
 exports.default = SwitchComponent;
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8560,7 +8601,7 @@ var TerminalVelocityComponent = function (_GameComponent) {
 exports.default = TerminalVelocityComponent;
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8619,7 +8660,7 @@ var TrackRotationComponent = function (_GameComponent) {
 exports.default = TrackRotationComponent;
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8728,7 +8769,7 @@ var BackgroundCollisionSystem = function (_GameObject) {
 exports.default = BackgroundCollisionSystem;
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8838,7 +8879,7 @@ var CollisionSystem = function (_GameObject) {
 exports.default = CollisionSystem;
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8902,7 +8943,7 @@ var DebugDrawBoundsComponent = function (_GameComponent) {
 exports.default = DebugDrawBoundsComponent;
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8922,7 +8963,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _vec = __webpack_require__(10);
+var _vec = __webpack_require__(5);
 
 var _vec2 = _interopRequireDefault(_vec);
 
@@ -9026,7 +9067,7 @@ var DebugDrawPathComponent = function (_GameComponent) {
 exports.default = DebugDrawPathComponent;
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9110,7 +9151,7 @@ var DebugDrawSurfacesComponent = function (_GameComponent) {
 exports.default = DebugDrawSurfacesComponent;
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9126,7 +9167,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _FlockingComponent = __webpack_require__(24);
+var _FlockingComponent = __webpack_require__(25);
 
 var _FlockingComponent2 = _interopRequireDefault(_FlockingComponent);
 
@@ -9179,7 +9220,7 @@ var DebugFlockingComponent = function (_GameComponent) {
 exports.default = DebugFlockingComponent;
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9253,7 +9294,7 @@ var PositionRenderComponent = function (_GameComponent) {
 exports.default = PositionRenderComponent;
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9269,11 +9310,11 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _mat = __webpack_require__(64);
+var _mat = __webpack_require__(65);
 
 var _mat2 = _interopRequireDefault(_mat);
 
-var _mat3 = __webpack_require__(25);
+var _mat3 = __webpack_require__(26);
 
 var _mat4 = _interopRequireDefault(_mat3);
 
@@ -9523,7 +9564,7 @@ PolyShapeRenderingComponent.createSphere = function (renderSystem, latitudeBands
 };
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9844,7 +9885,7 @@ CanvasSpriteRenderingComponent.prototype.update = function (parent, delta) {
 };
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -10286,7 +10327,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -11038,7 +11079,7 @@ module.exports = mat3;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11085,7 +11126,7 @@ Object.defineProperty(exports, 'CameraSystem', {
   }
 });
 
-var _CanvasRenderSystem = __webpack_require__(7);
+var _CanvasRenderSystem = __webpack_require__(8);
 
 Object.defineProperty(exports, 'CanvasRenderSystem', {
   enumerable: true,
@@ -11094,7 +11135,7 @@ Object.defineProperty(exports, 'CanvasRenderSystem', {
   }
 });
 
-var _WorldSystem = __webpack_require__(8);
+var _WorldSystem = __webpack_require__(9);
 
 Object.defineProperty(exports, 'WorldSystem', {
   enumerable: true,
@@ -11103,7 +11144,7 @@ Object.defineProperty(exports, 'WorldSystem', {
   }
 });
 
-var _InputSystem = __webpack_require__(6);
+var _InputSystem = __webpack_require__(7);
 
 Object.defineProperty(exports, 'InputSystem', {
   enumerable: true,
@@ -11112,7 +11153,7 @@ Object.defineProperty(exports, 'InputSystem', {
   }
 });
 
-var _AudioSystem = __webpack_require__(26);
+var _AudioSystem = __webpack_require__(27);
 
 Object.defineProperty(exports, 'AudioSystem', {
   enumerable: true,
@@ -11121,7 +11162,7 @@ Object.defineProperty(exports, 'AudioSystem', {
   }
 });
 
-var _Game = __webpack_require__(30);
+var _Game = __webpack_require__(31);
 
 Object.defineProperty(exports, 'Game', {
   enumerable: true,
@@ -11139,19 +11180,19 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _basic = __webpack_require__(28);
+var _basic = __webpack_require__(29);
 
 var basic = _interopRequireWildcard(_basic);
 
-var _animation = __webpack_require__(27);
+var _animation = __webpack_require__(28);
 
 var animation = _interopRequireWildcard(_animation);
 
-var _Easing = __webpack_require__(5);
+var _Easing = __webpack_require__(6);
 
 var easing = _interopRequireWildcard(_Easing);
 
-var _world = __webpack_require__(34);
+var _world = __webpack_require__(35);
 
 var world = _interopRequireWildcard(_world);
 
@@ -11163,7 +11204,7 @@ var _WorldWrapComponent = __webpack_require__(23);
 
 var _WorldWrapComponent2 = _interopRequireDefault(_WorldWrapComponent);
 
-var _input = __webpack_require__(32);
+var _input = __webpack_require__(33);
 
 var input = _interopRequireWildcard(_input);
 
@@ -11171,7 +11212,11 @@ var _ClickComponent = __webpack_require__(17);
 
 var _ClickComponent2 = _interopRequireDefault(_ClickComponent);
 
-var _collision = __webpack_require__(29);
+var _MoveToClickComponent = __webpack_require__(24);
+
+var _MoveToClickComponent2 = _interopRequireDefault(_MoveToClickComponent);
+
+var _collision = __webpack_require__(30);
 
 var collision = _interopRequireWildcard(_collision);
 
@@ -11191,7 +11236,7 @@ var _SolidComponent = __webpack_require__(15);
 
 var _SolidComponent2 = _interopRequireDefault(_SolidComponent);
 
-var _render = __webpack_require__(33);
+var _render = __webpack_require__(34);
 
 var render = _interopRequireWildcard(_render);
 
@@ -11207,7 +11252,7 @@ var _TextRenderComponent = __webpack_require__(20);
 
 var _TextRenderComponent2 = _interopRequireDefault(_TextRenderComponent);
 
-var _debug = __webpack_require__(31);
+var _debug = __webpack_require__(32);
 
 var debug = _interopRequireWildcard(_debug);
 
@@ -11243,6 +11288,8 @@ Components['WorldWrapComponent'] = _WorldWrapComponent2.default;
 exports.Input = input;
 
 Components['ClickComponent'] = _ClickComponent2.default;
+
+Components['MoveToClickComponent'] = _MoveToClickComponent2.default;
 
 // Export collision namespace
 exports.Collision = collision;
