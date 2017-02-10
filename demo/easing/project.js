@@ -85,13 +85,7 @@
 
   cameraSystem.setScale(0.8);
 
-  game.root.addObject(inputSystem);
-
-  game.root.addObject(particleManager);
-
-  game.root.addObject(worldSystem);
-  game.root.addObject(cameraSystem);
-  game.root.addObject(renderSystem);
+  game.root.addObjectAt(particleManager, 0);
 
   game.start();
 

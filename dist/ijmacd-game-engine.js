@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 66);
+/******/ 	return __webpack_require__(__webpack_require__.s = 67);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -113,7 +113,9 @@ class GameComponent extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* def
 	 * stateless components.
 	 * @param {number} delta - Time since last frame in milliseconds
 	 */
-	update (parent, delta) {}
+	update (parent, delta) {
+		super.update(delta);
+	}
 
 	/**
 	 * This method is used to produce a html representation of the component for
@@ -2083,7 +2085,7 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
     /** @deprecated */
     this.cameraSystem = cameraSystem;
 
-    this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+    this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.fromValues(NaN, NaN);
 
     // These values will persist for exactly one frame
 
@@ -2122,10 +2124,18 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(this._nextClick, NaN, NaN);
     this.hasClick = !isNaN(this.lastClick[0]);
 
+    if (this.hasClick) {
+      this.fire("click", this.lastClick)
+    }
+
     // Keypress
     this.lastKey = this._nextKey;
     // Consumers should interpret (null) as no keypress
     this._nextKey = null;
+
+    if (this.lastKey) {
+      this.fire("keypress", this.lastKey);
+    }
   }
 
   /**
@@ -2133,6 +2143,10 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
    * @param {Element} screen - New screen
    */
   setScreen (screen) {
+    if (this.screen) {
+      destroyScreen.call(this);
+    }
+
     this.screen = screen;
 
     initScreen.call(this);
@@ -2150,14 +2164,11 @@ class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
         camHeight = cam.height,
         screen = this.screen,
         screenWidth = screen.offsetWidth,
-        screenHeight = screen.offsetHeight,
-        screenScale = camWidth / screenWidth;
+        screenHeight = screen.offsetHeight;
 
     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v,
         screenX - screenWidth / 2,
         screenY - screenHeight / 2);
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(v, v, screenScale);
 
     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
 
@@ -2233,8 +2244,7 @@ function TouchClick(sel, fnc) {
   };
 
   // Remove previous handler in case this is element being re-initialised
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
+  OffTouchClick(sel);
 
   // Add new handler
   sel.addEventListener('touchstart', handle);
@@ -2242,6 +2252,20 @@ function TouchClick(sel, fnc) {
 
   // We need to keep track of this handler in order to be able to remove it later.
   sel.touchClick = handle;
+}
+
+function destroyScreen () {
+  const screen = this.screen;
+
+  if(screen) {
+    OffTouchClick(screen);
+  }
+}
+
+function OffTouchClick (sel) {
+  // Remove previous handlers
+  sel.removeEventListener('touchstart', sel.touchClick);
+  sel.removeEventListener('click', sel.touchClick);
 }
 
 // function worldToScreen(inputSystem, worldX, worldY){
@@ -5792,7 +5816,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__GravityComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(46);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PointGravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(56);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TerminalVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(42);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FollowComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__FollowComponent__["a"]; });
@@ -5800,7 +5824,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__RotationComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(51);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotateToHeadingComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TrackRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(49);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__["a"]; });
@@ -5810,12 +5834,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomImpulseComponent", function() { return __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(26);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(55);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(47);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(53);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__SmoothPositionComponent__ = __webpack_require__(53);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SmoothPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__SmoothPositionComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__SmoothRotationComponent__ = __webpack_require__(54);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SmoothRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_16__SmoothRotationComponent__["a"]; });
 
 
 
@@ -5847,7 +5873,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /** @deprecated */
 
 
-/** @deprecated */
+
+
 
 
 
@@ -5857,13 +5884,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(59);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(15);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(58);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__["a"]; });
@@ -6013,6 +6040,8 @@ class Game {
         this._lastTime = 0;
         this._loaded = 0;
 
+        this._generalObjects = null;
+
         this._autosizeCallback = () => {
 
             if (!this.canvas) return;
@@ -6037,6 +6066,19 @@ class Game {
         if(options.autosize) {
             this.setAutosize(true);
         }
+    }
+
+    /**
+     * Add an object to the game. The object is not directly added to the root
+     * GameObjectManager but is instead added to a special 'general objects'
+     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
+     * CameraSystem, RenderSystem).
+     * @param {GameObject} object - The object to add.
+     */
+    addObject (object) {
+        _initialiseGeneralObjects.call(this);
+
+        this._generalObjects.addObject(object);
     }
 
     /**
@@ -6157,13 +6199,18 @@ class Game {
     }
 
     /**
-     * Generate a default {@link CameraSystem} based on properties of this game
+     * Generate a default {@link CameraSystem} based on properties of this game.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {CameraSystem}
      */
     getDefaultCamera () {
         if (!this.cameraSystem) {
             this.cameraSystem = new __WEBPACK_IMPORTED_MODULE_3__CameraSystem__["a" /* default */]();
             this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.cameraSystem);
         }
         return this.cameraSystem;
     }
@@ -6171,6 +6218,8 @@ class Game {
     /**
      * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {CanvasRenderSystem}
      */
     getDefaultRenderer () {
@@ -6185,6 +6234,9 @@ class Game {
                 context = this.canvas.getContext("2d");
 
             this.renderSystem = new __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__["a" /* default */](context, this.cameraSystem);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.renderSystem);
         }
         return this.renderSystem;
     }
@@ -6192,6 +6244,8 @@ class Game {
     /**
      * <p>Generate a default {@link WorldSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
      * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
      * @return {WorldSystem}
@@ -6200,6 +6254,9 @@ class Game {
         const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
         if (!this.worldSystem) {
             this.worldSystem = new __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__["a" /* default */](bounds);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.worldSystem);
         }
         else {
             this.worldSystem.setBounds(...bounds);
@@ -6210,6 +6267,8 @@ class Game {
     /**
      * <p>Generate a default {@link InputSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {InputSystem}
      */
     getDefaultInput () {
@@ -6219,6 +6278,9 @@ class Game {
             }
             // params are: (screen, keyboard, camera)
             this.inputSystem = new __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a" /* default */](this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.inputSystem);
         }
         return this.inputSystem;
     }
@@ -6325,6 +6387,13 @@ function _resourceLoaded(self, resource) {
   }
 };
 
+function _initialiseGeneralObjects () {
+    if (!this._generalObjects) {
+        this._generalObjects = new __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__["a" /* default */]();
+        this.root.addObjectAt(this._generalObjects, 0);
+    }
+}
+
 
 /***/ }),
 /* 32 */
@@ -6332,15 +6401,15 @@ function _resourceLoaded(self, resource) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(60);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawBoundsComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(61);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawPathComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(62);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(63);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(64);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
@@ -6392,9 +6461,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(22);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(65);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(66);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
@@ -8079,32 +8148,65 @@ class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
-/**
- * Use generic [*]AnimationComponents instead
- * @deprecated
- */
-class RotationInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+
+const diff = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+
+class SmoothPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor () {
+        super();
+        this.speed = 0.01;
+    }
+
     update (parent, delta) {
-        var rotation = parent.rotation,
-            target = this.rotation,
-            diff = target - rotation,
-            speed = 0.01;
-        if(diff > Math.PI){
-            diff -= Math.PI * 2;
-        } else if (diff < -Math.PI){
-            diff += Math.PI * 2;
-        }
-        parent.rotation = rotation + diff * delta * speed;
+        super.update(this, delta);
+
+        const position = parent.position;
+        const target = this.position;
+        const speed = this.speed;
+
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.subtract(diff, target, position);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.position, position, diff, delta * speed);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = RotationInterpolatorComponent;
+/* harmony export (immutable) */ __webpack_exports__["a"] = SmoothPositionComponent;
 
 
 
 /***/ }),
 /* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class SmoothRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    update (parent, delta) {
+        if(this.rotation != parent.rotation) {
+            var rotation = this.rotation,
+                target = parent.rotation,
+                diff = target - rotation,
+                speed = 0.01;
+            if(diff > Math.PI){
+                diff -= Math.PI * 2;
+            } else if (diff < -Math.PI){
+                diff += Math.PI * 2;
+            }
+            parent.rotation = rotation + diff * delta * speed;
+            this.rotation = parent.rotation;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SmoothRotationComponent;
+
+
+
+/***/ }),
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8220,7 +8322,7 @@ class SwitchComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__[
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8257,7 +8359,7 @@ class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCo
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8288,7 +8390,7 @@ class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8356,7 +8458,7 @@ class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameOb
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8448,7 +8550,7 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8486,7 +8588,7 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8579,7 +8681,7 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8634,7 +8736,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8676,7 +8778,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8717,7 +8819,7 @@ class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9011,7 +9113,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9272,7 +9374,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

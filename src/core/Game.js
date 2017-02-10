@@ -116,6 +116,8 @@ class Game {
         this._lastTime = 0;
         this._loaded = 0;
 
+        this._generalObjects = null;
+
         this._autosizeCallback = () => {
 
             if (!this.canvas) return;
@@ -140,6 +142,19 @@ class Game {
         if(options.autosize) {
             this.setAutosize(true);
         }
+    }
+
+    /**
+     * Add an object to the game. The object is not directly added to the root
+     * GameObjectManager but is instead added to a special 'general objects'
+     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
+     * CameraSystem, RenderSystem).
+     * @param {GameObject} object - The object to add.
+     */
+    addObject (object) {
+        _initialiseGeneralObjects.call(this);
+
+        this._generalObjects.addObject(object);
     }
 
     /**
@@ -260,13 +275,18 @@ class Game {
     }
 
     /**
-     * Generate a default {@link CameraSystem} based on properties of this game
+     * Generate a default {@link CameraSystem} based on properties of this game.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {CameraSystem}
      */
     getDefaultCamera () {
         if (!this.cameraSystem) {
             this.cameraSystem = new CameraSystem();
             this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.cameraSystem);
         }
         return this.cameraSystem;
     }
@@ -274,6 +294,8 @@ class Game {
     /**
      * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {CanvasRenderSystem}
      */
     getDefaultRenderer () {
@@ -288,6 +310,9 @@ class Game {
                 context = this.canvas.getContext("2d");
 
             this.renderSystem = new CanvasRenderSystem(context, this.cameraSystem);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.renderSystem);
         }
         return this.renderSystem;
     }
@@ -295,6 +320,8 @@ class Game {
     /**
      * <p>Generate a default {@link WorldSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
      * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
      * @return {WorldSystem}
@@ -303,6 +330,9 @@ class Game {
         const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
         if (!this.worldSystem) {
             this.worldSystem = new WorldSystem(bounds);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.worldSystem);
         }
         else {
             this.worldSystem.setBounds(...bounds);
@@ -313,6 +343,8 @@ class Game {
     /**
      * <p>Generate a default {@link InputSystem} based on properties set on
      * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
      * @return {InputSystem}
      */
     getDefaultInput () {
@@ -322,6 +354,9 @@ class Game {
             }
             // params are: (screen, keyboard, camera)
             this.inputSystem = new InputSystem(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
+
+            _initialiseGeneralObjects.call(this);
+            this.root.addObject(this.inputSystem);
         }
         return this.inputSystem;
     }
@@ -427,3 +462,10 @@ function _resourceLoaded(self, resource) {
     self.fire("resourcesLoaded");
   }
 };
+
+function _initialiseGeneralObjects () {
+    if (!this._generalObjects) {
+        this._generalObjects = new GameObjectManager();
+        this.root.addObjectAt(this._generalObjects, 0);
+    }
+}

@@ -84,7 +84,6 @@
 			worldComponent,
 			switchComponent,
 			rotateToHeadingComponent,
-			rotationInterpolatorComponent,
 			surfacesRenderComponent,
 			gridSquareRenderingComponent,
 			flockingComponent,
@@ -236,14 +235,13 @@
 	worldWrapComponent = new GEC.WorldWrapComponent(worldSystem);
 
   rotateToHeadingComponent = new GEC.RotateToHeadingComponent();
-  rotationInterpolatorComponent = new GEC.RotationInterpolatorComponent();
 
 	flockingComponent = new IGE.Components.FlockingComponent(particles);
 
 	flockingSwitchComponent = new GEC.SwitchComponent(controlObj, "flocking");
 	flockingSwitchComponent.addComponents(
     [flockingComponent, arrowRenderingComponent],
-    [new GEC.RandomMotionComponent(), gridSquareRenderingComponent]
+    [new GEC.RandomVelocityComponent(), gridSquareRenderingComponent]
   );
 
 	cameraTrackSwitchComponent = new GEC.SwitchComponent(controlObj, "cameraTrack");
@@ -253,7 +251,7 @@
       moveComponent,
       arrowRenderingComponent,
       rotateToHeadingComponent,
-      rotationInterpolatorComponent
+      new GEC.SmoothRotationComponent()
     ],
     [particleRenderingComponent]);
 
@@ -289,7 +287,7 @@
 			particle.addComponent(flockingSwitchComponent);
 
 			particle.addComponent(rotateToHeadingComponent);
-			particle.addComponent(rotationInterpolatorComponent);
+			particle.addComponent(new GEC.SmoothRotationComponent());
 
 			//particle.addComponent(worldComponent);
 			particle.addComponent(new GEC.BackgroundCollisionComponent(backgroundSystem));
