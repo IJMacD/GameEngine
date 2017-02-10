@@ -1,5 +1,7 @@
+import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import BackgroundSystem from './BackgroundCollisionSystem';
 
 const u = vec2.create();
 const n = vec2.create();
@@ -18,18 +20,25 @@ const v = vec2.create();
  * @param {array} collisionBounds - Default bounds array for the parent object
  * @memberof Collision
  */
-class BackgroundCollisionComponent extends GameComponent {
-    constructor (backgroundSystem, collisionBounds) {
-        super();
-		this.backgroundSystem = backgroundSystem;
+export default class BackgroundCollisionComponent extends GameComponent {
+
+	static COEFFICIENT_FRICTION = 0.95;
+	static COEFFICIENT_RESTITUTION = 0.4;
+
+	background: BackgroundSystem;
+	bounds: number[];
+	coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
+	coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
+
+	constructor (backgroundSystem, collisionBounds) {
+		super();
+		this.background = backgroundSystem;
 		this.bounds = collisionBounds;
-		this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
-		this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
 	}
 
-	update (parent, delta) {
+	update (parent: GameObject, delta: number) {
 		// This logic should probably be moved to BackgroundCollisionSystem
-		var surfaces = this.backgroundSystem.surfaces,
+		var surfaces = this.background.surfaces,
 			j = 0,
 			m = surfaces.length,
 			c, l,
@@ -40,10 +49,11 @@ class BackgroundCollisionComponent extends GameComponent {
 			f = this.coefficientFriction,
 			e = this.coefficientRestitution,
 			parentX = parent.position[0],
-			parentY = parent.position[1];
-		if(this.lastX &&
-				Math.abs(this.lastX - parentX) < 100 &&
-				Math.abs(this.lastY - parentY) < 100){
+			parentY = parent.position[1],
+			lastPosition = this.position;
+		if(lastPosition[0] &&
+				Math.abs(lastPosition[0] - parentX) < 100 &&
+				Math.abs(lastPosition[1] - parentY) < 100){
 			for(;j<m;j++){
 				c = surfaces[j],
 				l = c.length;
@@ -53,7 +63,7 @@ class BackgroundCollisionComponent extends GameComponent {
 					vec2.set(p, c[i  ], c[i+1]);
 					vec2.set(r, c[i+2], c[i+3]);
 					vec2.subtract(r, r, p);
-					vec2.set(q, this.lastX, this.lastY);
+					vec2.copy(q, lastPosition);
 					vec2.subtract(s, parent.position, q);
 					//theta = s.angle();
 					//s.add(0,this.bounds*Math.cos(theta));
@@ -62,8 +72,7 @@ class BackgroundCollisionComponent extends GameComponent {
 					p_u = cross(q_p, r) / cross(r, s);
 					if(p_t >= 0 && p_t <= 1 && p_u >= 0 && p_u <= 1)
 					{
-						parent.position[0] = this.lastX;
-						parent.position[1] = this.lastY;
+						vec2.copy(parent.position, lastPosition)
 						// http://stackoverflow.com/questions/573084/how-to-calculate-bounce-angle
 						vec2.set(n, -r[1], r[0]); // this is the normal to the surface
 						vec2.normalize(n, n);
@@ -78,15 +87,10 @@ class BackgroundCollisionComponent extends GameComponent {
 				}
 			}
 		}
-		this.lastX = parent.position[0];
-		this.lastY = parent.position[1];
+		vec2.copy(parent.position, lastPosition);
 	}
 }
-BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
-BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
 
 function cross(a, b){
     return a[0]*b[1] - a[1]*b[0];
 }
-
-export default BackgroundCollisionComponent;

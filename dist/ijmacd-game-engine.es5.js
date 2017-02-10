@@ -82,118 +82,61 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
 /**
  * A GameComponent adds a particular behaviour to a GameObject. This class
  * should be subclassed to implement desired behaviour. The `update` method
  * is called once per frame for each GameObject it has been attached to. This
  * is where most of the work will be done.
- * @extends {GameObject}
  * @abstract
  */
-var GameComponent = function (_GameObject) {
-	_inherits(GameComponent, _GameObject);
-
-	function GameComponent() {
-		_classCallCheck(this, GameComponent);
-
-		return _possibleConstructorReturn(this, (GameComponent.__proto__ || Object.getPrototypeOf(GameComponent)).apply(this, arguments));
-	}
-
-	_createClass(GameComponent, [{
-		key: 'init',
-
-
-		/**
-   * This method is called once when the component is first added to each parent.
-   * Use this to perform set-up and add any necessary properties to parent objects.
-   * @abstract
-   * @param {GameObject} parent - A reference to the {@link GameObject} on which
-   * this component is operating. This allows multiple GameObjects to share
-   * stateless components.
-   */
-		value: function init(parent) {}
-
-		/**
-   * This method is called once per frame for each GameObject this component
-   * has been attached to.
-   * @abstract
-   * @param {GameObject} parent - A reference to the {@link GameObject} on which
-   * this component is operating. This allows multiple GameObjects to share
-   * stateless components.
-   * @param {number} delta - Time since last frame in milliseconds
-   */
-
-	}, {
-		key: 'update',
-		value: function update(parent, delta) {
-			_get(GameComponent.prototype.__proto__ || Object.getPrototypeOf(GameComponent.prototype), 'update', this).call(this, delta);
-		}
-
-		/**
-   * This method is used to produce a html representation of the component for
-   * things such as debugging trees. Similar to toString method.
-   * @return {string} Representation of this component in HTML
-   */
-
-	}, {
-		key: 'toHTML',
-		value: function toHTML() {
-			return this.name;
-		}
-	}]);
-
-	return GameComponent;
-}(_GameObject3.default);
-
-/**
- * This static helper method reduces the boiler plate of subclassing
- * GameComponent.
- * @static
- * @deprecated Use ES6 classes instead
- * @param {function} constructor - The constructor of the subclass. This should
- * be a named function expression or a reference to a function statement so that
- * magic can happen using the function's name for component identification.
- * @param {object} properties - A plain javascript object containing methods
- * and properties to be attached to the new prototype.
- * @return {GameComponent} The new 'class' which has been created.
- */
-
-
-GameComponent.create = function (constructor, properties) {
-	constructor.prototype = new GameComponent();
-	for (var prop in properties) {
-		constructor.prototype[prop] = properties[prop];
-	}
-	var name = constructor.name;
-	if (!name) {
-		name = constructor.toString().match(/^function ([a-z_]+)/i)[1];
-		constructor.name = name;
-	}
-	return constructor;
-};
-
+var GameComponent = (function (_super) {
+    __extends(GameComponent, _super);
+    function GameComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    /**
+     * This method is called once when the component is first added to each parent.
+     * Use this to perform set-up and add any necessary properties to parent objects.
+     * @abstract
+     * @param {GameObject} parent - A reference to the {@link GameObject} on which
+     * this component is operating. This allows multiple GameObjects to share
+     * stateless components.
+     */
+    GameComponent.prototype.init = function (parent) { };
+    /**
+     * This method is called once per frame for each GameObject this component
+     * has been attached to.
+     * @abstract
+     * @param {GameObject} parent - A reference to the {@link GameObject} on which
+     * this component is operating. This allows multiple GameObjects to share
+     * stateless components.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    GameComponent.prototype.update = function (parentOrDelta, delta) {
+        if (typeof parentOrDelta === "number")
+            return _super.prototype.update.call(this, parentOrDelta);
+        if (typeof delta === "number")
+            return _super.prototype.update.call(this, delta);
+    };
+    /**
+     * This method is used to produce a html representation of the component for
+     * things such as debugging trees. Similar to toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    GameComponent.prototype.toHTML = function () {
+        return this.name;
+    };
+    return GameComponent;
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = GameComponent;
+
 
 /***/ }),
 /* 1 */
@@ -984,325 +927,217 @@ module.exports = vec3;
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _vec = __webpack_require__(1);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-var _util = __webpack_require__(10);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
+var vec3_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(10);
 /**
  * The base object in the GameEngine. Most objects managed by the system
  * will be based on this class.
  */
-var GameObject = function () {
+var GameObject = (function () {
     function GameObject() {
-        _classCallCheck(this, GameObject);
-
-        /** Array of components which update this GameObject.
-         * @type {array} */
+        /** Array of components which update this GameObject. */
         this.components = [];
-        this.components.remove = arrayRemoveItem;
-
-        /** Position of this object in the world.
-         * @type {vec3} */
-        this.position = _vec2.default.create();
-
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
-        this.velocity = _vec2.default.create();
-
-        /** Current rotation of this object.
-         * @type {number} */
+        /** Position of this object in the world. */
+        this.position = vec3_1.default.create();
+        /** Velocity of this object moving through the world. */
+        this.velocity = vec3_1.default.create();
+        /** Current rotation of this object. */
         this.rotation = 0;
-
-        /** Rotation axis of this object.
-         * @type {number} */
-        this.rotationAxis = _vec2.default.fromValues(0, 0, 1);
-
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
+        /** 3D rotations require a rotation axis */
+        this.rotationAxis = vec3_1.default.fromValues(0, 0, 1);
+        /** Current speed of rotation. */
+        this.rotationSpeed = 0;
+        /** List of components which will be removed on next update. */
         this._toBeRemoved = [];
+        /**
+         * Events mixin
+         */
+        this._events = {};
     }
-
+    GameObject.prototype.addComponent = function (component) {
+        // Allow syntactic sugar of addComponent(function() {...}) which is a
+        // shorthand for specifying a simple component with only an update method
+        if (component instanceof Function) {
+            component = { update: component };
+        }
+        this.components.push(component);
+        // If the component has an init method call it when added so that the
+        // component can add properties to the parent object
+        if (component.init) {
+            component.init(this);
+        }
+        return this;
+    };
     /**
-     * <p>This method is used to add a {@link GameComponent} to this object.
-     *
-     * <p>GameComponents give objects particular behaviours. This method ensures
-     * that each component added will have a chance to update once per frame
-     * for this object.
-     * @param {GameComponent} component - The component to be added to this object
+     * Remove a particular {@link GameComponent} which had previously been added
+     * to this object.
+     * @param {GameComponent} component - The component to be removed from this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-
-
-    _createClass(GameObject, [{
-        key: 'addComponent',
-        value: function addComponent(component) {
-
-            // Allow syntactic sugar of addComponent(function() {...}) which is a
-            // shorthand for specifying a simple component with only an update method
-            if (isFunction(component)) {
-                component = { update: component };
-            }
-
-            this.components.push(component);
-
-            // If the component has an init method call it when added so that the
-            // component can add properties to the parent object
-            if (component.init) {
-                component.init(this);
-            }
-
-            return this;
+    GameObject.prototype.removeComponent = function (component) {
+        this._toBeRemoved.push(component);
+        return this;
+    };
+    GameObject.prototype.removeComponentByName = function (name) {
+        for (var i = 0; i < this.components.length; i++) {
+            var c = this.components[i];
+            if (c.name == name || c.constructor.name == name)
+                this._toBeRemoved.push(c);
         }
-
-        /**
-         * Remove a particular {@link GameComponent} which had previously been added
-         * to this object.
-         * @param {GameComponent} component - The component to be removed from this object
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'removeComponent',
-        value: function removeComponent(component) {
-            this._toBeRemoved.push(component);
-            return this;
+        return this;
+    };
+    GameObject.prototype.removeComponentByTest = function (test) {
+        for (var i = 0; i < this.components.length; i++) {
+            if (test(this.components[i]))
+                this._toBeRemoved.push(this.components[i]);
         }
-    }, {
-        key: 'removeComponentByName',
-        value: function removeComponentByName(name) {
-            for (var i = 0; i < this.components.length; i++) {
-                var c = this.components[i];
-                if (c.name == name || c.constructor.name == name) this._toBeRemoved.push(c);
-            }
-            return this;
+        return this;
+    };
+    /**
+     * <p>Protective method to set position of the object in world-units.
+     *
+     * <p>The native units are world-units. i.e. If a 2D camera is
+     * used with the scale set to 1x and the canvas is not scaled in the webpage,
+     * 1 unit in the world will equate to 1 pixel on the screen.
+     *
+     * <p>This method will preserve position on axes which you leave undefined
+     * in the call to this method.
+     *
+     * @example <caption>This will only affect the y co-ordinate, leaving x and
+     * z at their original values.</caption>
+     * // Set y = 20
+     * gameObject.setPosition(undefined, 20);
+     * @param {number} x - x component of position vector
+     * @param {number} y - y component of position vector
+     * @param {number} z - z component of position vector
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    GameObject.prototype.setPosition = function (x, y, z) {
+        if (x == undefined) {
+            x = this.position[0];
         }
-    }, {
-        key: 'removeComponentByTest',
-        value: function removeComponentByTest(test) {
-            for (var i = 0; i < this.components.length; i++) {
-                if (test(this.components[i])) this._toBeRemoved.push(this.components[i]);
-            }
-            return this;
+        if (y == undefined) {
+            y = this.position[1];
         }
-
-        /**
-         * <p>Protective method to set position of the object in world-units.
-         *
-         * <p>The native units are world-units. i.e. If a 2D camera is
-         * used with the scale set to 1x and the canvas is not scaled in the webpage,
-         * 1 unit in the world will equate to 1 pixel on the screen.
-         *
-         * <p>This method will preserve position on axes which you leave undefined
-         * in the call to this method.
-         *
-         * @example <caption>This will only affect the y co-ordinate, leaving x and
-         * z at their original values.</caption>
-         * // Set y = 20
-         * gameObject.setPosition(undefined, 20);
-         * @param {number} x - x component of position vector
-         * @param {number} y - y component of position vector
-         * @param {number} z - z component of position vector
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'setPosition',
-        value: function setPosition(x, y, z) {
-            if (x == undefined) {
-                x = this.position[0];
-            }
-            if (y == undefined) {
-                y = this.position[1];
-            }
-            if (z == undefined) {
-                z = this.position[2];
-            }
-            _vec2.default.set(this.position, x, y, z);
-            return this;
+        if (z == undefined) {
+            z = this.position[2];
         }
-
-        /**
-         * <p>Protective method to set velocity of the object.
-         *
-         * <p>The native units are world-units per millisecond. i.e. If a 2D camera
-         * is used with the scale set to 1x and the canvas is not scaled in the webpage,
-         * 1 unit in the world will equate to 1 pixel on the screen. In this common
-         * case the units of velocity will be equivelant to pixels-per-millisecond.
-         *
-         * <p>This method will preserve position on axes which you leave undefined
-         * in the call to this method.
-         *
-         * @example <caption>This will only affect the velocity parallel to the y-axis
-         * co-ordinate, leaving vx and vz unaffected.</caption>
-         * // Set vy = 20px per second
-         * gameObject.setVelocity(undefined, 0.02);
-         * @param {number} x - x component of velocity vector
-         * @param {number} y - y component of velocity vector
-         * @param {number} z - z component of velocity vector
-         * @return {GameObject} Returns a reference to this for chainability
-         */
-
-    }, {
-        key: 'setVelocity',
-        value: function setVelocity(vx, vy, vz) {
-            if (vx == undefined) {
-                vx = this.velocity[0];
-            }
-            if (vy == undefined) {
-                vy = this.velocity[1];
-            }
-            if (vz == undefined) {
-                vz = this.velocity[2];
-            }
-            _vec2.default.set(this.velocity, vx, vy, vz);
-            return this;
+        vec3_1.default.set(this.position, x, y, z);
+        return this;
+    };
+    /**
+     * <p>Protective method to set velocity of the object.
+     *
+     * <p>The native units are world-units per millisecond. i.e. If a 2D camera
+     * is used with the scale set to 1x and the canvas is not scaled in the webpage,
+     * 1 unit in the world will equate to 1 pixel on the screen. In this common
+     * case the units of velocity will be equivelant to pixels-per-millisecond.
+     *
+     * <p>This method will preserve position on axes which you leave undefined
+     * in the call to this method.
+     *
+     * @example <caption>This will only affect the velocity parallel to the y-axis
+     * co-ordinate, leaving vx and vz unaffected.</caption>
+     * // Set vy = 20px per second
+     * gameObject.setVelocity(undefined, 0.02);
+     * @param {number} x - x component of velocity vector
+     * @param {number} y - y component of velocity vector
+     * @param {number} z - z component of velocity vector
+     * @return {GameObject} Returns a reference to this for chainability
+     */
+    GameObject.prototype.setVelocity = function (vx, vy, vz) {
+        if (vx == undefined) {
+            vx = this.velocity[0];
         }
-
-        /**
-         * Set the bounds of the component relative to its position.
-         * @param {number} minX
-         * @param {number} minY
-         * @param {number} maxX
-         * @param {number} maxY
-         * @param {number} minZ - Optional
-         * @param {number} maxZ - Optional
-         * @return this
-         */
-
-    }, {
-        key: 'setBounds',
-        value: function setBounds() {
-            for (var _len = arguments.length, bounds = Array(_len), _key = 0; _key < _len; _key++) {
-                bounds[_key] = arguments[_key];
-            }
-
-            this.bounds = bounds;
-            return this;
+        if (vy == undefined) {
+            vy = this.velocity[1];
         }
-
-        /**
-         * Set object rotation
-         * @param {number} rotation - Rotation in radians
-         * @param {vec3} rotationAxis - 3D rotations require rotation axis.
-         * @return this
-         */
-
-    }, {
-        key: 'setRotation',
-        value: function setRotation(rotation, rotationAxis) {
-            this.rotation = rotation;
-            if (rotationAxis && rotationAxis.length == 3) {
-                _vec2.default.normalize(this.rotationAxis, rotationAxis);
-            }
-            return this;
+        if (vz == undefined) {
+            vz = this.velocity[2];
         }
-
-        /**
-         * @deprecated
-         */
-
-    }, {
-        key: 'hit',
-        value: function hit(victim) {
-            if (this.hitVictim == null) this.hitVictim = victim;
+        vec3_1.default.set(this.velocity, vx, vy, vz);
+        return this;
+    };
+    /**
+     * Set the bounds of the component relative to its position.
+     * @param {number} minX
+     * @param {number} minY
+     * @param {number} maxX
+     * @param {number} maxY
+     * @param {number} minZ - Optional
+     * @param {number} maxZ - Optional
+     * @return this
+     */
+    GameObject.prototype.setBounds = function () {
+        var bounds = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            bounds[_i] = arguments[_i];
         }
-
-        /**
-         * @deprecated
-         */
-
-    }, {
-        key: 'hitBy',
-        value: function hitBy(attacker) {
-            if (this.attackerHit == null) this.attackerHit = attacker;
+        this.bounds = bounds;
+        return this;
+    };
+    /**
+     * Set rotation
+     * @param {number} rotation - Rotation in radians
+     * @param {vec3} rotationAxis - 3D rotations require rotation axis.
+     */
+    GameObject.prototype.setRotation = function (rotation, rotationAxis) {
+        this.rotation = rotation;
+        if (rotationAxis) {
+            vec3_1.default.normalize(this.rotationAxis, rotationAxis);
         }
-
-        /**
-         * This method is called once per frame. GameObjects will usually only need
-         * to call update on each of its components in this method passing a reference
-         * to itself.
-         * @param {number} delta - Time since last frame in milliseconds
-         */
-
-    }, {
-        key: 'update',
-        value: function update(delta) {
-            var i = 0,
-                l = this.components.length,
-                j = 0,
-                m = this._toBeRemoved.length;
-            for (; j < m; j++) {
-                for (i = 0; i < l; i++) {
-                    if (this.components[i] == this._toBeRemoved[j]) {
-                        this.components.remove(i);
-                        break;
-                    }
+    };
+    /**
+     * This method is called once per frame. GameObjects will usually only need
+     * to call update on each of its components in this method passing a reference
+     * to itself.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    GameObject.prototype.update = function (delta) {
+        var i = 0, l = this.components.length, j = 0, m = this._toBeRemoved.length;
+        for (; j < m; j++) {
+            for (i = 0; i < l; i++) {
+                if (this.components[i] == this._toBeRemoved[j]) {
+                    arrayRemoveItem.call(this.components, i);
+                    break;
                 }
             }
-            this._toBeRemoved.length = 0;
-
-            l = this.components.length;
-            for (i = 0; i < l; i++) {
-                this.components[i].update(this, delta);
-            }
         }
-
-        /**
-         * This method is used to produce a html representation of the object for
-         * things such as debugging trees. It will include components in its rendering.
-         * Similar to the toString method.
-         * @return {string} Representation of this component in HTML
-         */
-
-    }, {
-        key: 'toHTML',
-        value: function toHTML() {
-            var html = this.name,
-                i;
-            if (typeof this.position.x == "number") html += " " + this.position;
-            if (this.components.length) {
-                html += "<ul>";
-                for (i = 0; i < this.components.length; i++) {
-                    html += "<li>" + this.components[i].toHTML();
-                }html += "</ul>";
-            }
-            return html;
+        this._toBeRemoved.length = 0;
+        l = this.components.length;
+        for (i = 0; i < l; i++) {
+            this.components[i].update(this, delta);
         }
-    }]);
-
+    };
+    /**
+     * This method is used to produce a html representation of the object for
+     * things such as debugging trees. It will include components in its rendering.
+     * Similar to the toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    GameObject.prototype.toHTML = function () {
+        var html = this.name, i;
+        if (typeof this.position.x == "number")
+            html += " " + this.position;
+        if (this.components.length) {
+            html += "<ul>";
+            for (i = 0; i < this.components.length; i++)
+                html += "<li>" + this.components[i].toHTML();
+            html += "</ul>";
+        }
+        return html;
+    };
     return GameObject;
-}();
-
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = GameObject;
-
-
-(0, _util.eventMixin)(GameObject);
-
+util_1.applyMixin(GameObject, util_1.Events);
 function arrayRemoveItem(from, to) {
     var rest = this.slice((to || from) + 1 || this.length);
     this.length = from < 0 ? this.length + from : from;
     return this.push.apply(this, rest);
 }
 
-function isFunction(a) {
-    return a instanceof Function;
-}
 
 /***/ }),
 /* 3 */
@@ -2198,39 +2033,17 @@ function DampedOscillation(n) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _vec = __webpack_require__(5);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-var _mat = __webpack_require__(65);
-
-var _mat2 = _interopRequireDefault(_mat);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
+var vec2_1 = __webpack_require__(5);
+var mat2_1 = __webpack_require__(62);
 // Create some spare vectors for use in screenToWorld method
-var v = _vec2.default.create();
-var rotMat = _mat2.default.create();
-
+var v = vec2_1.default.create();
+var rotMat = mat2_1.default.create();
 /**
  * InputSystem's job is to keep track of most recent user input to provide
  * filtering and rate-limiting etc. Inputs should be passed on the the rest
@@ -2243,242 +2056,155 @@ var rotMat = _mat2.default.create();
  * @param {any} keyboard - Something to watch for keyboard events on e.g. document
  * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
  */
-
-var InputSystem = function (_GameObject) {
-  _inherits(InputSystem, _GameObject);
-
-  function InputSystem(screen, keyboard, cameraSystem) {
-    _classCallCheck(this, InputSystem);
-
-    var _this = _possibleConstructorReturn(this, (InputSystem.__proto__ || Object.getPrototypeOf(InputSystem)).call(this));
-
-    _this.screen = screen;
-    _this.keyboard = keyboard;
-    _this.camera = cameraSystem;
-    /** @deprecated */
-    _this.cameraSystem = cameraSystem;
-
-    _this._nextClick = _vec2.default.fromValues(NaN, NaN);
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    _this.lastClick = _vec2.default.create();
-
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    _this.hasClick = false;
-
-    _this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    _this.lastKey = null;
-
-    initScreen.call(_this);
-    initKeyboard.call(_this);
-    return _this;
-  }
-
-  _createClass(InputSystem, [{
-    key: 'update',
-    value: function update(delta) {
-      _get(InputSystem.prototype.__proto__ || Object.getPrototypeOf(InputSystem.prototype), 'update', this).call(this, delta);
-
-      // Cycle the next event to last event property here so that
-      // last event persists for exactly one frame.
-
-      // Click
-      _vec2.default.copy(this.lastClick, this._nextClick);
-      _vec2.default.set(this._nextClick, NaN, NaN);
-      this.hasClick = !isNaN(this.lastClick[0]);
-
-      if (this.hasClick) {
-        this.fire("click", this.lastClick);
-      }
-
-      // Keypress
-      this.lastKey = this._nextKey;
-      // Consumers should interpret (null) as no keypress
-      this._nextKey = null;
-
-      if (this.lastKey) {
-        this.fire("keypress", this.lastKey);
-      }
+var InputSystem = (function (_super) {
+    __extends(InputSystem, _super);
+    function InputSystem(screen, keyboard, cameraSystem) {
+        var _this = _super.call(this) || this;
+        _this._nextClick = vec2_1.default.fromValues(NaN, NaN);
+        /** If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click. */
+        _this.lastClick = vec2_1.default.create();
+        /** Boolean to indicate if a click has been registered during the last frame. */
+        _this.hasClick = false;
+        _this._nextKey = null;
+        /** The most recent key press if one occured during the previous frame. */
+        _this.lastKey = null;
+        _this.screen = screen;
+        _this.keyboard = keyboard;
+        _this.camera = cameraSystem;
+        _this.initScreen();
+        _this.initKeyboard();
+        return _this;
     }
-
+    InputSystem.prototype.update = function (delta) {
+        _super.prototype.update.call(this, delta);
+        // Cycle the next event to last event property here so that
+        // last event persists for exactly one frame.
+        // Click
+        vec2_1.default.copy(this.lastClick, this._nextClick);
+        vec2_1.default.set(this._nextClick, NaN, NaN);
+        this.hasClick = !isNaN(this.lastClick[0]);
+        if (this.hasClick) {
+            this.fire("click", this.lastClick);
+        }
+        // Keypress
+        this.lastKey = this._nextKey;
+        // Consumers should interpret (null) as no keypress
+        this._nextKey = null;
+        if (this.lastKey) {
+            this.fire("keypress", this.lastKey);
+        }
+    };
     /**
      * Set a new screen object and initialse event listening on it.
      * @param {Element} screen - New screen
      */
-
-  }, {
-    key: 'setScreen',
-    value: function setScreen(screen) {
-      if (this.screen) {
-        destroyScreen.call(this);
-      }
-
-      this.screen = screen;
-
-      initScreen.call(this);
-    }
-
+    InputSystem.prototype.setScreen = function (screen) {
+        if (this.screen) {
+            this.destroyScreen();
+        }
+        this.screen = screen;
+        this.initScreen();
+    };
     /**
      * Convert screen co-ordinates to world co-ordinates.
      * @param {number} screenX - X co-ordinate on screen.
      * @param {number} screenY - Y co-ordinate on screen.
      * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
      */
-
-  }, {
-    key: 'screenToWorld',
-    value: function screenToWorld(screenX, screenY) {
-      var cam = this.camera,
-          camWidth = cam.width,
-          camHeight = cam.height,
-          screen = this.screen,
-          screenWidth = screen.offsetWidth,
-          screenHeight = screen.offsetHeight;
-
-      _vec2.default.set(v, screenX - screenWidth / 2, screenY - screenHeight / 2);
-
-      _vec2.default.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
-
-      // Rotation in 2D only makes sense around the Z-axis so that is
-      // all that is handled here.
-      if (cam.rotationAxis[2] == 1) {
-        _mat2.default.rotate(rotMat, rotMat, -cam.rotation);
-        _vec2.default.transformMat2(v, v, rotMat);
-      }
-
-      _vec2.default.add(v, v, cam.position);
-      return v;
-    }
-  }]);
-
-  return InputSystem;
-}(_GameObject3.default);
-
+    InputSystem.prototype.screenToWorld = function (screenX, screenY) {
+        var cam = this.camera, screen = this.screen, screenWidth = screen.offsetWidth, screenHeight = screen.offsetHeight;
+        vec2_1.default.set(v, screenX - screenWidth / 2, screenY - screenHeight / 2);
+        vec2_1.default.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+        // Rotation in 2D only makes sense around the Z-axis so that is
+        // all that is handled here.
+        if (cam.rotationAxis[2] == 1) {
+            mat2_1.default.rotate(rotMat, rotMat, -cam.rotation);
+            vec2_1.default.transformMat2(v, v, rotMat);
+        }
+        vec2_1.default.add(v, v, cam.position);
+        return v;
+    };
+    /**
+     * Private method to initialse touch events on screen.
+     *
+     * Should be invoked as initScreen.call(this);
+     * @private
+     */
+    InputSystem.prototype.initScreen = function () {
+        var _this = this;
+        if (!this.screen)
+            return;
+        TouchClick(this.screen, function (e) {
+            var offsetLeft = _this.screen.offsetLeft, offsetTop = _this.screen.offsetTop, touch = e.touches && e.touches[0], x = (touch ? touch.pageX : e.pageX) - offsetLeft, y = (touch ? touch.pageY : e.pageY) - offsetTop;
+            vec2_1.default.copy(_this._nextClick, _this.screenToWorld(x, y));
+        });
+    };
+    /**
+     * Initialse keyboard events
+     *
+     * Should be invoked as initKeyboard.call(this);
+     * @private
+     */
+    InputSystem.prototype.initKeyboard = function () {
+        var _this = this;
+        if (!this.keyboard)
+            return;
+        this.keyboard.addEventListener("keydown", function (e) {
+            _this._nextKey = e.which;
+        });
+    };
+    InputSystem.prototype.destroyScreen = function () {
+        var screen = this.screen;
+        if (screen) {
+            OffTouchClick(screen);
+        }
+    };
+    return InputSystem;
+}(GameObject_1.default));
+/** Reference object to convert keys to keycodes */
+InputSystem.Keys = {
+    "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+    a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+    n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = InputSystem;
-
-/**
- * Private method to initialse touch events on screen.
- *
- * Should be invoked as initScreen.call(this);
- * @private
- */
-
-function initScreen() {
-  var _this2 = this;
-
-  if (!this.screen) return;
-
-  TouchClick(this.screen, function (e) {
-    var offsetLeft = _this2.screen.offsetLeft,
-        offsetTop = _this2.screen.offsetTop,
-        touch = e.touches && e.touches[0],
-        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
-        y = (touch ? touch.pageY : e.pageY) - offsetTop;
-
-    _vec2.default.copy(_this2._nextClick, _this2.screenToWorld(x, y));
-  });
-}
-
-/**
- * Initialse keyboard events
- *
- * Should be invoked as initKeyboard.call(this);
- * @private
- */
-function initKeyboard() {
-  var _this3 = this;
-
-  if (!this.keyboard) return;
-
-  this.keyboard.addEventListener("keydown", function (e) {
-    _this3._nextKey = e.which;
-  });
-}
-
 /**
  * @callback TouchClickCallback
  * @param {object} event - Generic event object which will be relevant to event type.
  */
-
 /**
- * Helper function to handle both touches and clicks consistently
+ * Helper funciion to handle both touches and clicks consistently
  * @private
  * @param {Element} sel - Element on which we should look for input
  * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
  */
 function TouchClick(sel, fnc) {
-  var handle = function handle(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    if (event.handled !== true) {
-      fnc(event);
-      event.handled = true;
-    } else {
-      return false;
-    }
-  };
-
-  // Remove previous handler in case this is element being re-initialised
-  OffTouchClick(sel);
-
-  // Add new handler
-  sel.addEventListener('touchstart', handle);
-  sel.addEventListener('click', handle);
-
-  // We need to keep track of this handler in order to be able to remove it later.
-  sel.touchClick = handle;
+    var handle = function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (event.handled !== true) {
+            fnc(event);
+            event.handled = true;
+        }
+        else {
+            return false;
+        }
+    };
+    // Remove previous handler in case this is element being re-initialised
+    OffTouchClick(sel);
+    // Add new handler
+    sel.addEventListener('touchstart', handle);
+    sel.addEventListener('click', handle);
+    // We need to keep track of this handler in order to be able to remove it later.
+    sel.touchClick = handle;
 }
-
-function destroyScreen() {
-  var screen = this.screen;
-
-  if (screen) {
-    OffTouchClick(screen);
-  }
-}
-
 function OffTouchClick(sel) {
-  // Remove previous handlers
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
+    // Remove previous handlers
+    sel.removeEventListener('touchstart', sel.touchClick);
+    sel.removeEventListener('click', sel.touchClick);
 }
 
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};
 
 /***/ }),
 /* 8 */
@@ -2486,29 +2212,12 @@ InputSystem.Keys = {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _GameComponent = __webpack_require__(0);
-
-var _GameComponent2 = _interopRequireDefault(_GameComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
 /**
  * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
  * will get rendered to the canvas.
@@ -2517,141 +2226,95 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
  * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
  */
-var CanvasRenderSystem = function (_GameObject) {
-	_inherits(CanvasRenderSystem, _GameObject);
-
-	function CanvasRenderSystem(context, cameraSystem) {
-		_classCallCheck(this, CanvasRenderSystem);
-
-		var _this = _possibleConstructorReturn(this, (CanvasRenderSystem.__proto__ || Object.getPrototypeOf(CanvasRenderSystem)).call(this));
-
-		_this.context = context;
-		_this.canvas = context && context.canvas;
-		_this.camera = cameraSystem;
-
-		/** @deprecated */
-		_this.cameraSystem = cameraSystem;
-
-		_this.renderQueue = [];
-
-		/**
-   * Should the renderer clear the screen before drawing a frame or just overdraw.
-   * @type {boolean}
-   */
-		_this.clearScreen = true;
-		return _this;
-	}
-
-	/**
-  * @callback CanvasRenderable
-  * @param {CanvasRenderingContext2D} context
-  */
-
-	/**
-  * Add a renderable to the draw queue
-  * @param {CanvasRenderable} renderable - Function which will receive drawing context
-  * @param {number} layer - Layer to add this drawable to. Default: 1
-  */
-
-
-	_createClass(CanvasRenderSystem, [{
-		key: 'push',
-		value: function push(renderable, layer) {
-			layer = layer == undefined ? 1 : layer;
-			if (!this.renderQueue[layer]) {
-				this.renderQueue[layer] = [];
-			}
-			this.renderQueue[layer].push(renderable);
-		}
-	}, {
-		key: 'update',
-		value: function update(delta) {
-			if (this.clearScreen) {
-				this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-			}
-
-			this.context.save();
-
-			var p = this.camera.position,
-			    q = this.canvas.width / 2,
-			    r = this.canvas.height / 2,
-			    i,
-			    l,
-			    j,
-			    n;
-
-			this.context.translate(q, r);
-			// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
-			this.context.scale(this.camera.scaleX, this.camera.scaleY);
-
-			// Only rotation around the Z-axis makes sense for canvas rendering
-			if (this.camera.rotationAxis[2] == 1) {
-				this.context.rotate(-this.camera.rotation);
-			}
-
-			this.context.translate(-p[0], -p[1]);
-
-			for (i = 0, l = this.renderQueue.length; i < l; i++) {
-				_renderQueue(this, i);
-			}
-
-			this.context.restore();
-
-			// Special case layer renders on top independant of camera
-			_renderQueue(this, -1);
-		}
-	}, {
-		key: 'drawPath',
-		value: function drawPath(context, path) {
-			var i = 2,
-			    l = path.length;
-			context.beginPath();
-			context.moveTo(path[0], path[1]);
-			for (; i < l - 1; i += 2) {
-				context.lineTo(path[i], path[i + 1]);
-			}
-		}
-
-		/**
-   * Convenience method to stroke a path with the given style and to the given layer.
-   * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
-   * @param {string} style - Colour of line to draw. Default: #000
-   * @param {number} layer - Layer this should be drawn on. Default: 1
-   */
-
-	}, {
-		key: 'strokePath',
-		value: function strokePath(path, style, layer) {
-			if (typeof style == "undefined") style = '#000';
-			if (typeof layer == "undefined") layer = 1;
-			this.push(function (context) {
-				context.strokeStyle = style;
-				this.drawPath(context, path);
-				context.stroke();
-			}, layer);
-		}
-	}]);
-
-	return CanvasRenderSystem;
-}(_GameObject3.default);
-
+var CanvasRenderSystem = (function (_super) {
+    __extends(CanvasRenderSystem, _super);
+    function CanvasRenderSystem(context, cameraSystem) {
+        var _this = _super.call(this) || this;
+        _this.renderQueue = [];
+        /** Should the renderer clear the screen before drawing a frame or just overdraw. */
+        _this.clearScreen = true;
+        _this.context = context;
+        _this.canvas = context && context.canvas;
+        _this.camera = cameraSystem;
+        return _this;
+    }
+    /**
+     * @callback CanvasRenderable
+     * @param {CanvasRenderingContext2D} context
+     */
+    /**
+     * Add a renderable to the draw queue
+     * @param {CanvasRenderable} renderable - Function which will receive drawing context
+     * @param {number} layer - Layer to add this drawable to. Default: 1
+     */
+    CanvasRenderSystem.prototype.push = function (renderable, layer) {
+        if (layer === void 0) { layer = 1; }
+        if (!this.renderQueue[layer]) {
+            this.renderQueue[layer] = [];
+        }
+        this.renderQueue[layer].push(renderable);
+    };
+    CanvasRenderSystem.prototype.update = function (delta) {
+        if (this.clearScreen) {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        this.context.save();
+        var p = this.camera.position, q = this.canvas.width / 2, r = this.canvas.height / 2, i, l, j, n;
+        this.context.translate(q, r);
+        // this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+        this.context.scale(this.camera.scaleX, this.camera.scaleY);
+        // Only rotation around the Z-axis makes sense for canvas rendering
+        if (this.camera.rotationAxis[2] == 1) {
+            this.context.rotate(-this.camera.rotation);
+        }
+        this.context.translate(-p[0], -p[1]);
+        for (i = 0, l = this.renderQueue.length; i < l; i++) {
+            _renderQueue(this, i);
+        }
+        this.context.restore();
+        // Special case layer renders on top independant of camera
+        _renderQueue(this, -1);
+    };
+    CanvasRenderSystem.prototype.drawPath = function (context, path) {
+        var i = 2, l = path.length;
+        context.beginPath();
+        context.moveTo(path[0], path[1]);
+        for (; i < l - 1; i += 2) {
+            context.lineTo(path[i], path[i + 1]);
+        }
+    };
+    /**
+     * Convenience method to stroke a path with the given style and to the given layer.
+     * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
+     * @param {string} style - Colour of line to draw. Default: #000
+     * @param {number} layer - Layer this should be drawn on. Default: 1
+     */
+    CanvasRenderSystem.prototype.strokePath = function (path, style, layer) {
+        if (style === void 0) { style = "#000"; }
+        if (layer === void 0) { layer = 1; }
+        this.push(function (context) {
+            context.strokeStyle = style;
+            this.drawPath(context, path);
+            context.stroke();
+        }, layer);
+    };
+    return CanvasRenderSystem;
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = CanvasRenderSystem;
-
-
 function _renderQueue(renderSystem, layer) {
-	var context = renderSystem.context,
-	    renderQueue = renderSystem.renderQueue;
-
-	var queue = renderQueue[layer];
-	if (queue) {
-		for (var j = 0, n = queue.length; j < n; j++) {
-			context.save();
-			queue[j].call(renderSystem, context);
-			context.restore();
-		}
-		queue.length = 0;
-	}
+    var context = renderSystem.context, renderQueue = renderSystem.renderQueue;
+    var queue = renderQueue[layer];
+    if (queue) {
+        for (var j = 0, n = queue.length; j < n; j++) {
+            context.save();
+            queue[j].call(renderSystem, context);
+            context.restore();
+        }
+        queue.length = 0;
+    }
 }
+
 
 /***/ }),
 /* 9 */
@@ -2659,47 +2322,31 @@ function _renderQueue(renderSystem, layer) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
 /** @namespace World */
-
 /**
  * Generic way to access a 'world' with intrinsic bounds.
  * @extends {GameObject}
  * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
  * @memberof World
  */
-var WorldSystem = function (_GameObject) {
-    _inherits(WorldSystem, _GameObject);
-
+var WorldSystem = (function (_super) {
+    __extends(WorldSystem, _super);
     function WorldSystem(bounds) {
-        _classCallCheck(this, WorldSystem);
-
-        var _this = _possibleConstructorReturn(this, (WorldSystem.__proto__ || Object.getPrototypeOf(WorldSystem)).call(this));
-
+        var _this = _super.call(this) || this;
         _this.bounds = bounds;
         return _this;
     }
-
     return WorldSystem;
-}(_GameObject3.default);
-
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = WorldSystem;
+
 
 /***/ }),
 /* 10 */
@@ -2707,13 +2354,6 @@ exports.default = WorldSystem;
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.simplifyPaths = simplifyPaths;
-exports.parseColor = parseColor;
-exports.eventMixin = eventMixin;
 /**
  * This function simplifies paths which are really just path segments
  * by joining up adjacent segments.
@@ -2721,356 +2361,92 @@ exports.eventMixin = eventMixin;
  * @return {array} Array of arrays of numbers
  */
 function simplifyPaths(paths) {
-  var out = [],
-      current,
-      x,
-      y;
-  paths.forEach(function (path) {
-    if (path.length == 4) {
-      if (path[0] == x && path[1] == y) {
-        x = path[2];
-        y = path[3];
-        current.push(x, y);
-      } else {
-        if (current) {
-          out.push(current);
+    var out = [], current, x, y;
+    paths.forEach(function (path) {
+        if (path.length == 4) {
+            if (path[0] == x && path[1] == y) {
+                x = path[2];
+                y = path[3];
+                current.push(x, y);
+            }
+            else {
+                if (current) {
+                    out.push(current);
+                }
+                current = path.slice(0);
+                x = path[2];
+                y = path[3];
+            }
         }
-
-        current = path.slice(0);
-        x = path[2];
-        y = path[3];
-      }
+    });
+    if (current) {
+        out.push(current);
     }
-  });
-  if (current) {
-    out.push(current);
-  }
-  return out;
+    return out;
 }
-
+exports.simplifyPaths = simplifyPaths;
 var hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 var hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
 var rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
-
 function parseColor(str) {
-
-  var match = str.match(hexColor) || str.match(hexColorShort);
-  if (match) {
-    var out = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16), 1];
-    out.format = "hex";
-    return out;
-  }
-
-  match = str.match(rgbRegex);
-  if (match) {
-    var _out = [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10), match[4] ? parseFloat(match[4]) : 1];
-    _out.format = "rgb";
-    return _out;
-  }
+    var match = str.match(hexColor) || str.match(hexColorShort);
+    if (match) {
+        var out = [
+            parseInt(match[1], 16),
+            parseInt(match[2], 16),
+            parseInt(match[3], 16),
+            1
+        ];
+        return out;
+    }
+    match = str.match(rgbRegex);
+    if (match) {
+        var out = [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3], 10),
+            match[4] ? parseFloat(match[4]) : 1,
+        ];
+        return out;
+    }
 }
-
-function eventMixin(constructor) {
-
-  function on(event, callback) {
-    if (!this._events) this._events = {};
-
-    if (!this._events[event]) {
-      this._events[event] = [];
+exports.parseColor = parseColor;
+var Events = (function () {
+    function Events() {
+        this._events = {};
     }
-    this._events[event].push(callback);
-    return this;
-  }
-
-  function fire(event) {
-    var _this = this;
-
-    for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      params[_key - 1] = arguments[_key];
-    }
-
-    if (!this._events) this._events = {};
-
-    var callbacks = this._events[event];
-
-    if (callbacks && callbacks.length) {
-      callbacks.forEach(function (callback) {
-        callback.apply(_this, params);
-      });
-    }
-  }
-
-  constructor.prototype.on = on;
-  constructor.prototype.fire = fire;
+    Events.prototype.on = function (event, callback) {
+        if (!this._events[event]) {
+            this._events[event] = [];
+        }
+        this._events[event].push(callback);
+    };
+    Events.prototype.fire = function (event) {
+        var _this = this;
+        var params = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            params[_i - 1] = arguments[_i];
+        }
+        var callbacks = this._events[event];
+        if (callbacks && callbacks.length) {
+            callbacks.forEach(function (callback) {
+                callback.apply(_this, params);
+            });
+        }
+    };
+    return Events;
+}());
+exports.Events = Events;
+function applyMixin(constructor, mixin) {
+    Object.getOwnPropertyNames(mixin.prototype).forEach(function (name) {
+        constructor.prototype[name] = mixin.prototype[name];
+    });
 }
+exports.applyMixin = applyMixin;
+
 
 /***/ }),
 /* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _vec = __webpack_require__(1);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * Render systems require a camera. Use this class to create one.
- * @extends {GameObject}
- * @param {number} width
- * @param {number} height
- */
-var CameraSystem = function (_GameObject) {
-	_inherits(CameraSystem, _GameObject);
-
-	function CameraSystem() {
-		_classCallCheck(this, CameraSystem);
-
-		var _this = _possibleConstructorReturn(this, (CameraSystem.__proto__ || Object.getPrototypeOf(CameraSystem)).call(this));
-
-		_this.pruneList = [];
-		_this.suspendedObjects = [];
-		_this.skewX = _this.skew;
-		_this.skeyY = _this.skew;
-		_this.scaleX = 1;
-		_this.scaleY = 1;
-		_this.rotation = 0;
-		_this.rotationAxis = _vec2.default.create();
-		_vec2.default.set(_this.rotationAxis, 0, 0, 1);
-		return _this;
-	}
-
-	/**
-  * Set the scale to render at
-  * @param {number} scaleX
-  * @param {number} scaleY - Default: scaleX
-  */
-
-
-	_createClass(CameraSystem, [{
-		key: 'setScale',
-		value: function setScale(scaleX, scaleY) {
-			scaleY = scaleY || scaleX;
-			this.scaleX = scaleX;
-			this.scaleY = scaleY;
-		}
-
-		/**
-   * Change the size of the camera
-   * @param {number} width
-   * @param {number} height
-   */
-
-	}, {
-		key: 'setSize',
-		value: function setSize(width, height) {
-			this.width = width;
-			this.height = height;
-		}
-	}, {
-		key: 'addManagerForPruning',
-		value: function addManagerForPruning(objectManager) {
-			if (objectManager instanceof GameObjectManager) this.pruneList.push(objectManager);
-		}
-	}, {
-		key: 'getTransformMatrix',
-		value: function getTransformMatrix() {
-			// var m = new Matrix(this.shearMatrix);
-			// m.multiplyBy(this.scaleMatrix);
-			// m.multiplyBy(this.rotMat);
-			return this.transformMatrix;
-		}
-	}, {
-		key: 'update',
-		value: function update(delta) {
-			_get(CameraSystem.prototype.__proto__ || Object.getPrototypeOf(CameraSystem.prototype), 'update', this).call(this, delta);
-			//this.rotation += 0.0001 * delta;
-			//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
-			//this.angle += 0.0001 * delta;
-			//this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
-			//this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
-			//this.rotMat = Matrix.rotationMatrix(this.rotation);
-
-			/*
-   TODO: Pruning objeccts which are off screen could be a component's job?
-   var i = 0,
-   	l = this.pruneList.length,
-   	mgr, objs, j;
-   for(; i < l; i++){
-   	mgr = this.pruneList[i];
-   	if(mgr instanceof GE.GameObjectManager)
-   	{
-   		objs = mgr.objects;
-   		for(j=0;j<objs.length;j++){
-   			this.pruneVec.set(objs[j].position).subtract(this.position);
-   			if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
-   			{
-   				mgr.removeObject(objs[j]);
-   				this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});
-   			}
-   		}
-   	}
-   }
-   */
-		}
-	}]);
-
-	return CameraSystem;
-}(_GameObject3.default);
-
-exports.default = CameraSystem;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
-var _vec = __webpack_require__(5);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var u = _vec2.default.create();
-var n = _vec2.default.create();
-var w = _vec2.default.create();
-var p = _vec2.default.create();
-var r = _vec2.default.create();
-var q = _vec2.default.create();
-var s = _vec2.default.create();
-var q_p = _vec2.default.create();
-var v = _vec2.default.create();
-
-/**
- * Component which interacts with the background system to bounce an object off surfaces.
- * @extends {GameComponent}
- * @param {BackgroundCollisionSystem} backgroundSystem - Where can I find surfaces to collide with.
- * @param {array} collisionBounds - Default bounds array for the parent object
- * @memberof Collision
- */
-
-var BackgroundCollisionComponent = function (_GameComponent) {
-	_inherits(BackgroundCollisionComponent, _GameComponent);
-
-	function BackgroundCollisionComponent(backgroundSystem, collisionBounds) {
-		_classCallCheck(this, BackgroundCollisionComponent);
-
-		var _this = _possibleConstructorReturn(this, (BackgroundCollisionComponent.__proto__ || Object.getPrototypeOf(BackgroundCollisionComponent)).call(this));
-
-		_this.backgroundSystem = backgroundSystem;
-		_this.bounds = collisionBounds;
-		_this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
-		_this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
-		return _this;
-	}
-
-	_createClass(BackgroundCollisionComponent, [{
-		key: 'update',
-		value: function update(parent, delta) {
-			// This logic should probably be moved to BackgroundCollisionSystem
-			var surfaces = this.backgroundSystem.surfaces,
-			    j = 0,
-			    m = surfaces.length,
-			    c,
-			    l,
-			    i,
-			    p_t,
-			    p_u,
-
-			//theta,
-			f = this.coefficientFriction,
-			    e = this.coefficientRestitution,
-			    parentX = parent.position[0],
-			    parentY = parent.position[1];
-			if (this.lastX && Math.abs(this.lastX - parentX) < 100 && Math.abs(this.lastY - parentY) < 100) {
-				for (; j < m; j++) {
-					c = surfaces[j], l = c.length;
-					for (i = 0; i < l - 3; i += 2) {
-						// http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-						_vec2.default.set(p, c[i], c[i + 1]);
-						_vec2.default.set(r, c[i + 2], c[i + 3]);
-						_vec2.default.subtract(r, r, p);
-						_vec2.default.set(q, this.lastX, this.lastY);
-						_vec2.default.subtract(s, parent.position, q);
-						//theta = s.angle();
-						//s.add(0,this.bounds*Math.cos(theta));
-						_vec2.default.subtract(q_p, q, p);
-						p_t = cross(q_p, s) / cross(r, s);
-						p_u = cross(q_p, r) / cross(r, s);
-						if (p_t >= 0 && p_t <= 1 && p_u >= 0 && p_u <= 1) {
-							parent.position[0] = this.lastX;
-							parent.position[1] = this.lastY;
-							// http://stackoverflow.com/questions/573084/how-to-calculate-bounce-angle
-							_vec2.default.set(n, -r[1], r[0]); // this is the normal to the surface
-							_vec2.default.normalize(n, n);
-							_vec2.default.copy(v, parent.velocity);
-							_vec2.default.scale(u, n, _vec2.default.dot(n, v));
-							_vec2.default.subtract(w, v, u);
-							_vec2.default.scale(w, w, f);
-							_vec2.default.scale(u, u, e);
-							_vec2.default.subtract(parent.velocity, w, u);
-							break;
-						}
-					}
-				}
-			}
-			this.lastX = parent.position[0];
-			this.lastY = parent.position[1];
-		}
-	}]);
-
-	return BackgroundCollisionComponent;
-}(_GameComponent3.default);
-
-BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
-BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
-
-function cross(a, b) {
-	return a[0] * b[1] - a[1] * b[0];
-}
-
-exports.default = BackgroundCollisionComponent;
-
-/***/ }),
-/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3190,7 +2566,7 @@ var BounceComponent = function (_GameComponent) {
 exports.default = BounceComponent;
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3252,7 +2628,7 @@ var CollisionComponent = function (_GameComponent) {
 exports.default = CollisionComponent;
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3327,190 +2703,7 @@ var SolidComponent = function (_GameComponent) {
 exports.default = SolidComponent;
 
 /***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * A subclass of {@link GameObject} which manages its own children
- * @extends {GameObject}
- */
-var GameObjectManager = function (_GameObject) {
-  _inherits(GameObjectManager, _GameObject);
-
-  function GameObjectManager() {
-    _classCallCheck(this, GameObjectManager);
-
-    var _this = _possibleConstructorReturn(this, (GameObjectManager.__proto__ || Object.getPrototypeOf(GameObjectManager)).call(this));
-
-    _this.objects = [];
-
-    _this._objectsToBeRemoved = [];
-
-    _this.objects.remove = arrayRemoveItem;
-    return _this;
-  }
-
-  /**
-   * Add an object to be updated as children of this manager. Children are given a
-   * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
-   * @param {GameObject} object - Game object to be attached to this node in the tree
-   * @return {GameObjectManager} Returns a reference to this for chainability
-   */
-
-
-  _createClass(GameObjectManager, [{
-    key: "addObject",
-    value: function addObject(object) {
-      if (object instanceof _GameObject3.default) this.objects.push(object);
-      object.parent = this;
-      return this;
-    }
-
-    /**
-     * Add an object to be updated as children of this manager at particular place
-     * in the list of children.
-     * @param {GameObject} object - Game object to be attached to this node in the tree
-     * @param {number} index - Position in the list
-     * @return {GameObjectManager} Returns a reference to this for chainability
-     */
-
-  }, {
-    key: "addObjectAt",
-    value: function addObjectAt(object, index) {
-      if (object instanceof _GameObject3.default) this.objects.splice(index, 0, object);
-      object.parent = this;
-      return this;
-    }
-
-    /**
-     * Remove a previously added object from this manager.
-     * @param {GameObject} object - Game object to be removed
-     * @return {GameObjectManager} Returns a reference to this for chainability
-     */
-
-  }, {
-    key: "removeObject",
-    value: function removeObject(object) {
-      if (object instanceof _GameObject3.default) this._objectsToBeRemoved.push(object);
-      if (object.parent == this) {
-        object.parent = null;
-      }
-      return this;
-    }
-
-    /**
-     * Remove all previously added objects from this manager.
-     * @return {GameObjectManager} Returns a reference to this for chainability
-     */
-
-  }, {
-    key: "removeAll",
-    value: function removeAll() {
-      this.objects.length = 0;
-    }
-
-    /**
-     * This method is inherited from {@link GameObject}. It will first call update
-     * on each of its components like an ordinary {@link GameObject} but then it
-     * will start updating all of its child nodes.
-     * @param {number} delta - Time since last frame in milliseconds
-     */
-
-  }, {
-    key: "update",
-    value: function update(delta) {
-      _get(GameObjectManager.prototype.__proto__ || Object.getPrototypeOf(GameObjectManager.prototype), "update", this).call(this, delta);
-
-      var i = 0,
-          l = this.objects.length,
-          m,
-          j = 0;
-
-      for (i = 0; i < l; i++) {
-        this.objects[i].update(delta);
-      }
-
-      m = this._objectsToBeRemoved.length;
-
-      for (; j < m; j++) {
-        i = 0;
-        for (; i < l; i++) {
-          if (this.objects[i] == this._objectsToBeRemoved[j]) {
-            this.objects.remove(i);
-            l--;
-            break;
-          }
-        }
-      }
-      this._objectsToBeRemoved.length = 0;
-    }
-
-    /**
-     * This method is used to produce a html representation of the manage for
-     * things such as debugging trees. It will include components as well as child
-     * objects in its rendering. Similar to the toString method.
-     * @return {string} Representation of this component in HTML
-     */
-
-  }, {
-    key: "toHTML",
-    value: function toHTML() {
-      var html = this.name,
-          i;
-      if (this.objects.length > 1) html += " (" + this.objects.length + " items)";
-      if (this.components.length) {
-        html += "<ul>";
-        for (i = 0; i < this.components.length; i++) {
-          html += "<li>" + this.components[i].toHTML();
-        }html += "</ul>";
-      }
-      if (this.objects.length) {
-        html += "<ul>";
-        for (i = 0; i < this.objects.length; i++) {
-          html += "<li>" + this.objects[i].toHTML();
-        }html += "</ul>";
-      }
-      return html;
-    }
-  }]);
-
-  return GameObjectManager;
-}(_GameObject3.default);
-
-exports.default = GameObjectManager;
-
-
-function arrayRemoveItem(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
-}
-
-/***/ }),
-/* 17 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3574,7 +2767,7 @@ var ClickComponent = function (_GameComponent) {
 exports.default = ClickComponent;
 
 /***/ }),
-/* 18 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3638,7 +2831,7 @@ var DotRenderComponent = function (_GameComponent) {
 exports.default = DotRenderComponent;
 
 /***/ }),
-/* 19 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3701,7 +2894,7 @@ var RectangleRenderComponent = function (_GameComponent) {
 exports.default = RectangleRenderComponent;
 
 /***/ }),
-/* 20 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3765,7 +2958,7 @@ var TextRenderComponent = function (_GameComponent) {
 exports.default = TextRenderComponent;
 
 /***/ }),
-/* 21 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3785,7 +2978,7 @@ var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
 
-var _mat = __webpack_require__(26);
+var _mat = __webpack_require__(25);
 
 var _mat2 = _interopRequireDefault(_mat);
 
@@ -3868,221 +3061,308 @@ var WebGLRenderSystem = function (_GameObject) {
 exports.default = WebGLRenderSystem;
 
 /***/ }),
-/* 22 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
 /**
- * Bounce off the walls of a world.
- * @extends {GameComponent}
- * @param {WorldSystem} worldSystem - The world the parent object is in.
- * @param {number} width - Default width if parent has no bounds
- * @param {number} height - Default height if parent has no bounds
- * @param {number} thickness - Default thickness if parent has no bounds
- * @memberof World
+ * Render systems require a camera. Use this class to create one.
+ * @param {number} width
+ * @param {number} height
  */
-var WorldBounceComponent = function (_GameComponent) {
-    _inherits(WorldBounceComponent, _GameComponent);
-
-    function WorldBounceComponent(worldSystem, width, height, thickness) {
-        _classCallCheck(this, WorldBounceComponent);
-
-        var _this = _possibleConstructorReturn(this, (WorldBounceComponent.__proto__ || Object.getPrototypeOf(WorldBounceComponent)).call(this));
-
-        _this.worldSystem = worldSystem;
-        _this.ax = (width || 0) / 2;
-        _this.ay = (height || 0) / 2;
-        _this.az = (thickness || 0) / 2;
-
-        _this.cRestitution = 1;
-        _this.cFriction = 1;
+var CameraSystem = (function (_super) {
+    __extends(CameraSystem, _super);
+    function CameraSystem() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.pruneList = [];
+        _this.suspendedObjects = [];
+        _this.skewX = 0;
+        _this.skeyY = 0;
+        _this.scaleX = 1;
+        _this.scaleY = 1;
         return _this;
-    }
-
-    _createClass(WorldBounceComponent, [{
-        key: 'update',
-        value: function update(parent, delta) {
-            var coef = this.cRestitution,
-                friction = this.cFriction;
-
-            if (parent.bounds) {
-                this.bx1 = this.worldSystem.bounds[0] - parent.bounds[0];
-                this.by1 = this.worldSystem.bounds[1] - parent.bounds[1];
-                this.bx2 = this.worldSystem.bounds[2] - parent.bounds[2];
-                this.by2 = this.worldSystem.bounds[3] - parent.bounds[3];
-                this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4];
-                this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5];
-            } else {
-                this.bx1 = this.worldSystem.bounds[0] + this.ax;
-                this.by1 = this.worldSystem.bounds[1] + this.ay;
-                this.bx2 = this.worldSystem.bounds[2] - this.ax;
-                this.by2 = this.worldSystem.bounds[3] - this.ay;
-                this.bz1 = this.worldSystem.bounds[4] + this.az;
-                this.bz2 = this.worldSystem.bounds[5] - this.az;
-            }
-
-            // hasBounced: 1: x, 2: y, 3: z
-            parent.hasBounced = false;
-
-            if (parent.position[0] < this.bx1) {
-                parent.position[0] = this.bx1;
-                parent.velocity[0] = -parent.velocity[0] * coef;
-                parent.velocity[1] = parent.velocity[1] * friction;
-                parent.velocity[2] = parent.velocity[2] * friction;
-
-                parent.hasBounced = 1;
-            } else if (parent.position[0] > this.bx2) {
-                parent.position[0] = this.bx2;
-                parent.velocity[0] = -parent.velocity[0] * coef;
-                parent.velocity[1] = parent.velocity[1] * friction;
-                parent.velocity[2] = parent.velocity[2] * friction;
-
-                parent.hasBounced = 1;
-            }
-
-            if (parent.position[1] < this.by1) {
-                parent.position[1] = this.by1;
-                parent.velocity[1] = -parent.velocity[1] * coef;
-                parent.velocity[0] = parent.velocity[0] * friction;
-                parent.velocity[2] = parent.velocity[2] * friction;
-
-                parent.hasBounced = 2;
-            } else if (parent.position[1] > this.by2) {
-                parent.position[1] = this.by2;
-                parent.velocity[1] = -parent.velocity[1] * coef;
-                parent.velocity[0] = parent.velocity[0] * friction;
-                parent.velocity[2] = parent.velocity[2] * friction;
-
-                parent.hasBounced = 2;
-            }
-
-            if (parent.position[2] < this.bz1) {
-                parent.position[2] = this.bz1;
-                parent.velocity[2] = -parent.velocity[2] * coef;
-                parent.velocity[0] = parent.velocity[0] * friction;
-                parent.velocity[1] = parent.velocity[1] * friction;
-
-                parent.hasBounced = 3;
-            } else if (parent.position[2] > this.bz2) {
-                parent.position[2] = this.bz2;
-                parent.velocity[2] = -parent.velocity[2] * coef;
-                parent.velocity[0] = parent.velocity[0] * friction;
-                parent.velocity[1] = parent.velocity[1] * friction;
-
-                parent.hasBounced = 3;
+        // getTransformMatrix () {
+        // 	// var m = new Matrix(this.shearMatrix);
+        // 	// m.multiplyBy(this.scaleMatrix);
+        // 	// m.multiplyBy(this.rotMat);
+        // 	return this.transformMatrix;
+        // }
+        // update (delta) {
+        // 	super.update(delta);
+        //this.rotation += 0.0001 * delta;
+        //this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
+        //this.angle += 0.0001 * delta;
+        //this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
+        //this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
+        //this.rotMat = Matrix.rotationMatrix(this.rotation);
+        /*
+        TODO: Pruning objeccts which are off screen could be a component's job?
+        var i = 0,
+            l = this.pruneList.length,
+            mgr, objs, j;
+        for(; i < l; i++){
+            mgr = this.pruneList[i];
+            if(mgr instanceof GE.GameObjectManager)
+            {
+                objs = mgr.objects;
+                for(j=0;j<objs.length;j++){
+                    this.pruneVec.set(objs[j].position).subtract(this.position);
+                    if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
+                    {
+                        mgr.removeObject(objs[j]);
+                        this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});
+                    }
+                }
             }
         }
-    }]);
+        */
+        // }
+    }
+    /**
+     * Set the scale to render at
+     * @param {number} scaleX
+     * @param {number} scaleY - Default: scaleX
+     */
+    CameraSystem.prototype.setScale = function (scaleX, scaleY) {
+        scaleY = scaleY || scaleX;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+    };
+    CameraSystem.prototype.addManagerForPruning = function (objectManager) {
+        this.pruneList.push(objectManager);
+    };
+    return CameraSystem;
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = CameraSystem;
 
-    return WorldBounceComponent;
-}(_GameComponent3.default);
-
-exports.default = WorldBounceComponent;
 
 /***/ }),
-/* 23 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+var vec2_1 = __webpack_require__(5);
+var u = vec2_1.default.create();
+var n = vec2_1.default.create();
+var w = vec2_1.default.create();
+var p = vec2_1.default.create();
+var r = vec2_1.default.create();
+var q = vec2_1.default.create();
+var s = vec2_1.default.create();
+var q_p = vec2_1.default.create();
+var v = vec2_1.default.create();
 /**
- * When parent goes outside of world bounds wrap to the opposite wall.
+ * Component which interacts with the background system to bounce an object off surfaces.
  * @extends {GameComponent}
- * @param {WorldSystem} worldSystem - Which world is the parent in.
- * @memberof World
+ * @param {BackgroundCollisionSystem} backgroundSystem - Where can I find surfaces to collide with.
+ * @param {array} collisionBounds - Default bounds array for the parent object
+ * @memberof Collision
  */
-var WorldWrapComponent = function (_GameComponent) {
-	_inherits(WorldWrapComponent, _GameComponent);
+var BackgroundCollisionComponent = (function (_super) {
+    __extends(BackgroundCollisionComponent, _super);
+    function BackgroundCollisionComponent(backgroundSystem, collisionBounds) {
+        var _this = _super.call(this) || this;
+        _this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
+        _this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
+        _this.background = backgroundSystem;
+        _this.bounds = collisionBounds;
+        return _this;
+    }
+    BackgroundCollisionComponent.prototype.update = function (parent, delta) {
+        // This logic should probably be moved to BackgroundCollisionSystem
+        var surfaces = this.background.surfaces, j = 0, m = surfaces.length, c, l, i, p_t, p_u, 
+        //theta,
+        f = this.coefficientFriction, e = this.coefficientRestitution, parentX = parent.position[0], parentY = parent.position[1], lastPosition = this.position;
+        if (lastPosition[0] &&
+            Math.abs(lastPosition[0] - parentX) < 100 &&
+            Math.abs(lastPosition[1] - parentY) < 100) {
+            for (; j < m; j++) {
+                c = surfaces[j],
+                    l = c.length;
+                for (i = 0; i < l - 3; i += 2) {
+                    // http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+                    vec2_1.default.set(p, c[i], c[i + 1]);
+                    vec2_1.default.set(r, c[i + 2], c[i + 3]);
+                    vec2_1.default.subtract(r, r, p);
+                    vec2_1.default.copy(q, lastPosition);
+                    vec2_1.default.subtract(s, parent.position, q);
+                    //theta = s.angle();
+                    //s.add(0,this.bounds*Math.cos(theta));
+                    vec2_1.default.subtract(q_p, q, p);
+                    p_t = cross(q_p, s) / cross(r, s);
+                    p_u = cross(q_p, r) / cross(r, s);
+                    if (p_t >= 0 && p_t <= 1 && p_u >= 0 && p_u <= 1) {
+                        vec2_1.default.copy(parent.position, lastPosition);
+                        // http://stackoverflow.com/questions/573084/how-to-calculate-bounce-angle
+                        vec2_1.default.set(n, -r[1], r[0]); // this is the normal to the surface
+                        vec2_1.default.normalize(n, n);
+                        vec2_1.default.copy(v, parent.velocity);
+                        vec2_1.default.scale(u, n, vec2_1.default.dot(n, v));
+                        vec2_1.default.subtract(w, v, u);
+                        vec2_1.default.scale(w, w, f);
+                        vec2_1.default.scale(u, u, e);
+                        vec2_1.default.subtract(parent.velocity, w, u);
+                        break;
+                    }
+                }
+            }
+        }
+        vec2_1.default.copy(parent.position, lastPosition);
+    };
+    return BackgroundCollisionComponent;
+}(GameComponent_1.default));
+BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
+BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = BackgroundCollisionComponent;
+function cross(a, b) {
+    return a[0] * b[1] - a[1] * b[0];
+}
 
-	function WorldWrapComponent(worldSystem) {
-		_classCallCheck(this, WorldWrapComponent);
-
-		var _this = _possibleConstructorReturn(this, (WorldWrapComponent.__proto__ || Object.getPrototypeOf(WorldWrapComponent)).call(this));
-
-		_this.worldSystem = worldSystem;
-		return _this;
-	}
-
-	_createClass(WorldWrapComponent, [{
-		key: "update",
-		value: function update(parent, delta) {
-			this.ax = this.worldSystem.bounds[0];
-			this.ay = this.worldSystem.bounds[1];
-			this.bx = this.worldSystem.bounds[2];
-			this.by = this.worldSystem.bounds[3];
-			this.az = this.worldSystem.bounds[4];
-			this.bz = this.worldSystem.bounds[5];
-
-			if (parent.position[0] < this.ax && parent.velocity[0] < 0) {
-				parent.position[0] = this.bx;
-				this.fire("wrap", parent);
-			} else if (parent.position[0] > this.bx && parent.velocity[0] > 0) {
-				parent.position[0] = this.ax;
-				this.fire("wrap", parent);
-			}
-			if (parent.position[1] < this.ay && parent.velocity[1] < 0) {
-				parent.position[1] = this.by;
-				this.fire("wrap", parent);
-			} else if (parent.position[1] > this.by && parent.velocity[1] > 0) {
-				parent.position[1] = this.ay;
-				this.fire("wrap", parent);
-			}
-			if (parent.position[2] < this.az && parent.velocity[2] < 0) {
-				parent.position[2] = this.bz;
-				this.fire("wrap", parent);
-			} else if (parent.position[2] > this.bz && parent.velocity[2] > 0) {
-				parent.position[2] = this.az;
-				this.fire("wrap", parent);
-			}
-		}
-	}]);
-
-	return WorldWrapComponent;
-}(_GameComponent3.default);
-
-exports.default = WorldWrapComponent;
 
 /***/ }),
-/* 24 */
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
+/**
+ * A subclass of {@link GameObject} which manages its own children.
+ */
+var GameObjectManager = (function (_super) {
+    __extends(GameObjectManager, _super);
+    function GameObjectManager() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.objects = [];
+        _this._objectsToBeRemoved = [];
+        return _this;
+    }
+    /**
+     * Add an object to be updated as children of this manager. Children are given a
+     * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
+     * @param {GameObject} object - Game object to be attached to this node in the tree
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    GameObjectManager.prototype.addObject = function (object) {
+        if (object instanceof GameObject_1.default)
+            this.objects.push(object);
+        // object.parent = this;
+        return this;
+    };
+    /**
+     * Add an object to be updated as children of this manager at particular place
+     * in the list of children.
+     * @param {GameObject} object - Game object to be attached to this node in the tree
+     * @param {number} index - Position in the list
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    GameObjectManager.prototype.addObjectAt = function (object, index) {
+        if (object instanceof GameObject_1.default)
+            this.objects.splice(index, 0, object);
+        // object.parent = this;
+        return this;
+    };
+    /**
+     * Remove a previously added object from this manager.
+     * @param {GameObject} object - Game object to be removed
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    GameObjectManager.prototype.removeObject = function (object) {
+        if (object instanceof GameObject_1.default)
+            this._objectsToBeRemoved.push(object);
+        // if(object.parent == this) { object.parent = null; }
+        return this;
+    };
+    /**
+     * Remove all previously added objects from this manager.
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    GameObjectManager.prototype.removeAll = function () {
+        this.objects.length = 0;
+    };
+    /**
+     * This method is inherited from {@link GameObject}. It will first call update
+     * on each of its components like an ordinary {@link GameObject} but then it
+     * will start updating all of its child nodes.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    GameObjectManager.prototype.update = function (delta) {
+        _super.prototype.update.call(this, delta);
+        var i = 0, l = this.objects.length, m, j = 0;
+        for (i = 0; i < l; i++) {
+            this.objects[i].update(delta);
+        }
+        m = this._objectsToBeRemoved.length;
+        for (; j < m; j++) {
+            i = 0;
+            for (; i < l; i++) {
+                if (this.objects[i] == this._objectsToBeRemoved[j]) {
+                    arrayRemoveItem.call(this.objects, i);
+                    l--;
+                    break;
+                }
+            }
+        }
+        this._objectsToBeRemoved.length = 0;
+    };
+    /**
+     * This method is used to produce a html representation of the manage for
+     * things such as debugging trees. It will include components as well as child
+     * objects in its rendering. Similar to the toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    GameObjectManager.prototype.toHTML = function () {
+        var html = this.name, i;
+        if (this.objects.length > 1)
+            html += " (" + this.objects.length + " items)";
+        if (this.components.length) {
+            html += "<ul>";
+            for (i = 0; i < this.components.length; i++)
+                html += "<li>" + this.components[i].toHTML();
+            html += "</ul>";
+        }
+        if (this.objects.length) {
+            html += "<ul>";
+            for (i = 0; i < this.objects.length; i++)
+                html += "<li>" + this.objects[i].toHTML();
+            html += "</ul>";
+        }
+        return html;
+    };
+    return GameObjectManager;
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = GameObjectManager;
+function arrayRemoveItem(from, to) {
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+}
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4113,136 +3393,183 @@ exports.default = MoveToClickComponent;
 
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
-var _vec = __webpack_require__(1);
-
-var _vec2 = _interopRequireDefault(_vec);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// Working Vectors
-var vecSeparation = _vec2.default.create();
-var vecAlign = _vec2.default.create();
-var vecCohesion = _vec2.default.create();
-var vecSpare = _vec2.default.create();
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_ts_1 = __webpack_require__(0);
 /**
- * <p>Objects with this component will try to 'flock' together. There are three effects Working
- * together to produce flocking behaviour.
- * <p>The parent object will be attracted to the average position of objects within the
- * {@link FlockingComponent.NEIGHBOUR_RADIUS}, this is called cohesion.
- * <p>The parent object wil try to move in the average direction of all the other objects within
- * the neighbourhood, this is called alignment.
- * <p>The parent object will try to move away from object with the
- * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
- * @extends {GameComponent}
- * @param {array} flock - An array of game objects which are considered to be in the same flock.
- * @memberof Behaviour
+ * Bounce off the walls of a world.
+ * @param {WorldSystem} worldSystem - The world the parent object is in.
+ * @param {number} width - Default width if parent has no bounds
+ * @param {number} height - Default height if parent has no bounds
+ * @param {number} thickness - Default thickness if parent has no bounds
+ * @memberof World
  */
-
-var FlockingComponent = function (_GameComponent) {
-    _inherits(FlockingComponent, _GameComponent);
-
-    function FlockingComponent(flock) {
-        _classCallCheck(this, FlockingComponent);
-
-        var _this = _possibleConstructorReturn(this, (FlockingComponent.__proto__ || Object.getPrototypeOf(FlockingComponent)).call(this));
-
-        _this.flock = flock;
+var WorldBounceComponent = (function (_super) {
+    __extends(WorldBounceComponent, _super);
+    function WorldBounceComponent(worldSystem, width, height, thickness) {
+        if (width === void 0) { width = 0; }
+        if (height === void 0) { height = 0; }
+        if (thickness === void 0) { thickness = 0; }
+        var _this = _super.call(this) || this;
+        _this.cRestitution = 1;
+        _this.cFriction = 1;
+        _this.worldSystem = worldSystem;
+        _this.ax = width / 2;
+        _this.ay = height / 2;
+        _this.az = thickness / 2;
         return _this;
     }
-
-    _createClass(FlockingComponent, [{
-        key: 'update',
-        value: function update(parent, delta) {
-            _vec2.default.set(vecCohesion, 0, 0, 0);
-            _vec2.default.set(vecAlign, 0, 0, 0);
-            _vec2.default.set(vecSeparation, 0, 0, 0);
-            _vec2.default.set(vecSpare, 0, 0, 0);
-
-            var count = 0;
-            var length = this.flock.length;
-
-            for (var i = 0; i < length; i++) {
-                var other = this.flock[i];
-                var dist = _vec2.default.dist(other.position, parent.position);
-
-                if (dist > 0 && dist < FlockingComponent.NEIGHBOUR_RADIUS) {
-                    _vec2.default.add(vecCohesion, vecCohesion, other.position);
-                    _vec2.default.add(vecAlign, vecAlign, other.velocity);
-
-                    if (dist < FlockingComponent.SEPARATION_RADIUS) {
-                        _vec2.default.subtract(vecSpare, parent.position, other.position);
-                        _vec2.default.normalize(vecSpare, vecSpare);
-                        _vec2.default.scaleAndAdd(vecSeparation, vecSeparation, vecSpare, 1 / dist);
-                    }
-
-                    count++;
-                }
-            }
-
-            if (count > 0) {
-                _vec2.default.scale(vecCohesion, vecCohesion, 1 / count);
-                _vec2.default.subtract(vecCohesion, vecCohesion, parent.position);
-                _vec2.default.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, FlockingComponent.COHESION_WEIGHT);
-
-                _vec2.default.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, FlockingComponent.ALIGN_WEIGHT / count);
-
-                _vec2.default.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, FlockingComponent.SEPARATION_WEIGHT / count);
-
-                var mag = _vec2.default.length(parent.velocity);
-
-                if (mag > FlockingComponent.MAX_SPEED) {
-                    _vec2.default.scale(parent.velocity, parent.velocity, FlockingComponent.MAX_SPEED / mag);
-                }
-            }
+    WorldBounceComponent.prototype.update = function (parent, delta) {
+        var coef = this.cRestitution;
+        var friction = this.cFriction;
+        var worldBounds = this.worldSystem.bounds;
+        var parentBounds = parent.bounds;
+        var bx1, by1, bx2, by2, bz1, bz2;
+        if (parentBounds) {
+            bx1 = worldBounds[0] - parentBounds[0];
+            by1 = worldBounds[1] - parentBounds[1];
+            bx2 = worldBounds[2] - parentBounds[2];
+            by2 = worldBounds[3] - parentBounds[3];
+            bz1 = worldBounds[4] - parentBounds[4];
+            bz2 = worldBounds[5] - parentBounds[5];
         }
-    }]);
+        else {
+            bx1 = worldBounds[0] + this.ax;
+            by1 = worldBounds[1] + this.ay;
+            bx2 = worldBounds[2] - this.ax;
+            by2 = worldBounds[3] - this.ay;
+            bz1 = worldBounds[4] + this.az;
+            bz2 = worldBounds[5] - this.az;
+        }
+        // hasBounced: 1: x, 2: y, 3: z
+        parent.hasBounced = false;
+        if (parent.position[0] < bx1) {
+            parent.position[0] = bx1;
+            parent.velocity[0] = -parent.velocity[0] * coef;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 1;
+        }
+        else if (parent.position[0] > bx2) {
+            parent.position[0] = bx2;
+            parent.velocity[0] = -parent.velocity[0] * coef;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 1;
+        }
+        if (parent.position[1] < by1) {
+            parent.position[1] = by1;
+            parent.velocity[1] = -parent.velocity[1] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 2;
+        }
+        else if (parent.position[1] > by2) {
+            parent.position[1] = by2;
+            parent.velocity[1] = -parent.velocity[1] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 2;
+        }
+        if (parent.position[2] < bz1) {
+            parent.position[2] = bz1;
+            parent.velocity[2] = -parent.velocity[2] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.hasBounced = 3;
+        }
+        else if (parent.position[2] > bz2) {
+            parent.position[2] = bz2;
+            parent.velocity[2] = -parent.velocity[2] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.hasBounced = 3;
+        }
+    };
+    return WorldBounceComponent;
+}(GameComponent_ts_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = WorldBounceComponent;
 
-    return FlockingComponent;
-}(_GameComponent3.default);
-
-exports.default = FlockingComponent;
-
-// FlockingComponent Constants
-
-/** Size of sphere of influence. */
-
-FlockingComponent.NEIGHBOUR_RADIUS = 200;
-/** Size of replulsion sphere. */
-FlockingComponent.SEPARATION_RADIUS = 150;
-/** Lock speed to maximum magnitude. */
-FlockingComponent.MAX_SPEED = 0.1;
-/** Coefficient controlling desire to move to same position. */
-FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
-/** Coefficient controlling desire to match velocity. */
-FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
-/** Coefficient controlling desire to move away from others. */
-FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
 
 /***/ }),
-/* 26 */
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_ts_1 = __webpack_require__(0);
+/**
+ * When parent goes outside of world bounds wrap to the opposite wall.
+ * @param {WorldSystem} worldSystem - Which world is the parent in.
+ * @memberof World
+ */
+var WorldWrapComponent = (function (_super) {
+    __extends(WorldWrapComponent, _super);
+    function WorldWrapComponent(worldSystem) {
+        var _this = _super.call(this) || this;
+        _this.worldSystem = worldSystem;
+        return _this;
+    }
+    WorldWrapComponent.prototype.update = function (parent, delta) {
+        var ax = this.worldSystem.bounds[0];
+        var ay = this.worldSystem.bounds[1];
+        var bx = this.worldSystem.bounds[2];
+        var by = this.worldSystem.bounds[3];
+        var az = this.worldSystem.bounds[4];
+        var bz = this.worldSystem.bounds[5];
+        if (parent.position[0] < ax
+            && parent.velocity[0] < 0) {
+            parent.position[0] = bx;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[0] > bx
+            && parent.velocity[0] > 0) {
+            parent.position[0] = ax;
+            this.fire("wrap", parent);
+        }
+        if (parent.position[1] < ay
+            && parent.velocity[1] < 0) {
+            parent.position[1] = by;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[1] > by
+            && parent.velocity[1] > 0) {
+            parent.position[1] = ay;
+            this.fire("wrap", parent);
+        }
+        if (parent.position[2] < az
+            && parent.velocity[2] < 0) {
+            parent.position[2] = bz;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[2] > bz
+            && parent.velocity[2] > 0) {
+            parent.position[2] = az;
+            this.fire("wrap", parent);
+        }
+    };
+    return WorldWrapComponent;
+}(GameComponent_ts_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = WorldWrapComponent;
+
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -6384,71 +5711,94 @@ module.exports = mat4;
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+var vec3_1 = __webpack_require__(1);
+// Working Vectors
+var vecSeparation = vec3_1.default.create();
+var vecAlign = vec3_1.default.create();
+var vecCohesion = vec3_1.default.create();
+var vecSpare = vec3_1.default.create();
 /**
- * Class to play audio at specific points during gameplay
- *
- * This is a very basic implementaion which is limited to one sound effect at a time.
- * It is possible to enhance this class to provide multi-track playback.
- * @extends {GameObject}
+ * <p>Objects with this component will try to 'flock' together. There are three effects Working
+ * together to produce flocking behaviour.
+ * <p>The parent object will be attracted to the average position of objects within the
+ * {@link FlockingComponent.NEIGHBOUR_RADIUS}, this is called cohesion.
+ * <p>The parent object wil try to move in the average direction of all the other objects within
+ * the neighbourhood, this is called alignment.
+ * <p>The parent object will try to move away from object with the
+ * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
+ * @param {array} flock - An array of game objects which are considered to be in the same flock.
  */
-var AudioSystem = function (_GameObject) {
-    _inherits(AudioSystem, _GameObject);
-
-    function AudioSystem() {
-        _classCallCheck(this, AudioSystem);
-
-        return _possibleConstructorReturn(this, (AudioSystem.__proto__ || Object.getPrototypeOf(AudioSystem)).call(this));
-
-        // this.context = new AudioContext();
+var FlockingComponent = (function (_super) {
+    __extends(FlockingComponent, _super);
+    function FlockingComponent(flock) {
+        var _this = _super.call(this) || this;
+        _this.flock = flock;
+        return _this;
     }
-
-    /**
-     * Queue a sound to be played at the start of the next frame
-     * @param {object} res - Audio "texture" containing Audio resource
-     */
-
-
-    _createClass(AudioSystem, [{
-        key: 'playSound',
-        value: function playSound(res) {
-            // Real implementation should add audio to queue to play at start of next frame etc.
-            if (res.audio) {
-                res.audio.play();
+    FlockingComponent.prototype.update = function (parent, delta) {
+        vec3_1.default.set(vecCohesion, 0, 0, 0);
+        vec3_1.default.set(vecAlign, 0, 0, 0);
+        vec3_1.default.set(vecSeparation, 0, 0, 0);
+        vec3_1.default.set(vecSpare, 0, 0, 0);
+        var count = 0;
+        var length = this.flock.length;
+        for (var i = 0; i < length; i++) {
+            var other = this.flock[i];
+            var dist = vec3_1.default.dist(other.position, parent.position);
+            if (dist > 0 && dist < FlockingComponent.NEIGHBOUR_RADIUS) {
+                vec3_1.default.add(vecCohesion, vecCohesion, other.position);
+                vec3_1.default.add(vecAlign, vecAlign, other.velocity);
+                if (dist < FlockingComponent.SEPARATION_RADIUS) {
+                    vec3_1.default.subtract(vecSpare, parent.position, other.position);
+                    vec3_1.default.normalize(vecSpare, vecSpare);
+                    vec3_1.default.scaleAndAdd(vecSeparation, vecSeparation, vecSpare, 1 / dist);
+                }
+                count++;
             }
         }
-    }]);
+        if (count > 0) {
+            vec3_1.default.scale(vecCohesion, vecCohesion, 1 / count);
+            vec3_1.default.subtract(vecCohesion, vecCohesion, parent.position);
+            vec3_1.default.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, FlockingComponent.COHESION_WEIGHT);
+            vec3_1.default.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, FlockingComponent.ALIGN_WEIGHT / count);
+            vec3_1.default.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, FlockingComponent.SEPARATION_WEIGHT / count);
+            var mag = vec3_1.default.length(parent.velocity);
+            if (mag > FlockingComponent.MAX_SPEED) {
+                vec3_1.default.scale(parent.velocity, parent.velocity, FlockingComponent.MAX_SPEED / mag);
+            }
+        }
+    };
+    return FlockingComponent;
+}(GameComponent_1.default));
+/** Size of sphere of influence. */
+FlockingComponent.NEIGHBOUR_RADIUS = 200;
+/** Size of replulsion sphere. */
+FlockingComponent.SEPARATION_RADIUS = 150;
+/** Lock speed to maximum magnitude. */
+FlockingComponent.MAX_SPEED = 0.1;
+/** Coefficient controlling desire to move to same position. */
+FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+/** Coefficient controlling desire to match velocity. */
+FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+/** Coefficient controlling desire to move away from others. */
+FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = FlockingComponent;
 
-    return AudioSystem;
-}(_GameObject3.default);
-
-exports.default = AudioSystem;
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6488,7 +5838,7 @@ exports.ColorAnimationComponent = _ColorAnimationComponent2.default;
 exports.RotationAnimationComponent = _RotationAnimationComponent2.default;
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6498,7 +5848,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _MoveComponent = __webpack_require__(42);
+var _MoveComponent = __webpack_require__(41);
 
 Object.defineProperty(exports, 'MoveComponent', {
   enumerable: true,
@@ -6507,7 +5857,7 @@ Object.defineProperty(exports, 'MoveComponent', {
   }
 });
 
-var _PhysicsComponent = __webpack_require__(43);
+var _PhysicsComponent = __webpack_require__(42);
 
 Object.defineProperty(exports, 'PhysicsComponent', {
   enumerable: true,
@@ -6516,7 +5866,7 @@ Object.defineProperty(exports, 'PhysicsComponent', {
   }
 });
 
-var _GravityComponent = __webpack_require__(41);
+var _GravityComponent = __webpack_require__(64);
 
 Object.defineProperty(exports, 'GravityComponent', {
   enumerable: true,
@@ -6525,7 +5875,7 @@ Object.defineProperty(exports, 'GravityComponent', {
   }
 });
 
-var _PointGravityComponent = __webpack_require__(44);
+var _PointGravityComponent = __webpack_require__(43);
 
 Object.defineProperty(exports, 'PointGravityComponent', {
   enumerable: true,
@@ -6534,7 +5884,7 @@ Object.defineProperty(exports, 'PointGravityComponent', {
   }
 });
 
-var _TerminalVelocityComponent = __webpack_require__(54);
+var _TerminalVelocityComponent = __webpack_require__(53);
 
 Object.defineProperty(exports, 'TerminalVelocityComponent', {
   enumerable: true,
@@ -6552,7 +5902,7 @@ Object.defineProperty(exports, 'FollowComponent', {
   }
 });
 
-var _RotationComponent = __webpack_require__(50);
+var _RotationComponent = __webpack_require__(49);
 
 Object.defineProperty(exports, 'RotationComponent', {
   enumerable: true,
@@ -6561,7 +5911,7 @@ Object.defineProperty(exports, 'RotationComponent', {
   }
 });
 
-var _RotateToHeadingComponent = __webpack_require__(49);
+var _RotateToHeadingComponent = __webpack_require__(48);
 
 Object.defineProperty(exports, 'RotateToHeadingComponent', {
   enumerable: true,
@@ -6570,7 +5920,7 @@ Object.defineProperty(exports, 'RotateToHeadingComponent', {
   }
 });
 
-var _TrackRotationComponent = __webpack_require__(55);
+var _TrackRotationComponent = __webpack_require__(54);
 
 Object.defineProperty(exports, 'TrackRotationComponent', {
   enumerable: true,
@@ -6579,7 +5929,7 @@ Object.defineProperty(exports, 'TrackRotationComponent', {
   }
 });
 
-var _RandomPositionComponent = __webpack_require__(47);
+var _RandomPositionComponent = __webpack_require__(46);
 
 Object.defineProperty(exports, 'RandomPositionComponent', {
   enumerable: true,
@@ -6588,7 +5938,7 @@ Object.defineProperty(exports, 'RandomPositionComponent', {
   }
 });
 
-var _RandomVelocityComponent = __webpack_require__(48);
+var _RandomVelocityComponent = __webpack_require__(47);
 
 Object.defineProperty(exports, 'RandomVelocityComponent', {
   enumerable: true,
@@ -6597,7 +5947,7 @@ Object.defineProperty(exports, 'RandomVelocityComponent', {
   }
 });
 
-var _RandomImpulseComponent = __webpack_require__(46);
+var _RandomImpulseComponent = __webpack_require__(45);
 
 Object.defineProperty(exports, 'RandomImpulseComponent', {
   enumerable: true,
@@ -6606,7 +5956,7 @@ Object.defineProperty(exports, 'RandomImpulseComponent', {
   }
 });
 
-var _FlockingComponent = __webpack_require__(25);
+var _FlockingComponent = __webpack_require__(26);
 
 Object.defineProperty(exports, 'FlockingComponent', {
   enumerable: true,
@@ -6615,7 +5965,7 @@ Object.defineProperty(exports, 'FlockingComponent', {
   }
 });
 
-var _SwitchComponent = __webpack_require__(53);
+var _SwitchComponent = __webpack_require__(52);
 
 Object.defineProperty(exports, 'SwitchComponent', {
   enumerable: true,
@@ -6624,7 +5974,7 @@ Object.defineProperty(exports, 'SwitchComponent', {
   }
 });
 
-var _PositionInterpolatorComponent = __webpack_require__(45);
+var _PositionInterpolatorComponent = __webpack_require__(44);
 
 Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   enumerable: true,
@@ -6633,7 +5983,7 @@ Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   }
 });
 
-var _SmoothPositionComponent = __webpack_require__(51);
+var _SmoothPositionComponent = __webpack_require__(50);
 
 Object.defineProperty(exports, 'SmoothPositionComponent', {
   enumerable: true,
@@ -6642,12 +5992,79 @@ Object.defineProperty(exports, 'SmoothPositionComponent', {
   }
 });
 
-var _SmoothRotationComponent = __webpack_require__(52);
+var _SmoothRotationComponent = __webpack_require__(51);
 
 Object.defineProperty(exports, 'SmoothRotationComponent', {
   enumerable: true,
   get: function get() {
     return _interopRequireDefault(_SmoothRotationComponent).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _CollisionSystem = __webpack_require__(55);
+
+Object.defineProperty(exports, 'CollisionSystem', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CollisionSystem).default;
+  }
+});
+
+var _CollisionComponent = __webpack_require__(12);
+
+Object.defineProperty(exports, 'CollisionComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CollisionComponent).default;
+  }
+});
+
+var _BounceComponent = __webpack_require__(11);
+
+Object.defineProperty(exports, 'BounceComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_BounceComponent).default;
+  }
+});
+
+var _BackgroundCollisionSystem = __webpack_require__(65);
+
+Object.defineProperty(exports, 'BackgroundCollisionSystem', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_BackgroundCollisionSystem).default;
+  }
+});
+
+var _BackgroundCollisionComponent = __webpack_require__(20);
+
+Object.defineProperty(exports, 'BackgroundCollisionComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_BackgroundCollisionComponent).default;
+  }
+});
+
+var _SolidComponent = __webpack_require__(13);
+
+Object.defineProperty(exports, 'SolidComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_SolidComponent).default;
   }
 });
 
@@ -6664,648 +6081,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CollisionSystem = __webpack_require__(57);
-
-Object.defineProperty(exports, 'CollisionSystem', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_CollisionSystem).default;
-  }
-});
-
-var _CollisionComponent = __webpack_require__(14);
-
-Object.defineProperty(exports, 'CollisionComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_CollisionComponent).default;
-  }
-});
-
-var _BounceComponent = __webpack_require__(13);
-
-Object.defineProperty(exports, 'BounceComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_BounceComponent).default;
-  }
-});
-
-var _BackgroundCollisionSystem = __webpack_require__(56);
-
-Object.defineProperty(exports, 'BackgroundCollisionSystem', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_BackgroundCollisionSystem).default;
-  }
-});
-
-var _BackgroundCollisionComponent = __webpack_require__(12);
-
-Object.defineProperty(exports, 'BackgroundCollisionComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_BackgroundCollisionComponent).default;
-  }
-});
-
-var _SolidComponent = __webpack_require__(15);
-
-Object.defineProperty(exports, 'SolidComponent', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_SolidComponent).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject = __webpack_require__(2);
-
-var _GameObject2 = _interopRequireDefault(_GameObject);
-
-var _GameObjectManager = __webpack_require__(16);
-
-var _GameObjectManager2 = _interopRequireDefault(_GameObjectManager);
-
-var _GameComponent = __webpack_require__(0);
-
-var _GameComponent2 = _interopRequireDefault(_GameComponent);
-
-var _CameraSystem = __webpack_require__(11);
-
-var _CameraSystem2 = _interopRequireDefault(_CameraSystem);
-
-var _CanvasRenderSystem = __webpack_require__(8);
-
-var _CanvasRenderSystem2 = _interopRequireDefault(_CanvasRenderSystem);
-
-var _WorldSystem = __webpack_require__(9);
-
-var _WorldSystem2 = _interopRequireDefault(_WorldSystem);
-
-var _InputSystem = __webpack_require__(7);
-
-var _InputSystem2 = _interopRequireDefault(_InputSystem);
-
-var _util = __webpack_require__(10);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var STATE_PAUSED = 0;
-var STATE_PLAYING = 1;
-var STATE_STOPPED = 2;
-var STATE_DEAD = 3;
-
-var _lastTime = 0;
-var _raf = typeof window !== "undefined" && window.requestAnimationFrame || function (callback, element) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
-    var id = setTimeout(function () {
-        callback(currTime + timeToCall);
-    }, timeToCall);
-    _lastTime = currTime + timeToCall;
-    return id;
-};
-
-/**
- * Utility class for things such as bootstrapping.
- *
- * <p>Providing width and height in options object as well as a canvas will set
- * the intrinsic rendering size of the canvas.
- * @param {object} options
- * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
- * @param {number} options.width - Render width.
- * @param {number} options.height - Render height.
- * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
- * @param {number} options.score - Initial score
- * @param {number} options.level - Initial level
- * @param {number} options.lives - Initial lives
- */
-
-var Game = function () {
-    function Game() {
-        var _this = this;
-
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-        _classCallCheck(this, Game);
-
-        /**
-         * Canvas this game will render to.
-         * @type {HTMLCanvasElement}
-         */
-        this.canvas = options.canvas;
-
-        /**
-         * Width of game canvas. Use {@link Game#setSize} to change.
-         * Explicit width takes priority.
-         * @readonly
-         */
-        this.width = options.width || this.canvas && this.canvas.width || 0;
-
-        /**
-         * Height of game canvas. Use {@link Game#setSize} to change.
-         * Explicit height takes priority.
-         * @readonly
-         */
-        this.height = options.height || this.canvas && this.canvas.height || 0;
-
-        if (this.canvas) {
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
-        }
-
-        // Init some properties
-
-        /** The root {@link GameObject} from which the object tree grows. This is the
-         * input point for the loop to inject the time delta. All objects wanting updated
-         * need to be a child or grandchild of this object.
-         * @type {GameObject}
-         */
-        this.root = new _GameObjectManager2.default();
-
-        this.textures = [];
-        this.sounds = [];
-
-        /**
-         * Counter of how many frames have been rendered so far.
-         * @type {number}
-         */
-        this.frame = 0;
-
-        /**
-         * Current game time in milliseconds.
-         * @type {number}
-         */
-        this.time = 0;
-
-        /**
-         * Keeps track of an arbritary score.
-         * @type {number}
-         */
-        this.score = options.score || 0;
-
-        /**
-         * Keeps track of an arbritary number of lives.
-         * @type {number}
-         */
-        this.lives = options.lives || 0;
-
-        /**
-         * Tracks what level the game is running. Don't change this directly use
-         * {@link Game#setLevel} instead.
-         * @readonly
-         * @type {number}
-         */
-        this.level = options.level || 0;
-
-        /**
-         * Number of resources currently pending.
-         * @private
-         * */
-        this._toLoad = 0;
-
-        this._lastTime = 0;
-        this._loaded = 0;
-
-        this._generalObjects = null;
-
-        this._autosizeCallback = function () {
-
-            if (!_this.canvas) return;
-
-            var width = _this.canvas.offsetWidth;
-            var height = _this.canvas.offsetHeight;
-
-            _this.setSize(width, height);
-
-            // Keep Camera centred
-            if (_this.cameraSystem) {
-                _this.cameraSystem.setPosition(width / 2, height / 2);
-            }
-
-            // Update bounds of the world
-            // WARN: Does not retain previous world 'padding'
-            if (_this.worldSystem) {
-                _this.worldSystem.setBounds(0, 0, width, height);
-            }
-        };
-
-        if (options.autosize) {
-            this.setAutosize(true);
-        }
-    }
-
-    /**
-     * Add an object to the game. The object is not directly added to the root
-     * GameObjectManager but is instead added to a special 'general objects'
-     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
-     * CameraSystem, RenderSystem).
-     * @param {GameObject} object - The object to add.
-     */
-
-
-    _createClass(Game, [{
-        key: 'addObject',
-        value: function addObject(object) {
-            _initialiseGeneralObjects.call(this);
-
-            this._generalObjects.addObject(object);
-        }
-
-        /**
-         * Replace the canvas of this game.
-         *
-         * <p>If there is a height and width set the new canvas will be intialised with them.
-         *
-         * <p>If height and width are unset they will be taken from the canvas size.
-         * @param {HTMLCanvasElement} canvas - New canvas
-         */
-
-    }, {
-        key: 'setCanvas',
-        value: function setCanvas(canvas) {
-            this.canvas = canvas;
-
-            if (this.canvas) {
-                this.width = this.width || this.canvas.width;
-                this.height = this.height || this.canvas.height;
-
-                this.canvas.width = this.width;
-                this.canvas.height = this.height;
-            }
-        }
-
-        /**
-         * @typedef {object} Texture
-         * @property {Image} image - HTML <code>&ltimage></code> Element
-         * @property {number} width - Natural width of image
-         * @property {number} height - Natural height of image
-         * @property {boolean} loaded - If image has loaded width and height properties should be available.
-         */
-
-        /**
-         * Provide an array of urls pointing to image resources and they will be loaded.
-         *
-         * <p>The return value of this method is a mapped array of texture objects.
-         * @param {string[]} texturePaths - Array of urls
-         * @return {Texture[]}
-         */
-
-    }, {
-        key: 'loadTextures',
-        value: function loadTextures(texturePaths) {
-            this._toLoad += texturePaths.length;
-            var self = this;
-            return texturePaths.map(function (path) {
-                var texture = {
-                    image: new Image(),
-                    width: 0,
-                    height: 0,
-                    loaded: false
-                };
-                texture.image.onload = function () {
-                    texture.width = texture.image.width;
-                    texture.height = texture.image.height;
-                    texture.loaded = true;
-                    _resourceLoaded(self, texture);
-                };
-                texture.image.onerror = function () {
-                    throw new Error("Failed to load a texture: " + path);
-                };
-                texture.image.src = path;
-                self.textures.push(texture);
-                return texture;
-            });
-        }
-
-        /**
-         * @typedef {object} AudioTexture
-         * @property {Audio} audio - HTML <code>&lt;audio></code> element
-         * @property {number} length - Total length of audio
-         * @property {boolean} loaded - If loaded is <code>true</code> length should be available.
-         */
-
-        /**
-         * Provide an array of urls pointing to audio resources and they will be loaded.
-         *
-         * <p>The return value of this method is a mapped array of 'audio texture' objects.
-         * @param {string[]} texturePaths - Array of urls
-         * @return {AudioTexture[]}
-         */
-
-    }, {
-        key: 'loadAudio',
-        value: function loadAudio(audioPaths) {
-            this._toLoad += audioPaths.length;
-            var self = this;
-            return audioPaths.map(function (path) {
-                var sound = {
-                    audio: new Audio(),
-                    length: 0,
-                    laoded: false
-                };
-                sound.audio.addEventListener("canplaythrough", function () {
-                    if (!sound.loaded) {
-                        sound.length = sound.audio.duration;
-                        sound.loaded = true;
-                        _resourceLoaded(self, sound);
-                    }
-                });
-                sound.audio.onerror = function () {
-                    throw new Error("Failed to load a sound: " + path);
-                };
-                sound.audio.src = path;
-                self.sounds.push(sound);
-                return sound;
-            });
-        }
-
-        /**
-         * Start the loop.
-         */
-
-    }, {
-        key: 'start',
-        value: function start() {
-            this.nextLevel();
-
-            this.state = STATE_PLAYING;
-
-            _loop(this);
-        }
-
-        /**
-         * Stop the loop after the current frame.
-         */
-
-    }, {
-        key: 'stop',
-        value: function stop() {
-            this.state = STATE_STOPPED;
-        }
-
-        /**
-         * Generate a default {@link CameraSystem} based on properties of this game.
-         *
-         * Calling this method will also add it to the game root after general objects.
-         * @return {CameraSystem}
-         */
-
-    }, {
-        key: 'getDefaultCamera',
-        value: function getDefaultCamera() {
-            if (!this.cameraSystem) {
-                this.cameraSystem = new _CameraSystem2.default();
-                this.cameraSystem.setPosition(this.width / 2, this.height / 2);
-
-                _initialiseGeneralObjects.call(this);
-                this.root.addObject(this.cameraSystem);
-            }
-            return this.cameraSystem;
-        }
-
-        /**
-         * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
-         * this game instance.
-         *
-         * Calling this method will also add it to the game root after general objects.
-         * @return {CanvasRenderSystem}
-         */
-
-    }, {
-        key: 'getDefaultRenderer',
-        value: function getDefaultRenderer() {
-            if (!this.renderSystem) {
-                if (!this.cameraSystem) {
-                    this.getDefaultCamera();
-                }
-
-                var context = void 0;
-
-                if (this.canvas) context = this.canvas.getContext("2d");
-
-                this.renderSystem = new _CanvasRenderSystem2.default(context, this.cameraSystem);
-
-                _initialiseGeneralObjects.call(this);
-                this.root.addObject(this.renderSystem);
-            }
-            return this.renderSystem;
-        }
-
-        /**
-         * <p>Generate a default {@link WorldSystem} based on properties set on
-         * this game instance.
-         *
-         * Calling this method will also add it to the game root after general objects.
-         * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
-         * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
-         * @return {WorldSystem}
-         */
-
-    }, {
-        key: 'getDefaultWorld',
-        value: function getDefaultWorld() {
-            var paddingX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-            var paddingY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : paddingX;
-
-            var bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
-            if (!this.worldSystem) {
-                this.worldSystem = new _WorldSystem2.default(bounds);
-
-                _initialiseGeneralObjects.call(this);
-                this.root.addObject(this.worldSystem);
-            } else {
-                var _worldSystem;
-
-                (_worldSystem = this.worldSystem).setBounds.apply(_worldSystem, bounds);
-            }
-            return this.worldSystem;
-        }
-
-        /**
-         * <p>Generate a default {@link InputSystem} based on properties set on
-         * this game instance.
-         *
-         * Calling this method will also add it to the game root after general objects.
-         * @return {InputSystem}
-         */
-
-    }, {
-        key: 'getDefaultInput',
-        value: function getDefaultInput() {
-            if (!this.inputSystem) {
-                if (!this.cameraSystem) {
-                    this.getDefaultCamera();
-                }
-                // params are: (screen, keyboard, camera)
-                this.inputSystem = new _InputSystem2.default(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
-
-                _initialiseGeneralObjects.call(this);
-                this.root.addObject(this.inputSystem);
-            }
-            return this.inputSystem;
-        }
-
-        /** Specify a new score
-         * @param {number} score - New score.
-         */
-
-    }, {
-        key: 'setScore',
-        value: function setScore(score) {
-            this.score = score;
-            this.fire("score", this.score);
-        }
-
-        /** Move to the next level */
-
-    }, {
-        key: 'nextLevel',
-        value: function nextLevel() {
-            this.level++;
-            this.fire("loadLevel", this.level);
-        }
-
-        /** Specify a level to jump to.
-         * @param {number} level - Level number to jump to.
-         */
-
-    }, {
-        key: 'setLevel',
-        value: function setLevel(level) {
-            this.level = level;
-            this.fire("loadLevel", this.level);
-        }
-
-        /**
-         * <p>Send an event notifiying listeners that the level has been completed.
-         * <p>This does not automatically move to the next level.
-         */
-
-    }, {
-        key: 'completeLevel',
-        value: function completeLevel() {
-            this.fire("levelComplete", this.level);
-        }
-
-        /**
-         * Set the size of the game. This will also set the canvas size.
-         * @param {number} width - Size in pixels
-         * @param {number} height - Size in pixels
-         */
-
-    }, {
-        key: 'setSize',
-        value: function setSize(width, height) {
-            this.width = width;
-            this.height = height;
-
-            if (this.canvas) {
-                this.canvas.width = width;
-                this.canvas.height = height;
-            }
-        }
-
-        /**
-         * Set whether or not to update the world dimensions with changes to the canvas dimensions.
-         * @param {boolean} enable
-         */
-
-    }, {
-        key: 'setAutosize',
-        value: function setAutosize(enable) {
-            if (enable) {
-                window.addEventListener("resize", this._autosizeCallback);
-            } else {
-                window.removeEventListener("resize", this._autosizeCallback);
-            }
-        }
-    }]);
-
-    return Game;
-}();
-
-exports.default = Game;
-
-
-(0, _util.eventMixin)(Game);
-
-// Export constants
-Game.STATE_PAUSED = STATE_PAUSED;
-Game.STATE_PLAYING = STATE_PLAYING;
-Game.STATE_STOPPED = STATE_STOPPED;
-Game.STATE_DEAD = STATE_DEAD;
-
-function _loop(self) {
-
-    loop(self._lastTime);
-
-    function loop(time) {
-        if (time && self.time == time) {
-            console.log("Multiple calls: " + time);
-            return;
-        }
-        self.time = time;
-        self.frame++;
-        try {
-            self.root.update(Math.min(time - self._lastTime, 100));
-
-            if (self.state == STATE_PLAYING) {
-                _raf(loop);
-            }
-            self._lastTime = time;
-        } catch (e) {
-            if (window.console) {
-                console.error(e.stack || e);
-            }
-        }
-    }
-}
-
-function _resourceLoaded(self, resource) {
-    self._loaded++;
-    self.fire("resourcesProgress", self._loaded / self._toLoad);
-    if (self._toLoad - self._loaded <= 0) {
-        self.fire("resourcesLoaded");
-    }
-};
-
-function _initialiseGeneralObjects() {
-    if (!this._generalObjects) {
-        this._generalObjects = new _GameObjectManager2.default();
-        this.root.addObjectAt(this._generalObjects, 0);
-    }
-}
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _DebugDrawBoundsComponent = __webpack_require__(58);
+var _DebugDrawBoundsComponent = __webpack_require__(56);
 
 Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   enumerable: true,
@@ -7314,7 +6090,7 @@ Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   }
 });
 
-var _DebugDrawPathComponent = __webpack_require__(59);
+var _DebugDrawPathComponent = __webpack_require__(57);
 
 Object.defineProperty(exports, 'DebugDrawPathComponent', {
   enumerable: true,
@@ -7323,7 +6099,7 @@ Object.defineProperty(exports, 'DebugDrawPathComponent', {
   }
 });
 
-var _DebugDrawSurfacesComponent = __webpack_require__(60);
+var _DebugDrawSurfacesComponent = __webpack_require__(58);
 
 Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   enumerable: true,
@@ -7332,7 +6108,7 @@ Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   }
 });
 
-var _DebugFlockingComponent = __webpack_require__(61);
+var _DebugFlockingComponent = __webpack_require__(59);
 
 Object.defineProperty(exports, 'DebugFlockingComponent', {
   enumerable: true,
@@ -7341,7 +6117,7 @@ Object.defineProperty(exports, 'DebugFlockingComponent', {
   }
 });
 
-var _PositionRenderComponent = __webpack_require__(62);
+var _PositionRenderComponent = __webpack_require__(60);
 
 Object.defineProperty(exports, 'PositionRenderComponent', {
   enumerable: true,
@@ -7353,7 +6129,7 @@ Object.defineProperty(exports, 'PositionRenderComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7372,7 +6148,7 @@ Object.defineProperty(exports, 'InputSystem', {
   }
 });
 
-var _ClickComponent = __webpack_require__(17);
+var _ClickComponent = __webpack_require__(14);
 
 Object.defineProperty(exports, 'ClickComponent', {
   enumerable: true,
@@ -7381,7 +6157,7 @@ Object.defineProperty(exports, 'ClickComponent', {
   }
 });
 
-var _MoveToClickComponent = __webpack_require__(24);
+var _MoveToClickComponent = __webpack_require__(22);
 
 Object.defineProperty(exports, 'MoveToClickComponent', {
   enumerable: true,
@@ -7393,7 +6169,7 @@ Object.defineProperty(exports, 'MoveToClickComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7412,7 +6188,7 @@ Object.defineProperty(exports, 'CanvasRenderSystem', {
   }
 });
 
-var _DotRenderComponent = __webpack_require__(18);
+var _DotRenderComponent = __webpack_require__(15);
 
 Object.defineProperty(exports, 'DotRenderComponent', {
   enumerable: true,
@@ -7421,7 +6197,7 @@ Object.defineProperty(exports, 'DotRenderComponent', {
   }
 });
 
-var _RectangleRenderComponent = __webpack_require__(19);
+var _RectangleRenderComponent = __webpack_require__(16);
 
 Object.defineProperty(exports, 'RectangleRenderComponent', {
   enumerable: true,
@@ -7430,7 +6206,7 @@ Object.defineProperty(exports, 'RectangleRenderComponent', {
   }
 });
 
-var _TextRenderComponent = __webpack_require__(20);
+var _TextRenderComponent = __webpack_require__(17);
 
 Object.defineProperty(exports, 'TextRenderComponent', {
   enumerable: true,
@@ -7439,7 +6215,7 @@ Object.defineProperty(exports, 'TextRenderComponent', {
   }
 });
 
-var _WebGLRenderSystem = __webpack_require__(21);
+var _WebGLRenderSystem = __webpack_require__(18);
 
 Object.defineProperty(exports, 'WebGLRenderSystem', {
   enumerable: true,
@@ -7448,7 +6224,7 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _PolyShapeRenderComponent = __webpack_require__(63);
+var _PolyShapeRenderComponent = __webpack_require__(61);
 
 Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   enumerable: true,
@@ -7457,7 +6233,7 @@ Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   }
 });
 
-var _sprite = __webpack_require__(64);
+var _sprite = __webpack_require__(66);
 
 Object.keys(_sprite).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -7472,7 +6248,7 @@ Object.keys(_sprite).forEach(function (key) {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 35 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7491,7 +6267,7 @@ Object.defineProperty(exports, 'WorldSystem', {
   }
 });
 
-var _WorldBounceComponent = __webpack_require__(22);
+var _WorldBounceComponent = __webpack_require__(23);
 
 Object.defineProperty(exports, 'WorldBounceComponent', {
   enumerable: true,
@@ -7500,7 +6276,7 @@ Object.defineProperty(exports, 'WorldBounceComponent', {
   }
 });
 
-var _WorldWrapComponent = __webpack_require__(23);
+var _WorldWrapComponent = __webpack_require__(24);
 
 Object.defineProperty(exports, 'WorldWrapComponent', {
   enumerable: true,
@@ -7510,6 +6286,451 @@ Object.defineProperty(exports, 'WorldWrapComponent', {
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_ts_1 = __webpack_require__(2);
+/**
+ * Class to play audio at specific points during gameplay
+ *
+ * This is a very basic implementaion which is limited to one sound effect at a time.
+ * It is possible to enhance this class to provide multi-track playback.
+ * @extends {GameObject}
+ */
+var AudioSystem = (function (_super) {
+    __extends(AudioSystem, _super);
+    function AudioSystem() {
+        return _super.call(this) || this;
+        // this.context = new AudioContext();
+    }
+    /**
+     * Queue a sound to be played at the start of the next frame
+     * @param {object} res - Audio "texture" containing Audio resource
+     */
+    AudioSystem.prototype.playSound = function (res) {
+        // Real implementation should add audio to queue to play at start of next frame etc.
+        if (res.audio) {
+            res.audio.play();
+        }
+    };
+    return AudioSystem;
+}(GameObject_ts_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = AudioSystem;
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var GameObjectManager_1 = __webpack_require__(21);
+var CameraSystem_1 = __webpack_require__(19);
+var CanvasRenderSystem_1 = __webpack_require__(8);
+var WorldSystem_1 = __webpack_require__(9);
+var InputSystem_1 = __webpack_require__(7);
+var util_1 = __webpack_require__(10);
+var State;
+(function (State) {
+    State[State["STATE_PAUSED"] = 0] = "STATE_PAUSED";
+    State[State["STATE_PLAYING"] = 1] = "STATE_PLAYING";
+    State[State["STATE_STOPPED"] = 2] = "STATE_STOPPED";
+    State[State["STATE_DEAD"] = 3] = "STATE_DEAD";
+})(State || (State = {}));
+var _lastTime = 0;
+var _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function (callback, element) {
+    var currTime = new Date().getTime();
+    var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
+    var id = setTimeout(function () { callback(currTime + timeToCall); }, timeToCall);
+    _lastTime = currTime + timeToCall;
+    return id;
+};
+/**
+ * Utility class for things such as bootstrapping.
+ *
+ * <p>Providing width and height in options object as well as a canvas will set
+ * the intrinsic rendering size of the canvas.
+ * @param {object} options
+ * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
+ * @param {number} options.width - Render width.
+ * @param {number} options.height - Render height.
+ * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
+ * @param {number} options.score - Initial score
+ * @param {number} options.level - Initial level
+ * @param {number} options.lives - Initial lives
+ */
+var Game = (function () {
+    function Game(_a) {
+        var _b = _a === void 0 ? {
+            canvas: null,
+            width: 0,
+            height: 0,
+            score: 0,
+            lives: 0,
+            level: 0,
+            autosize: false,
+        } : _a, canvas = _b.canvas, width = _b.width, height = _b.height, score = _b.score, lives = _b.lives, level = _b.level, autosize = _b.autosize;
+        var _this = this;
+        /**
+         * The root {@link GameObject} from which the object tree grows. This is the
+         * input point for the loop to inject the time delta. All objects wanting updated
+         * need to be a child or grandchild of this object.
+         */
+        this.root = new GameObjectManager_1.default();
+        this.textures = [];
+        this.sounds = [];
+        /** Counter of how many frames have been rendered so far. */
+        this.frame = 0;
+        /** Current game time in milliseconds. */
+        this.time = 0;
+        /** Keeps track of an arbritary score. */
+        this.score = 0;
+        /** Keeps track of an arbritary number of lives. */
+        this.lives = 0;
+        /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
+        this.level = 0;
+        /** Number of resources currently pending. */
+        this._toLoad = 0;
+        this._lastTime = 0;
+        this._loaded = 0;
+        this._generalObjects = null;
+        this._autosizeCallback = function () {
+            if (!_this.canvas)
+                return;
+            var width = _this.canvas.offsetWidth;
+            var height = _this.canvas.offsetHeight;
+            _this.setSize(width, height);
+            // Keep Camera centred
+            if (_this.cameraSystem) {
+                _this.cameraSystem.setPosition(width / 2, height / 2);
+            }
+            // Update bounds of the world
+            // WARN: Does not retain previous world 'padding'
+            if (_this.worldSystem) {
+                _this.worldSystem.setBounds(0, 0, width, height);
+            }
+        };
+        /**
+         * Events mixin
+         */
+        this._events = {};
+        /**
+         * Canvas this game will render to.
+         */
+        this.canvas = canvas;
+        /**
+         * Width of game canvas. Use {@link Game#setSize} to change.
+         * Explicit width takes priority.
+         * @readonly
+         */
+        this.width = width || (this.canvas && this.canvas.width) || 0;
+        /**
+         * Height of game canvas. Use {@link Game#setSize} to change.
+         * Explicit height takes priority.
+         * @readonly
+         */
+        this.height = height || (this.canvas && this.canvas.height) || 0;
+        if (this.canvas) {
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+        }
+        this.score = score;
+        this.lives = lives;
+        this.level = level;
+        if (autosize) {
+            this.setAutosize(true);
+        }
+    }
+    /**
+     * Add an object to the game. The object is not directly added to the root
+     * GameObjectManager but is instead added to a special 'general objects'
+     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
+     * CameraSystem, RenderSystem).
+     * @param {GameObject} object - The object to add.
+     */
+    Game.prototype.addObject = function (object) {
+        this._initialiseGeneralObjects();
+        this._generalObjects.addObject(object);
+    };
+    /**
+     * Replace the canvas of this game.
+     *
+     * <p>If there is a height and width set the new canvas will be intialised with them.
+     *
+     * <p>If height and width are unset they will be taken from the canvas size.
+     * @param {HTMLCanvasElement} canvas - New canvas
+     */
+    Game.prototype.setCanvas = function (canvas) {
+        this.canvas = canvas;
+        if (this.canvas) {
+            this.width = this.width || this.canvas.width;
+            this.height = this.height || this.canvas.height;
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+        }
+    };
+    /**
+     * Provide an array of urls pointing to image resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of texture objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {Texture[]}
+     */
+    Game.prototype.loadTextures = function (texturePaths) {
+        var _this = this;
+        this._toLoad += texturePaths.length;
+        return texturePaths.map(function (path) {
+            var texture = {
+                image: new Image(),
+                width: 0,
+                height: 0,
+                loaded: false
+            };
+            texture.image.onload = function () {
+                texture.width = texture.image.width;
+                texture.height = texture.image.height;
+                texture.loaded = true;
+                _this._resourceLoaded(texture);
+            };
+            texture.image.onerror = function () {
+                throw new Error("Failed to load a texture: " + path);
+            };
+            texture.image.src = path;
+            _this.textures.push(texture);
+            return texture;
+        });
+    };
+    /**
+     * Provide an array of urls pointing to audio resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of 'audio texture' objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {AudioTexture[]}
+     */
+    Game.prototype.loadAudio = function (audioPaths) {
+        var _this = this;
+        this._toLoad += audioPaths.length;
+        return audioPaths.map(function (path) {
+            var sound = {
+                audio: new Audio(),
+                length: 0,
+                loaded: false
+            };
+            sound.audio.addEventListener("canplaythrough", function () {
+                if (!sound.loaded) {
+                    sound.length = sound.audio.duration;
+                    sound.loaded = true;
+                    _this._resourceLoaded(sound);
+                }
+            });
+            sound.audio.onerror = function () {
+                throw new Error("Failed to load a sound: " + path);
+            };
+            sound.audio.src = path;
+            _this.sounds.push(sound);
+            return sound;
+        });
+    };
+    /**
+     * Start the loop.
+     */
+    Game.prototype.start = function () {
+        this.nextLevel();
+        this.state = State.STATE_PLAYING;
+        this._loop();
+    };
+    /**
+     * Stop the loop after the current frame.
+     */
+    Game.prototype.stop = function () {
+        this.state = State.STATE_STOPPED;
+    };
+    /**
+     * Generate a default {@link CameraSystem} based on properties of this game.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {CameraSystem}
+     */
+    Game.prototype.getDefaultCamera = function () {
+        if (!this.cameraSystem) {
+            this.cameraSystem = new CameraSystem_1.default();
+            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.cameraSystem);
+        }
+        return this.cameraSystem;
+    };
+    /**
+     * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {CanvasRenderSystem}
+     */
+    Game.prototype.getDefaultRenderer = function () {
+        if (!this.renderSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+            var context = void 0;
+            if (this.canvas)
+                context = this.canvas.getContext("2d");
+            this.renderSystem = new CanvasRenderSystem_1.default(context, this.cameraSystem);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.renderSystem);
+        }
+        return this.renderSystem;
+    };
+    /**
+     * <p>Generate a default {@link WorldSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
+     * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
+     * @return {WorldSystem}
+     */
+    Game.prototype.getDefaultWorld = function (paddingX, paddingY) {
+        if (paddingX === void 0) { paddingX = 0; }
+        if (paddingY === void 0) { paddingY = paddingX; }
+        var bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
+        if (!this.worldSystem) {
+            this.worldSystem = new WorldSystem_1.default(bounds);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.worldSystem);
+        }
+        else {
+            (_a = this.worldSystem).setBounds.apply(_a, bounds);
+        }
+        return this.worldSystem;
+        var _a;
+    };
+    /**
+     * <p>Generate a default {@link InputSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {InputSystem}
+     */
+    Game.prototype.getDefaultInput = function () {
+        if (!this.inputSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+            // params are: (screen, keyboard, camera)
+            this.inputSystem = new InputSystem_1.default(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.inputSystem);
+        }
+        return this.inputSystem;
+    };
+    /** Specify a new score
+     * @param {number} score - New score.
+     */
+    Game.prototype.setScore = function (score) {
+        this.score = score;
+        this.fire("score", this.score);
+    };
+    /** Move to the next level */
+    Game.prototype.nextLevel = function () {
+        this.level++;
+        this.fire("loadLevel", this.level);
+    };
+    /** Specify a level to jump to.
+     * @param {number} level - Level number to jump to.
+     */
+    Game.prototype.setLevel = function (level) {
+        this.level = level;
+        this.fire("loadLevel", this.level);
+    };
+    /**
+     * <p>Send an event notifiying listeners that the level has been completed.
+     * <p>This does not automatically move to the next level.
+     */
+    Game.prototype.completeLevel = function () {
+        this.fire("levelComplete", this.level);
+    };
+    /**
+     * Set the size of the game. This will also set the canvas size.
+     * @param {number} width - Size in pixels
+     * @param {number} height - Size in pixels
+     */
+    Game.prototype.setSize = function (width, height) {
+        this.width = width;
+        this.height = height;
+        if (this.canvas) {
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+    };
+    /**
+     * Set whether or not to update the world dimensions with changes to the canvas dimensions.
+     * @param {boolean} enable
+     */
+    Game.prototype.setAutosize = function (enable) {
+        if (typeof window !== "undefined") {
+            if (enable) {
+                window.addEventListener("resize", this._autosizeCallback);
+            }
+            else {
+                window.removeEventListener("resize", this._autosizeCallback);
+            }
+        }
+    };
+    Game.prototype._loop = function () {
+        var _this = this;
+        var loop = function (time) {
+            if (time && _this.time == time) {
+                console.log("Multiple calls: " + time);
+                return;
+            }
+            _this.time = time;
+            _this.frame++;
+            try {
+                _this.root.update(Math.min(time - _this._lastTime, 100));
+                if (_this.state == State.STATE_PLAYING) {
+                    _raf(loop);
+                }
+                _this._lastTime = time;
+            }
+            catch (e) {
+                if (window.console) {
+                    console.error(e.stack || e);
+                }
+            }
+        };
+        loop(this._lastTime);
+    };
+    Game.prototype._resourceLoaded = function (resource) {
+        this._loaded++;
+        this.fire("resourcesProgress", this._loaded / this._toLoad);
+        if (this._toLoad - this._loaded <= 0) {
+            this.fire("resourcesLoaded");
+        }
+    };
+    Game.prototype._initialiseGeneralObjects = function () {
+        if (!this._generalObjects) {
+            this._generalObjects = new GameObjectManager_1.default();
+            this.root.addObjectAt(this._generalObjects, 0);
+        }
+    };
+    return Game;
+}());
+Game.State = State;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Game;
+util_1.applyMixin(Game, util_1.Events);
+
 
 /***/ }),
 /* 36 */
@@ -7797,62 +7018,6 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * Objects with this component will fall to the floor.
- * @extends {GameComponent}
- * @memberof Behaviour
- */
-var GravityComponent = function (_GameComponent) {
-    _inherits(GravityComponent, _GameComponent);
-
-    function GravityComponent() {
-        _classCallCheck(this, GravityComponent);
-
-        return _possibleConstructorReturn(this, (GravityComponent.__proto__ || Object.getPrototypeOf(GravityComponent)).apply(this, arguments));
-    }
-
-    _createClass(GravityComponent, [{
-        key: "update",
-        value: function update(parent, delta) {
-            if (typeof parent.velocity[1] == "undefined") parent.velocity[1] = 0;
-            parent.velocity[1] += GravityComponent.GRAVITATIONAL_CONSTANT * delta;
-        }
-    }]);
-
-    return GravityComponent;
-}(_GameComponent3.default);
-
-exports.default = GravityComponent;
-
-/** Gravitational Constant is the acceleration object will head towards the ground with. */
-
-GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameComponent2 = __webpack_require__(0);
-
-var _GameComponent3 = _interopRequireDefault(_GameComponent2);
-
 var _vec = __webpack_require__(1);
 
 var _vec2 = _interopRequireDefault(_vec);
@@ -7891,7 +7056,7 @@ var MoveComponent = function (_GameComponent) {
 exports.default = MoveComponent;
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7955,7 +7120,7 @@ var PhysicsComponent = function (_GameComponent) {
 exports.default = PhysicsComponent;
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8012,7 +7177,7 @@ var PointGravityComponent = function (_GameComponent) {
 exports.default = PointGravityComponent;
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8118,7 +7283,7 @@ var PositionInterpolatorComponent = function (_GameComponent) {
 exports.default = PositionInterpolatorComponent;
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8180,7 +7345,7 @@ var RandomImpulseComponent = function (_GameComponent) {
 exports.default = RandomImpulseComponent;
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8242,7 +7407,7 @@ var RandomPositionComponent = function (_GameComponent) {
 exports.default = RandomPositionComponent;
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8299,7 +7464,7 @@ var RandomVelocityComponent = function (_GameComponent) {
 exports.default = RandomVelocityComponent;
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8345,7 +7510,7 @@ var RotateToHeadingComponent = function (_GameComponent) {
 exports.default = RotateToHeadingComponent;
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8395,7 +7560,7 @@ var RotationComponent = function (_GameComponent) {
 exports.default = RotationComponent;
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8459,7 +7624,7 @@ var SmoothPositionComponent = function (_GameComponent) {
 exports.default = SmoothPositionComponent;
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8517,7 +7682,7 @@ var SmoothRotationComponent = function (_GameComponent) {
 exports.default = SmoothRotationComponent;
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8681,7 +7846,7 @@ var SwitchComponent = function (_GameComponent) {
 exports.default = SwitchComponent;
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8744,7 +7909,7 @@ var TerminalVelocityComponent = function (_GameComponent) {
 exports.default = TerminalVelocityComponent;
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8803,116 +7968,7 @@ var TrackRotationComponent = function (_GameComponent) {
 exports.default = TrackRotationComponent;
 
 /***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameObject2 = __webpack_require__(2);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * System to maintain list of polylines for collision detection.
- * @extends {GameObject}
- * @memberof Collision
- */
-var BackgroundCollisionSystem = function (_GameObject) {
-  _inherits(BackgroundCollisionSystem, _GameObject);
-
-  function BackgroundCollisionSystem() {
-    _classCallCheck(this, BackgroundCollisionSystem);
-
-    var _this = _possibleConstructorReturn(this, (BackgroundCollisionSystem.__proto__ || Object.getPrototypeOf(BackgroundCollisionSystem)).call(this));
-
-    _this.surfaces = [];
-    _this.temporarySurfaces = [];
-    return _this;
-  }
-
-  /**
-   * Add permanent surface. Surfaces are all polylines.
-   *
-   * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
-   * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
-   * @example
-   * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
-   * @param {array} surface - Array defining surface.
-   */
-
-
-  _createClass(BackgroundCollisionSystem, [{
-    key: 'addSurface',
-    value: function addSurface(surface) {
-      this.surfaces.push(surface);
-    }
-
-    /**
-     * Add multiple permanent surfaces at once.
-     * @param {array} surfaces - Array of arrays defining surfaces.
-     */
-
-  }, {
-    key: 'addSurfaces',
-    value: function addSurfaces(surfaces) {
-      for (var i = 0; i < surfaces.length; i++) {
-        this.surfaces.push(surfaces[i]);
-      }
-    }
-
-    /**
-     * Remove all permanent surfaces.
-     */
-
-  }, {
-    key: 'clearSurfaces',
-    value: function clearSurfaces() {
-      this.surfaces.length = 0;
-    }
-
-    /**
-     * Add a temporary (single frame) surface
-     * @param {array} surface - Array defining surface
-     */
-
-  }, {
-    key: 'addTemporarySurface',
-    value: function addTemporarySurface(surface) {
-      this.temporarySurfaces.push(surface);
-    }
-  }, {
-    key: 'update',
-    value: function update(delta) {
-      _get(BackgroundCollisionSystem.prototype.__proto__ || Object.getPrototypeOf(BackgroundCollisionSystem.prototype), 'update', this).call(this, delta);
-
-      this.temporarySurfaces.length = 0;
-    }
-  }]);
-
-  return BackgroundCollisionSystem;
-}(_GameObject3.default);
-
-exports.default = BackgroundCollisionSystem;
-
-/***/ }),
-/* 57 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9022,7 +8078,7 @@ var CollisionSystem = function (_GameObject) {
 exports.default = CollisionSystem;
 
 /***/ }),
-/* 58 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9086,7 +8142,7 @@ var DebugDrawBoundsComponent = function (_GameComponent) {
 exports.default = DebugDrawBoundsComponent;
 
 /***/ }),
-/* 59 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9210,7 +8266,7 @@ var DebugDrawPathComponent = function (_GameComponent) {
 exports.default = DebugDrawPathComponent;
 
 /***/ }),
-/* 60 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9294,7 +8350,7 @@ var DebugDrawSurfacesComponent = function (_GameComponent) {
 exports.default = DebugDrawSurfacesComponent;
 
 /***/ }),
-/* 61 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9310,7 +8366,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _FlockingComponent = __webpack_require__(25);
+var _FlockingComponent = __webpack_require__(26);
 
 var _FlockingComponent2 = _interopRequireDefault(_FlockingComponent);
 
@@ -9363,7 +8419,7 @@ var DebugFlockingComponent = function (_GameComponent) {
 exports.default = DebugFlockingComponent;
 
 /***/ }),
-/* 62 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9437,7 +8493,7 @@ var PositionRenderComponent = function (_GameComponent) {
 exports.default = PositionRenderComponent;
 
 /***/ }),
-/* 63 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9453,11 +8509,11 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _mat = __webpack_require__(66);
+var _mat = __webpack_require__(63);
 
 var _mat2 = _interopRequireDefault(_mat);
 
-var _mat3 = __webpack_require__(26);
+var _mat3 = __webpack_require__(25);
 
 var _mat4 = _interopRequireDefault(_mat3);
 
@@ -9707,328 +8763,7 @@ PolyShapeRenderingComponent.createSphere = function (renderSystem, latitudeBands
 };
 
 /***/ }),
-/* 64 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Sprite = exports.SpriteAnimationComponent = exports.SpriteRenderingComponent = exports.TileComponent = undefined;
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.AnimatedSpriteComponent = AnimatedSpriteComponent;
-exports.CanvasSpriteRenderingComponent = CanvasSpriteRenderingComponent;
-
-var _GameComponent4 = __webpack_require__(0);
-
-var _GameComponent5 = _interopRequireDefault(_GameComponent4);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * Component for rendering backgrounds for example.
- * @extends {GameComponent}
- * @param {RenderSystem} renderSystem - Where to draw.
- * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
- * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
- * @memberof Sprite
- */
-var TileComponent = exports.TileComponent = function (_GameComponent) {
-  _inherits(TileComponent, _GameComponent);
-
-  function TileComponent(renderSystem, texture, bounds) {
-    _classCallCheck(this, TileComponent);
-
-    var _this = _possibleConstructorReturn(this, (TileComponent.__proto__ || Object.getPrototypeOf(TileComponent)).call(this));
-
-    _this.renderSystem = renderSystem;
-    _this.texture = texture;
-    _this.bounds = bounds;
-    return _this;
-  }
-
-  _createClass(TileComponent, [{
-    key: 'update',
-    value: function update(parent, delta) {
-      var renderSystem = this.renderSystem,
-          texture = this.texture,
-          bounds = this.bounds,
-          dx = texture.width,
-          dy = texture.height,
-          startX = parent.position[0] % dx,
-          startY = parent.position[1] % dy,
-          x,
-          y = bounds[1],
-          // + startY - dy,
-      width = bounds[2],
-          height = bounds[3],
-          render = function render(texture, x, y) {
-        return function (context) {
-          context.drawImage(texture.image, x, y);
-        };
-      };
-      for (; y < height + dy; y += dy) {
-        for (x = bounds[0] + startX - dx; x < width + dx; x += dx) {
-          renderSystem.push(render(texture, x, y));
-        }
-      }
-    }
-  }]);
-
-  return TileComponent;
-}(_GameComponent5.default);
-
-/**
- * Component renders a sprite for a parent object.
- *
- * Component can either contain its own sprite or use one provided on the parent.
- * In the case where both component and parent have sprites, the one on the parent
- * is prefered.
- * @extends {GameComponent}
- * @param {RenderSystem} renderSystem - Target renderer
- * @param {number} layer - optional layer to render this sprite on to.
- * @param {Sprite} sprite - Sprite object
- * @memberof Sprite
- */
-
-
-var SpriteRenderingComponent = exports.SpriteRenderingComponent = function (_GameComponent2) {
-  _inherits(SpriteRenderingComponent, _GameComponent2);
-
-  function SpriteRenderingComponent(renderSystem, layer, sprite) {
-    _classCallCheck(this, SpriteRenderingComponent);
-
-    /** @type {RenderSystem} */
-    var _this2 = _possibleConstructorReturn(this, (SpriteRenderingComponent.__proto__ || Object.getPrototypeOf(SpriteRenderingComponent)).call(this));
-
-    _this2.renderSystem = renderSystem;
-
-    /** @type {number} */
-    _this2.layer = layer;
-
-    /** @type {Sprite} */
-    _this2.sprite = sprite;
-    return _this2;
-  }
-
-  _createClass(SpriteRenderingComponent, [{
-    key: 'update',
-    value: function update(parent, delta) {
-      _get(SpriteRenderingComponent.prototype.__proto__ || Object.getPrototypeOf(SpriteRenderingComponent.prototype), 'update', this).call(this, delta);
-
-      var sprite = this.sprite || parent.sprite,
-          image = sprite && sprite.t.image;
-
-      if (sprite) {
-        this.renderSystem.push(function (context) {
-          var x = parent.position[0],
-              y = parent.position[1],
-              w = sprite.w,
-              h = sprite.h;
-          context.translate(x, y);
-          context.rotate(parent.rotation);
-          context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
-        }, this.layer);
-      }
-    }
-  }]);
-
-  return SpriteRenderingComponent;
-}(_GameComponent5.default);
-
-/**
- * Animate through a sequence of sprites.
- * @extends {GameComponent}
- * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
- * @param {Sprite[]} sprites - Array of sprite objects.
- * @memberof Sprite
- */
-
-
-var SpriteAnimationComponent = exports.SpriteAnimationComponent = function (_GameComponent3) {
-  _inherits(SpriteAnimationComponent, _GameComponent3);
-
-  function SpriteAnimationComponent(duration, sprites) {
-    _classCallCheck(this, SpriteAnimationComponent);
-
-    var _this3 = _possibleConstructorReturn(this, (SpriteAnimationComponent.__proto__ || Object.getPrototypeOf(SpriteAnimationComponent)).call(this));
-
-    _this3.duration = duration;
-    _this3.spriteIndex = 0;
-    _this3.playing = true;
-    _this3.sprites = sprites;
-    return _this3;
-  }
-
-  _createClass(SpriteAnimationComponent, [{
-    key: 'init',
-    value: function init(parent) {
-      if (this.sprites) {
-        parent.sprites = this.sprites;
-      }
-      if (parent.sprites.length) {
-        parent.sprite = parent.sprites[0];
-      }
-      parent.spriteCountdown = parent.sprite && parent.sprite.d || this.duration;
-    }
-  }, {
-    key: 'update',
-    value: function update(parent, delta) {
-      var spriteCount = parent.sprites.length,
-          sprite,
-          duration;
-
-      if (this.playing) {
-        parent.spriteCountdown -= delta;
-        if (parent.spriteCountdown <= 0) {
-          // TODO: Possible divide by zero
-          this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
-          sprite = parent.sprites[this.spriteIndex];
-          parent.sprite = sprite;
-          duration = sprite.d || this.duration;
-          parent.spriteCountdown = duration;
-        }
-      }
-    }
-
-    /**
-     * Start the animation.
-     */
-
-  }, {
-    key: 'play',
-    value: function play() {
-      this.playing = true;
-    }
-
-    /**
-     * Stop the animation and reset the frame to the first sprite.
-     */
-
-  }, {
-    key: 'stop',
-    value: function stop() {
-      this.playing = false;
-      this.spriteIndex = 0;
-    }
-
-    /**
-     * Pause the animation.
-     */
-
-  }, {
-    key: 'pause',
-    value: function pause() {
-      this.playing = false;
-    }
-  }]);
-
-  return SpriteAnimationComponent;
-}(_GameComponent5.default);
-
-/** @namespace
- * @property {Texture} t - texture object
- * @property {number} x - X-offset of sprite in spritesheet
- * @property {number} y - Y-offset of sprite in spritesheet
- * @property {number} width - width of sprite
- * @property {number} height - height of sprite
- * @property {number} ox - origin x-offset, so sprite can be centred on parent's position
- * @property {number} oy - origin y-offset, so sprite can be centred on parent's position
- * @property {number} d - (optional) duration of sprite for animation
- */
-
-
-var Sprite = exports.Sprite = {};
-
-/**
- * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
- * @static
- * @param {object} sprite - The sprite template.
- * @param {number} rows - Number of rows in the sprite sheet.
- * @param {number} cols - Number of columns in the sprite sheet.
- */
-Sprite.generateSpriteSheet = function (sprite, rows, cols) {
-  var out = [],
-      i,
-      j;
-  for (i = 0; i < rows; i++) {
-    for (j = 0; j < cols; j++) {
-      out.push({
-        t: sprite.t,
-        x: j * sprite.w,
-        y: i * sprite.h,
-        w: sprite.w,
-        h: sprite.h,
-        ox: sprite.ox,
-        oy: sprite.oy,
-        d: sprite.d
-      });
-    }
-  }
-  return out;
-};
-
-/**
- * This component is not to be used any more. Use {@link SpriteAnimationComponent} instead
- * @constructor
- * @deprecated
- * @extends {GameComponent}
- * @memberof Sprite
- */
-function AnimatedSpriteComponent(images, speed) {
-  this.images = images;
-  this.delay = 1000 / speed;
-  this.lastChange = 0;
-  this.imageIndex = 0;
-}
-AnimatedSpriteComponent.prototype = new _GameComponent5.default();
-AnimatedSpriteComponent.prototype.update = function (parent, delta) {
-  if (this.lastChange > this.delay) {
-    this.imageIndex = (this.imageIndex + 1) % this.images.length;
-    parent.sprite = this.images[this.imageIndex];
-    this.lastChange = 0;
-  } else {
-    this.lastChange += delta;
-  }
-};
-
-/**
- * This component is not to be used any more. Use other components instead
- * @constructor
- * @deprecated
- * @extends {GameComponent}
- * @memberof Sprite
- */
-function CanvasSpriteRenderingComponent(renderSystem) {
-  this.renderSystem = renderSystem;
-}
-CanvasSpriteRenderingComponent.prototype = new _GameComponent5.default();
-CanvasSpriteRenderingComponent.prototype.update = function (parent, delta) {
-  this.renderSystem.push(function (context) {
-    var x = parent.position[0],
-        y = parent.position[1],
-        w = parent.sprite.width,
-        h = parent.sprite.height;
-    context.translate(x, y);
-    context.rotate(parent.rotation);
-    context.drawImage(parent.sprite, -w / 2, -h / 2);
-  });
-};
-
-/***/ }),
-/* 65 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -10470,7 +9205,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 66 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -11222,6 +9957,282 @@ module.exports = mat3;
 
 
 /***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+/**
+ * Objects with this component will fall to the floor.
+ */
+var GravityComponent = (function (_super) {
+    __extends(GravityComponent, _super);
+    function GravityComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GravityComponent.prototype.update = function (parent, delta) {
+        if (typeof parent.velocity[1] == "undefined")
+            parent.velocity[1] = 0;
+        parent.velocity[1] += GravityComponent.GRAVITATIONAL_CONSTANT * delta;
+    };
+    return GravityComponent;
+}(GameComponent_1.default));
+/** Gravitational Constant is the acceleration object will head towards the ground with. */
+GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = GravityComponent;
+
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameObject_1 = __webpack_require__(2);
+/**
+ * System to maintain list of polylines for collision detection.
+ */
+var BackgroundCollisionSystem = (function (_super) {
+    __extends(BackgroundCollisionSystem, _super);
+    function BackgroundCollisionSystem() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.surfaces = [];
+        _this.temporarySurfaces = [];
+        return _this;
+    }
+    /**
+     * Add permanent surface. Surfaces are all polylines.
+     *
+     * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
+     * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
+     * @example
+     * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
+     * @param {array} surface - Array defining surface.
+     */
+    BackgroundCollisionSystem.prototype.addSurface = function (surface) {
+        this.surfaces.push(surface);
+    };
+    /**
+     * Add multiple permanent surfaces at once.
+     * @param {array} surfaces - Array of arrays defining surfaces.
+     */
+    BackgroundCollisionSystem.prototype.addSurfaces = function (surfaces) {
+        for (var i = 0; i < surfaces.length; i++) {
+            this.surfaces.push(surfaces[i]);
+        }
+    };
+    /**
+     * Remove all permanent surfaces.
+     */
+    BackgroundCollisionSystem.prototype.clearSurfaces = function () {
+        this.surfaces.length = 0;
+    };
+    /**
+     * Add a temporary (single frame) surface
+     * @param {array} surface - Array defining surface
+     */
+    BackgroundCollisionSystem.prototype.addTemporarySurface = function (surface) {
+        this.temporarySurfaces.push(surface);
+    };
+    BackgroundCollisionSystem.prototype.update = function (delta) {
+        _super.prototype.update.call(this, delta);
+        this.temporarySurfaces.length = 0;
+    };
+    return BackgroundCollisionSystem;
+}(GameObject_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = BackgroundCollisionSystem;
+
+
+/***/ }),
+/* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+/**
+ * Component for rendering backgrounds for example.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Where to draw.
+ * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
+ * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
+ * @memberof Sprite
+ */
+var TileComponent = (function (_super) {
+    __extends(TileComponent, _super);
+    function TileComponent(renderSystem, texture, bounds) {
+        var _this = _super.call(this) || this;
+        _this.renderSystem = renderSystem;
+        _this.texture = texture;
+        _this.bounds = bounds;
+        return _this;
+    }
+    TileComponent.prototype.update = function (parent, delta) {
+        var renderSystem = this.renderSystem, texture = this.texture, bounds = this.bounds, dx = texture.width, dy = texture.height, startX = parent.position[0] % dx, startY = parent.position[1] % dy, x, y = bounds[1], // + startY - dy,
+        width = bounds[2], height = bounds[3], render = function (texture, x, y) {
+            return function (context) {
+                context.drawImage(texture.image, x, y);
+            };
+        };
+        for (; y < height + dy; y += dy) {
+            for (x = bounds[0] + startX - dx; x < width + dx; x += dx) {
+                renderSystem.push(render(texture, x, y));
+            }
+        }
+    };
+    return TileComponent;
+}(GameComponent_1.default));
+exports.TileComponent = TileComponent;
+/**
+ * Component renders a sprite for a parent object.
+ *
+ * Component can either contain its own sprite or use one provided on the parent.
+ * In the case where both component and parent have sprites, the one on the parent
+ * is prefered.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Target renderer
+ * @param {number} layer - optional layer to render this sprite on to.
+ * @param {Sprite} sprite - Sprite object
+ * @memberof Sprite
+ */
+var SpriteRenderingComponent = (function (_super) {
+    __extends(SpriteRenderingComponent, _super);
+    function SpriteRenderingComponent(renderSystem, layer, sprite) {
+        var _this = _super.call(this) || this;
+        _this.renderSystem = renderSystem;
+        _this.layer = layer;
+        _this.sprite = sprite;
+        return _this;
+    }
+    SpriteRenderingComponent.prototype.update = function (parent, delta) {
+        _super.prototype.update.call(this, delta);
+        var sprite = this.sprite || parent.sprite, image = sprite && sprite.t.image;
+        if (sprite) {
+            this.renderSystem.push(function (context) {
+                var x = parent.position[0], y = parent.position[1], w = sprite.w, h = sprite.h;
+                context.translate(x, y);
+                context.rotate(parent.rotation);
+                context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
+            }, this.layer);
+        }
+    };
+    return SpriteRenderingComponent;
+}(GameComponent_1.default));
+exports.SpriteRenderingComponent = SpriteRenderingComponent;
+/**
+ * Animate through a sequence of sprites.
+ * @extends {GameComponent}
+ * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
+ * @param {Sprite[]} sprites - Array of sprite objects.
+ * @memberof Sprite
+ */
+var SpriteAnimationComponent = (function (_super) {
+    __extends(SpriteAnimationComponent, _super);
+    function SpriteAnimationComponent(duration, sprites) {
+        var _this = _super.call(this) || this;
+        _this.duration = duration;
+        _this.spriteIndex = 0;
+        _this.playing = true;
+        _this.sprites = sprites;
+        return _this;
+    }
+    SpriteAnimationComponent.prototype.init = function (parent) {
+        if (this.sprites) {
+            parent.sprites = this.sprites;
+        }
+        if (parent.sprites.length) {
+            parent.sprite = parent.sprites[0];
+        }
+        parent.spriteCountdown = (parent.sprite && parent.sprite.d) || this.duration;
+    };
+    SpriteAnimationComponent.prototype.update = function (parent, delta) {
+        var spriteCount = parent.sprites.length, sprite, duration;
+        if (this.playing) {
+            parent.spriteCountdown -= delta;
+            if (parent.spriteCountdown <= 0) {
+                // TODO: Possible divide by zero
+                this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
+                sprite = parent.sprites[this.spriteIndex];
+                parent.sprite = sprite;
+                duration = sprite.d || this.duration;
+                parent.spriteCountdown = duration;
+            }
+        }
+    };
+    /**
+     * Start the animation.
+     */
+    SpriteAnimationComponent.prototype.play = function () {
+        this.playing = true;
+    };
+    /**
+     * Stop the animation and reset the frame to the first sprite.
+     */
+    SpriteAnimationComponent.prototype.stop = function () {
+        this.playing = false;
+        this.spriteIndex = 0;
+    };
+    /**
+     * Pause the animation.
+     */
+    SpriteAnimationComponent.prototype.pause = function () {
+        this.playing = false;
+    };
+    return SpriteAnimationComponent;
+}(GameComponent_1.default));
+exports.SpriteAnimationComponent = SpriteAnimationComponent;
+var Sprite = (function () {
+    function Sprite() {
+    }
+    /**
+     * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
+     * @param {object} sprite - The sprite template.
+     * @param {number} rows - Number of rows in the sprite sheet.
+     * @param {number} cols - Number of columns in the sprite sheet.
+     * @return {Sprite[]}
+     */
+    Sprite.generateSpriteSheet = function (sprite, rows, cols) {
+        var out = [], i, j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                out.push({
+                    t: sprite.t,
+                    x: j * sprite.w,
+                    y: i * sprite.h,
+                    w: sprite.w,
+                    h: sprite.h,
+                    ox: sprite.ox,
+                    oy: sprite.oy,
+                    d: sprite.d
+                });
+            }
+        }
+        return out;
+    };
+    return Sprite;
+}());
+exports.Sprite = Sprite;
+
+
+/***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11242,7 +10253,7 @@ Object.defineProperty(exports, 'GameObject', {
   }
 });
 
-var _GameObjectManager = __webpack_require__(16);
+var _GameObjectManager = __webpack_require__(21);
 
 Object.defineProperty(exports, 'GameObjectManager', {
   enumerable: true,
@@ -11260,7 +10271,7 @@ Object.defineProperty(exports, 'GameComponent', {
   }
 });
 
-var _CameraSystem = __webpack_require__(11);
+var _CameraSystem = __webpack_require__(19);
 
 Object.defineProperty(exports, 'CameraSystem', {
   enumerable: true,
@@ -11296,7 +10307,7 @@ Object.defineProperty(exports, 'InputSystem', {
   }
 });
 
-var _AudioSystem = __webpack_require__(27);
+var _AudioSystem = __webpack_require__(34);
 
 Object.defineProperty(exports, 'AudioSystem', {
   enumerable: true,
@@ -11305,7 +10316,7 @@ Object.defineProperty(exports, 'AudioSystem', {
   }
 });
 
-var _Game = __webpack_require__(31);
+var _Game = __webpack_require__(35);
 
 Object.defineProperty(exports, 'Game', {
   enumerable: true,
@@ -11314,7 +10325,7 @@ Object.defineProperty(exports, 'Game', {
   }
 });
 
-var _WebGLRenderSystem = __webpack_require__(21);
+var _WebGLRenderSystem = __webpack_require__(18);
 
 Object.defineProperty(exports, 'WebGLRenderSystem', {
   enumerable: true,
@@ -11323,11 +10334,11 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _basic = __webpack_require__(29);
+var _basic = __webpack_require__(28);
 
 var basic = _interopRequireWildcard(_basic);
 
-var _animation = __webpack_require__(28);
+var _animation = __webpack_require__(27);
 
 var animation = _interopRequireWildcard(_animation);
 
@@ -11335,67 +10346,67 @@ var _Easing = __webpack_require__(6);
 
 var easing = _interopRequireWildcard(_Easing);
 
-var _world = __webpack_require__(35);
+var _world = __webpack_require__(33);
 
 var world = _interopRequireWildcard(_world);
 
-var _WorldBounceComponent = __webpack_require__(22);
+var _WorldBounceComponent = __webpack_require__(23);
 
 var _WorldBounceComponent2 = _interopRequireDefault(_WorldBounceComponent);
 
-var _WorldWrapComponent = __webpack_require__(23);
+var _WorldWrapComponent = __webpack_require__(24);
 
 var _WorldWrapComponent2 = _interopRequireDefault(_WorldWrapComponent);
 
-var _input = __webpack_require__(33);
+var _input = __webpack_require__(31);
 
 var input = _interopRequireWildcard(_input);
 
-var _ClickComponent = __webpack_require__(17);
+var _ClickComponent = __webpack_require__(14);
 
 var _ClickComponent2 = _interopRequireDefault(_ClickComponent);
 
-var _MoveToClickComponent = __webpack_require__(24);
+var _MoveToClickComponent = __webpack_require__(22);
 
 var _MoveToClickComponent2 = _interopRequireDefault(_MoveToClickComponent);
 
-var _collision = __webpack_require__(30);
+var _collision = __webpack_require__(29);
 
 var collision = _interopRequireWildcard(_collision);
 
-var _CollisionComponent = __webpack_require__(14);
+var _CollisionComponent = __webpack_require__(12);
 
 var _CollisionComponent2 = _interopRequireDefault(_CollisionComponent);
 
-var _BounceComponent = __webpack_require__(13);
+var _BounceComponent = __webpack_require__(11);
 
 var _BounceComponent2 = _interopRequireDefault(_BounceComponent);
 
-var _BackgroundCollisionComponent = __webpack_require__(12);
+var _BackgroundCollisionComponent = __webpack_require__(20);
 
 var _BackgroundCollisionComponent2 = _interopRequireDefault(_BackgroundCollisionComponent);
 
-var _SolidComponent = __webpack_require__(15);
+var _SolidComponent = __webpack_require__(13);
 
 var _SolidComponent2 = _interopRequireDefault(_SolidComponent);
 
-var _render = __webpack_require__(34);
+var _render = __webpack_require__(32);
 
 var render = _interopRequireWildcard(_render);
 
-var _DotRenderComponent = __webpack_require__(18);
+var _DotRenderComponent = __webpack_require__(15);
 
 var _DotRenderComponent2 = _interopRequireDefault(_DotRenderComponent);
 
-var _RectangleRenderComponent = __webpack_require__(19);
+var _RectangleRenderComponent = __webpack_require__(16);
 
 var _RectangleRenderComponent2 = _interopRequireDefault(_RectangleRenderComponent);
 
-var _TextRenderComponent = __webpack_require__(20);
+var _TextRenderComponent = __webpack_require__(17);
 
 var _TextRenderComponent2 = _interopRequireDefault(_TextRenderComponent);
 
-var _debug = __webpack_require__(32);
+var _debug = __webpack_require__(30);
 
 var debug = _interopRequireWildcard(_debug);
 

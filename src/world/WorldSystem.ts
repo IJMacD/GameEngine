@@ -8,11 +8,9 @@ import GameObject from '../core/GameObject';
  * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
  * @memberof World
  */
-class WorldSystem extends GameObject {
+export default class WorldSystem extends GameObject {
     constructor (bounds) {
         super();
         this.bounds = bounds;
     }
 }
-
-export default WorldSystem;

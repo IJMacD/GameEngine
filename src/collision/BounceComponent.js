@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 const sCBVdelta = vec3.create();

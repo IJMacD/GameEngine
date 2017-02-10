@@ -1,3 +1,4 @@
+import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
@@ -16,18 +17,31 @@ const vecSpare = vec3.create();
  * the neighbourhood, this is called alignment.
  * <p>The parent object will try to move away from object with the
  * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
- * @extends {GameComponent}
  * @param {array} flock - An array of game objects which are considered to be in the same flock.
- * @memberof Behaviour
  */
-class FlockingComponent extends GameComponent {
+export default class FlockingComponent extends GameComponent {
 
-    constructor (flock) {
+    flock: GameObject[];
+
+    /** Size of sphere of influence. */
+    static NEIGHBOUR_RADIUS = 200;
+    /** Size of replulsion sphere. */
+    static SEPARATION_RADIUS = 150;
+    /** Lock speed to maximum magnitude. */
+    static MAX_SPEED = 0.1;
+    /** Coefficient controlling desire to move to same position. */
+    static COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+    /** Coefficient controlling desire to match velocity. */
+    static ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
+    /** Coefficient controlling desire to move away from others. */
+    static SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
+
+    constructor (flock: GameObject[]) {
         super();
         this.flock = flock;
     }
 
-    update (parent, delta) {
+    update (parent: GameObject, delta: number) {
         vec3.set(vecCohesion, 0, 0, 0);
         vec3.set(vecAlign, 0, 0, 0);
         vec3.set(vecSeparation, 0, 0, 0);
@@ -71,20 +85,3 @@ class FlockingComponent extends GameComponent {
         }
     }
 }
-
-export default FlockingComponent;
-
-// FlockingComponent Constants
-
-/** Size of sphere of influence. */
-FlockingComponent.NEIGHBOUR_RADIUS = 200;
-/** Size of replulsion sphere. */
-FlockingComponent.SEPARATION_RADIUS = 150;
-/** Lock speed to maximum magnitude. */
-FlockingComponent.MAX_SPEED = 0.1;
-/** Coefficient controlling desire to move to same position. */
-FlockingComponent.COHESION_WEIGHT = 0.1 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
-/** Coefficient controlling desire to match velocity. */
-FlockingComponent.ALIGN_WEIGHT = 30 * FlockingComponent.MAX_SPEED / FlockingComponent.NEIGHBOUR_RADIUS;
-/** Coefficient controlling desire to move away from others. */
-FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;

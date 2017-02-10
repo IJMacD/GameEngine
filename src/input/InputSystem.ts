@@ -1,4 +1,5 @@
 import GameObject from '../core/GameObject';
+import CameraSystem from '../CameraSystem';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
@@ -18,42 +19,33 @@ const rotMat = mat2.create();
  * @param {any} keyboard - Something to watch for keyboard events on e.g. document
  * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
  */
-class InputSystem extends GameObject {
-  constructor (screen, keyboard, cameraSystem) {
+export default class InputSystem extends GameObject {
+  screen: HTMLElement;
+  keyboard: HTMLDocument;
+  camera: CameraSystem;
+
+  private _nextClick: vec2 = vec2.fromValues(NaN, NaN);
+
+  /** If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click. */
+  lastClick: vec2 = vec2.create();
+
+  /** Boolean to indicate if a click has been registered during the last frame. */
+  hasClick: boolean = false;
+
+  private _nextKey: number = null;
+
+  /** The most recent key press if one occured during the previous frame. */
+  lastKey:number = null;
+
+  constructor (screen: HTMLElement, keyboard: HTMLDocument, cameraSystem: CameraSystem) {
     super();
 
     this.screen = screen;
     this.keyboard = keyboard;
     this.camera = cameraSystem;
-    /** @deprecated */
-    this.cameraSystem = cameraSystem;
 
-    this._nextClick = vec2.fromValues(NaN, NaN);
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    this.lastClick = vec2.create();
-
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    this.hasClick = false;
-
-    this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    this.lastKey = null;
-
-    initScreen.call(this);
-    initKeyboard.call(this);
+    this.initScreen();
+    this.initKeyboard();
   }
 
   update (delta) {
@@ -85,14 +77,14 @@ class InputSystem extends GameObject {
    * Set a new screen object and initialse event listening on it.
    * @param {Element} screen - New screen
    */
-  setScreen (screen) {
+  setScreen (screen: HTMLElement) {
     if (this.screen) {
-      destroyScreen.call(this);
+      this.destroyScreen();
     }
 
     this.screen = screen;
 
-    initScreen.call(this);
+    this.initScreen();
   }
 
   /**
@@ -103,8 +95,6 @@ class InputSystem extends GameObject {
    */
   screenToWorld (screenX, screenY){
     const cam = this.camera,
-        camWidth = cam.width,
-        camHeight = cam.height,
         screen = this.screen,
         screenWidth = screen.offsetWidth,
         screenHeight = screen.offsetHeight;
@@ -125,42 +115,56 @@ class InputSystem extends GameObject {
     vec2.add(v, v, cam.position);
     return v;
   }
-}
 
-export default InputSystem;
+  /** Reference object to convert keys to keycodes */
+  static Keys = {
+    "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+    a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+    n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+  }
 
-/**
- * Private method to initialse touch events on screen.
- *
- * Should be invoked as initScreen.call(this);
- * @private
- */
-function initScreen () {
-  if (!this.screen) return;
+  /**
+   * Private method to initialse touch events on screen.
+   *
+   * Should be invoked as initScreen.call(this);
+   * @private
+   */
+  private initScreen () {
+    if (!this.screen) return;
 
-  TouchClick(this.screen, e => {
-    const offsetLeft = this.screen.offsetLeft,
-        offsetTop = this.screen.offsetTop,
-        touch = e.touches && e.touches[0],
-        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
-        y = (touch ? touch.pageY : e.pageY) - offsetTop;
+    TouchClick(this.screen, e => {
+      const offsetLeft = this.screen.offsetLeft,
+          offsetTop = this.screen.offsetTop,
+          touch = e.touches && e.touches[0],
+          x = (touch ? touch.pageX : e.pageX) - offsetLeft,
+          y = (touch ? touch.pageY : e.pageY) - offsetTop;
 
-    vec2.copy(this._nextClick, this.screenToWorld(x, y));
-  });
-}
+      vec2.copy(this._nextClick, this.screenToWorld(x, y));
+    });
+  }
 
-/**
- * Initialse keyboard events
- *
- * Should be invoked as initKeyboard.call(this);
- * @private
- */
-function initKeyboard () {
-  if (!this.keyboard) return;
+  /**
+   * Initialse keyboard events
+   *
+   * Should be invoked as initKeyboard.call(this);
+   * @private
+   */
+  private initKeyboard () {
+    if (!this.keyboard) return;
 
-  this.keyboard.addEventListener("keydown", e => {
-    this._nextKey = e.which;
-  });
+    this.keyboard.addEventListener("keydown", e => {
+      this._nextKey = e.which;
+    });
+  }
+
+  private destroyScreen () {
+    const screen = this.screen;
+
+    if(screen) {
+      OffTouchClick(screen);
+    }
+  }
+
 }
 
 /**
@@ -169,7 +173,7 @@ function initKeyboard () {
  */
 
 /**
- * Helper function to handle both touches and clicks consistently
+ * Helper funciion to handle both touches and clicks consistently
  * @private
  * @param {Element} sel - Element on which we should look for input
  * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
@@ -197,40 +201,8 @@ function TouchClick(sel, fnc) {
   sel.touchClick = handle;
 }
 
-function destroyScreen () {
-  const screen = this.screen;
-
-  if(screen) {
-    OffTouchClick(screen);
-  }
-}
-
 function OffTouchClick (sel) {
   // Remove previous handlers
   sel.removeEventListener('touchstart', sel.touchClick);
   sel.removeEventListener('click', sel.touchClick);
 }
-
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};

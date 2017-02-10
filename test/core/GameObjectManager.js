@@ -31,10 +31,6 @@ describe('GameObjectManager', function() {
       assert.equal(gom.objects.length, 1);
     });
 
-    it('should initialise object with parent', function() {
-      assert.equal(go.parent, gom);
-    });
-
     it('should add multiple objects', function() {
       gom.addObject(go);
       assert.equal(gom.objects.length, 2);

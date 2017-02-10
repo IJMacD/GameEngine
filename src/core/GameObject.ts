@@ -1,40 +1,44 @@
+import GameComponent from './GameComponent';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
-import { eventMixin } from '../util';
+import { Events, applyMixin } from '../util';
 
 /**
  * The base object in the GameEngine. Most objects managed by the system
  * will be based on this class.
  */
-class GameObject {
-    constructor () {
-        /** Array of components which update this GameObject.
-         * @type {array} */
-        this.components = [];
-        this.components.remove = arrayRemoveItem;
+export default class GameObject implements Events {
+    /** Array of components which update this GameObject. */
+    components: GameComponent[] = [];
 
-        /** Position of this object in the world.
-         * @type {vec3} */
-        this.position = vec3.create();
+    /** Position of this object in the world. */
+    position: vec3 = vec3.create();
 
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
-        this.velocity = vec3.create();
+    /** Velocity of this object moving through the world. */
+    velocity: vec3 = vec3.create();
 
-        /** Current rotation of this object.
-         * @type {number} */
-        this.rotation = 0;
+    /** Current rotation of this object. */
+    rotation = 0;
 
-        /** Rotation axis of this object.
-         * @type {number} */
-        this.rotationAxis = vec3.fromValues(0, 0, 1);
+    /** 3D rotations require a rotation axis */
+    rotationAxis: vec3 = vec3.fromValues(0, 0, 1);
 
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
-        this._toBeRemoved = [];
-    }
+    /** Current speed of rotation. */
+    rotationSpeed = 0;
+
+    /** List of components which will be removed on next update. */
+    private _toBeRemoved: GameComponent[] = [];
+
+    name: string;
+
+    /** Array of numbers describing bounds [minX, minY, maxX, maxY, minZ, maxZ] */
+    bounds: number[];
+
+    /**
+     * Events mixin
+     */
+    _events = {};
+    on: (type: string, callback) => void;
+    fire: (type: string, ...params) => void;
 
     /**
      * <p>This method is used to add a {@link GameComponent} to this object.
@@ -45,11 +49,14 @@ class GameObject {
      * @param {GameComponent} component - The component to be added to this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-    addComponent (component){
+    addComponent (component: GameComponent): void;
+    addComponent (update: (parent: GameObject, delta: number) => void): void;
+
+    addComponent (component) {
 
         // Allow syntactic sugar of addComponent(function() {...}) which is a
         // shorthand for specifying a simple component with only an update method
-        if(isFunction(component)){
+        if (component instanceof Function) {
             component = { update: component };
         }
 
@@ -70,12 +77,12 @@ class GameObject {
      * @param {GameComponent} component - The component to be removed from this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-    removeComponent (component){
+    removeComponent (component: GameComponent){
         this._toBeRemoved.push(component);
         return this;
     }
 
-    removeComponentByName (name){
+    removeComponentByName (name: string){
         for(var i = 0; i < this.components.length; i++){
             const c = this.components[i];
             if(c.name == name || c.constructor.name == name)
@@ -111,7 +118,7 @@ class GameObject {
      * @param {number} z - z component of position vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setPosition (x,y,z) {
+    setPosition (x?:number, y?:number, z?:number) {
         if(x == undefined) { x = this.position[0]; }
         if(y == undefined) { y = this.position[1]; }
         if(z == undefined) { z = this.position[2]; }
@@ -139,7 +146,7 @@ class GameObject {
      * @param {number} z - z component of velocity vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setVelocity (vx,vy,vz) {
+    setVelocity (vx?: number, vy?: number, vz?: number) {
         if(vx == undefined) { vx = this.velocity[0]; }
         if(vy == undefined) { vy = this.velocity[1]; }
         if(vz == undefined) { vz = this.velocity[2]; }
@@ -162,35 +169,17 @@ class GameObject {
         return this;
     }
 
-    /**
-     * Set object rotation
-     * @param {number} rotation - Rotation in radians
-     * @param {vec3} rotationAxis - 3D rotations require rotation axis.
-     * @return this
-     */
-    setRotation (rotation, rotationAxis){
-        this.rotation = rotation;
-        if(rotationAxis && rotationAxis.length == 3){
-            vec3.normalize(this.rotationAxis, rotationAxis);
-        }
-        return this;
-    }
-
-    /**
-     * @deprecated
-     */
-    hit (victim) {
-        if(this.hitVictim == null)
-            this.hitVictim = victim;
-    }
-
-    /**
-     * @deprecated
-     */
-    hitBy (attacker) {
-        if(this.attackerHit == null)
-            this.attackerHit = attacker;
-    }
+	/**
+	 * Set rotation
+	 * @param {number} rotation - Rotation in radians
+	 * @param {vec3} rotationAxis - 3D rotations require rotation axis.
+	 */
+	setRotation (rotation: number, rotationAxis?: vec3){
+		this.rotation = rotation;
+		if(rotationAxis){
+			vec3.normalize(this.rotationAxis, rotationAxis);
+		}
+	}
 
     /**
      * This method is called once per frame. GameObjects will usually only need
@@ -198,7 +187,7 @@ class GameObject {
      * to itself.
      * @param {number} delta - Time since last frame in milliseconds
      */
-    update (delta){
+    update (delta: number){
         var i = 0,
             l = this.components.length,
             j = 0,
@@ -206,7 +195,7 @@ class GameObject {
         for(;j<m;j++){
             for(i=0;i<l;i++){
                 if(this.components[i] == this._toBeRemoved[j]){
-                    this.components.remove(i);
+                    arrayRemoveItem.call(this.components, i);
                     break;
                 }
             }
@@ -240,16 +229,10 @@ class GameObject {
     }
 }
 
-export default GameObject;
-
-eventMixin(GameObject);
+applyMixin(GameObject, Events);
 
 function arrayRemoveItem(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);
   this.length = from < 0 ? this.length + from : from;
   return this.push.apply(this, rest);
-}
-
-function isFunction(a) {
-  return (a instanceof Function);
 }

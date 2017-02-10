@@ -5,15 +5,17 @@ import CameraSystem from '../CameraSystem';
 import CanvasRenderSystem from '../render/CanvasRenderSystem';
 import WorldSystem from '../world/WorldSystem';
 import InputSystem from '../input/InputSystem';
-import { eventMixin } from '../util';
+import { Events, applyMixin } from '../util';
 
-const STATE_PAUSED = 0;
-const STATE_PLAYING = 1;
-const STATE_STOPPED = 2;
-const STATE_DEAD = 3;
+enum State {
+    STATE_PAUSED = 0,
+    STATE_PLAYING = 1,
+    STATE_STOPPED = 2,
+    STATE_DEAD = 3,
+}
 
 let _lastTime = 0;
-const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
+const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element?) {
         var currTime = new Date().getTime();
         var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
         var id = setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
@@ -35,111 +37,124 @@ const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || 
  * @param {number} options.level - Initial level
  * @param {number} options.lives - Initial lives
  */
-class Game {
-    constructor (options={}) {
+export default class Game implements Events {
+
+    static readonly State = State;
+
+    canvas: HTMLCanvasElement;
+    width: number;
+    height: number;
+
+    /**
+     * The root {@link GameObject} from which the object tree grows. This is the
+     * input point for the loop to inject the time delta. All objects wanting updated
+     * need to be a child or grandchild of this object.
+     */
+    root: GameObjectManager = new GameObjectManager();
+
+    textures: Texture[] = [];
+    sounds: AudioTexture[] = [];
+
+    worldSystem: WorldSystem;
+    inputSystem: InputSystem;
+    cameraSystem: CameraSystem;
+    renderSystem: CanvasRenderSystem;
+
+    /** Counter of how many frames have been rendered so far. */
+    frame = 0;
+
+    /** Current game time in milliseconds. */
+    time = 0;
+
+    /** Arbitrary state e.g. Alive or dead */
+    state: State;
+
+    /** Keeps track of an arbritary score. */
+    score = 0;
+
+    /** Keeps track of an arbritary number of lives. */
+    lives = 0;
+
+    /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
+    level = 0;
+
+    /** Number of resources currently pending. */
+    private _toLoad = 0;
+
+    private _lastTime = 0;
+    private _loaded = 0;
+
+    private _generalObjects: GameObjectManager = null;
+
+    private _autosizeCallback = () => {
+
+        if (!this.canvas) return;
+
+        const width = this.canvas.offsetWidth;
+        const height = this.canvas.offsetHeight;
+
+        this.setSize(width, height);
+
+        // Keep Camera centred
+        if (this.cameraSystem) {
+            this.cameraSystem.setPosition(width / 2, height / 2);
+        }
+
+        // Update bounds of the world
+        // WARN: Does not retain previous world 'padding'
+        if (this.worldSystem) {
+            this.worldSystem.setBounds(0,0,width,height);
+        }
+    }
+
+    /**
+     * Events mixin
+     */
+    _events = {};
+    on: (type: string, callback) => void;
+    fire: (type: string, ...params) => void;
+
+    constructor ({canvas, width, height, score, lives, level, autosize} = {
+        canvas: null,
+        width: 0,
+        height: 0,
+        score: 0,
+        lives: 0,
+        level: 0,
+        autosize: false,
+    }) {
 
         /**
          * Canvas this game will render to.
-         * @type {HTMLCanvasElement}
          */
-        this.canvas = options.canvas;
+        this.canvas = canvas;
 
         /**
          * Width of game canvas. Use {@link Game#setSize} to change.
          * Explicit width takes priority.
          * @readonly
          */
-        this.width = options.width || (this.canvas && this.canvas.width) || 0;
+        this.width = width || (this.canvas && this.canvas.width) || 0;
 
         /**
          * Height of game canvas. Use {@link Game#setSize} to change.
          * Explicit height takes priority.
          * @readonly
          */
-        this.height = options.height || (this.canvas && this.canvas.height) || 0;
+        this.height = height || (this.canvas && this.canvas.height) || 0;
 
         if(this.canvas){
             this.canvas.width = this.width;
             this.canvas.height = this.height;
         }
 
-        // Init some properties
+        this.score = score;
 
-        /** The root {@link GameObject} from which the object tree grows. This is the
-         * input point for the loop to inject the time delta. All objects wanting updated
-         * need to be a child or grandchild of this object.
-         * @type {GameObject}
-         */
-        this.root = new GameObjectManager();
+        this.lives = lives;
 
-        this.textures = [];
-        this.sounds = [];
+        this.level = level;
 
-        /**
-         * Counter of how many frames have been rendered so far.
-         * @type {number}
-         */
-        this.frame = 0;
-
-        /**
-         * Current game time in milliseconds.
-         * @type {number}
-         */
-        this.time = 0;
-
-        /**
-         * Keeps track of an arbritary score.
-         * @type {number}
-         */
-        this.score = options.score || 0;
-
-        /**
-         * Keeps track of an arbritary number of lives.
-         * @type {number}
-         */
-        this.lives = options.lives || 0;
-
-        /**
-         * Tracks what level the game is running. Don't change this directly use
-         * {@link Game#setLevel} instead.
-         * @readonly
-         * @type {number}
-         */
-        this.level = options.level || 0;
-
-        /**
-         * Number of resources currently pending.
-         * @private
-         * */
-        this._toLoad = 0;
-
-        this._lastTime = 0;
-        this._loaded = 0;
-
-        this._generalObjects = null;
-
-        this._autosizeCallback = () => {
-
-            if (!this.canvas) return;
-
-            const width = this.canvas.offsetWidth;
-            const height = this.canvas.offsetHeight;
-
-            this.setSize(width, height);
-
-            // Keep Camera centred
-            if (this.cameraSystem) {
-                this.cameraSystem.setPosition(width / 2, height / 2);
-            }
-
-            // Update bounds of the world
-            // WARN: Does not retain previous world 'padding'
-            if (this.worldSystem) {
-                this.worldSystem.setBounds(0,0,width,height);
-            }
-        }
-
-        if(options.autosize) {
+        if(autosize) {
             this.setAutosize(true);
         }
     }
@@ -151,8 +166,8 @@ class Game {
      * CameraSystem, RenderSystem).
      * @param {GameObject} object - The object to add.
      */
-    addObject (object) {
-        _initialiseGeneralObjects.call(this);
+    addObject (object: GameObject) {
+        this._initialiseGeneralObjects();
 
         this._generalObjects.addObject(object);
     }
@@ -165,7 +180,7 @@ class Game {
      * <p>If height and width are unset they will be taken from the canvas size.
      * @param {HTMLCanvasElement} canvas - New canvas
      */
-    setCanvas (canvas) {
+    setCanvas (canvas: HTMLCanvasElement) {
         this.canvas = canvas;
 
         if (this.canvas){
@@ -178,51 +193,36 @@ class Game {
     }
 
     /**
-     * @typedef {object} Texture
-     * @property {Image} image - HTML <code>&ltimage></code> Element
-     * @property {number} width - Natural width of image
-     * @property {number} height - Natural height of image
-     * @property {boolean} loaded - If image has loaded width and height properties should be available.
-     */
-
-    /**
      * Provide an array of urls pointing to image resources and they will be loaded.
      *
      * <p>The return value of this method is a mapped array of texture objects.
      * @param {string[]} texturePaths - Array of urls
      * @return {Texture[]}
      */
-    loadTextures (texturePaths) {
+    loadTextures (texturePaths: string[]) {
         this._toLoad += texturePaths.length;
-        var self = this;
-        return texturePaths.map(function(path){
-            var texture = {
+
+        return texturePaths.map(path => {
+            const texture: Texture = {
                 image: new Image(),
                 width: 0,
                 height: 0,
                 loaded: false
             };
-            texture.image.onload = function() {
+            texture.image.onload = () => {
                 texture.width = texture.image.width;
                 texture.height = texture.image.height;
                 texture.loaded = true;
-                _resourceLoaded(self, texture);
+                this._resourceLoaded(texture);
             };
             texture.image.onerror = function(){
                 throw new Error("Failed to load a texture: " + path);
             };
             texture.image.src = path;
-            self.textures.push(texture);
+            this.textures.push(texture);
             return texture;
         });
     }
-
-    /**
-     * @typedef {object} AudioTexture
-     * @property {Audio} audio - HTML <code>&lt;audio></code> element
-     * @property {number} length - Total length of audio
-     * @property {boolean} loaded - If loaded is <code>true</code> length should be available.
-     */
 
     /**
      * Provide an array of urls pointing to audio resources and they will be loaded.
@@ -233,25 +233,25 @@ class Game {
      */
     loadAudio (audioPaths) {
         this._toLoad += audioPaths.length;
-        var self = this;
-        return audioPaths.map(function(path){
-            var sound = {
+
+        return audioPaths.map(path => {
+            const sound: AudioTexture = {
                 audio: new Audio(),
                 length: 0,
-                laoded: false
+                loaded: false
             };
             sound.audio.addEventListener("canplaythrough", () => {
                 if(!sound.loaded){
                     sound.length = sound.audio.duration;
                     sound.loaded = true;
-                    _resourceLoaded(self, sound);
+                    this._resourceLoaded(sound);
                 }
             });
             sound.audio.onerror = function(){
                 throw new Error("Failed to load a sound: " + path);
             };
             sound.audio.src = path;
-            self.sounds.push(sound);
+            this.sounds.push(sound);
             return sound;
         });
     }
@@ -262,16 +262,16 @@ class Game {
     start () {
         this.nextLevel();
 
-        this.state = STATE_PLAYING;
+        this.state = State.STATE_PLAYING;
 
-        _loop(this);
+        this._loop();
     }
 
     /**
      * Stop the loop after the current frame.
      */
     stop () {
-        this.state = STATE_STOPPED;
+        this.state = State.STATE_STOPPED;
     }
 
     /**
@@ -285,7 +285,7 @@ class Game {
             this.cameraSystem = new CameraSystem();
             this.cameraSystem.setPosition(this.width / 2, this.height / 2);
 
-            _initialiseGeneralObjects.call(this);
+            this._initialiseGeneralObjects();
             this.root.addObject(this.cameraSystem);
         }
         return this.cameraSystem;
@@ -311,7 +311,7 @@ class Game {
 
             this.renderSystem = new CanvasRenderSystem(context, this.cameraSystem);
 
-            _initialiseGeneralObjects.call(this);
+            this._initialiseGeneralObjects();
             this.root.addObject(this.renderSystem);
         }
         return this.renderSystem;
@@ -331,7 +331,7 @@ class Game {
         if (!this.worldSystem) {
             this.worldSystem = new WorldSystem(bounds);
 
-            _initialiseGeneralObjects.call(this);
+            this._initialiseGeneralObjects();
             this.root.addObject(this.worldSystem);
         }
         else {
@@ -355,7 +355,7 @@ class Game {
             // params are: (screen, keyboard, camera)
             this.inputSystem = new InputSystem(this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
 
-            _initialiseGeneralObjects.call(this);
+            this._initialiseGeneralObjects();
             this.root.addObject(this.inputSystem);
         }
         return this.inputSystem;
@@ -411,61 +411,78 @@ class Game {
      * @param {boolean} enable
      */
     setAutosize (enable) {
-        if(enable) {
-            window.addEventListener("resize", this._autosizeCallback);
-        } else {
-            window.removeEventListener("resize", this._autosizeCallback);
+        if (typeof window !== "undefined") {
+            if(enable) {
+                window.addEventListener("resize", this._autosizeCallback);
+            } else {
+                window.removeEventListener("resize", this._autosizeCallback);
+            }
+        }
+    }
+
+    private _loop() {
+
+        const loop = (time) => {
+            if(time && this.time == time) {
+                console.log("Multiple calls: " + time);
+                return;
+            }
+
+            this.time = time;
+            this.frame++;
+
+            try {
+                this.root.update(Math.min(time - this._lastTime,100));
+
+                if(this.state == State.STATE_PLAYING){
+                    _raf(loop);
+                }
+
+                this._lastTime = time;
+            } catch (e){
+                if(window.console){
+                    console.error(e.stack || e);
+                }
+            }
+        }
+
+        loop(this._lastTime);
+    }
+
+    private _resourceLoaded(resource) {
+        this._loaded++;
+        this.fire("resourcesProgress", this._loaded / this._toLoad);
+        if(this._toLoad - this._loaded <= 0){
+            this.fire("resourcesLoaded");
+        }
+    }
+
+    private _initialiseGeneralObjects () {
+        if (!this._generalObjects) {
+            this._generalObjects = new GameObjectManager();
+            this.root.addObjectAt(this._generalObjects, 0);
         }
     }
 }
 
-export default Game;
+applyMixin(Game, Events);
 
-eventMixin(Game);
-
-// Export constants
-Game.STATE_PAUSED   = STATE_PAUSED;
-Game.STATE_PLAYING  = STATE_PLAYING;
-Game.STATE_STOPPED  = STATE_STOPPED;
-Game.STATE_DEAD     = STATE_DEAD;
-
-function _loop(self) {
-
-    loop(self._lastTime);
-
-    function loop(time){
-        if(time && self.time == time) {
-            console.log("Multiple calls: " + time);
-            return;
-        }
-        self.time = time;
-        self.frame++;
-        try {
-            self.root.update(Math.min(time - self._lastTime,100));
-
-            if(self.state == STATE_PLAYING){
-                _raf(loop);
-            }
-            self._lastTime = time;
-        } catch (e){
-            if(window.console){
-                console.error(e.stack || e);
-            }
-        }
-    }
+export interface Texture {
+    /** HTML <code>&ltimage></code> Element */
+    image: HTMLImageElement;
+    /** Natural width of image */
+    width: number;
+    /** Natural height of image */
+    height: number;
+    /** If image has loaded width and height properties should be available. */
+    loaded: boolean;
 }
 
-function _resourceLoaded(self, resource) {
-  self._loaded++;
-  self.fire("resourcesProgress", self._loaded / self._toLoad);
-  if(self._toLoad - self._loaded <= 0){
-    self.fire("resourcesLoaded");
-  }
-};
-
-function _initialiseGeneralObjects () {
-    if (!this._generalObjects) {
-        this._generalObjects = new GameObjectManager();
-        this.root.addObjectAt(this._generalObjects, 0);
-    }
+export interface AudioTexture {
+    /** HTML <code>&lt;audio></code> element */
+    audio: HTMLAudioElement;
+    /** Total length of audio */
+    length: number;
+    /** If loaded is <code>true</code> length should be available. */
+    loaded: boolean;
 }

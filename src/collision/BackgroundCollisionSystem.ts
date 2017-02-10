@@ -2,15 +2,10 @@ import GameObject from '../core/GameObject';
 
 /**
  * System to maintain list of polylines for collision detection.
- * @extends {GameObject}
- * @memberof Collision
  */
-class BackgroundCollisionSystem extends GameObject {
-    constructor () {
-		super();
-		this.surfaces = [];
-        this.temporarySurfaces = [];
-	}
+export default class BackgroundCollisionSystem extends GameObject {
+    surfaces: number[][] = [];
+    temporarySurfaces: number[][] = [];
 
     /**
      * Add permanent surface. Surfaces are all polylines.
@@ -21,7 +16,7 @@ class BackgroundCollisionSystem extends GameObject {
      * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
      * @param {array} surface - Array defining surface.
      */
-	addSurface (surface) {
+	addSurface (surface: number[]) {
 		this.surfaces.push(surface);
 	}
 
@@ -29,7 +24,7 @@ class BackgroundCollisionSystem extends GameObject {
      * Add multiple permanent surfaces at once.
      * @param {array} surfaces - Array of arrays defining surfaces.
      */
-	addSurfaces (surfaces) {
+	addSurfaces (surfaces: number[][]) {
 		for(var i = 0; i < surfaces.length; i++){
 			this.surfaces.push(surfaces[i]);
 		}
@@ -50,11 +45,9 @@ class BackgroundCollisionSystem extends GameObject {
         this.temporarySurfaces.push(surface);
     }
 
-    update (delta) {
+    update (delta: number) {
         super.update(delta);
 
         this.temporarySurfaces.length = 0;
     }
 }
-
-export default BackgroundCollisionSystem;

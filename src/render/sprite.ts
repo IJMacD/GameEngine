@@ -1,4 +1,6 @@
 import GameComponent from '../core/GameComponent';
+import CanvasRenderSystem from './CanvasRenderSystem';
+import { Texture } from '../core/Game';
 
   /**
    * Component for rendering backgrounds for example.
@@ -9,6 +11,9 @@ import GameComponent from '../core/GameComponent';
    * @memberof Sprite
    */
   export class TileComponent extends GameComponent{
+    renderSystem: CanvasRenderSystem;
+    texture: Texture;
+
     constructor (renderSystem, texture, bounds) {
       super();
 
@@ -55,16 +60,15 @@ import GameComponent from '../core/GameComponent';
    * @memberof Sprite
    */
   export class SpriteRenderingComponent extends GameComponent {
-    constructor (renderSystem, layer, sprite){
+    renderSystem: CanvasRenderSystem;
+    layer: number;
+    sprite: Sprite;
+
+    constructor (renderSystem: CanvasRenderSystem, layer: number, sprite: Sprite){
       super();
 
-      /** @type {RenderSystem} */
       this.renderSystem = renderSystem;
-
-      /** @type {number} */
       this.layer = layer;
-
-      /** @type {Sprite} */
       this.sprite = sprite;
     }
 
@@ -96,6 +100,11 @@ import GameComponent from '../core/GameComponent';
    * @memberof Sprite
    */
   export class SpriteAnimationComponent extends GameComponent {
+    duration: number;
+    spriteIndex: number;
+    playing: boolean;
+    sprites: Sprite[];
+
     constructor (duration, sprites) {
       super();
       this.duration = duration;
@@ -155,27 +164,33 @@ import GameComponent from '../core/GameComponent';
     }
   }
 
-  /** @namespace
-   * @property {Texture} t - texture object
-   * @property {number} x - X-offset of sprite in spritesheet
-   * @property {number} y - Y-offset of sprite in spritesheet
-   * @property {number} width - width of sprite
-   * @property {number} height - height of sprite
-   * @property {number} ox - origin x-offset, so sprite can be centred on parent's position
-   * @property {number} oy - origin y-offset, so sprite can be centred on parent's position
-   * @property {number} d - (optional) duration of sprite for animation
-   */
-  export const Sprite = {};
+export class Sprite {
+  /** Texture object */
+  t: Texture;
+  /** X-offset of sprite in spritesheet */
+  x: number;
+  /** Y-offset of sprite in spritesheet */
+  y: number;
+  /** width - width of sprite */
+  w: number;
+  /** height - height of sprite */
+  h: number;
+  /** ox - origin x-offset, so sprite can be visually centred on parent's position */
+  ox: number;
+  /** oy - origin y-offset, so sprite can be visually centred on parent's position */
+  oy: number;
+  /** d - (optional) duration of sprite for animation */
+  d?: number;
 
   /**
    * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
-   * @static
    * @param {object} sprite - The sprite template.
    * @param {number} rows - Number of rows in the sprite sheet.
    * @param {number} cols - Number of columns in the sprite sheet.
+   * @return {Sprite[]}
    */
-  Sprite.generateSpriteSheet = function(sprite, rows, cols){
-    var out = [],
+  static generateSpriteSheet (sprite: Sprite, rows: number, cols: number){
+    var out: Sprite[] = [],
         i,
         j;
     for(i=0; i<rows; i++){
@@ -193,51 +208,5 @@ import GameComponent from '../core/GameComponent';
       }
     }
     return out;
-  };
-
-  /**
-   * This component is not to be used any more. Use {@link SpriteAnimationComponent} instead
-   * @constructor
-   * @deprecated
-   * @extends {GameComponent}
-   * @memberof Sprite
-   */
-  export function AnimatedSpriteComponent(images, speed){
-    this.images = images;
-    this.delay = 1000 / speed;
-    this.lastChange = 0;
-    this.imageIndex = 0;
   }
-  AnimatedSpriteComponent.prototype = new GameComponent();
-  AnimatedSpriteComponent.prototype.update = function(parent, delta) {
-    if(this.lastChange > this.delay){
-      this.imageIndex = (this.imageIndex + 1) % this.images.length;
-      parent.sprite = this.images[this.imageIndex];
-      this.lastChange = 0;
-    } else {
-      this.lastChange += delta;
-    }
-  };
-
-  /**
-   * This component is not to be used any more. Use other components instead
-   * @constructor
-   * @deprecated
-   * @extends {GameComponent}
-   * @memberof Sprite
-   */
-  export function CanvasSpriteRenderingComponent(renderSystem){
-    this.renderSystem = renderSystem;
-  }
-  CanvasSpriteRenderingComponent.prototype = new GameComponent();
-  CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
-    this.renderSystem.push(function(context){
-      var x = parent.position[0],
-          y = parent.position[1],
-          w = parent.sprite.width,
-          h = parent.sprite.height;
-      context.translate(x,y);
-      context.rotate(parent.rotation);
-      context.drawImage(parent.sprite,-w/2,-h/2);
-    });
-  };
+}

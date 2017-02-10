@@ -1,19 +1,11 @@
 import GameObject from './GameObject';
 
 /**
- * A subclass of {@link GameObject} which manages its own children
- * @extends {GameObject}
+ * A subclass of {@link GameObject} which manages its own children.
  */
-class GameObjectManager extends GameObject {
-    constructor() {
-  		super();
-
-  		this.objects = [];
-
-  		this._objectsToBeRemoved = [];
-
-  		this.objects.remove = arrayRemoveItem;
-  	}
+export default class GameObjectManager extends GameObject {
+	objects: GameObject[] = [];
+	private _objectsToBeRemoved: GameObject[] = [];
 
 	/**
 	 * Add an object to be updated as children of this manager. Children are given a
@@ -21,12 +13,12 @@ class GameObjectManager extends GameObject {
 	 * @param {GameObject} object - Game object to be attached to this node in the tree
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
-  	addObject (object){
-  		if(object instanceof GameObject)
-  			this.objects.push(object);
-  		object.parent = this;
-  		return this;
-  	}
+	addObject (object: GameObject){
+		if(object instanceof GameObject)
+			this.objects.push(object);
+		// object.parent = this;
+		return this;
+	}
 
 	/**
 	 * Add an object to be updated as children of this manager at particular place
@@ -35,32 +27,32 @@ class GameObjectManager extends GameObject {
 	 * @param {number} index - Position in the list
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
-  	addObjectAt (object, index){
-  		if(object instanceof GameObject)
-  			this.objects.splice(index,0,object);
-  		object.parent = this;
-  		return this;
-  	}
+	addObjectAt (object: GameObject, index: number){
+		if(object instanceof GameObject)
+			this.objects.splice(index,0,object);
+		// object.parent = this;
+		return this;
+	}
 
 	/**
 	 * Remove a previously added object from this manager.
 	 * @param {GameObject} object - Game object to be removed
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
-  	removeObject (object){
-  		if(object instanceof GameObject)
-  			this._objectsToBeRemoved.push(object);
-  		if(object.parent == this) { object.parent = null; }
-  		return this;
-  	}
+	removeObject (object: GameObject){
+		if(object instanceof GameObject)
+			this._objectsToBeRemoved.push(object);
+		// if(object.parent == this) { object.parent = null; }
+		return this;
+	}
 
 	/**
 	 * Remove all previously added objects from this manager.
 	 * @return {GameObjectManager} Returns a reference to this for chainability
 	 */
-  	removeAll () {
-  		this.objects.length = 0;
-  	}
+	removeAll () {
+		this.objects.length = 0;
+	}
 
 	/**
 	 * This method is inherited from {@link GameObject}. It will first call update
@@ -68,32 +60,32 @@ class GameObjectManager extends GameObject {
 	 * will start updating all of its child nodes.
 	 * @param {number} delta - Time since last frame in milliseconds
 	 */
-  	update (delta) {
-  		super.update(delta);
+	update (delta: number) {
+		super.update(delta);
 
-  		var i = 0,
-  			l = this.objects.length,
-  			m,
-  			j = 0;
+		var i = 0,
+			l = this.objects.length,
+			m,
+			j = 0;
 
-  		for(i=0;i<l;i++){
+		for(i=0;i<l;i++){
 			this.objects[i].update(delta);
-  		}
+		}
 
-  		m = this._objectsToBeRemoved.length;
+		m = this._objectsToBeRemoved.length;
 
-  		for(;j<m;j++){
-  			i = 0;
-  			for(;i<l;i++){
-  				if(this.objects[i] == this._objectsToBeRemoved[j]){
-  					this.objects.remove(i);
-  					l--;
-  					break;
-  				}
-  			}
-  		}
-  		this._objectsToBeRemoved.length = 0;
-  	}
+		for(;j<m;j++){
+			i = 0;
+			for(;i<l;i++){
+				if(this.objects[i] == this._objectsToBeRemoved[j]){
+					arrayRemoveItem.call(this.objects, i);
+					l--;
+					break;
+				}
+			}
+		}
+		this._objectsToBeRemoved.length = 0;
+	}
 
 	/**
 	 * This method is used to produce a html representation of the manage for
@@ -101,28 +93,26 @@ class GameObjectManager extends GameObject {
 	 * objects in its rendering. Similar to the toString method.
 	 * @return {string} Representation of this component in HTML
 	 */
-  	toHTML () {
-  		var html = this.name,
-  			i;
-  		if(this.objects.length > 1)
-  			html += " (" + this.objects.length + " items)";
-  		if(this.components.length){
-  			html += "<ul>";
-  			for(i=0;i<this.components.length;i++)
-  				html += "<li>"+this.components[i].toHTML();
-  			html += "</ul>";
-  		}
-  		if(this.objects.length){
-  			html += "<ul>";
-  			for(i=0;i<this.objects.length;i++)
-  				html += "<li>"+this.objects[i].toHTML();
-  			html += "</ul>";
-  		}
-  		return html;
-  	}
+	toHTML () {
+		var html = this.name,
+			i;
+		if(this.objects.length > 1)
+			html += " (" + this.objects.length + " items)";
+		if(this.components.length){
+			html += "<ul>";
+			for(i=0;i<this.components.length;i++)
+				html += "<li>"+this.components[i].toHTML();
+			html += "</ul>";
+		}
+		if(this.objects.length){
+			html += "<ul>";
+			for(i=0;i<this.objects.length;i++)
+				html += "<li>"+this.objects[i].toHTML();
+			html += "</ul>";
+		}
+		return html;
+	}
 }
-
-export default GameObjectManager;
 
 function arrayRemoveItem(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);

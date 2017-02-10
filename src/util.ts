@@ -4,12 +4,12 @@
  * @param {array} paths - Array of arrays of numbers
  * @return {array} Array of arrays of numbers
  */
-export function simplifyPaths(paths){
-  var out = [],
-      current,
-      x,
-      y;
-  paths.forEach(function(path){
+export function simplifyPaths(paths: number[][]){
+  var out: number[][] = [],
+      current: number[],
+      x: number,
+      y: number;
+  paths.forEach(function(path: number[]){
     if(path.length == 4){
       if(path[0] == x && path[1] == y){
         x = path[2];
@@ -37,7 +37,7 @@ const hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 const hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
 const rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
 
-export function parseColor (str) {
+export function parseColor (str: string) {
 
   let match = str.match(hexColor) || str.match(hexColorShort);
   if (match) {
@@ -47,7 +47,6 @@ export function parseColor (str) {
       parseInt(match[3], 16),
       1
     ];
-    out.format = "hex";
     return out;
   }
 
@@ -59,26 +58,21 @@ export function parseColor (str) {
       parseInt(match[3], 10),
       match[4] ? parseFloat(match[4]) : 1,
     ];
-    out.format = "rgb";
     return out;
   }
 }
 
-export function eventMixin (constructor) {
+export class Events {
+    _events = {};
 
-    function on (event, callback) {
-        if (!this._events) this._events = {};
-
+    on (event: string, callback) {
         if (!this._events[event]){
             this._events[event] = [];
         }
         this._events[event].push(callback);
-        return this;
     }
 
-    function fire (event, ...params) {
-        if (!this._events) this._events = {};
-
+    fire (event: string, ...params) {
         var callbacks = this._events[event];
 
         if (callbacks && callbacks.length){
@@ -87,7 +81,10 @@ export function eventMixin (constructor) {
             });
         }
     }
+}
 
-    constructor.prototype.on = on;
-    constructor.prototype.fire = fire;
+export function applyMixin (constructor, mixin) {
+  Object.getOwnPropertyNames(mixin.prototype).forEach(name => {
+        constructor.prototype[name] = mixin.prototype[name];
+  });
 }

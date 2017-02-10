@@ -1,26 +1,21 @@
 import GameObject from './core/GameObject';
+import GameObjectManager from './core/GameObjectManager';
 import vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 /**
  * Render systems require a camera. Use this class to create one.
- * @extends {GameObject}
  * @param {number} width
  * @param {number} height
  */
 class CameraSystem extends GameObject {
-	constructor () {
-		super();
 
-		this.pruneList = [];
-		this.suspendedObjects = [];
-		this.skewX = this.skew;
-		this.skeyY = this.skew;
-		this.scaleX = 1;
-		this.scaleY = 1;
-		this.rotation = 0;
-		this.rotationAxis = vec3.create();
-		vec3.set(this.rotationAxis, 0, 0, 1);
-	}
+	pruneList: GameObjectManager[] = [];
+	suspendedObjects: GameObject[] = [];
+
+	skewX = 0;
+	skeyY = 0;
+	scaleX = 1;
+	scaleY = 1;
 
 	/**
 	 * Set the scale to render at
@@ -33,30 +28,19 @@ class CameraSystem extends GameObject {
 		this.scaleY = scaleY;
 	}
 
-	/**
-	 * Change the size of the camera
-	 * @param {number} width
-	 * @param {number} height
-	 */
-	setSize (width, height){
-		this.width = width;
-		this.height = height;
+	addManagerForPruning (objectManager: GameObjectManager) {
+		this.pruneList.push(objectManager);
 	}
 
-	addManagerForPruning (objectManager) {
-		if(objectManager instanceof GameObjectManager)
-			this.pruneList.push(objectManager);
-	}
+	// getTransformMatrix () {
+	// 	// var m = new Matrix(this.shearMatrix);
+	// 	// m.multiplyBy(this.scaleMatrix);
+	// 	// m.multiplyBy(this.rotMat);
+	// 	return this.transformMatrix;
+	// }
 
-	getTransformMatrix () {
-		// var m = new Matrix(this.shearMatrix);
-		// m.multiplyBy(this.scaleMatrix);
-		// m.multiplyBy(this.rotMat);
-		return this.transformMatrix;
-	}
-
-	update (delta) {
-		super.update(delta);
+	// update (delta) {
+	// 	super.update(delta);
 		//this.rotation += 0.0001 * delta;
 		//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
 		//this.angle += 0.0001 * delta;
@@ -85,7 +69,7 @@ class CameraSystem extends GameObject {
 			}
 		}
 		*/
-	}
+	// }
 }
 
 export default CameraSystem;

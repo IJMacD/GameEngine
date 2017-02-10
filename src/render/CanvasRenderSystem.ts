@@ -1,5 +1,6 @@
 import GameObject from '../core/GameObject';
 import GameComponent from '../core/GameComponent';
+import CameraSystem from '../CameraSystem';
 
 /**
  * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
@@ -11,23 +12,21 @@ import GameComponent from '../core/GameComponent';
  */
 class CanvasRenderSystem extends GameObject {
 
+	context: CanvasRenderingContext2D;
+	canvas: HTMLCanvasElement;
+	camera: CameraSystem;
+
+	renderQueue = [];
+
+	/** Should the renderer clear the screen before drawing a frame or just overdraw. */
+	clearScreen = true;
+
 	constructor (context, cameraSystem) {
 		super();
 
 		this.context = context;
 		this.canvas = context && context.canvas;
 		this.camera = cameraSystem;
-
-		/** @deprecated */
-		this.cameraSystem = cameraSystem;
-
-		this.renderQueue = [];
-
-		/**
-		 * Should the renderer clear the screen before drawing a frame or just overdraw.
-		 * @type {boolean}
-		 */
-		this.clearScreen = true;
 	}
 
 	/**
@@ -40,8 +39,7 @@ class CanvasRenderSystem extends GameObject {
 	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
 	 * @param {number} layer - Layer to add this drawable to. Default: 1
 	 */
-	push (renderable, layer) {
-		layer = layer == undefined ? 1 : layer;
+	push (renderable, layer: number = 1) {
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
 		}
@@ -100,11 +98,7 @@ class CanvasRenderSystem extends GameObject {
 	 * @param {string} style - Colour of line to draw. Default: #000
 	 * @param {number} layer - Layer this should be drawn on. Default: 1
 	 */
-	strokePath (path, style, layer) {
-		if(typeof style == "undefined")
-			style = '#000';
-	 	if(typeof layer == "undefined")
-			layer = 1;
+	strokePath (path: number[], style = "#000", layer = 1) {
 		this.push(function(context){
 			context.strokeStyle = style;
 			this.drawPath(context, path);

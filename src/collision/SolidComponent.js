@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent';
+import GameComponent from '../core/GameComponent.ts';
 
 /**
  * Submit temporary surfaces to BackgroundCollisionSystem every frame.

@@ -166,7 +166,7 @@ describe('Game', function() {
     });
 
     it('should set play state', function() {
-      assert.equal(game.state, Game.STATE_PLAYING);
+      assert.equal(game.state, Game.State.STATE_PLAYING);
     });
 
     it('should execute loop', function() {
@@ -186,7 +186,7 @@ describe('Game', function() {
     game.stop();
 
     it('should set play state', function() {
-      assert.equal(game.state, Game.STATE_STOPPED);
+      assert.equal(game.state, Game.State.STATE_STOPPED);
     });
 
     it('should stop executing loop', function(done) {

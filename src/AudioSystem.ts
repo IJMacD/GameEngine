@@ -1,4 +1,4 @@
-import GameObject from './core/GameObject';
+import GameObject from './core/GameObject.ts';
 
 /**
  * Class to play audio at specific points during gameplay

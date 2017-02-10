@@ -83,76 +83,49 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
 
-
 /**
  * A GameComponent adds a particular behaviour to a GameObject. This class
  * should be subclassed to implement desired behaviour. The `update` method
  * is called once per frame for each GameObject it has been attached to. This
  * is where most of the work will be done.
- * @extends {GameObject}
  * @abstract
  */
 class GameComponent extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */] {
-
-	/**
-	 * This method is called once when the component is first added to each parent.
-	 * Use this to perform set-up and add any necessary properties to parent objects.
-	 * @abstract
-	 * @param {GameObject} parent - A reference to the {@link GameObject} on which
-	 * this component is operating. This allows multiple GameObjects to share
-	 * stateless components.
-	 */
-	init (parent) {}
-
-	/**
-	 * This method is called once per frame for each GameObject this component
-	 * has been attached to.
-	 * @abstract
-	 * @param {GameObject} parent - A reference to the {@link GameObject} on which
-	 * this component is operating. This allows multiple GameObjects to share
-	 * stateless components.
-	 * @param {number} delta - Time since last frame in milliseconds
-	 */
-	update (parent, delta) {
-		super.update(delta);
-	}
-
-	/**
-	 * This method is used to produce a html representation of the component for
-	 * things such as debugging trees. Similar to toString method.
-	 * @return {string} Representation of this component in HTML
-	 */
-	toHTML () {
-		return this.name;
-	}
+    /**
+     * This method is called once when the component is first added to each parent.
+     * Use this to perform set-up and add any necessary properties to parent objects.
+     * @abstract
+     * @param {GameObject} parent - A reference to the {@link GameObject} on which
+     * this component is operating. This allows multiple GameObjects to share
+     * stateless components.
+     */
+    init(parent) { }
+    /**
+     * This method is called once per frame for each GameObject this component
+     * has been attached to.
+     * @abstract
+     * @param {GameObject} parent - A reference to the {@link GameObject} on which
+     * this component is operating. This allows multiple GameObjects to share
+     * stateless components.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    update(parentOrDelta, delta) {
+        if (typeof parentOrDelta === "number")
+            return super.update(parentOrDelta);
+        if (typeof delta === "number")
+            return super.update(delta);
+    }
+    /**
+     * This method is used to produce a html representation of the component for
+     * things such as debugging trees. Similar to toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    toHTML() {
+        return this.name;
+    }
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = GameComponent;
 
-/**
- * This static helper method reduces the boiler plate of subclassing
- * GameComponent.
- * @static
- * @deprecated Use ES6 classes instead
- * @param {function} constructor - The constructor of the subclass. This should
- * be a named function expression or a reference to a function statement so that
- * magic can happen using the function's name for component identification.
- * @param {object} properties - A plain javascript object containing methods
- * and properties to be attached to the new prototype.
- * @return {GameComponent} The new 'class' which has been created.
- */
-GameComponent.create = function(constructor, properties){
-	constructor.prototype = new GameComponent();
-	for(var prop in properties){
-		constructor.prototype[prop] = properties[prop];
-	}
-	var name = constructor.name;
-	if(!name){
-		name = constructor.toString().match(/^function ([a-z_]+)/i)[1];
-		constructor.name = name;
-	}
-	return constructor;
-};
-
-/* harmony default export */ __webpack_exports__["a"] = GameComponent;
 
 
 /***/ }),
@@ -948,98 +921,70 @@ module.exports = vec3;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(10);
 
 
-
 /**
  * The base object in the GameEngine. Most objects managed by the system
  * will be based on this class.
  */
 class GameObject {
-    constructor () {
-        /** Array of components which update this GameObject.
-         * @type {array} */
+    constructor() {
+        /** Array of components which update this GameObject. */
         this.components = [];
-        this.components.remove = arrayRemoveItem;
-
-        /** Position of this object in the world.
-         * @type {vec3} */
+        /** Position of this object in the world. */
         this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
-
-        /** Velocity of this object moving through the world.
-         * @type {vec3} */
+        /** Velocity of this object moving through the world. */
         this.velocity = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
-
-        /** Current rotation of this object.
-         * @type {number} */
+        /** Current rotation of this object. */
         this.rotation = 0;
-
-        /** Rotation axis of this object.
-         * @type {number} */
+        /** 3D rotations require a rotation axis */
         this.rotationAxis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.fromValues(0, 0, 1);
-
-        /**
-          * List of components which will be removed on next update.
-          * @private
-          * @type {array}
-          */
+        /** Current speed of rotation. */
+        this.rotationSpeed = 0;
+        /** List of components which will be removed on next update. */
         this._toBeRemoved = [];
+        /**
+         * Events mixin
+         */
+        this._events = {};
     }
-
-    /**
-     * <p>This method is used to add a {@link GameComponent} to this object.
-     *
-     * <p>GameComponents give objects particular behaviours. This method ensures
-     * that each component added will have a chance to update once per frame
-     * for this object.
-     * @param {GameComponent} component - The component to be added to this object
-     * @return {GameObject} Returns a reference to this for chainability
-     */
-    addComponent (component){
-
+    addComponent(component) {
         // Allow syntactic sugar of addComponent(function() {...}) which is a
         // shorthand for specifying a simple component with only an update method
-        if(isFunction(component)){
+        if (component instanceof Function) {
             component = { update: component };
         }
-
         this.components.push(component);
-
         // If the component has an init method call it when added so that the
         // component can add properties to the parent object
-        if(component.init){
+        if (component.init) {
             component.init(this);
         }
-
         return this;
     }
-
     /**
      * Remove a particular {@link GameComponent} which had previously been added
      * to this object.
      * @param {GameComponent} component - The component to be removed from this object
      * @return {GameObject} Returns a reference to this for chainability
      */
-    removeComponent (component){
+    removeComponent(component) {
         this._toBeRemoved.push(component);
         return this;
     }
-
-    removeComponentByName (name){
-        for(var i = 0; i < this.components.length; i++){
+    removeComponentByName(name) {
+        for (var i = 0; i < this.components.length; i++) {
             const c = this.components[i];
-            if(c.name == name || c.constructor.name == name)
+            if (c.name == name || c.constructor.name == name)
                 this._toBeRemoved.push(c);
         }
         return this;
     }
-
-    removeComponentByTest (test){
-        for(var i = 0; i < this.components.length; i++){
-            if(test(this.components[i]))
+    removeComponentByTest(test) {
+        for (var i = 0; i < this.components.length; i++) {
+            if (test(this.components[i]))
                 this._toBeRemoved.push(this.components[i]);
         }
         return this;
     }
-
     /**
      * <p>Protective method to set position of the object in world-units.
      *
@@ -1059,14 +1004,19 @@ class GameObject {
      * @param {number} z - z component of position vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setPosition (x,y,z) {
-        if(x == undefined) { x = this.position[0]; }
-        if(y == undefined) { y = this.position[1]; }
-        if(z == undefined) { z = this.position[2]; }
+    setPosition(x, y, z) {
+        if (x == undefined) {
+            x = this.position[0];
+        }
+        if (y == undefined) {
+            y = this.position[1];
+        }
+        if (z == undefined) {
+            z = this.position[2];
+        }
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.position, x, y, z);
         return this;
     }
-
     /**
      * <p>Protective method to set velocity of the object.
      *
@@ -1087,14 +1037,19 @@ class GameObject {
      * @param {number} z - z component of velocity vector
      * @return {GameObject} Returns a reference to this for chainability
      */
-    setVelocity (vx,vy,vz) {
-        if(vx == undefined) { vx = this.velocity[0]; }
-        if(vy == undefined) { vy = this.velocity[1]; }
-        if(vz == undefined) { vz = this.velocity[2]; }
+    setVelocity(vx, vy, vz) {
+        if (vx == undefined) {
+            vx = this.velocity[0];
+        }
+        if (vy == undefined) {
+            vy = this.velocity[1];
+        }
+        if (vz == undefined) {
+            vz = this.velocity[2];
+        }
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.set(this.velocity, vx, vy, vz);
         return this;
     }
-
     /**
      * Set the bounds of the component relative to its position.
      * @param {number} minX
@@ -1105,101 +1060,69 @@ class GameObject {
      * @param {number} maxZ - Optional
      * @return this
      */
-    setBounds (...bounds) {
+    setBounds(...bounds) {
         this.bounds = bounds;
         return this;
     }
-
     /**
-     * Set object rotation
+     * Set rotation
      * @param {number} rotation - Rotation in radians
      * @param {vec3} rotationAxis - 3D rotations require rotation axis.
-     * @return this
      */
-    setRotation (rotation, rotationAxis){
+    setRotation(rotation, rotationAxis) {
         this.rotation = rotation;
-        if(rotationAxis && rotationAxis.length == 3){
+        if (rotationAxis) {
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.normalize(this.rotationAxis, rotationAxis);
         }
-        return this;
     }
-
-    /**
-     * @deprecated
-     */
-    hit (victim) {
-        if(this.hitVictim == null)
-            this.hitVictim = victim;
-    }
-
-    /**
-     * @deprecated
-     */
-    hitBy (attacker) {
-        if(this.attackerHit == null)
-            this.attackerHit = attacker;
-    }
-
     /**
      * This method is called once per frame. GameObjects will usually only need
      * to call update on each of its components in this method passing a reference
      * to itself.
      * @param {number} delta - Time since last frame in milliseconds
      */
-    update (delta){
-        var i = 0,
-            l = this.components.length,
-            j = 0,
-            m = this._toBeRemoved.length;
-        for(;j<m;j++){
-            for(i=0;i<l;i++){
-                if(this.components[i] == this._toBeRemoved[j]){
-                    this.components.remove(i);
+    update(delta) {
+        var i = 0, l = this.components.length, j = 0, m = this._toBeRemoved.length;
+        for (; j < m; j++) {
+            for (i = 0; i < l; i++) {
+                if (this.components[i] == this._toBeRemoved[j]) {
+                    arrayRemoveItem.call(this.components, i);
                     break;
                 }
             }
         }
         this._toBeRemoved.length = 0;
-
         l = this.components.length;
-        for(i=0;i<l;i++){
+        for (i = 0; i < l; i++) {
             this.components[i].update(this, delta);
         }
     }
-
     /**
      * This method is used to produce a html representation of the object for
      * things such as debugging trees. It will include components in its rendering.
      * Similar to the toString method.
      * @return {string} Representation of this component in HTML
      */
-    toHTML () {
-        var html = this.name,
-            i;
-        if(typeof this.position.x == "number")
+    toHTML() {
+        var html = this.name, i;
+        if (typeof this.position.x == "number")
             html += " " + this.position;
-        if(this.components.length){
+        if (this.components.length) {
             html += "<ul>";
-            for(i=0;i<this.components.length;i++)
-                html += "<li>"+this.components[i].toHTML();
+            for (i = 0; i < this.components.length; i++)
+                html += "<li>" + this.components[i].toHTML();
             html += "</ul>";
         }
         return html;
     }
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = GameObject;
 
-/* harmony default export */ __webpack_exports__["a"] = GameObject;
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* eventMixin */])(GameObject);
-
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* applyMixin */])(GameObject, __WEBPACK_IMPORTED_MODULE_1__util__["c" /* Events */]);
 function arrayRemoveItem(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
-}
-
-function isFunction(a) {
-  return (a instanceof Function);
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
 }
 
 
@@ -1285,7 +1208,7 @@ module.exports = glMatrix;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Easing__ = __webpack_require__(9);
 
 
 
@@ -1960,6 +1883,301 @@ module.exports = vec2;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__);
+
+
+
+// Create some spare vectors for use in screenToWorld method
+const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const rotMat = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.create();
+/**
+ * InputSystem's job is to keep track of most recent user input to provide
+ * filtering and rate-limiting etc. Inputs should be passed on the the rest
+ * of game in World co-ordinates rather than screen co-ordinates so the
+ * InputSystem is responsible for mapping between the two.
+ *
+ * @todo Right now this is very 2D orientated. Try to make more generic
+ * @extends {GameObject}
+ * @param {Element} screen - Should be a DOMElement to get size information from
+ * @param {any} keyboard - Something to watch for keyboard events on e.g. document
+ * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
+ */
+class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor(screen, keyboard, cameraSystem) {
+        super();
+        this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.fromValues(NaN, NaN);
+        /** If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click. */
+        this.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+        /** Boolean to indicate if a click has been registered during the last frame. */
+        this.hasClick = false;
+        this._nextKey = null;
+        /** The most recent key press if one occured during the previous frame. */
+        this.lastKey = null;
+        this.screen = screen;
+        this.keyboard = keyboard;
+        this.camera = cameraSystem;
+        this.initScreen();
+        this.initKeyboard();
+    }
+    update(delta) {
+        super.update(delta);
+        // Cycle the next event to last event property here so that
+        // last event persists for exactly one frame.
+        // Click
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this.lastClick, this._nextClick);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(this._nextClick, NaN, NaN);
+        this.hasClick = !isNaN(this.lastClick[0]);
+        if (this.hasClick) {
+            this.fire("click", this.lastClick);
+        }
+        // Keypress
+        this.lastKey = this._nextKey;
+        // Consumers should interpret (null) as no keypress
+        this._nextKey = null;
+        if (this.lastKey) {
+            this.fire("keypress", this.lastKey);
+        }
+    }
+    /**
+     * Set a new screen object and initialse event listening on it.
+     * @param {Element} screen - New screen
+     */
+    setScreen(screen) {
+        if (this.screen) {
+            this.destroyScreen();
+        }
+        this.screen = screen;
+        this.initScreen();
+    }
+    /**
+     * Convert screen co-ordinates to world co-ordinates.
+     * @param {number} screenX - X co-ordinate on screen.
+     * @param {number} screenY - Y co-ordinate on screen.
+     * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
+     */
+    screenToWorld(screenX, screenY) {
+        const cam = this.camera, screen = this.screen, screenWidth = screen.offsetWidth, screenHeight = screen.offsetHeight;
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, screenX - screenWidth / 2, screenY - screenHeight / 2);
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
+        // Rotation in 2D only makes sense around the Z-axis so that is
+        // all that is handled here.
+        if (cam.rotationAxis[2] == 1) {
+            __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.rotate(rotMat, rotMat, -cam.rotation);
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.transformMat2(v, v, rotMat);
+        }
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.add(v, v, cam.position);
+        return v;
+    }
+    /**
+     * Private method to initialse touch events on screen.
+     *
+     * Should be invoked as initScreen.call(this);
+     * @private
+     */
+    initScreen() {
+        if (!this.screen)
+            return;
+        TouchClick(this.screen, e => {
+            const offsetLeft = this.screen.offsetLeft, offsetTop = this.screen.offsetTop, touch = e.touches && e.touches[0], x = (touch ? touch.pageX : e.pageX) - offsetLeft, y = (touch ? touch.pageY : e.pageY) - offsetTop;
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this._nextClick, this.screenToWorld(x, y));
+        });
+    }
+    /**
+     * Initialse keyboard events
+     *
+     * Should be invoked as initKeyboard.call(this);
+     * @private
+     */
+    initKeyboard() {
+        if (!this.keyboard)
+            return;
+        this.keyboard.addEventListener("keydown", e => {
+            this._nextKey = e.which;
+        });
+    }
+    destroyScreen() {
+        const screen = this.screen;
+        if (screen) {
+            OffTouchClick(screen);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = InputSystem;
+
+/** Reference object to convert keys to keycodes */
+InputSystem.Keys = {
+    "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
+    a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
+    n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
+};
+/**
+ * @callback TouchClickCallback
+ * @param {object} event - Generic event object which will be relevant to event type.
+ */
+/**
+ * Helper funciion to handle both touches and clicks consistently
+ * @private
+ * @param {Element} sel - Element on which we should look for input
+ * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
+ */
+function TouchClick(sel, fnc) {
+    const handle = function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (event.handled !== true) {
+            fnc(event);
+            event.handled = true;
+        }
+        else {
+            return false;
+        }
+    };
+    // Remove previous handler in case this is element being re-initialised
+    OffTouchClick(sel);
+    // Add new handler
+    sel.addEventListener('touchstart', handle);
+    sel.addEventListener('click', handle);
+    // We need to keep track of this handler in order to be able to remove it later.
+    sel.touchClick = handle;
+}
+function OffTouchClick(sel) {
+    // Remove previous handlers
+    sel.removeEventListener('touchstart', sel.touchClick);
+    sel.removeEventListener('click', sel.touchClick);
+}
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+
+/**
+ * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
+ * will get rendered to the canvas.
+ * <p>It supports render layers as well.
+ * @extends {GameObject}
+ * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
+ * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
+ */
+class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor(context, cameraSystem) {
+        super();
+        this.renderQueue = [];
+        /** Should the renderer clear the screen before drawing a frame or just overdraw. */
+        this.clearScreen = true;
+        this.context = context;
+        this.canvas = context && context.canvas;
+        this.camera = cameraSystem;
+    }
+    /**
+     * @callback CanvasRenderable
+     * @param {CanvasRenderingContext2D} context
+     */
+    /**
+     * Add a renderable to the draw queue
+     * @param {CanvasRenderable} renderable - Function which will receive drawing context
+     * @param {number} layer - Layer to add this drawable to. Default: 1
+     */
+    push(renderable, layer = 1) {
+        if (!this.renderQueue[layer]) {
+            this.renderQueue[layer] = [];
+        }
+        this.renderQueue[layer].push(renderable);
+    }
+    update(delta) {
+        if (this.clearScreen) {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        this.context.save();
+        var p = this.camera.position, q = this.canvas.width / 2, r = this.canvas.height / 2, i, l, j, n;
+        this.context.translate(q, r);
+        // this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
+        this.context.scale(this.camera.scaleX, this.camera.scaleY);
+        // Only rotation around the Z-axis makes sense for canvas rendering
+        if (this.camera.rotationAxis[2] == 1) {
+            this.context.rotate(-this.camera.rotation);
+        }
+        this.context.translate(-p[0], -p[1]);
+        for (i = 0, l = this.renderQueue.length; i < l; i++) {
+            _renderQueue(this, i);
+        }
+        this.context.restore();
+        // Special case layer renders on top independant of camera
+        _renderQueue(this, -1);
+    }
+    drawPath(context, path) {
+        var i = 2, l = path.length;
+        context.beginPath();
+        context.moveTo(path[0], path[1]);
+        for (; i < l - 1; i += 2) {
+            context.lineTo(path[i], path[i + 1]);
+        }
+    }
+    /**
+     * Convenience method to stroke a path with the given style and to the given layer.
+     * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
+     * @param {string} style - Colour of line to draw. Default: #000
+     * @param {number} layer - Layer this should be drawn on. Default: 1
+     */
+    strokePath(path, style = "#000", layer = 1) {
+        this.push(function (context) {
+            context.strokeStyle = style;
+            this.drawPath(context, path);
+            context.stroke();
+        }, layer);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = CanvasRenderSystem;
+function _renderQueue(renderSystem, layer) {
+    const { context, renderQueue } = renderSystem;
+    const queue = renderQueue[layer];
+    if (queue) {
+        for (let j = 0, n = queue.length; j < n; j++) {
+            context.save();
+            queue[j].call(renderSystem, context);
+            context.restore();
+        }
+        queue.length = 0;
+    }
+}
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+
+/** @namespace World */
+/**
+ * Generic way to access a 'world' with intrinsic bounds.
+ * @extends {GameObject}
+ * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
+ * @memberof World
+ */
+class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor(bounds) {
+        super();
+        this.bounds = bounds;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = WorldSystem;
+
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["BackIn"] = BackIn;
 /* harmony export (immutable) */ __webpack_exports__["BackOut"] = BackOut;
@@ -2046,522 +2264,381 @@ function DampedOscillation (n) {
 
 
 /***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2__);
-
-
-
-
-// Create some spare vectors for use in screenToWorld method
-const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const rotMat = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.create();
-
-/**
- * InputSystem's job is to keep track of most recent user input to provide
- * filtering and rate-limiting etc. Inputs should be passed on the the rest
- * of game in World co-ordinates rather than screen co-ordinates so the
- * InputSystem is responsible for mapping between the two.
- *
- * @todo Right now this is very 2D orientated. Try to make more generic
- * @extends {GameObject}
- * @param {Element} screen - Should be a DOMElement to get size information from
- * @param {any} keyboard - Something to watch for keyboard events on e.g. document
- * @param {CameraSystem} cameraSystem - A camera to be used for mapping co-ordinates
- */
-class InputSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-  constructor (screen, keyboard, cameraSystem) {
-    super();
-
-    this.screen = screen;
-    this.keyboard = keyboard;
-    this.camera = cameraSystem;
-    /** @deprecated */
-    this.cameraSystem = cameraSystem;
-
-    this._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.fromValues(NaN, NaN);
-
-    // These values will persist for exactly one frame
-
-    /**
-     * If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click.
-     * @type {vec2}
-     */
-    this.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-
-    /**
-     * Boolean to indicate if a click has been registered during the last frame.
-     * @type {boolean}
-     */
-    this.hasClick = false;
-
-    this._nextKey = null;
-
-    /**
-     * The most recent key press if one occured during the previous frame.
-     * @type {boolean}
-     */
-    this.lastKey = null;
-
-    initScreen.call(this);
-    initKeyboard.call(this);
-  }
-
-  update (delta) {
-    super.update(delta);
-
-    // Cycle the next event to last event property here so that
-    // last event persists for exactly one frame.
-
-    // Click
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this.lastClick, this._nextClick);
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(this._nextClick, NaN, NaN);
-    this.hasClick = !isNaN(this.lastClick[0]);
-
-    if (this.hasClick) {
-      this.fire("click", this.lastClick)
-    }
-
-    // Keypress
-    this.lastKey = this._nextKey;
-    // Consumers should interpret (null) as no keypress
-    this._nextKey = null;
-
-    if (this.lastKey) {
-      this.fire("keypress", this.lastKey);
-    }
-  }
-
-  /**
-   * Set a new screen object and initialse event listening on it.
-   * @param {Element} screen - New screen
-   */
-  setScreen (screen) {
-    if (this.screen) {
-      destroyScreen.call(this);
-    }
-
-    this.screen = screen;
-
-    initScreen.call(this);
-  }
-
-  /**
-   * Convert screen co-ordinates to world co-ordinates.
-   * @param {number} screenX - X co-ordinate on screen.
-   * @param {number} screenY - Y co-ordinate on screen.
-   * @return {vec2} - Vector containing co-ordinates in the world taking into account camera position, rotation etc.
-   */
-  screenToWorld (screenX, screenY){
-    const cam = this.camera,
-        camWidth = cam.width,
-        camHeight = cam.height,
-        screen = this.screen,
-        screenWidth = screen.offsetWidth,
-        screenHeight = screen.offsetHeight;
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v,
-        screenX - screenWidth / 2,
-        screenY - screenHeight / 2);
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(v, v[0] / cam.scaleX, v[1] / cam.scaleY);
-
-    // Rotation in 2D only makes sense around the Z-axis so that is
-    // all that is handled here.
-    if(cam.rotationAxis[2] == 1){
-      __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat2___default.a.rotate(rotMat, rotMat, -cam.rotation);
-      __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.transformMat2(v, v, rotMat);
-    }
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.add(v, v, cam.position);
-    return v;
-  }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = InputSystem;
-
-/**
- * Private method to initialse touch events on screen.
- *
- * Should be invoked as initScreen.call(this);
- * @private
- */
-function initScreen () {
-  if (!this.screen) return;
-
-  TouchClick(this.screen, e => {
-    const offsetLeft = this.screen.offsetLeft,
-        offsetTop = this.screen.offsetTop,
-        touch = e.touches && e.touches[0],
-        x = (touch ? touch.pageX : e.pageX) - offsetLeft,
-        y = (touch ? touch.pageY : e.pageY) - offsetTop;
-
-    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(this._nextClick, this.screenToWorld(x, y));
-  });
-}
-
-/**
- * Initialse keyboard events
- *
- * Should be invoked as initKeyboard.call(this);
- * @private
- */
-function initKeyboard () {
-  if (!this.keyboard) return;
-
-  this.keyboard.addEventListener("keydown", e => {
-    this._nextKey = e.which;
-  });
-}
-
-/**
- * @callback TouchClickCallback
- * @param {object} event - Generic event object which will be relevant to event type.
- */
-
-/**
- * Helper function to handle both touches and clicks consistently
- * @private
- * @param {Element} sel - Element on which we should look for input
- * @param {TouchClickCallback} fnc - Callback which will be called with event object only once per touch/click
- */
-function TouchClick(sel, fnc) {
-  const handle = function(event){
-    event.stopPropagation();
-    event.preventDefault();
-    if(event.handled !== true) {
-        fnc(event);
-        event.handled = true;
-    } else {
-        return false;
-    }
-  };
-
-  // Remove previous handler in case this is element being re-initialised
-  OffTouchClick(sel);
-
-  // Add new handler
-  sel.addEventListener('touchstart', handle);
-  sel.addEventListener('click', handle);
-
-  // We need to keep track of this handler in order to be able to remove it later.
-  sel.touchClick = handle;
-}
-
-function destroyScreen () {
-  const screen = this.screen;
-
-  if(screen) {
-    OffTouchClick(screen);
-  }
-}
-
-function OffTouchClick (sel) {
-  // Remove previous handlers
-  sel.removeEventListener('touchstart', sel.touchClick);
-  sel.removeEventListener('click', sel.touchClick);
-}
-
-// function worldToScreen(inputSystem, worldX, worldY){
-//   // TODO: Check whether or not this code is outdated
-//   var cam = inputSystem.cameraSystem,
-//       screen = inputSystem.screen,
-//       v = cam.worldVec.set(worldX, worldY);
-//   v.subtract(cam.position);
-//   v.leftMultiply(cam.shearMatrix);
-//   v.leftMultiply(cam.scaleMatrix);
-//   v.leftMultiply(cam.rotMat);
-//   v.add(screen.offsetWidth / 2, screen.offsetHeight / 2);
-//   return v;
-// };
-
-/**
- * Reference object to convert keys to keycodes
- * @static
- * @type {object}
- */
-InputSystem.Keys = {
-  "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-  a: 65, b: 66, c: 67, d: 68, e: 69, f: 70, g: 71, h: 72, i: 73, j: 74, k: 75, l: 76, m: 77,
-  n: 78, o: 79, p: 80, q: 81, r: 82, s: 83, t: 84, u: 85, v: 86, w: 87, x: 88, y: 89, z: 90
-};
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__ = __webpack_require__(0);
-
-
-
-/**
- * <p>The default renderer for 2D canvas renderings. Jobs submitted each frame
- * will get rendered to the canvas.
- * <p>It supports render layers as well.
- * @extends {GameObject}
- * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
- * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
- */
-class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-
-	constructor (context, cameraSystem) {
-		super();
-
-		this.context = context;
-		this.canvas = context && context.canvas;
-		this.camera = cameraSystem;
-
-		/** @deprecated */
-		this.cameraSystem = cameraSystem;
-
-		this.renderQueue = [];
-
-		/**
-		 * Should the renderer clear the screen before drawing a frame or just overdraw.
-		 * @type {boolean}
-		 */
-		this.clearScreen = true;
-	}
-
-	/**
-	 * @callback CanvasRenderable
-	 * @param {CanvasRenderingContext2D} context
-	 */
-
-	/**
-	 * Add a renderable to the draw queue
-	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
-	 * @param {number} layer - Layer to add this drawable to. Default: 1
-	 */
-	push (renderable, layer) {
-		layer = layer == undefined ? 1 : layer;
-		if(!this.renderQueue[layer]) {
-			this.renderQueue[layer] = [];
-		}
-		this.renderQueue[layer].push(renderable);
-	}
-
-	update (delta) {
-		if(this.clearScreen){
-			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
-		}
-
-		this.context.save();
-
-		var p = this.camera.position,
-			q = this.canvas.width / 2,
-			r = this.canvas.height / 2,
-			i,
-			l,
-			j,
-			n;
-
-		this.context.translate(q,r);
-		// this.context.transform(this.camera.skewX,1,1,this.camera.skewY,0,0);
-		this.context.scale(this.camera.scaleX, this.camera.scaleY);
-
-		// Only rotation around the Z-axis makes sense for canvas rendering
-		if(this.camera.rotationAxis[2] == 1){
-			this.context.rotate(-this.camera.rotation);
-		}
-
-		this.context.translate(-p[0],-p[1]);
-
-		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			_renderQueue(this, i);
-		}
-
-		this.context.restore();
-
-		// Special case layer renders on top independant of camera
-		_renderQueue(this, -1);
-	}
-
-	drawPath (context, path){
-		var i = 2,
-				l = path.length;
-		context.beginPath();
-		context.moveTo(path[0],path[1]);
-		for(;i<l-1;i+=2){
-			context.lineTo(path[i],path[i+1]);
-		}
-	}
-
-	/**
-	 * Convenience method to stroke a path with the given style and to the given layer.
-	 * @param {array} path - Array of path co-ordinates [x0, y0, x1, y1, ..., xn, yn]
-	 * @param {string} style - Colour of line to draw. Default: #000
-	 * @param {number} layer - Layer this should be drawn on. Default: 1
-	 */
-	strokePath (path, style, layer) {
-		if(typeof style == "undefined")
-			style = '#000';
-	 	if(typeof layer == "undefined")
-			layer = 1;
-		this.push(function(context){
-			context.strokeStyle = style;
-			this.drawPath(context, path);
-			context.stroke();
-		}, layer);
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = CanvasRenderSystem;
-
-function _renderQueue (renderSystem, layer) {
-	const { context, renderQueue } = renderSystem;
-	const queue = renderQueue[layer];
-	if(queue){
-		for(let j = 0, n = queue.length; j < n; j++){
-			context.save();
-			queue[j].call(renderSystem, context);
-			context.restore();
-		}
-		queue.length = 0;
-	}
-}
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-
-
-/** @namespace World */
-
-/**
- * Generic way to access a 'world' with intrinsic bounds.
- * @extends {GameObject}
- * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
- * @memberof World
- */
-class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-    constructor (bounds) {
-        super();
-        this.bounds = bounds;
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = WorldSystem;
-
-
-/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export simplifyPaths */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseColor;
-/* harmony export (immutable) */ __webpack_exports__["b"] = eventMixin;
+/* harmony export (immutable) */ __webpack_exports__["b"] = applyMixin;
 /**
  * This function simplifies paths which are really just path segments
  * by joining up adjacent segments.
  * @param {array} paths - Array of arrays of numbers
  * @return {array} Array of arrays of numbers
  */
-function simplifyPaths(paths){
-  var out = [],
-      current,
-      x,
-      y;
-  paths.forEach(function(path){
-    if(path.length == 4){
-      if(path[0] == x && path[1] == y){
-        x = path[2];
-        y = path[3];
-        current.push(x, y);
-      }
-      else {
-        if(current){
-          out.push(current);
+/**
+ * This function simplifies paths which are really just path segments
+ * by joining up adjacent segments.
+ * @param {array} paths - Array of arrays of numbers
+ * @return {array} Array of arrays of numbers
+ */ function simplifyPaths(paths) {
+    var out = [], current, x, y;
+    paths.forEach(function (path) {
+        if (path.length == 4) {
+            if (path[0] == x && path[1] == y) {
+                x = path[2];
+                y = path[3];
+                current.push(x, y);
+            }
+            else {
+                if (current) {
+                    out.push(current);
+                }
+                current = path.slice(0);
+                x = path[2];
+                y = path[3];
+            }
         }
-
-        current = path.slice(0);
-        x = path[2];
-        y = path[3];
-      }
+    });
+    if (current) {
+        out.push(current);
     }
-  });
-  if(current){
-    out.push(current);
-  }
-  return out;
+    return out;
 }
-
 const hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 const hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
 const rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
-
-function parseColor (str) {
-
-  let match = str.match(hexColor) || str.match(hexColorShort);
-  if (match) {
-    const out = [
-      parseInt(match[1], 16),
-      parseInt(match[2], 16),
-      parseInt(match[3], 16),
-      1
-    ];
-    out.format = "hex";
-    return out;
-  }
-
-  match = str.match(rgbRegex);
-  if (match) {
-    const out = [
-      parseInt(match[1], 10),
-      parseInt(match[2], 10),
-      parseInt(match[3], 10),
-      match[4] ? parseFloat(match[4]) : 1,
-    ];
-    out.format = "rgb";
-    return out;
-  }
+function parseColor(str) {
+    let match = str.match(hexColor) || str.match(hexColorShort);
+    if (match) {
+        const out = [
+            parseInt(match[1], 16),
+            parseInt(match[2], 16),
+            parseInt(match[3], 16),
+            1
+        ];
+        return out;
+    }
+    match = str.match(rgbRegex);
+    if (match) {
+        const out = [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3], 10),
+            match[4] ? parseFloat(match[4]) : 1,
+        ];
+        return out;
+    }
 }
-
-function eventMixin (constructor) {
-
-    function on (event, callback) {
-        if (!this._events) this._events = {};
-
-        if (!this._events[event]){
+class Events {
+    constructor() {
+        this._events = {};
+    }
+    on(event, callback) {
+        if (!this._events[event]) {
             this._events[event] = [];
         }
         this._events[event].push(callback);
-        return this;
     }
-
-    function fire (event, ...params) {
-        if (!this._events) this._events = {};
-
+    fire(event, ...params) {
         var callbacks = this._events[event];
-
-        if (callbacks && callbacks.length){
+        if (callbacks && callbacks.length) {
             callbacks.forEach(callback => {
                 callback.apply(this, params);
             });
         }
     }
+}
+/* harmony export (immutable) */ __webpack_exports__["c"] = Events;
 
-    constructor.prototype.on = on;
-    constructor.prototype.fire = fire;
+function applyMixin(constructor, mixin) {
+    Object.getOwnPropertyNames(mixin.prototype).forEach(name => {
+        constructor.prototype[name] = mixin.prototype[name];
+    });
 }
 
 
 /***/ }),
 /* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+
+/**
+ * Render systems require a camera. Use this class to create one.
+ * @param {number} width
+ * @param {number} height
+ */
+class CameraSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor() {
+        super(...arguments);
+        this.pruneList = [];
+        this.suspendedObjects = [];
+        this.skewX = 0;
+        this.skeyY = 0;
+        this.scaleX = 1;
+        this.scaleY = 1;
+        // getTransformMatrix () {
+        // 	// var m = new Matrix(this.shearMatrix);
+        // 	// m.multiplyBy(this.scaleMatrix);
+        // 	// m.multiplyBy(this.rotMat);
+        // 	return this.transformMatrix;
+        // }
+        // update (delta) {
+        // 	super.update(delta);
+        //this.rotation += 0.0001 * delta;
+        //this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
+        //this.angle += 0.0001 * delta;
+        //this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
+        //this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
+        //this.rotMat = Matrix.rotationMatrix(this.rotation);
+        /*
+        TODO: Pruning objeccts which are off screen could be a component's job?
+        var i = 0,
+            l = this.pruneList.length,
+            mgr, objs, j;
+        for(; i < l; i++){
+            mgr = this.pruneList[i];
+            if(mgr instanceof GE.GameObjectManager)
+            {
+                objs = mgr.objects;
+                for(j=0;j<objs.length;j++){
+                    this.pruneVec.set(objs[j].position).subtract(this.position);
+                    if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
+                    {
+                        mgr.removeObject(objs[j]);
+                        this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});
+                    }
+                }
+            }
+        }
+        */
+        // }
+    }
+    /**
+     * Set the scale to render at
+     * @param {number} scaleX
+     * @param {number} scaleY - Default: scaleX
+     */
+    setScale(scaleX, scaleY) {
+        scaleY = scaleY || scaleX;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+    }
+    addManagerForPruning(objectManager) {
+        this.pruneList.push(objectManager);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = CameraSystem;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
+
+
+const u = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const n = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const w = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const p = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const r = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const q = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const s = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const q_p = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+/**
+ * Component which interacts with the background system to bounce an object off surfaces.
+ * @extends {GameComponent}
+ * @param {BackgroundCollisionSystem} backgroundSystem - Where can I find surfaces to collide with.
+ * @param {array} collisionBounds - Default bounds array for the parent object
+ * @memberof Collision
+ */
+class BackgroundCollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor(backgroundSystem, collisionBounds) {
+        super();
+        this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
+        this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
+        this.background = backgroundSystem;
+        this.bounds = collisionBounds;
+    }
+    update(parent, delta) {
+        // This logic should probably be moved to BackgroundCollisionSystem
+        var surfaces = this.background.surfaces, j = 0, m = surfaces.length, c, l, i, p_t, p_u, 
+        //theta,
+        f = this.coefficientFriction, e = this.coefficientRestitution, parentX = parent.position[0], parentY = parent.position[1], lastPosition = this.position;
+        if (lastPosition[0] &&
+            Math.abs(lastPosition[0] - parentX) < 100 &&
+            Math.abs(lastPosition[1] - parentY) < 100) {
+            for (; j < m; j++) {
+                c = surfaces[j],
+                    l = c.length;
+                for (i = 0; i < l - 3; i += 2) {
+                    // http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(p, c[i], c[i + 1]);
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(r, c[i + 2], c[i + 3]);
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(r, r, p);
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(q, lastPosition);
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(s, parent.position, q);
+                    //theta = s.angle();
+                    //s.add(0,this.bounds*Math.cos(theta));
+                    __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(q_p, q, p);
+                    p_t = cross(q_p, s) / cross(r, s);
+                    p_u = cross(q_p, r) / cross(r, s);
+                    if (p_t >= 0 && p_t <= 1 && p_u >= 0 && p_u <= 1) {
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(parent.position, lastPosition);
+                        // http://stackoverflow.com/questions/573084/how-to-calculate-bounce-angle
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(n, -r[1], r[0]); // this is the normal to the surface
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.normalize(n, n);
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(v, parent.velocity);
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(u, n, __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.dot(n, v));
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(w, v, u);
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(w, w, f);
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(u, u, e);
+                        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(parent.velocity, w, u);
+                        break;
+                    }
+                }
+            }
+        }
+        __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(parent.position, lastPosition);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = BackgroundCollisionComponent;
+
+BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
+BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
+function cross(a, b) {
+    return a[0] * b[1] - a[1] * b[0];
+}
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
+
+/**
+ * A subclass of {@link GameObject} which manages its own children.
+ */
+class GameObjectManager extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */] {
+    constructor() {
+        super(...arguments);
+        this.objects = [];
+        this._objectsToBeRemoved = [];
+    }
+    /**
+     * Add an object to be updated as children of this manager. Children are given a
+     * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
+     * @param {GameObject} object - Game object to be attached to this node in the tree
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    addObject(object) {
+        if (object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
+            this.objects.push(object);
+        // object.parent = this;
+        return this;
+    }
+    /**
+     * Add an object to be updated as children of this manager at particular place
+     * in the list of children.
+     * @param {GameObject} object - Game object to be attached to this node in the tree
+     * @param {number} index - Position in the list
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    addObjectAt(object, index) {
+        if (object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
+            this.objects.splice(index, 0, object);
+        // object.parent = this;
+        return this;
+    }
+    /**
+     * Remove a previously added object from this manager.
+     * @param {GameObject} object - Game object to be removed
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    removeObject(object) {
+        if (object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
+            this._objectsToBeRemoved.push(object);
+        // if(object.parent == this) { object.parent = null; }
+        return this;
+    }
+    /**
+     * Remove all previously added objects from this manager.
+     * @return {GameObjectManager} Returns a reference to this for chainability
+     */
+    removeAll() {
+        this.objects.length = 0;
+    }
+    /**
+     * This method is inherited from {@link GameObject}. It will first call update
+     * on each of its components like an ordinary {@link GameObject} but then it
+     * will start updating all of its child nodes.
+     * @param {number} delta - Time since last frame in milliseconds
+     */
+    update(delta) {
+        super.update(delta);
+        var i = 0, l = this.objects.length, m, j = 0;
+        for (i = 0; i < l; i++) {
+            this.objects[i].update(delta);
+        }
+        m = this._objectsToBeRemoved.length;
+        for (; j < m; j++) {
+            i = 0;
+            for (; i < l; i++) {
+                if (this.objects[i] == this._objectsToBeRemoved[j]) {
+                    arrayRemoveItem.call(this.objects, i);
+                    l--;
+                    break;
+                }
+            }
+        }
+        this._objectsToBeRemoved.length = 0;
+    }
+    /**
+     * This method is used to produce a html representation of the manage for
+     * things such as debugging trees. It will include components as well as child
+     * objects in its rendering. Similar to the toString method.
+     * @return {string} Representation of this component in HTML
+     */
+    toHTML() {
+        var html = this.name, i;
+        if (this.objects.length > 1)
+            html += " (" + this.objects.length + " items)";
+        if (this.components.length) {
+            html += "<ul>";
+            for (i = 0; i < this.components.length; i++)
+                html += "<li>" + this.components[i].toHTML();
+            html += "</ul>";
+        }
+        if (this.objects.length) {
+            html += "<ul>";
+            for (i = 0; i < this.objects.length; i++)
+                html += "<li>" + this.objects[i].toHTML();
+            html += "</ul>";
+        }
+        return html;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GameObjectManager;
+
+function arrayRemoveItem(from, to) {
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+}
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2586,214 +2663,166 @@ class MoveToClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompone
 
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 /**
- * Render systems require a camera. Use this class to create one.
- * @extends {GameObject}
- * @param {number} width
- * @param {number} height
+ * Bounce off the walls of a world.
+ * @param {WorldSystem} worldSystem - The world the parent object is in.
+ * @param {number} width - Default width if parent has no bounds
+ * @param {number} height - Default height if parent has no bounds
+ * @param {number} thickness - Default thickness if parent has no bounds
+ * @memberof World
  */
-class CameraSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-	constructor () {
-		super();
-
-		this.pruneList = [];
-		this.suspendedObjects = [];
-		this.skewX = this.skew;
-		this.skeyY = this.skew;
-		this.scaleX = 1;
-		this.scaleY = 1;
-		this.rotation = 0;
-		this.rotationAxis = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-		__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(this.rotationAxis, 0, 0, 1);
-	}
-
-	/**
-	 * Set the scale to render at
-	 * @param {number} scaleX
-	 * @param {number} scaleY - Default: scaleX
-	 */
-	setScale (scaleX, scaleY){
-		scaleY = scaleY || scaleX;
-		this.scaleX = scaleX;
-		this.scaleY = scaleY;
-	}
-
-	/**
-	 * Change the size of the camera
-	 * @param {number} width
-	 * @param {number} height
-	 */
-	setSize (width, height){
-		this.width = width;
-		this.height = height;
-	}
-
-	addManagerForPruning (objectManager) {
-		if(objectManager instanceof GameObjectManager)
-			this.pruneList.push(objectManager);
-	}
-
-	getTransformMatrix () {
-		// var m = new Matrix(this.shearMatrix);
-		// m.multiplyBy(this.scaleMatrix);
-		// m.multiplyBy(this.rotMat);
-		return this.transformMatrix;
-	}
-
-	update (delta) {
-		super.update(delta);
-		//this.rotation += 0.0001 * delta;
-		//this.rotMat = Matrix.rotationMatrix(-Vector2.angleBetween(suns[0],pointMasses[0]));
-		//this.angle += 0.0001 * delta;
-		//this.scaleMatrix.values[0][0] = -(Math.sin(this.angle)+0.5)*3;
-		//this.scaleMatrix.values[1][1] = (Math.sin(this.angle)+0.5)*3;
-		//this.rotMat = Matrix.rotationMatrix(this.rotation);
-
-		/*
-		TODO: Pruning objeccts which are off screen could be a component's job?
-		var i = 0,
-			l = this.pruneList.length,
-			mgr, objs, j;
-		for(; i < l; i++){
-			mgr = this.pruneList[i];
-			if(mgr instanceof GE.GameObjectManager)
-			{
-				objs = mgr.objects;
-				for(j=0;j<objs.length;j++){
-					this.pruneVec.set(objs[j].position).subtract(this.position);
-					if(Math.abs(this.pruneVec.x) > this.screen.width * 2 || Math.abs(this.pruneVec.y) > this.screen.height * 2)
-					{
-						mgr.removeObject(objs[j]);
-						this.suspendedObjects.push({object: objs[j], parent: mgr, position: j});
-					}
-				}
-			}
-		}
-		*/
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = CameraSystem;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2__);
-
-
-
-const u = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const n = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const w = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const p = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const r = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const q = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const s = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const q_p = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-const v = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
-
-/**
- * Component which interacts with the background system to bounce an object off surfaces.
- * @extends {GameComponent}
- * @param {BackgroundCollisionSystem} backgroundSystem - Where can I find surfaces to collide with.
- * @param {array} collisionBounds - Default bounds array for the parent object
- * @memberof Collision
- */
-class BackgroundCollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    constructor (backgroundSystem, collisionBounds) {
+class WorldBounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
+    constructor(worldSystem, width = 0, height = 0, thickness = 0) {
         super();
-		this.backgroundSystem = backgroundSystem;
-		this.bounds = collisionBounds;
-		this.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
-		this.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
-	}
-
-	update (parent, delta) {
-		// This logic should probably be moved to BackgroundCollisionSystem
-		var surfaces = this.backgroundSystem.surfaces,
-			j = 0,
-			m = surfaces.length,
-			c, l,
-			i,
-			p_t,
-			p_u,
-			//theta,
-			f = this.coefficientFriction,
-			e = this.coefficientRestitution,
-			parentX = parent.position[0],
-			parentY = parent.position[1];
-		if(this.lastX &&
-				Math.abs(this.lastX - parentX) < 100 &&
-				Math.abs(this.lastY - parentY) < 100){
-			for(;j<m;j++){
-				c = surfaces[j],
-				l = c.length;
-				for(i=0; i<l-3;i+=2)
-				{
-					// http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(p, c[i  ], c[i+1]);
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(r, c[i+2], c[i+3]);
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(r, r, p);
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(q, this.lastX, this.lastY);
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(s, parent.position, q);
-					//theta = s.angle();
-					//s.add(0,this.bounds*Math.cos(theta));
-					__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(q_p, q, p);
-					p_t = cross(q_p, s) / cross(r, s);
-					p_u = cross(q_p, r) / cross(r, s);
-					if(p_t >= 0 && p_t <= 1 && p_u >= 0 && p_u <= 1)
-					{
-						parent.position[0] = this.lastX;
-						parent.position[1] = this.lastY;
-						// http://stackoverflow.com/questions/573084/how-to-calculate-bounce-angle
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.set(n, -r[1], r[0]); // this is the normal to the surface
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.normalize(n, n);
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(v, parent.velocity);
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(u, n, __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.dot(n, v));
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(w, v, u);
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(w, w, f);
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.scale(u, u, e);
-						__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.subtract(parent.velocity, w, u);
-						break;
-					}
-				}
-			}
-		}
-		this.lastX = parent.position[0];
-		this.lastY = parent.position[1];
-	}
+        this.cRestitution = 1;
+        this.cFriction = 1;
+        this.worldSystem = worldSystem;
+        this.ax = width / 2;
+        this.ay = height / 2;
+        this.az = thickness / 2;
+    }
+    update(parent, delta) {
+        const coef = this.cRestitution;
+        const friction = this.cFriction;
+        const worldBounds = this.worldSystem.bounds;
+        const parentBounds = parent.bounds;
+        let bx1, by1, bx2, by2, bz1, bz2;
+        if (parentBounds) {
+            bx1 = worldBounds[0] - parentBounds[0];
+            by1 = worldBounds[1] - parentBounds[1];
+            bx2 = worldBounds[2] - parentBounds[2];
+            by2 = worldBounds[3] - parentBounds[3];
+            bz1 = worldBounds[4] - parentBounds[4];
+            bz2 = worldBounds[5] - parentBounds[5];
+        }
+        else {
+            bx1 = worldBounds[0] + this.ax;
+            by1 = worldBounds[1] + this.ay;
+            bx2 = worldBounds[2] - this.ax;
+            by2 = worldBounds[3] - this.ay;
+            bz1 = worldBounds[4] + this.az;
+            bz2 = worldBounds[5] - this.az;
+        }
+        // hasBounced: 1: x, 2: y, 3: z
+        parent.hasBounced = false;
+        if (parent.position[0] < bx1) {
+            parent.position[0] = bx1;
+            parent.velocity[0] = -parent.velocity[0] * coef;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 1;
+        }
+        else if (parent.position[0] > bx2) {
+            parent.position[0] = bx2;
+            parent.velocity[0] = -parent.velocity[0] * coef;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 1;
+        }
+        if (parent.position[1] < by1) {
+            parent.position[1] = by1;
+            parent.velocity[1] = -parent.velocity[1] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 2;
+        }
+        else if (parent.position[1] > by2) {
+            parent.position[1] = by2;
+            parent.velocity[1] = -parent.velocity[1] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[2] = parent.velocity[2] * friction;
+            parent.hasBounced = 2;
+        }
+        if (parent.position[2] < bz1) {
+            parent.position[2] = bz1;
+            parent.velocity[2] = -parent.velocity[2] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.hasBounced = 3;
+        }
+        else if (parent.position[2] > bz2) {
+            parent.position[2] = bz2;
+            parent.velocity[2] = -parent.velocity[2] * coef;
+            parent.velocity[0] = parent.velocity[0] * friction;
+            parent.velocity[1] = parent.velocity[1] * friction;
+            parent.hasBounced = 3;
+        }
+    }
 }
-BackgroundCollisionComponent.COEFFICIENT_FRICTION = 0.95;
-BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.4;
-
-function cross(a, b){
-    return a[0]*b[1] - a[1]*b[0];
-}
-
-/* harmony default export */ __webpack_exports__["a"] = BackgroundCollisionComponent;
+/* harmony default export */ __webpack_exports__["a"] = WorldBounceComponent;
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
+
+/**
+ * When parent goes outside of world bounds wrap to the opposite wall.
+ * @param {WorldSystem} worldSystem - Which world is the parent in.
+ * @memberof World
+ */
+class WorldWrapComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
+    constructor(worldSystem) {
+        super();
+        this.worldSystem = worldSystem;
+    }
+    update(parent, delta) {
+        const ax = this.worldSystem.bounds[0];
+        const ay = this.worldSystem.bounds[1];
+        const bx = this.worldSystem.bounds[2];
+        const by = this.worldSystem.bounds[3];
+        const az = this.worldSystem.bounds[4];
+        const bz = this.worldSystem.bounds[5];
+        if (parent.position[0] < ax
+            && parent.velocity[0] < 0) {
+            parent.position[0] = bx;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[0] > bx
+            && parent.velocity[0] > 0) {
+            parent.position[0] = ax;
+            this.fire("wrap", parent);
+        }
+        if (parent.position[1] < ay
+            && parent.velocity[1] < 0) {
+            parent.position[1] = by;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[1] > by
+            && parent.velocity[1] > 0) {
+            parent.position[1] = ay;
+            this.fire("wrap", parent);
+        }
+        if (parent.position[2] < az
+            && parent.velocity[2] < 0) {
+            parent.position[2] = bz;
+            this.fire("wrap", parent);
+        }
+        else if (parent.position[2] > bz
+            && parent.velocity[2] > 0) {
+            parent.position[2] = az;
+            this.fire("wrap", parent);
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = WorldWrapComponent;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
@@ -2817,7 +2846,7 @@ const sCBVimpulse = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___d
  * @extends {GameComponent}
  * @memberof Collision
  */
-class BounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class BounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
 	constructor () {
 		super();
 
@@ -2879,11 +2908,11 @@ class BounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__[
 
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 
 /**
@@ -2895,7 +2924,7 @@ class BounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__[
  * @param {boolean} vulnerable - Is this object vulnerable?
  * @memberof Collision
  */
-class CollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class CollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
 
 	constructor (collisionSystem, attack, vulnerable) {
 		super();
@@ -2918,11 +2947,11 @@ class CollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
 
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 
 /**
@@ -2934,7 +2963,7 @@ class CollisionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
  * @param {array} lineSegments - Line segments to add. These are polylines e.g. <code>[x1, y1, x2, y2, ..., xn, yn]</code>
  * @memberof Collision
  */
-class SolidComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class SolidComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
     constructor (backgroundSystem, lineSegments) {
         super();
 
@@ -2965,150 +2994,11 @@ class SolidComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["
 
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
-
-
-/**
- * A subclass of {@link GameObject} which manages its own children
- * @extends {GameObject}
- */
-class GameObjectManager extends __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */] {
-    constructor() {
-  		super();
-
-  		this.objects = [];
-
-  		this._objectsToBeRemoved = [];
-
-  		this.objects.remove = arrayRemoveItem;
-  	}
-
-	/**
-	 * Add an object to be updated as children of this manager. Children are given a
-	 * property <code>parent</code> pointing to this <code>GameObjectManager</code>.
-	 * @param {GameObject} object - Game object to be attached to this node in the tree
-	 * @return {GameObjectManager} Returns a reference to this for chainability
-	 */
-  	addObject (object){
-  		if(object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
-  			this.objects.push(object);
-  		object.parent = this;
-  		return this;
-  	}
-
-	/**
-	 * Add an object to be updated as children of this manager at particular place
-	 * in the list of children.
-	 * @param {GameObject} object - Game object to be attached to this node in the tree
-	 * @param {number} index - Position in the list
-	 * @return {GameObjectManager} Returns a reference to this for chainability
-	 */
-  	addObjectAt (object, index){
-  		if(object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
-  			this.objects.splice(index,0,object);
-  		object.parent = this;
-  		return this;
-  	}
-
-	/**
-	 * Remove a previously added object from this manager.
-	 * @param {GameObject} object - Game object to be removed
-	 * @return {GameObjectManager} Returns a reference to this for chainability
-	 */
-  	removeObject (object){
-  		if(object instanceof __WEBPACK_IMPORTED_MODULE_0__GameObject__["a" /* default */])
-  			this._objectsToBeRemoved.push(object);
-  		if(object.parent == this) { object.parent = null; }
-  		return this;
-  	}
-
-	/**
-	 * Remove all previously added objects from this manager.
-	 * @return {GameObjectManager} Returns a reference to this for chainability
-	 */
-  	removeAll () {
-  		this.objects.length = 0;
-  	}
-
-	/**
-	 * This method is inherited from {@link GameObject}. It will first call update
-	 * on each of its components like an ordinary {@link GameObject} but then it
-	 * will start updating all of its child nodes.
-	 * @param {number} delta - Time since last frame in milliseconds
-	 */
-  	update (delta) {
-  		super.update(delta);
-
-  		var i = 0,
-  			l = this.objects.length,
-  			m,
-  			j = 0;
-
-  		for(i=0;i<l;i++){
-			this.objects[i].update(delta);
-  		}
-
-  		m = this._objectsToBeRemoved.length;
-
-  		for(;j<m;j++){
-  			i = 0;
-  			for(;i<l;i++){
-  				if(this.objects[i] == this._objectsToBeRemoved[j]){
-  					this.objects.remove(i);
-  					l--;
-  					break;
-  				}
-  			}
-  		}
-  		this._objectsToBeRemoved.length = 0;
-  	}
-
-	/**
-	 * This method is used to produce a html representation of the manage for
-	 * things such as debugging trees. It will include components as well as child
-	 * objects in its rendering. Similar to the toString method.
-	 * @return {string} Representation of this component in HTML
-	 */
-  	toHTML () {
-  		var html = this.name,
-  			i;
-  		if(this.objects.length > 1)
-  			html += " (" + this.objects.length + " items)";
-  		if(this.components.length){
-  			html += "<ul>";
-  			for(i=0;i<this.components.length;i++)
-  				html += "<li>"+this.components[i].toHTML();
-  			html += "</ul>";
-  		}
-  		if(this.objects.length){
-  			html += "<ul>";
-  			for(i=0;i<this.objects.length;i++)
-  				html += "<li>"+this.objects[i].toHTML();
-  			html += "</ul>";
-  		}
-  		return html;
-  	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = GameObjectManager;
-
-function arrayRemoveItem(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
-}
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 
 /**
@@ -3118,7 +3008,7 @@ function arrayRemoveItem(from, to) {
  * @extends {GameComponent}
  * @param {InputSystem} inputSystem - Where to listen to for clicks
  */
-class ClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class ClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
   constructor (inputSystem) {
     super();
 
@@ -3144,7 +3034,7 @@ class ClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3181,7 +3071,7 @@ class DotRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3217,7 +3107,7 @@ class RectangleRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3248,7 +3138,7 @@ class TextRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponen
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3317,181 +3207,6 @@ class WebGLRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = WebGLRenderSystem;
 
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-
-/**
- * Bounce off the walls of a world.
- * @extends {GameComponent}
- * @param {WorldSystem} worldSystem - The world the parent object is in.
- * @param {number} width - Default width if parent has no bounds
- * @param {number} height - Default height if parent has no bounds
- * @param {number} thickness - Default thickness if parent has no bounds
- * @memberof World
- */
-class WorldBounceComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    constructor (worldSystem, width, height, thickness) {
-        super();
-
-        this.worldSystem = worldSystem;
-        this.ax = (width || 0) / 2;
-        this.ay = (height || 0) / 2;
-        this.az = (thickness || 0) / 2;
-
-        this.cRestitution = 1;
-        this.cFriction = 1;
-    }
-
-    update (parent, delta) {
-        var coef = this.cRestitution,
-                friction = this.cFriction;
-
-        if(parent.bounds){
-            this.bx1 = this.worldSystem.bounds[0] - parent.bounds[0];
-            this.by1 = this.worldSystem.bounds[1] - parent.bounds[1];
-            this.bx2 = this.worldSystem.bounds[2] - parent.bounds[2];
-            this.by2 = this.worldSystem.bounds[3] - parent.bounds[3];
-            this.bz1 = this.worldSystem.bounds[4] - parent.bounds[4];
-            this.bz2 = this.worldSystem.bounds[5] - parent.bounds[5];
-        }
-        else{
-            this.bx1 = this.worldSystem.bounds[0] + this.ax;
-            this.by1 = this.worldSystem.bounds[1] + this.ay;
-            this.bx2 = this.worldSystem.bounds[2] - this.ax;
-            this.by2 = this.worldSystem.bounds[3] - this.ay;
-            this.bz1 = this.worldSystem.bounds[4] + this.az;
-            this.bz2 = this.worldSystem.bounds[5] - this.az;
-        }
-
-        // hasBounced: 1: x, 2: y, 3: z
-        parent.hasBounced = false;
-
-        if(parent.position[0] < this.bx1){
-            parent.position[0] = this.bx1;
-            parent.velocity[0] = -parent.velocity[0]*coef;
-            parent.velocity[1] = parent.velocity[1]*friction;
-            parent.velocity[2] = parent.velocity[2]*friction;
-
-            parent.hasBounced = 1;
-        }
-        else if(parent.position[0] > this.bx2){
-            parent.position[0] = this.bx2;
-            parent.velocity[0] = -parent.velocity[0]*coef;
-            parent.velocity[1] = parent.velocity[1]*friction;
-            parent.velocity[2] = parent.velocity[2]*friction;
-
-            parent.hasBounced = 1;
-        }
-
-        if(parent.position[1] < this.by1){
-            parent.position[1] = this.by1;
-            parent.velocity[1] = -parent.velocity[1]*coef;
-            parent.velocity[0] = parent.velocity[0]*friction;
-            parent.velocity[2] = parent.velocity[2]*friction;
-
-            parent.hasBounced = 2;
-        }
-        else if(parent.position[1] > this.by2){
-            parent.position[1] = this.by2;
-            parent.velocity[1] = -parent.velocity[1]*coef;
-            parent.velocity[0] = parent.velocity[0]*friction;
-            parent.velocity[2] = parent.velocity[2]*friction;
-
-            parent.hasBounced = 2;
-        }
-
-        if(parent.position[2] < this.bz1){
-            parent.position[2] = this.bz1;
-            parent.velocity[2] = -parent.velocity[2]*coef;
-            parent.velocity[0] = parent.velocity[0]*friction;
-            parent.velocity[1] = parent.velocity[1]*friction;
-
-            parent.hasBounced = 3;
-        }
-        else if(parent.position[2] > this.bz2){
-            parent.position[2] = this.bz2;
-            parent.velocity[2] = -parent.velocity[2]*coef;
-            parent.velocity[0] = parent.velocity[0]*friction;
-            parent.velocity[1] = parent.velocity[1]*friction;
-
-            parent.hasBounced = 3;
-        }
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = WorldBounceComponent;
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-
-/**
- * When parent goes outside of world bounds wrap to the opposite wall.
- * @extends {GameComponent}
- * @param {WorldSystem} worldSystem - Which world is the parent in.
- * @memberof World
- */
-class WorldWrapComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-	constructor (worldSystem) {
-		super();
-
-		this.worldSystem = worldSystem;
-	}
-
-	update (parent, delta) {
-		this.ax = this.worldSystem.bounds[0];
-		this.ay = this.worldSystem.bounds[1];
-		this.bx = this.worldSystem.bounds[2];
-		this.by = this.worldSystem.bounds[3];
-		this.az = this.worldSystem.bounds[4];
-		this.bz = this.worldSystem.bounds[5];
-
-		if(parent.position[0] < this.ax
-			&& parent.velocity[0] < 0){
-			parent.position[0] = this.bx;
-			this.fire("wrap", parent);
-		}
-		else if(parent.position[0] > this.bx
-			&& parent.velocity[0] > 0){
-			parent.position[0] = this.ax;
-			this.fire("wrap", parent);
-		}
-		if(parent.position[1] < this.ay
-			&& parent.velocity[1] < 0){
-			parent.position[1] = this.by;
-			this.fire("wrap", parent);
-		}
-		else if(parent.position[1] > this.by
-			&& parent.velocity[1] > 0){
-			parent.position[1] = this.ay;
-			this.fire("wrap", parent);
-		}
-		if(parent.position[2] < this.az
-			&& parent.velocity[2] < 0){
-			parent.position[2] = this.bz;
-			this.fire("wrap", parent);
-		}
-		else if(parent.position[2] > this.bz
-			&& parent.velocity[2] > 0){
-			parent.position[2] = this.az;
-			this.fire("wrap", parent);
-		}
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = WorldWrapComponent;
 
 
 /***/ }),
@@ -5646,13 +5361,11 @@ module.exports = mat4;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
 
 
-
 // Working Vectors
 const vecSeparation = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
 const vecAlign = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
 const vecCohesion = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
 const vecSpare = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-
 /**
  * <p>Objects with this component will try to 'flock' together. There are three effects Working
  * together to produce flocking behaviour.
@@ -5662,65 +5375,48 @@ const vecSpare = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___defa
  * the neighbourhood, this is called alignment.
  * <p>The parent object will try to move away from object with the
  * {@link FlockingComponent.SEPARATION_RADIUS}, this is called separation.
- * @extends {GameComponent}
  * @param {array} flock - An array of game objects which are considered to be in the same flock.
- * @memberof Behaviour
  */
 class FlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-
-    constructor (flock) {
+    constructor(flock) {
         super();
         this.flock = flock;
     }
-
-    update (parent, delta) {
+    update(parent, delta) {
         __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(vecCohesion, 0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(vecAlign, 0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(vecSeparation, 0, 0, 0);
         __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.set(vecSpare, 0, 0, 0);
-
         let count = 0;
         const length = this.flock.length;
-
-        for(let i = 0; i < length; i++){
+        for (let i = 0; i < length; i++) {
             const other = this.flock[i];
             const dist = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.dist(other.position, parent.position);
-
-            if(dist > 0 && dist < FlockingComponent.NEIGHBOUR_RADIUS){
+            if (dist > 0 && dist < FlockingComponent.NEIGHBOUR_RADIUS) {
                 __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.add(vecCohesion, vecCohesion, other.position);
                 __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.add(vecAlign, vecAlign, other.velocity);
-
-                if(dist < FlockingComponent.SEPARATION_RADIUS){
+                if (dist < FlockingComponent.SEPARATION_RADIUS) {
                     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.subtract(vecSpare, parent.position, other.position);
                     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.normalize(vecSpare, vecSpare);
                     __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(vecSeparation, vecSeparation, vecSpare, 1 / dist);
                 }
-
                 count++;
             }
         }
-
-        if(count > 0){
+        if (count > 0) {
             __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scale(vecCohesion, vecCohesion, 1 / count);
             __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.subtract(vecCohesion, vecCohesion, parent.position);
             __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.velocity, parent.velocity, vecCohesion, FlockingComponent.COHESION_WEIGHT);
-
             __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.velocity, parent.velocity, vecAlign, FlockingComponent.ALIGN_WEIGHT / count);
-
             __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scaleAndAdd(parent.velocity, parent.velocity, vecSeparation, FlockingComponent.SEPARATION_WEIGHT / count);
-
             var mag = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.length(parent.velocity);
-
-            if(mag > FlockingComponent.MAX_SPEED){
+            if (mag > FlockingComponent.MAX_SPEED) {
                 __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scale(parent.velocity, parent.velocity, FlockingComponent.MAX_SPEED / mag);
             }
         }
     }
 }
-
-/* harmony default export */ __webpack_exports__["a"] = FlockingComponent;
-
-// FlockingComponent Constants
+/* harmony export (immutable) */ __webpack_exports__["a"] = FlockingComponent;
 
 /** Size of sphere of influence. */
 FlockingComponent.NEIGHBOUR_RADIUS = 200;
@@ -5741,8 +5437,7 @@ FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject_ts__ = __webpack_require__(2);
 
 /**
  * Class to play audio at specific points during gameplay
@@ -5751,25 +5446,22 @@ FlockingComponent.SEPARATION_WEIGHT = 100 / FlockingComponent.SEPARATION_RADIUS;
  * It is possible to enhance this class to provide multi-track playback.
  * @extends {GameObject}
  */
-class AudioSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-    constructor () {
+class AudioSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject_ts__["a" /* default */] {
+    constructor() {
         super();
-
         // this.context = new AudioContext();
     }
-
     /**
      * Queue a sound to be played at the start of the next frame
      * @param {object} res - Audio "texture" containing Audio resource
      */
-    playSound (res) {
+    playSound(res) {
         // Real implementation should add audio to queue to play at start of next frame etc.
-        if(res.audio){
+        if (res.audio) {
             res.audio.play();
         }
     }
 }
-
 /* harmony default export */ __webpack_exports__["a"] = AudioSystem;
 
 
@@ -5778,12 +5470,412 @@ class AudioSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* 
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObjectManager__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CameraSystem__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__render_CanvasRenderSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__world_WorldSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__input_InputSystem__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util__ = __webpack_require__(10);
+
+
+
+
+
+
+var State;
+(function (State) {
+    State[State["STATE_PAUSED"] = 0] = "STATE_PAUSED";
+    State[State["STATE_PLAYING"] = 1] = "STATE_PLAYING";
+    State[State["STATE_STOPPED"] = 2] = "STATE_STOPPED";
+    State[State["STATE_DEAD"] = 3] = "STATE_DEAD";
+})(State || (State = {}));
+let _lastTime = 0;
+const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function (callback, element) {
+    var currTime = new Date().getTime();
+    var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
+    var id = setTimeout(function () { callback(currTime + timeToCall); }, timeToCall);
+    _lastTime = currTime + timeToCall;
+    return id;
+};
+/**
+ * Utility class for things such as bootstrapping.
+ *
+ * <p>Providing width and height in options object as well as a canvas will set
+ * the intrinsic rendering size of the canvas.
+ * @param {object} options
+ * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
+ * @param {number} options.width - Render width.
+ * @param {number} options.height - Render height.
+ * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
+ * @param {number} options.score - Initial score
+ * @param {number} options.level - Initial level
+ * @param {number} options.lives - Initial lives
+ */
+class Game {
+    constructor({ canvas, width, height, score, lives, level, autosize } = {
+            canvas: null,
+            width: 0,
+            height: 0,
+            score: 0,
+            lives: 0,
+            level: 0,
+            autosize: false,
+        }) {
+        /**
+         * The root {@link GameObject} from which the object tree grows. This is the
+         * input point for the loop to inject the time delta. All objects wanting updated
+         * need to be a child or grandchild of this object.
+         */
+        this.root = new __WEBPACK_IMPORTED_MODULE_0__GameObjectManager__["a" /* default */]();
+        this.textures = [];
+        this.sounds = [];
+        /** Counter of how many frames have been rendered so far. */
+        this.frame = 0;
+        /** Current game time in milliseconds. */
+        this.time = 0;
+        /** Keeps track of an arbritary score. */
+        this.score = 0;
+        /** Keeps track of an arbritary number of lives. */
+        this.lives = 0;
+        /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
+        this.level = 0;
+        /** Number of resources currently pending. */
+        this._toLoad = 0;
+        this._lastTime = 0;
+        this._loaded = 0;
+        this._generalObjects = null;
+        this._autosizeCallback = () => {
+            if (!this.canvas)
+                return;
+            const width = this.canvas.offsetWidth;
+            const height = this.canvas.offsetHeight;
+            this.setSize(width, height);
+            // Keep Camera centred
+            if (this.cameraSystem) {
+                this.cameraSystem.setPosition(width / 2, height / 2);
+            }
+            // Update bounds of the world
+            // WARN: Does not retain previous world 'padding'
+            if (this.worldSystem) {
+                this.worldSystem.setBounds(0, 0, width, height);
+            }
+        };
+        /**
+         * Events mixin
+         */
+        this._events = {};
+        /**
+         * Canvas this game will render to.
+         */
+        this.canvas = canvas;
+        /**
+         * Width of game canvas. Use {@link Game#setSize} to change.
+         * Explicit width takes priority.
+         * @readonly
+         */
+        this.width = width || (this.canvas && this.canvas.width) || 0;
+        /**
+         * Height of game canvas. Use {@link Game#setSize} to change.
+         * Explicit height takes priority.
+         * @readonly
+         */
+        this.height = height || (this.canvas && this.canvas.height) || 0;
+        if (this.canvas) {
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+        }
+        this.score = score;
+        this.lives = lives;
+        this.level = level;
+        if (autosize) {
+            this.setAutosize(true);
+        }
+    }
+    /**
+     * Add an object to the game. The object is not directly added to the root
+     * GameObjectManager but is instead added to a special 'general objects'
+     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
+     * CameraSystem, RenderSystem).
+     * @param {GameObject} object - The object to add.
+     */
+    addObject(object) {
+        this._initialiseGeneralObjects();
+        this._generalObjects.addObject(object);
+    }
+    /**
+     * Replace the canvas of this game.
+     *
+     * <p>If there is a height and width set the new canvas will be intialised with them.
+     *
+     * <p>If height and width are unset they will be taken from the canvas size.
+     * @param {HTMLCanvasElement} canvas - New canvas
+     */
+    setCanvas(canvas) {
+        this.canvas = canvas;
+        if (this.canvas) {
+            this.width = this.width || this.canvas.width;
+            this.height = this.height || this.canvas.height;
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+        }
+    }
+    /**
+     * Provide an array of urls pointing to image resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of texture objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {Texture[]}
+     */
+    loadTextures(texturePaths) {
+        this._toLoad += texturePaths.length;
+        return texturePaths.map(path => {
+            const texture = {
+                image: new Image(),
+                width: 0,
+                height: 0,
+                loaded: false
+            };
+            texture.image.onload = () => {
+                texture.width = texture.image.width;
+                texture.height = texture.image.height;
+                texture.loaded = true;
+                this._resourceLoaded(texture);
+            };
+            texture.image.onerror = function () {
+                throw new Error("Failed to load a texture: " + path);
+            };
+            texture.image.src = path;
+            this.textures.push(texture);
+            return texture;
+        });
+    }
+    /**
+     * Provide an array of urls pointing to audio resources and they will be loaded.
+     *
+     * <p>The return value of this method is a mapped array of 'audio texture' objects.
+     * @param {string[]} texturePaths - Array of urls
+     * @return {AudioTexture[]}
+     */
+    loadAudio(audioPaths) {
+        this._toLoad += audioPaths.length;
+        return audioPaths.map(path => {
+            const sound = {
+                audio: new Audio(),
+                length: 0,
+                loaded: false
+            };
+            sound.audio.addEventListener("canplaythrough", () => {
+                if (!sound.loaded) {
+                    sound.length = sound.audio.duration;
+                    sound.loaded = true;
+                    this._resourceLoaded(sound);
+                }
+            });
+            sound.audio.onerror = function () {
+                throw new Error("Failed to load a sound: " + path);
+            };
+            sound.audio.src = path;
+            this.sounds.push(sound);
+            return sound;
+        });
+    }
+    /**
+     * Start the loop.
+     */
+    start() {
+        this.nextLevel();
+        this.state = State.STATE_PLAYING;
+        this._loop();
+    }
+    /**
+     * Stop the loop after the current frame.
+     */
+    stop() {
+        this.state = State.STATE_STOPPED;
+    }
+    /**
+     * Generate a default {@link CameraSystem} based on properties of this game.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {CameraSystem}
+     */
+    getDefaultCamera() {
+        if (!this.cameraSystem) {
+            this.cameraSystem = new __WEBPACK_IMPORTED_MODULE_1__CameraSystem__["a" /* default */]();
+            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.cameraSystem);
+        }
+        return this.cameraSystem;
+    }
+    /**
+     * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {CanvasRenderSystem}
+     */
+    getDefaultRenderer() {
+        if (!this.renderSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+            let context;
+            if (this.canvas)
+                context = this.canvas.getContext("2d");
+            this.renderSystem = new __WEBPACK_IMPORTED_MODULE_2__render_CanvasRenderSystem__["a" /* default */](context, this.cameraSystem);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.renderSystem);
+        }
+        return this.renderSystem;
+    }
+    /**
+     * <p>Generate a default {@link WorldSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
+     * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
+     * @return {WorldSystem}
+     */
+    getDefaultWorld(paddingX = 0, paddingY = paddingX) {
+        const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
+        if (!this.worldSystem) {
+            this.worldSystem = new __WEBPACK_IMPORTED_MODULE_3__world_WorldSystem__["a" /* default */](bounds);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.worldSystem);
+        }
+        else {
+            this.worldSystem.setBounds(...bounds);
+        }
+        return this.worldSystem;
+    }
+    /**
+     * <p>Generate a default {@link InputSystem} based on properties set on
+     * this game instance.
+     *
+     * Calling this method will also add it to the game root after general objects.
+     * @return {InputSystem}
+     */
+    getDefaultInput() {
+        if (!this.inputSystem) {
+            if (!this.cameraSystem) {
+                this.getDefaultCamera();
+            }
+            // params are: (screen, keyboard, camera)
+            this.inputSystem = new __WEBPACK_IMPORTED_MODULE_4__input_InputSystem__["a" /* default */](this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
+            this._initialiseGeneralObjects();
+            this.root.addObject(this.inputSystem);
+        }
+        return this.inputSystem;
+    }
+    /** Specify a new score
+     * @param {number} score - New score.
+     */
+    setScore(score) {
+        this.score = score;
+        this.fire("score", this.score);
+    }
+    /** Move to the next level */
+    nextLevel() {
+        this.level++;
+        this.fire("loadLevel", this.level);
+    }
+    /** Specify a level to jump to.
+     * @param {number} level - Level number to jump to.
+     */
+    setLevel(level) {
+        this.level = level;
+        this.fire("loadLevel", this.level);
+    }
+    /**
+     * <p>Send an event notifiying listeners that the level has been completed.
+     * <p>This does not automatically move to the next level.
+     */
+    completeLevel() {
+        this.fire("levelComplete", this.level);
+    }
+    /**
+     * Set the size of the game. This will also set the canvas size.
+     * @param {number} width - Size in pixels
+     * @param {number} height - Size in pixels
+     */
+    setSize(width, height) {
+        this.width = width;
+        this.height = height;
+        if (this.canvas) {
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+    }
+    /**
+     * Set whether or not to update the world dimensions with changes to the canvas dimensions.
+     * @param {boolean} enable
+     */
+    setAutosize(enable) {
+        if (typeof window !== "undefined") {
+            if (enable) {
+                window.addEventListener("resize", this._autosizeCallback);
+            }
+            else {
+                window.removeEventListener("resize", this._autosizeCallback);
+            }
+        }
+    }
+    _loop() {
+        const loop = (time) => {
+            if (time && this.time == time) {
+                console.log("Multiple calls: " + time);
+                return;
+            }
+            this.time = time;
+            this.frame++;
+            try {
+                this.root.update(Math.min(time - this._lastTime, 100));
+                if (this.state == State.STATE_PLAYING) {
+                    _raf(loop);
+                }
+                this._lastTime = time;
+            }
+            catch (e) {
+                if (window.console) {
+                    console.error(e.stack || e);
+                }
+            }
+        };
+        loop(this._lastTime);
+    }
+    _resourceLoaded(resource) {
+        this._loaded++;
+        this.fire("resourcesProgress", this._loaded / this._toLoad);
+        if (this._toLoad - this._loaded <= 0) {
+            this.fire("resourcesLoaded");
+        }
+    }
+    _initialiseGeneralObjects() {
+        if (!this._generalObjects) {
+            this._generalObjects = new __WEBPACK_IMPORTED_MODULE_0__GameObjectManager__["a" /* default */]();
+            this.root.addObjectAt(this._generalObjects, 0);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Game;
+
+Game.State = State;
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__util__["b" /* applyMixin */])(Game, __WEBPACK_IMPORTED_MODULE_5__util__["c" /* Events */]);
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(44);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PropertyAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BoundsAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__["a"]; });
@@ -5803,44 +5895,44 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__MoveComponent__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__MoveComponent__ = __webpack_require__(46);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MoveComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__MoveComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__ = __webpack_require__(47);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PhysicsComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PhysicsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GravityComponent__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GravityComponent__ = __webpack_require__(38);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__GravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(48);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PointGravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(58);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TerminalVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(45);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FollowComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__FollowComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(54);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__RotationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(53);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotateToHeadingComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(59);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TrackRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(51);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__ = __webpack_require__(52);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_10__RandomVelocityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__ = __webpack_require__(50);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomImpulseComponent", function() { return __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(26);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(49);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__SmoothPositionComponent__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__SmoothPositionComponent__ = __webpack_require__(55);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SmoothPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__SmoothPositionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__SmoothRotationComponent__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__SmoothRotationComponent__ = __webpack_require__(56);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SmoothRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_16__SmoothRotationComponent__["a"]; });
 
 
@@ -5879,22 +5971,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(60);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(18);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(17);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(39);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(12);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__SolidComponent__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__SolidComponent__ = __webpack_require__(19);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SolidComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__SolidComponent__["a"]; });
 
 
@@ -5910,506 +6002,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 31 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__GameObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__GameComponent__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util__ = __webpack_require__(10);
-
-
-
-
-
-
-
-
-
-const STATE_PAUSED = 0;
-const STATE_PLAYING = 1;
-const STATE_STOPPED = 2;
-const STATE_DEAD = 3;
-
-let _lastTime = 0;
-const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || function(callback, element) {
-        var currTime = new Date().getTime();
-        var timeToCall = Math.max(0, 16 - (currTime - _lastTime));
-        var id = setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
-        _lastTime = currTime + timeToCall;
-        return id;
-    };
-
-/**
- * Utility class for things such as bootstrapping.
- *
- * <p>Providing width and height in options object as well as a canvas will set
- * the intrinsic rendering size of the canvas.
- * @param {object} options
- * @param {HTMLCanvasElement} options.canvas - HTML5 <code>&lt;canvas></code> element
- * @param {number} options.width - Render width.
- * @param {number} options.height - Render height.
- * @param {boolean} options.autosize - Whether or not to resize the world with the canvas.
- * @param {number} options.score - Initial score
- * @param {number} options.level - Initial level
- * @param {number} options.lives - Initial lives
- */
-class Game {
-    constructor (options={}) {
-
-        /**
-         * Canvas this game will render to.
-         * @type {HTMLCanvasElement}
-         */
-        this.canvas = options.canvas;
-
-        /**
-         * Width of game canvas. Use {@link Game#setSize} to change.
-         * Explicit width takes priority.
-         * @readonly
-         */
-        this.width = options.width || (this.canvas && this.canvas.width) || 0;
-
-        /**
-         * Height of game canvas. Use {@link Game#setSize} to change.
-         * Explicit height takes priority.
-         * @readonly
-         */
-        this.height = options.height || (this.canvas && this.canvas.height) || 0;
-
-        if(this.canvas){
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
-        }
-
-        // Init some properties
-
-        /** The root {@link GameObject} from which the object tree grows. This is the
-         * input point for the loop to inject the time delta. All objects wanting updated
-         * need to be a child or grandchild of this object.
-         * @type {GameObject}
-         */
-        this.root = new __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__["a" /* default */]();
-
-        this.textures = [];
-        this.sounds = [];
-
-        /**
-         * Counter of how many frames have been rendered so far.
-         * @type {number}
-         */
-        this.frame = 0;
-
-        /**
-         * Current game time in milliseconds.
-         * @type {number}
-         */
-        this.time = 0;
-
-        /**
-         * Keeps track of an arbritary score.
-         * @type {number}
-         */
-        this.score = options.score || 0;
-
-        /**
-         * Keeps track of an arbritary number of lives.
-         * @type {number}
-         */
-        this.lives = options.lives || 0;
-
-        /**
-         * Tracks what level the game is running. Don't change this directly use
-         * {@link Game#setLevel} instead.
-         * @readonly
-         * @type {number}
-         */
-        this.level = options.level || 0;
-
-        /**
-         * Number of resources currently pending.
-         * @private
-         * */
-        this._toLoad = 0;
-
-        this._lastTime = 0;
-        this._loaded = 0;
-
-        this._generalObjects = null;
-
-        this._autosizeCallback = () => {
-
-            if (!this.canvas) return;
-
-            const width = this.canvas.offsetWidth;
-            const height = this.canvas.offsetHeight;
-
-            this.setSize(width, height);
-
-            // Keep Camera centred
-            if (this.cameraSystem) {
-                this.cameraSystem.setPosition(width / 2, height / 2);
-            }
-
-            // Update bounds of the world
-            // WARN: Does not retain previous world 'padding'
-            if (this.worldSystem) {
-                this.worldSystem.setBounds(0,0,width,height);
-            }
-        }
-
-        if(options.autosize) {
-            this.setAutosize(true);
-        }
-    }
-
-    /**
-     * Add an object to the game. The object is not directly added to the root
-     * GameObjectManager but is instead added to a special 'general objects'
-     * manager which is guarenteed to be before the 'System' objects (i.e. InputSystem,
-     * CameraSystem, RenderSystem).
-     * @param {GameObject} object - The object to add.
-     */
-    addObject (object) {
-        _initialiseGeneralObjects.call(this);
-
-        this._generalObjects.addObject(object);
-    }
-
-    /**
-     * Replace the canvas of this game.
-     *
-     * <p>If there is a height and width set the new canvas will be intialised with them.
-     *
-     * <p>If height and width are unset they will be taken from the canvas size.
-     * @param {HTMLCanvasElement} canvas - New canvas
-     */
-    setCanvas (canvas) {
-        this.canvas = canvas;
-
-        if (this.canvas){
-            this.width = this.width || this.canvas.width;
-            this.height = this.height || this.canvas.height;
-
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
-        }
-    }
-
-    /**
-     * @typedef {object} Texture
-     * @property {Image} image - HTML <code>&ltimage></code> Element
-     * @property {number} width - Natural width of image
-     * @property {number} height - Natural height of image
-     * @property {boolean} loaded - If image has loaded width and height properties should be available.
-     */
-
-    /**
-     * Provide an array of urls pointing to image resources and they will be loaded.
-     *
-     * <p>The return value of this method is a mapped array of texture objects.
-     * @param {string[]} texturePaths - Array of urls
-     * @return {Texture[]}
-     */
-    loadTextures (texturePaths) {
-        this._toLoad += texturePaths.length;
-        var self = this;
-        return texturePaths.map(function(path){
-            var texture = {
-                image: new Image(),
-                width: 0,
-                height: 0,
-                loaded: false
-            };
-            texture.image.onload = function() {
-                texture.width = texture.image.width;
-                texture.height = texture.image.height;
-                texture.loaded = true;
-                _resourceLoaded(self, texture);
-            };
-            texture.image.onerror = function(){
-                throw new Error("Failed to load a texture: " + path);
-            };
-            texture.image.src = path;
-            self.textures.push(texture);
-            return texture;
-        });
-    }
-
-    /**
-     * @typedef {object} AudioTexture
-     * @property {Audio} audio - HTML <code>&lt;audio></code> element
-     * @property {number} length - Total length of audio
-     * @property {boolean} loaded - If loaded is <code>true</code> length should be available.
-     */
-
-    /**
-     * Provide an array of urls pointing to audio resources and they will be loaded.
-     *
-     * <p>The return value of this method is a mapped array of 'audio texture' objects.
-     * @param {string[]} texturePaths - Array of urls
-     * @return {AudioTexture[]}
-     */
-    loadAudio (audioPaths) {
-        this._toLoad += audioPaths.length;
-        var self = this;
-        return audioPaths.map(function(path){
-            var sound = {
-                audio: new Audio(),
-                length: 0,
-                laoded: false
-            };
-            sound.audio.addEventListener("canplaythrough", () => {
-                if(!sound.loaded){
-                    sound.length = sound.audio.duration;
-                    sound.loaded = true;
-                    _resourceLoaded(self, sound);
-                }
-            });
-            sound.audio.onerror = function(){
-                throw new Error("Failed to load a sound: " + path);
-            };
-            sound.audio.src = path;
-            self.sounds.push(sound);
-            return sound;
-        });
-    }
-
-    /**
-     * Start the loop.
-     */
-    start () {
-        this.nextLevel();
-
-        this.state = STATE_PLAYING;
-
-        _loop(this);
-    }
-
-    /**
-     * Stop the loop after the current frame.
-     */
-    stop () {
-        this.state = STATE_STOPPED;
-    }
-
-    /**
-     * Generate a default {@link CameraSystem} based on properties of this game.
-     *
-     * Calling this method will also add it to the game root after general objects.
-     * @return {CameraSystem}
-     */
-    getDefaultCamera () {
-        if (!this.cameraSystem) {
-            this.cameraSystem = new __WEBPACK_IMPORTED_MODULE_3__CameraSystem__["a" /* default */]();
-            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
-
-            _initialiseGeneralObjects.call(this);
-            this.root.addObject(this.cameraSystem);
-        }
-        return this.cameraSystem;
-    }
-
-    /**
-     * <p>Generate a default {@link CanvasRenderSystem} based on properties set on
-     * this game instance.
-     *
-     * Calling this method will also add it to the game root after general objects.
-     * @return {CanvasRenderSystem}
-     */
-    getDefaultRenderer () {
-        if (!this.renderSystem) {
-            if (!this.cameraSystem) {
-                this.getDefaultCamera();
-            }
-
-            let context;
-
-            if (this.canvas)
-                context = this.canvas.getContext("2d");
-
-            this.renderSystem = new __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__["a" /* default */](context, this.cameraSystem);
-
-            _initialiseGeneralObjects.call(this);
-            this.root.addObject(this.renderSystem);
-        }
-        return this.renderSystem;
-    }
-
-    /**
-     * <p>Generate a default {@link WorldSystem} based on properties set on
-     * this game instance.
-     *
-     * Calling this method will also add it to the game root after general objects.
-     * @param {number} paddingX - (optional) Additional padding outside of canvas size. Default: 0
-     * @param {number} paddingY - (optional) Additional padding outside of canvas size. Default: same as paddingX
-     * @return {WorldSystem}
-     */
-    getDefaultWorld (paddingX = 0, paddingY = paddingX) {
-        const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
-        if (!this.worldSystem) {
-            this.worldSystem = new __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__["a" /* default */](bounds);
-
-            _initialiseGeneralObjects.call(this);
-            this.root.addObject(this.worldSystem);
-        }
-        else {
-            this.worldSystem.setBounds(...bounds);
-        }
-        return this.worldSystem;
-    }
-
-    /**
-     * <p>Generate a default {@link InputSystem} based on properties set on
-     * this game instance.
-     *
-     * Calling this method will also add it to the game root after general objects.
-     * @return {InputSystem}
-     */
-    getDefaultInput () {
-        if (!this.inputSystem) {
-            if (!this.cameraSystem) {
-                this.getDefaultCamera();
-            }
-            // params are: (screen, keyboard, camera)
-            this.inputSystem = new __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a" /* default */](this.canvas, typeof document !== "undefined" && document, this.cameraSystem);
-
-            _initialiseGeneralObjects.call(this);
-            this.root.addObject(this.inputSystem);
-        }
-        return this.inputSystem;
-    }
-
-    /** Specify a new score
-     * @param {number} score - New score.
-     */
-    setScore (score) {
-        this.score = score;
-        this.fire("score", this.score);
-    }
-
-    /** Move to the next level */
-    nextLevel () {
-        this.level++;
-        this.fire("loadLevel", this.level);
-    }
-
-    /** Specify a level to jump to.
-     * @param {number} level - Level number to jump to.
-     */
-    setLevel (level) {
-        this.level = level;
-        this.fire("loadLevel", this.level);
-    }
-
-    /**
-     * <p>Send an event notifiying listeners that the level has been completed.
-     * <p>This does not automatically move to the next level.
-     */
-    completeLevel () {
-        this.fire("levelComplete", this.level);
-    }
-
-    /**
-     * Set the size of the game. This will also set the canvas size.
-     * @param {number} width - Size in pixels
-     * @param {number} height - Size in pixels
-     */
-    setSize (width, height) {
-        this.width = width;
-        this.height = height;
-
-        if(this.canvas){
-            this.canvas.width = width;
-            this.canvas.height = height;
-        }
-    }
-
-    /**
-     * Set whether or not to update the world dimensions with changes to the canvas dimensions.
-     * @param {boolean} enable
-     */
-    setAutosize (enable) {
-        if(enable) {
-            window.addEventListener("resize", this._autosizeCallback);
-        } else {
-            window.removeEventListener("resize", this._autosizeCallback);
-        }
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = Game;
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__util__["b" /* eventMixin */])(Game);
-
-// Export constants
-Game.STATE_PAUSED   = STATE_PAUSED;
-Game.STATE_PLAYING  = STATE_PLAYING;
-Game.STATE_STOPPED  = STATE_STOPPED;
-Game.STATE_DEAD     = STATE_DEAD;
-
-function _loop(self) {
-
-    loop(self._lastTime);
-
-    function loop(time){
-        if(time && self.time == time) {
-            console.log("Multiple calls: " + time);
-            return;
-        }
-        self.time = time;
-        self.frame++;
-        try {
-            self.root.update(Math.min(time - self._lastTime,100));
-
-            if(self.state == STATE_PLAYING){
-                _raf(loop);
-            }
-            self._lastTime = time;
-        } catch (e){
-            if(window.console){
-                console.error(e.stack || e);
-            }
-        }
-    }
-}
-
-function _resourceLoaded(self, resource) {
-  self._loaded++;
-  self.fire("resourcesProgress", self._loaded / self._toLoad);
-  if(self._toLoad - self._loaded <= 0){
-    self.fire("resourcesLoaded");
-  }
-};
-
-function _initialiseGeneralObjects () {
-    if (!this._generalObjects) {
-        this._generalObjects = new __WEBPACK_IMPORTED_MODULE_1__GameObjectManager__["a" /* default */]();
-        this.root.addObjectAt(this._generalObjects, 0);
-    }
-}
-
-
-/***/ }),
 /* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(61);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawBoundsComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(62);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawPathComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(63);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(64);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(65);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
@@ -6432,11 +6038,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputSystem__ = __webpack_require__(6);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__InputSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ClickComponent__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ClickComponent__ = __webpack_require__(20);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ClickComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__ClickComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__MoveToClickComponent__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__MoveToClickComponent__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MoveToClickComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__MoveToClickComponent__["a"]; });
 
 
@@ -6451,25 +6057,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CanvasRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DotRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DotRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__ = __webpack_require__(22);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RectangleRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__RectangleRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__ = __webpack_require__(23);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(24);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(66);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(40);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sprite", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "AnimatedSpriteComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "CanvasSpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["f"]; });
 
 
 
@@ -6491,11 +6095,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__WorldSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__WorldSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__ = __webpack_require__(15);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldBounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__WorldBounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__ = __webpack_require__(16);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldWrapComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__WorldWrapComponent__["a"]; });
 
 
@@ -7703,6 +7307,251 @@ module.exports = mat3;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+/**
+ * Objects with this component will fall to the floor.
+ */
+class GravityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    update(parent, delta) {
+        if (typeof parent.velocity[1] == "undefined")
+            parent.velocity[1] = 0;
+        parent.velocity[1] += GravityComponent.GRAVITATIONAL_CONSTANT * delta;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GravityComponent;
+
+/** Gravitational Constant is the acceleration object will head towards the ground with. */
+GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+
+/**
+ * System to maintain list of polylines for collision detection.
+ */
+class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+    constructor() {
+        super(...arguments);
+        this.surfaces = [];
+        this.temporarySurfaces = [];
+    }
+    /**
+     * Add permanent surface. Surfaces are all polylines.
+     *
+     * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
+     * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
+     * @example
+     * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
+     * @param {array} surface - Array defining surface.
+     */
+    addSurface(surface) {
+        this.surfaces.push(surface);
+    }
+    /**
+     * Add multiple permanent surfaces at once.
+     * @param {array} surfaces - Array of arrays defining surfaces.
+     */
+    addSurfaces(surfaces) {
+        for (var i = 0; i < surfaces.length; i++) {
+            this.surfaces.push(surfaces[i]);
+        }
+    }
+    /**
+     * Remove all permanent surfaces.
+     */
+    clearSurfaces() {
+        this.surfaces.length = 0;
+    }
+    /**
+     * Add a temporary (single frame) surface
+     * @param {array} surface - Array defining surface
+     */
+    addTemporarySurface(surface) {
+        this.temporarySurfaces.push(surface);
+    }
+    update(delta) {
+        super.update(delta);
+        this.temporarySurfaces.length = 0;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = BackgroundCollisionSystem;
+
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+/**
+ * Component for rendering backgrounds for example.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Where to draw.
+ * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
+ * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
+ * @memberof Sprite
+ */
+class TileComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor(renderSystem, texture, bounds) {
+        super();
+        this.renderSystem = renderSystem;
+        this.texture = texture;
+        this.bounds = bounds;
+    }
+    update(parent, delta) {
+        var renderSystem = this.renderSystem, texture = this.texture, bounds = this.bounds, dx = texture.width, dy = texture.height, startX = parent.position[0] % dx, startY = parent.position[1] % dy, x, y = bounds[1], // + startY - dy,
+        width = bounds[2], height = bounds[3], render = function (texture, x, y) {
+            return function (context) {
+                context.drawImage(texture.image, x, y);
+            };
+        };
+        for (; y < height + dy; y += dy) {
+            for (x = bounds[0] + startX - dx; x < width + dx; x += dx) {
+                renderSystem.push(render(texture, x, y));
+            }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TileComponent;
+
+/**
+ * Component renders a sprite for a parent object.
+ *
+ * Component can either contain its own sprite or use one provided on the parent.
+ * In the case where both component and parent have sprites, the one on the parent
+ * is prefered.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Target renderer
+ * @param {number} layer - optional layer to render this sprite on to.
+ * @param {Sprite} sprite - Sprite object
+ * @memberof Sprite
+ */
+class SpriteRenderingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor(renderSystem, layer, sprite) {
+        super();
+        this.renderSystem = renderSystem;
+        this.layer = layer;
+        this.sprite = sprite;
+    }
+    update(parent, delta) {
+        super.update(delta);
+        var sprite = this.sprite || parent.sprite, image = sprite && sprite.t.image;
+        if (sprite) {
+            this.renderSystem.push(function (context) {
+                var x = parent.position[0], y = parent.position[1], w = sprite.w, h = sprite.h;
+                context.translate(x, y);
+                context.rotate(parent.rotation);
+                context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
+            }, this.layer);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = SpriteRenderingComponent;
+
+/**
+ * Animate through a sequence of sprites.
+ * @extends {GameComponent}
+ * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
+ * @param {Sprite[]} sprites - Array of sprite objects.
+ * @memberof Sprite
+ */
+class SpriteAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor(duration, sprites) {
+        super();
+        this.duration = duration;
+        this.spriteIndex = 0;
+        this.playing = true;
+        this.sprites = sprites;
+    }
+    init(parent) {
+        if (this.sprites) {
+            parent.sprites = this.sprites;
+        }
+        if (parent.sprites.length) {
+            parent.sprite = parent.sprites[0];
+        }
+        parent.spriteCountdown = (parent.sprite && parent.sprite.d) || this.duration;
+    }
+    update(parent, delta) {
+        var spriteCount = parent.sprites.length, sprite, duration;
+        if (this.playing) {
+            parent.spriteCountdown -= delta;
+            if (parent.spriteCountdown <= 0) {
+                // TODO: Possible divide by zero
+                this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
+                sprite = parent.sprites[this.spriteIndex];
+                parent.sprite = sprite;
+                duration = sprite.d || this.duration;
+                parent.spriteCountdown = duration;
+            }
+        }
+    }
+    /**
+     * Start the animation.
+     */
+    play() {
+        this.playing = true;
+    }
+    /**
+     * Stop the animation and reset the frame to the first sprite.
+     */
+    stop() {
+        this.playing = false;
+        this.spriteIndex = 0;
+    }
+    /**
+     * Pause the animation.
+     */
+    pause() {
+        this.playing = false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["c"] = SpriteAnimationComponent;
+
+class Sprite {
+    /**
+     * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
+     * @param {object} sprite - The sprite template.
+     * @param {number} rows - Number of rows in the sprite sheet.
+     * @param {number} cols - Number of columns in the sprite sheet.
+     * @return {Sprite[]}
+     */
+    static generateSpriteSheet(sprite, rows, cols) {
+        var out = [], i, j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                out.push({
+                    t: sprite.t,
+                    x: j * sprite.w,
+                    y: i * sprite.h,
+                    w: sprite.w,
+                    h: sprite.h,
+                    ox: sprite.ox,
+                    oy: sprite.oy,
+                    d: sprite.d
+                });
+            }
+        }
+        return out;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["d"] = Sprite;
+
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__ = __webpack_require__(4);
 
 
@@ -7717,7 +7566,7 @@ class BoundsAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnim
 
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7740,7 +7589,7 @@ class ColorAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnima
 
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7758,7 +7607,7 @@ class PositionAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
 
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7791,7 +7640,7 @@ class RotationAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
 
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7825,34 +7674,7 @@ class FollowComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__[
 
 
 /***/ }),
-/* 43 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-
-/**
- * Objects with this component will fall to the floor.
- * @extends {GameComponent}
- * @memberof Behaviour
- */
-class GravityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    update (parent, delta) {
-        if(typeof parent.velocity[1] == "undefined")
-            parent.velocity[1] = 0;
-        parent.velocity[1] += GravityComponent.GRAVITATIONAL_CONSTANT * delta;
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = GravityComponent;
-
-/** Gravitational Constant is the acceleration object will head towards the ground with. */
-GravityComponent.GRAVITATIONAL_CONSTANT = 0.0003;
-
-
-/***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7876,7 +7698,7 @@ class MoveComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7909,7 +7731,7 @@ class PhysicsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7938,14 +7760,14 @@ class PointGravityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompon
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Easing__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Easing__ = __webpack_require__(9);
 
 
 
@@ -8010,7 +7832,7 @@ class PositionInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_Ga
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8042,7 +7864,7 @@ class RandomImpulseComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8075,7 +7897,7 @@ class RandomPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8103,7 +7925,7 @@ class RandomVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8120,7 +7942,7 @@ class RotateToHeadingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8143,7 +7965,7 @@ class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8177,7 +7999,7 @@ class SmoothPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8206,7 +8028,7 @@ class SmoothRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8322,7 +8144,7 @@ class SwitchComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__[
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8359,7 +8181,7 @@ class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCo
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8390,79 +8212,11 @@ class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
-
-
-/**
- * System to maintain list of polylines for collision detection.
- * @extends {GameObject}
- * @memberof Collision
- */
-class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
-    constructor () {
-		super();
-		this.surfaces = [];
-        this.temporarySurfaces = [];
-	}
-
-    /**
-     * Add permanent surface. Surfaces are all polylines.
-     *
-     * <p>Surface is an array containing pairs of values representing (x,y) co-ordinates.
-     * <p>Therefore the minimum size of the array is 4: <code>[x1, y1, x2, y2]</code>;
-     * @example
-     * backgroundCollisionSystem.addSurface([x0, y0, x1, y1, ..., xn, yn]);
-     * @param {array} surface - Array defining surface.
-     */
-	addSurface (surface) {
-		this.surfaces.push(surface);
-	}
-
-    /**
-     * Add multiple permanent surfaces at once.
-     * @param {array} surfaces - Array of arrays defining surfaces.
-     */
-	addSurfaces (surfaces) {
-		for(var i = 0; i < surfaces.length; i++){
-			this.surfaces.push(surfaces[i]);
-		}
-	}
-
-    /**
-     * Remove all permanent surfaces.
-     */
-	clearSurfaces (){
-		this.surfaces.length = 0;
-	}
-
-    /**
-     * Add a temporary (single frame) surface
-     * @param {array} surface - Array defining surface
-     */
-    addTemporarySurface (surface) {
-        this.temporarySurfaces.push(surface);
-    }
-
-    update (delta) {
-        super.update(delta);
-
-        this.temporarySurfaces.length = 0;
-    }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = BackgroundCollisionSystem;
-
-
-/***/ }),
-/* 59 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject_ts__ = __webpack_require__(2);
 
 
 /** @namespace Collision */
@@ -8474,7 +8228,7 @@ class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameOb
  * @extends {GameObject}
  * @memberof Collision
  */
-class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
+class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject_ts__["a" /* default */] {
 	constructor () {
 		super();
 
@@ -8550,11 +8304,11 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 
 /**
@@ -8563,7 +8317,7 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
  * @extends {GameComponent}
  * @param {CanvasRenderSystem} renderSystem - Where to draw the bounds
  */
-class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
 
 	constructor (renderSystem) {
 		super();
@@ -8588,7 +8342,7 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8680,12 +8434,13 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 /* harmony export (immutable) */ __webpack_exports__["a"] = DebugDrawPathComponent;
 
 
+
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
 
 
 /**
@@ -8695,7 +8450,7 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
  * @param {CanvasRenderSystem} renderSystem - Where to draw to.
  * @param {string} colour - Colour of surfaces
  */
-class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */] {
     constructor (renderSystem, colour){
         super();
 		this.renderSystem = renderSystem;
@@ -8736,7 +8491,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8778,7 +8533,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8819,7 +8574,7 @@ class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9113,267 +8868,6 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 66 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-/* harmony export (immutable) */ __webpack_exports__["e"] = AnimatedSpriteComponent;
-/* harmony export (immutable) */ __webpack_exports__["f"] = CanvasSpriteRenderingComponent;
-
-
-  /**
-   * Component for rendering backgrounds for example.
-   * @extends {GameComponent}
-   * @param {RenderSystem} renderSystem - Where to draw.
-   * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
-   * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
-   * @memberof Sprite
-   */
-  class TileComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]{
-    constructor (renderSystem, texture, bounds) {
-      super();
-
-      this.renderSystem = renderSystem;
-      this.texture = texture;
-      this.bounds = bounds;
-    }
-
-    update (parent, delta) {
-      var renderSystem = this.renderSystem,
-          texture = this.texture,
-          bounds = this.bounds,
-          dx = texture.width,
-          dy = texture.height,
-          startX = parent.position[0] % dx,
-          startY = parent.position[1] % dy,
-          x,
-          y = bounds[1],// + startY - dy,
-          width = bounds[2],
-          height = bounds[3],
-          render = function(texture, x, y){
-            return function(context){
-              context.drawImage(texture.image, x, y);
-            };
-          };
-      for(; y < height + dy; y += dy){
-        for(x = bounds[0] + startX - dx; x < width + dx; x += dx){
-          renderSystem.push(render(texture, x, y));
-        }
-      }
-    }
-  }
-/* harmony export (immutable) */ __webpack_exports__["a"] = TileComponent;
-
-
-  /**
-   * Component renders a sprite for a parent object.
-   *
-   * Component can either contain its own sprite or use one provided on the parent.
-   * In the case where both component and parent have sprites, the one on the parent
-   * is prefered.
-   * @extends {GameComponent}
-   * @param {RenderSystem} renderSystem - Target renderer
-   * @param {number} layer - optional layer to render this sprite on to.
-   * @param {Sprite} sprite - Sprite object
-   * @memberof Sprite
-   */
-  class SpriteRenderingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    constructor (renderSystem, layer, sprite){
-      super();
-
-      /** @type {RenderSystem} */
-      this.renderSystem = renderSystem;
-
-      /** @type {number} */
-      this.layer = layer;
-
-      /** @type {Sprite} */
-      this.sprite = sprite;
-    }
-
-    update (parent, delta) {
-      super.update(delta);
-
-      var sprite = this.sprite || parent.sprite,
-          image = sprite && sprite.t.image;
-
-      if(sprite){
-        this.renderSystem.push(function(context){
-          var x = parent.position[0],
-              y = parent.position[1],
-              w = sprite.w,
-              h = sprite.h;
-          context.translate(x,y);
-          context.rotate(parent.rotation);
-          context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
-        }, this.layer);
-      }
-    }
-  }
-/* harmony export (immutable) */ __webpack_exports__["b"] = SpriteRenderingComponent;
-
-
-  /**
-   * Animate through a sequence of sprites.
-   * @extends {GameComponent}
-   * @param {number} duration - Default duration if sprites do no contain their own intrinsic duration.
-   * @param {Sprite[]} sprites - Array of sprite objects.
-   * @memberof Sprite
-   */
-  class SpriteAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    constructor (duration, sprites) {
-      super();
-      this.duration = duration;
-      this.spriteIndex = 0;
-      this.playing = true;
-      this.sprites = sprites;
-    }
-
-    init (parent) {
-      if(this.sprites) {
-        parent.sprites = this.sprites;
-      }
-      if(parent.sprites.length){
-        parent.sprite = parent.sprites[0];
-      }
-      parent.spriteCountdown = (parent.sprite && parent.sprite.d) || this.duration;
-    }
-
-    update (parent, delta) {
-      var spriteCount = parent.sprites.length,
-          sprite,
-          duration;
-
-      if(this.playing){
-        parent.spriteCountdown -= delta;
-        if(parent.spriteCountdown <= 0){
-          // TODO: Possible divide by zero
-          this.spriteIndex = (this.spriteIndex + 1) % spriteCount;
-          sprite = parent.sprites[this.spriteIndex];
-          parent.sprite = sprite;
-          duration = sprite.d || this.duration;
-          parent.spriteCountdown = duration;
-        }
-      }
-    }
-
-    /**
-     * Start the animation.
-     */
-    play() {
-      this.playing = true;
-    }
-
-    /**
-     * Stop the animation and reset the frame to the first sprite.
-     */
-    stop () {
-      this.playing = false;
-      this.spriteIndex = 0;
-    }
-
-    /**
-     * Pause the animation.
-     */
-    pause () {
-      this.playing = false;
-    }
-  }
-/* harmony export (immutable) */ __webpack_exports__["c"] = SpriteAnimationComponent;
-
-
-  /** @namespace
-   * @property {Texture} t - texture object
-   * @property {number} x - X-offset of sprite in spritesheet
-   * @property {number} y - Y-offset of sprite in spritesheet
-   * @property {number} width - width of sprite
-   * @property {number} height - height of sprite
-   * @property {number} ox - origin x-offset, so sprite can be centred on parent's position
-   * @property {number} oy - origin y-offset, so sprite can be centred on parent's position
-   * @property {number} d - (optional) duration of sprite for animation
-   */
-  const Sprite = {};
-/* harmony export (immutable) */ __webpack_exports__["d"] = Sprite;
-
-
-  /**
-   * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
-   * @static
-   * @param {object} sprite - The sprite template.
-   * @param {number} rows - Number of rows in the sprite sheet.
-   * @param {number} cols - Number of columns in the sprite sheet.
-   */
-  Sprite.generateSpriteSheet = function(sprite, rows, cols){
-    var out = [],
-        i,
-        j;
-    for(i=0; i<rows; i++){
-      for(j=0; j<cols; j++){
-        out.push({
-          t: sprite.t,
-          x: j*sprite.w,
-          y: i*sprite.h,
-          w: sprite.w,
-          h: sprite.h,
-          ox: sprite.ox,
-          oy: sprite.oy,
-          d: sprite.d
-        });
-      }
-    }
-    return out;
-  };
-
-  /**
-   * This component is not to be used any more. Use {@link SpriteAnimationComponent} instead
-   * @constructor
-   * @deprecated
-   * @extends {GameComponent}
-   * @memberof Sprite
-   */
-  function AnimatedSpriteComponent(images, speed){
-    this.images = images;
-    this.delay = 1000 / speed;
-    this.lastChange = 0;
-    this.imageIndex = 0;
-  }
-  AnimatedSpriteComponent.prototype = new __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]();
-  AnimatedSpriteComponent.prototype.update = function(parent, delta) {
-    if(this.lastChange > this.delay){
-      this.imageIndex = (this.imageIndex + 1) % this.images.length;
-      parent.sprite = this.images[this.imageIndex];
-      this.lastChange = 0;
-    } else {
-      this.lastChange += delta;
-    }
-  };
-
-  /**
-   * This component is not to be used any more. Use other components instead
-   * @constructor
-   * @deprecated
-   * @extends {GameComponent}
-   * @memberof Sprite
-   */
-  function CanvasSpriteRenderingComponent(renderSystem){
-    this.renderSystem = renderSystem;
-  }
-  CanvasSpriteRenderingComponent.prototype = new __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]();
-  CanvasSpriteRenderingComponent.prototype.update = function(parent, delta) {
-    this.renderSystem.push(function(context){
-      var x = parent.position[0],
-          y = parent.position[1],
-          w = parent.sprite.width,
-          h = parent.sprite.height;
-      context.translate(x,y);
-      context.rotate(parent.rotation);
-      context.drawImage(parent.sprite,-w/2,-h/2);
-    });
-  };
-
-
-/***/ }),
 /* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9381,47 +8875,47 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObject", function() { return __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameObjectManager", function() { return __WEBPACK_IMPORTED_MODULE_1__core_GameObjectManager__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__ = __webpack_require__(0);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GameComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__core_GameComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__CameraSystem__ = __webpack_require__(11);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__CameraSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__ = __webpack_require__(7);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CanvasRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__render_CanvasRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__ = __webpack_require__(8);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return __WEBPACK_IMPORTED_MODULE_5__world_WorldSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__ = __webpack_require__(6);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "InputSystem", function() { return __WEBPACK_IMPORTED_MODULE_6__input_InputSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__AudioSystem__ = __webpack_require__(27);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "AudioSystem", function() { return __WEBPACK_IMPORTED_MODULE_7__AudioSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Game__ = __webpack_require__(28);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return __WEBPACK_IMPORTED_MODULE_8__core_Game__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__animation__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__Easing__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__basic__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__animation__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__Easing__ = __webpack_require__(9);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Easing", function() { return __WEBPACK_IMPORTED_MODULE_11__Easing__; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__world__ = __webpack_require__(35);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "World", function() { return __WEBPACK_IMPORTED_MODULE_12__world__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__world_WorldBounceComponent__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__world_WorldWrapComponent__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__input__ = __webpack_require__(33);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Input", function() { return __WEBPACK_IMPORTED_MODULE_15__input__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__input_MoveToClickComponent__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__input_ClickComponent__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__input_MoveToClickComponent__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__collision__ = __webpack_require__(31);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Collision", function() { return __WEBPACK_IMPORTED_MODULE_18__collision__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_CollisionComponent__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_BounceComponent__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__collision_BackgroundCollisionComponent__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__collision_SolidComponent__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__collision_CollisionComponent__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__collision_BounceComponent__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__collision_BackgroundCollisionComponent__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__collision_SolidComponent__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__render__ = __webpack_require__(34);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Render", function() { return __WEBPACK_IMPORTED_MODULE_23__render__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_WebGLRenderSystem__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__render_WebGLRenderSystem__ = __webpack_require__(24);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_24__render_WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_DotRenderComponent__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__render_RectangleRenderComponent__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__render_TextRenderComponent__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__render_DotRenderComponent__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__render_RectangleRenderComponent__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__render_TextRenderComponent__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__debug__ = __webpack_require__(32);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "Debug", function() { return __WEBPACK_IMPORTED_MODULE_28__debug__; });
 // Export core classes. GameObject, GameComponent etc.
