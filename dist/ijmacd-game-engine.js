@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 64);
+/******/ 	return __webpack_require__(__webpack_require__.s = 65);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -5734,6 +5734,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__ = __webpack_require__(40);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PropertyAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__PropertyAnimationComponent__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__PositionAnimationComponent__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BoundsAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BoundsAnimationComponent__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ColorAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__ColorAnimationComponent__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__RotationAnimationComponent__["a"]; });
+
+
 
 
 
@@ -5759,15 +5766,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__GravityComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__ = __webpack_require__(45);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PointGravityComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__PointGravityComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__ = __webpack_require__(54);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TerminalVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__TerminalVelocityComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__FollowComponent__ = __webpack_require__(41);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FollowComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__FollowComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__RotationComponent__ = __webpack_require__(51);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__RotationComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__ = __webpack_require__(50);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotateToHeadingComponent", function() { return __WEBPACK_IMPORTED_MODULE_7__RotateToHeadingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__ = __webpack_require__(55);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TrackRotationComponent", function() { return __WEBPACK_IMPORTED_MODULE_8__TrackRotationComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__ = __webpack_require__(48);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_9__RandomPositionComponent__["a"]; });
@@ -5777,11 +5784,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RandomImpulseComponent", function() { return __WEBPACK_IMPORTED_MODULE_11__RandomImpulseComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__ = __webpack_require__(25);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_12__FlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__ = __webpack_require__(53);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SwitchComponent", function() { return __WEBPACK_IMPORTED_MODULE_13__SwitchComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__ = __webpack_require__(46);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_14__PositionInterpolatorComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__ = __webpack_require__(52);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "RotationInterpolatorComponent", function() { return __WEBPACK_IMPORTED_MODULE_15__RotationInterpolatorComponent__["a"]; });
 
 
@@ -5824,13 +5831,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_0__CollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__CollisionComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BounceComponent__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BounceComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__BounceComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__ = __webpack_require__(56);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionSystem", function() { return __WEBPACK_IMPORTED_MODULE_3__BackgroundCollisionSystem__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__ = __webpack_require__(12);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BackgroundCollisionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__BackgroundCollisionComponent__["a"]; });
@@ -6299,15 +6306,15 @@ function _resourceLoaded(self, resource) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__ = __webpack_require__(58);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawBoundsComponent", function() { return __WEBPACK_IMPORTED_MODULE_0__DebugDrawBoundsComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__ = __webpack_require__(59);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawPathComponent", function() { return __WEBPACK_IMPORTED_MODULE_1__DebugDrawPathComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__ = __webpack_require__(60);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(61);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(62);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
 
 
@@ -6355,9 +6362,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TextRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__TextRenderComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "WebGLRenderSystem", function() { return __WEBPACK_IMPORTED_MODULE_4__WebGLRenderSystem__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__ = __webpack_require__(63);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PolyShapeRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__PolyShapeRenderComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__sprite__ = __webpack_require__(64);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "TileComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteRenderingComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["b"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SpriteAnimationComponent", function() { return __WEBPACK_IMPORTED_MODULE_6__sprite__["c"]; });
@@ -7606,7 +7613,7 @@ class BoundsAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnim
     super(boundsFormatter, start, end, duration, easing);
   }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = BoundsAnimationComponent;
 
 
 
@@ -7629,7 +7636,7 @@ class ColorAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAnima
     super(colorFormatter, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* parseColor */])(start), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* parseColor */])(end), duration, easing);
   }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = ColorAnimationComponent;
 
 
 
@@ -7647,7 +7654,7 @@ class PositionAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
     super(positionFormatter, start, end, duration, easing);
   }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = PositionAnimationComponent;
 
 
 
@@ -7680,7 +7687,7 @@ class RotationAnimationComponent extends __WEBPACK_IMPORTED_MODULE_0__PropertyAn
     super.setRotation(rotation);
   }
 }
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = RotationAnimationComponent;
 
 
 
@@ -8021,6 +8028,29 @@ class RotateToHeadingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
 
 
+class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+    constructor (dth) {
+        super();
+        this.rotationSpeed = dth;
+    }
+
+    update (parent, delta) {
+        var w = parent.rotationSpeed || this.rotationSpeed || 0;
+        parent.setRotation(parent.rotation + w * delta);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RotationComponent;
+
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
 /**
  * Use generic [*]AnimationComponents instead
  * @deprecated
@@ -8044,7 +8074,7 @@ class RotationInterpolatorComponent extends __WEBPACK_IMPORTED_MODULE_0__core_Ga
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8160,7 +8190,7 @@ class SwitchComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameComponent__[
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8197,7 +8227,7 @@ class TerminalVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCo
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8228,7 +8258,7 @@ class TrackRotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8296,7 +8326,7 @@ class BackgroundCollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameOb
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8388,7 +8418,7 @@ class CollisionSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a"
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8426,7 +8456,7 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8519,7 +8549,7 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8574,7 +8604,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8616,7 +8646,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8657,7 +8687,7 @@ class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComp
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8951,7 +8981,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9212,7 +9242,7 @@ PolyShapeRenderingComponent.createSphere = function(renderSystem, latitudeBands,
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9345,29 +9375,6 @@ Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_26__render_TextRen
 
 // Export debug
 
-
-
-
-/***/ }),
-/* 65 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-
-class RotationComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-    constructor (dth) {
-        super();
-        this.rotationSpeed = dth;
-    }
-
-    update (parent, delta) {
-        var w = parent.rotationSpeed || this.rotationSpeed || 0;
-        parent.setRotation(parent.rotation + w * delta);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = RotationComponent;
 
 
 

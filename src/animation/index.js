@@ -7,3 +7,11 @@ import BoundsAnimationComponent from './BoundsAnimationComponent';
 import ColorAnimationComponent from './ColorAnimationComponent';
 
 import RotationAnimationComponent from './RotationAnimationComponent';
+
+export {
+  PropertyAnimationComponent,
+  PositionAnimationComponent,
+  BoundsAnimationComponent,
+  ColorAnimationComponent,
+  RotationAnimationComponent
+};

@@ -6396,6 +6396,11 @@ exports.default = AudioSystem;
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.RotationAnimationComponent = exports.ColorAnimationComponent = exports.BoundsAnimationComponent = exports.PositionAnimationComponent = exports.PropertyAnimationComponent = undefined;
+
 var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
@@ -6417,6 +6422,12 @@ var _RotationAnimationComponent = __webpack_require__(38);
 var _RotationAnimationComponent2 = _interopRequireDefault(_RotationAnimationComponent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.PropertyAnimationComponent = _PropertyAnimationComponent2.default;
+exports.PositionAnimationComponent = _PositionAnimationComponent2.default;
+exports.BoundsAnimationComponent = _BoundsAnimationComponent2.default;
+exports.ColorAnimationComponent = _ColorAnimationComponent2.default;
+exports.RotationAnimationComponent = _RotationAnimationComponent2.default;
 
 /***/ }),
 /* 28 */
