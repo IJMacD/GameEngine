@@ -1,6 +1,6 @@
-import assert from 'assert';
+const assert = require('assert');
 
-import { GameObject, GameObjectManager, GameComponent } from '../../dist/ijmacd-game-engine';
+const { GameObject, GameObjectManager, GameComponent } = require('../../dist/ijmacd-game-engine');
 
 describe('GameObjectManager', function() {
   describe('#constructor()', function() {

@@ -1,13 +1,13 @@
-import assert from 'assert';
+const assert = require('assert');
 
-import {
+const {
   Game,
   GameObjectManager,
   CameraSystem,
   CanvasRenderSystem,
   WorldSystem,
   InputSystem
-} from '../../dist/ijmacd-game-engine';
+} = require('../../dist/ijmacd-game-engine');
 
 class CanvasMock {
   constructor(width, height) {
