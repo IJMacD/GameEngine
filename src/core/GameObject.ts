@@ -85,7 +85,7 @@ export default class GameObject implements Events {
     removeComponentByName (name: string){
         for(var i = 0; i < this.components.length; i++){
             const c = this.components[i];
-            if(c.name == name || c.constructor.name == name)
+            if(c.name == name || (<any>c).constructor.name == name)
                 this._toBeRemoved.push(c);
         }
         return this;

@@ -2328,12 +2328,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var GameObject_1 = __webpack_require__(2);
-/** @namespace World */
 /**
  * Generic way to access a 'world' with intrinsic bounds.
- * @extends {GameObject}
  * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
- * @memberof World
  */
 var WorldSystem = (function (_super) {
     __extends(WorldSystem, _super);
@@ -2811,6 +2808,7 @@ var DotRenderComponent = function (_GameComponent) {
         value: function update(parent, delta) {
             var b = parent.bounds;
             var p = parent.position;
+            var r = parent.rotation;
             var s = parent.size;
             var c = parent.color || parent.colour || this.color;
 
@@ -2818,6 +2816,7 @@ var DotRenderComponent = function (_GameComponent) {
                 ctx.beginPath();
                 ctx.fillStyle = c;
                 ctx.translate(p[0], p[1]);
+                ctx.rotate(r);
                 if (b) ctx.scale(b[2] - b[0], b[3] - b[1]);else if (s) ctx.scale(s, s);
                 ctx.arc(0, 0, 0.5, 0, Math.PI * 2, false);
                 ctx.fill();
@@ -2876,12 +2875,14 @@ var RectangleRenderComponent = function (_GameComponent) {
             var b = parent.bounds;
             var p = parent.position;
             var s = parent.size;
+            var r = parent.rotation;
             var c = parent.color || parent.colour || this.color;
 
             this.renderSystem.push(function (ctx) {
                 ctx.beginPath();
                 ctx.fillStyle = c;
                 ctx.translate(p[0], p[1]);
+                ctx.rotate(r);
                 if (b) ctx.rect(b[0], b[1], b[2] - b[0], b[3] - b[1]);else if (s) ctx.rect(-s / 2, -s / 2, s, s);
                 ctx.fill();
             });
@@ -6379,7 +6380,8 @@ var Game = (function () {
             lives: 0,
             level: 0,
             autosize: false,
-        } : _a, canvas = _b.canvas, width = _b.width, height = _b.height, score = _b.score, lives = _b.lives, level = _b.level, autosize = _b.autosize;
+            originCentric: false,
+        } : _a, canvas = _b.canvas, width = _b.width, height = _b.height, score = _b.score, lives = _b.lives, level = _b.level, autosize = _b.autosize, originCentric = _b.originCentric;
         var _this = this;
         /**
          * The root {@link GameObject} from which the object tree grows. This is the
@@ -6399,6 +6401,7 @@ var Game = (function () {
         this.lives = 0;
         /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
         this.level = 0;
+        this.originCentric = false;
         /** Number of resources currently pending. */
         this._toLoad = 0;
         this._lastTime = 0;
@@ -6447,6 +6450,7 @@ var Game = (function () {
         this.score = score;
         this.lives = lives;
         this.level = level;
+        this.originCentric = originCentric;
         if (autosize) {
             this.setAutosize(true);
         }
@@ -6564,7 +6568,9 @@ var Game = (function () {
     Game.prototype.getDefaultCamera = function () {
         if (!this.cameraSystem) {
             this.cameraSystem = new CameraSystem_1.default();
-            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            if (!this.originCentric) {
+                this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            }
             this._initialiseGeneralObjects();
             this.root.addObject(this.cameraSystem);
         }
@@ -6604,6 +6610,14 @@ var Game = (function () {
         if (paddingX === void 0) { paddingX = 0; }
         if (paddingY === void 0) { paddingY = paddingX; }
         var bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
+        if (this.originCentric) {
+            var halfWidth = this.width / 2;
+            var halfHeight = this.height / 2;
+            bounds[0] -= halfWidth;
+            bounds[1] -= halfHeight;
+            bounds[2] -= halfWidth;
+            bounds[3] -= halfHeight;
+        }
         if (!this.worldSystem) {
             this.worldSystem = new WorldSystem_1.default(bounds);
             this._initialiseGeneralObjects();
@@ -8127,6 +8141,8 @@ var DebugDrawBoundsComponent = function (_GameComponent) {
 			if (bounds) {
 				this.renderSystem.push(function (ctx) {
 					ctx.translate(parent.position[0], parent.position[1]);
+					// Don't rotate yet because collision components don't take rotation into account
+					// ctx.rotate(parent.rotation);
 					ctx.beginPath();
 					ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
 					ctx.strokeStyle = "#000";

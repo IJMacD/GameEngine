@@ -2156,12 +2156,9 @@ function _renderQueue(renderSystem, layer) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameObject__ = __webpack_require__(2);
 
-/** @namespace World */
 /**
  * Generic way to access a 'world' with intrinsic bounds.
- * @extends {GameObject}
  * @param {array} bounds - Array containing co-ordinates specifying the world <code>[minX, minY, maxX, maxY, minZ, maxZ]</code>
- * @memberof World
  */
 class WorldSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
     constructor(bounds) {
@@ -2431,7 +2428,8 @@ class CameraSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /*
         this.pruneList.push(objectManager);
     }
 }
-/* harmony default export */ __webpack_exports__["a"] = CameraSystem;
+/* harmony export (immutable) */ __webpack_exports__["a"] = CameraSystem;
+
 
 
 /***/ }),
@@ -3052,6 +3050,7 @@ class DotRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
     update (parent, delta) {
         const b = parent.bounds;
         const p = parent.position;
+        const r = parent.rotation;
         const s = parent.size;
         const c = parent.color || parent.colour || this.color;
 
@@ -3059,6 +3058,7 @@ class DotRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent
             ctx.beginPath();
             ctx.fillStyle = c;
             ctx.translate(p[0], p[1]);
+            ctx.rotate(r);
             if(b) ctx.scale(b[2] - b[0], b[3] - b[1]);
             else if(s) ctx.scale(s, s);
             ctx.arc(0, 0, 0.5, 0, Math.PI*2, false);
@@ -3090,12 +3090,14 @@ class RectangleRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
         const b = parent.bounds;
         const p = parent.position;
         const s = parent.size;
+        const r = parent.rotation;
         const c = parent.color || parent.colour || this.color;
 
         this.renderSystem.push(ctx => {
             ctx.beginPath();
             ctx.fillStyle = c;
             ctx.translate(p[0], p[1]);
+            ctx.rotate(r);
             if(b) ctx.rect(b[0], b[1], b[2] - b[0], b[3] - b[1]);
             else if(s) ctx.rect(-s/2, -s/2, s, s);
             ctx.fill();
@@ -5512,7 +5514,7 @@ const _raf = (typeof window !== "undefined" && window.requestAnimationFrame) || 
  * @param {number} options.lives - Initial lives
  */
 class Game {
-    constructor({ canvas, width, height, score, lives, level, autosize } = {
+    constructor({ canvas, width, height, score, lives, level, autosize, originCentric } = {
             canvas: null,
             width: 0,
             height: 0,
@@ -5520,6 +5522,7 @@ class Game {
             lives: 0,
             level: 0,
             autosize: false,
+            originCentric: false,
         }) {
         /**
          * The root {@link GameObject} from which the object tree grows. This is the
@@ -5539,6 +5542,7 @@ class Game {
         this.lives = 0;
         /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
         this.level = 0;
+        this.originCentric = false;
         /** Number of resources currently pending. */
         this._toLoad = 0;
         this._lastTime = 0;
@@ -5587,6 +5591,7 @@ class Game {
         this.score = score;
         this.lives = lives;
         this.level = level;
+        this.originCentric = originCentric;
         if (autosize) {
             this.setAutosize(true);
         }
@@ -5702,7 +5707,9 @@ class Game {
     getDefaultCamera() {
         if (!this.cameraSystem) {
             this.cameraSystem = new __WEBPACK_IMPORTED_MODULE_1__CameraSystem__["a" /* default */]();
-            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            if (!this.originCentric) {
+                this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            }
             this._initialiseGeneralObjects();
             this.root.addObject(this.cameraSystem);
         }
@@ -5740,6 +5747,14 @@ class Game {
      */
     getDefaultWorld(paddingX = 0, paddingY = paddingX) {
         const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
+        if (this.originCentric) {
+            const halfWidth = this.width / 2;
+            const halfHeight = this.height / 2;
+            bounds[0] -= halfWidth;
+            bounds[1] -= halfHeight;
+            bounds[2] -= halfWidth;
+            bounds[3] -= halfHeight;
+        }
         if (!this.worldSystem) {
             this.worldSystem = new __WEBPACK_IMPORTED_MODULE_3__world_WorldSystem__["a" /* default */](bounds);
             this._initialiseGeneralObjects();
@@ -8330,6 +8345,8 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 		if(bounds){
 			this.renderSystem.push(ctx => {
 				ctx.translate(parent.position[0], parent.position[1]);
+				// Don't rotate yet because collision components don't take rotation into account
+				// ctx.rotate(parent.rotation);
 				ctx.beginPath();
 				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
 				ctx.strokeStyle = "#000";
@@ -8339,6 +8356,7 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 	}
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = DebugDrawBoundsComponent;
+
 
 
 /***/ }),

@@ -21,14 +21,19 @@
         width: canvas.offsetWidth,
         height: canvas.offsetHeight,
         autosize: true,
-        score: 10
+        score: 10,
+        originCentric: true,
       });
       const falling = false;
 
+      const cameraSystem = game.getDefaultCamera();
+      // cameraSystem.setPosition(0, 0);
       const inputSystem = game.getDefaultInput();
       const renderSystem = game.getDefaultRenderer();
-      // renderSystem.context.globalCompositeOperation = "screen";
-      let collisionSystem;
+      const worldSystem = game.getDefaultWorld();
+      const bounds = worldSystem.bounds;
+      const bounds2 = bounds.map(x => x * 0.8);
+      worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(bounds, bounds2, 5000, IGE.Easing.Linear));
 
       // ScoreRenderComponent
       game.root.addComponent((parent, delta) => {
@@ -72,6 +77,7 @@
       clickMarker.addComponent(new IGE.Debug.PositionRenderComponent(game.getDefaultRenderer()));
       game.addObject(clickMarker);
 
+      let collisionSystem;
       if(falling) {
         collisionSystem = new IGE.Collision.BackgroundCollisionSystem();
         collisionSystem.addSurface([game.width * 0.25, game.height / 2 + 100, game.width / 2, game.height * 0.2, game.width * 0.75, game.height / 2 + 100]);
@@ -86,7 +92,7 @@
 
       function ballFactory (game, renderSystem) {
         const ball = new IGE.GameObject();
-        ball.setPosition(Math.random() * game.width, Math.random() * game.height);
+        setRandomPosition(ball, worldSystem);
         ball.setVelocity(Math.random()*0.1 - 0.05, Math.random()*0.1 - 0.05);
         const rx = Math.random() * 20 + 20;
         const ry = Math.random() * 20 + 20;
@@ -111,13 +117,27 @@
           ball.addComponent(new IGE.Components.RectangleRenderComponent(renderSystem, color));
         } else {
           ball.addComponent(new IGE.Components.MoveComponent());
+          ball.addComponent(new IGE.Components.RotationComponent(0.001));
           ball.addComponent(new IGE.Components.WorldBounceComponent(game.getDefaultWorld()));
           ball.addComponent(new IGE.Components.ColorAnimationComponent(color, color2, 3000));
           ball.addComponent(new IGE.Components.BoundsAnimationComponent(bounds, bounds2, 2000, IGE.Easing.Smooth));
           ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
+          // ball.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
+
         }
 
         return ball;
+      }
+
+      function setRandomPosition(object, world) {
+        const bounds = world.bounds;
+        const minX = bounds[0];
+        const minY = bounds[1];
+        const width = bounds[2] - minX;
+        const height = bounds[3] - minY;
+        const x = Math.random() * width + minX;
+        const y = Math.random() * height + minY;
+        object.setPosition(x, y);
       }
 
       function addBall() {
