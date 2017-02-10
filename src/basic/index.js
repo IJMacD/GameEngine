@@ -29,5 +29,6 @@ export { default as SwitchComponent } from './SwitchComponent';
 /** @deprecated */
 export { default as PositionInterpolatorComponent } from './PositionInterpolatorComponent';
 
-/** @deprecated */
-export { default as RotationInterpolatorComponent } from './RotationInterpolatorComponent';
+export { default as SmoothPositionComponent } from './SmoothPositionComponent';
+
+export { default as SmoothRotationComponent } from './SmoothRotationComponent';

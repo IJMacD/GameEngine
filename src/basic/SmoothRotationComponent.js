@@ -1,9 +1,5 @@
 import GameComponent from '../core/GameComponent';
 
-/**
- * Use generic [*]AnimationComponents instead
- * @deprecated
- */
 export default class RotationInterpolatorComponent extends GameComponent {
     update (parent, delta) {
         var rotation = parent.rotation,

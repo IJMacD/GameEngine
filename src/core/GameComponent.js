@@ -29,7 +29,9 @@ class GameComponent extends GameObject {
 	 * stateless components.
 	 * @param {number} delta - Time since last frame in milliseconds
 	 */
-	update (parent, delta) {}
+	update (parent, delta) {
+		super.update(delta);
+	}
 
 	/**
 	 * This method is used to produce a html representation of the component for
