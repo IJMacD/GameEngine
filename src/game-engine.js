@@ -70,8 +70,6 @@ Components['SolidComponent'] = SolidComponent;
 import * as render from './render';
 export { render as Render };
 
-export { default as WebGLRenderSystem } from './render/WebGLRenderSystem';
-
 import DotRenderComponent from './render/DotRenderComponent';
 Components['DotRenderComponent'] = DotRenderComponent;
 
