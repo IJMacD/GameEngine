@@ -72,6 +72,13 @@ export default class GameObject implements Events {
     }
 
     /**
+     * Add an array of components all at once
+     */
+    addComponents (components: GameComponent[]) {
+        components.forEach(c => this.addComponent(c));
+    }
+
+    /**
      * Remove a particular {@link GameComponent} which had previously been added
      * to this object.
      * @param {GameComponent} component - The component to be removed from this object
