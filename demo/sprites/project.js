@@ -207,12 +207,9 @@
 
     gameRoot.addObject(sun);
 
-    var chestImg = new Image();
-    chestImg.src = "img/chest.gif";
-    var buoyOnImg = new Image();
-    buoyOnImg.src = "img/buoy.png";
-    var buoyOffImg = new Image();
-    buoyOffImg.src = "img/buoyOff.png";
+    const chestSprite = new IGE.Render.Sprite(new IGE.Render.Texture("img/chest.gif"));
+    const buoyOnSprite = new IGE.Render.Sprite(new IGE.Render.Texture("img/buoy.png"));
+    const buoyOffSprite = new IGE.Render.Sprite(new IGE.Render.Texture("img/buoyOff.png"));
 
     // Bug: Cube Render does not work
     // var cubeRenderer = IGE.Render.PolyShapeRenderComponent.createCube(renderSystem);
@@ -233,13 +230,13 @@
 
         var r = Math.random();
         if(r < 0.2){
-            redBall.sprite = chestImg;
-            redBall.addComponent(new IGE.Render.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.sprite = chestSprite;
+            redBall.addComponent(new IGE.Render.SpriteRenderComponent(renderSystem2));
         }
         else if(r < 0.4){
-            redBall.sprite = buoyOffImg;
-            redBall.addComponent(new IGE.Render.AnimatedSpriteComponent([buoyOnImg,buoyOffImg],1));
-            redBall.addComponent(new IGE.Render.CanvasSpriteRenderingComponent(renderSystem2));
+            redBall.sprite = buoyOffSprite;
+            redBall.addComponent(new IGE.Render.SpriteAnimationComponent(1000, [buoyOnSprite,buoyOffSprite]));
+            redBall.addComponent(new IGE.Render.SpriteRenderComponent(renderSystem2));
         }
         else if(r < 0.5) {
             redBall.addComponent(new RedBallRenderingComponent(renderSystem2));

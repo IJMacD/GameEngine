@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 67);
+/******/ 	return __webpack_require__(__webpack_require__.s = 71);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2040,7 +2040,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var GameObject_1 = __webpack_require__(2);
 var vec2_1 = __webpack_require__(5);
-var mat2_1 = __webpack_require__(62);
+var mat2_1 = __webpack_require__(63);
 // Create some spare vectors for use in screenToWorld method
 var v = vec2_1.default.create();
 var rotMat = mat2_1.default.create();
@@ -5803,6 +5803,43 @@ exports.default = FlockingComponent;
 
 "use strict";
 
+var Texture = (function () {
+    function Texture(path, onLoad) {
+        var _this = this;
+        this.image = new Image();
+        this.width = 0;
+        this.height = 0;
+        this.loaded = false;
+        this.loadPromise = new Promise(function (resolve, reject) {
+            _this.image.onload = function () {
+                _this.width = _this.image.width;
+                _this.height = _this.image.height;
+                _this.loaded = true;
+                if (onLoad)
+                    onLoad(_this);
+                resolve(_this);
+            };
+            _this.image.onerror = function () {
+                throw new Error("Failed to load a texture: " + path);
+            };
+            _this.image.src = path;
+        });
+    }
+    Texture.prototype.load = function () {
+        return this.loadPromise;
+    };
+    return Texture;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Texture;
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5813,19 +5850,19 @@ var _PropertyAnimationComponent = __webpack_require__(3);
 
 var _PropertyAnimationComponent2 = _interopRequireDefault(_PropertyAnimationComponent);
 
-var _PositionAnimationComponent = __webpack_require__(38);
+var _PositionAnimationComponent = __webpack_require__(39);
 
 var _PositionAnimationComponent2 = _interopRequireDefault(_PositionAnimationComponent);
 
-var _BoundsAnimationComponent = __webpack_require__(36);
+var _BoundsAnimationComponent = __webpack_require__(37);
 
 var _BoundsAnimationComponent2 = _interopRequireDefault(_BoundsAnimationComponent);
 
-var _ColorAnimationComponent = __webpack_require__(37);
+var _ColorAnimationComponent = __webpack_require__(38);
 
 var _ColorAnimationComponent2 = _interopRequireDefault(_ColorAnimationComponent);
 
-var _RotationAnimationComponent = __webpack_require__(39);
+var _RotationAnimationComponent = __webpack_require__(40);
 
 var _RotationAnimationComponent2 = _interopRequireDefault(_RotationAnimationComponent);
 
@@ -5838,7 +5875,7 @@ exports.ColorAnimationComponent = _ColorAnimationComponent2.default;
 exports.RotationAnimationComponent = _RotationAnimationComponent2.default;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5848,7 +5885,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _MoveComponent = __webpack_require__(41);
+var _MoveComponent = __webpack_require__(42);
 
 Object.defineProperty(exports, 'MoveComponent', {
   enumerable: true,
@@ -5857,7 +5894,7 @@ Object.defineProperty(exports, 'MoveComponent', {
   }
 });
 
-var _PhysicsComponent = __webpack_require__(42);
+var _PhysicsComponent = __webpack_require__(43);
 
 Object.defineProperty(exports, 'PhysicsComponent', {
   enumerable: true,
@@ -5866,7 +5903,7 @@ Object.defineProperty(exports, 'PhysicsComponent', {
   }
 });
 
-var _GravityComponent = __webpack_require__(64);
+var _GravityComponent = __webpack_require__(65);
 
 Object.defineProperty(exports, 'GravityComponent', {
   enumerable: true,
@@ -5875,7 +5912,7 @@ Object.defineProperty(exports, 'GravityComponent', {
   }
 });
 
-var _PointGravityComponent = __webpack_require__(43);
+var _PointGravityComponent = __webpack_require__(44);
 
 Object.defineProperty(exports, 'PointGravityComponent', {
   enumerable: true,
@@ -5884,7 +5921,7 @@ Object.defineProperty(exports, 'PointGravityComponent', {
   }
 });
 
-var _TerminalVelocityComponent = __webpack_require__(53);
+var _TerminalVelocityComponent = __webpack_require__(54);
 
 Object.defineProperty(exports, 'TerminalVelocityComponent', {
   enumerable: true,
@@ -5893,7 +5930,7 @@ Object.defineProperty(exports, 'TerminalVelocityComponent', {
   }
 });
 
-var _FollowComponent = __webpack_require__(40);
+var _FollowComponent = __webpack_require__(41);
 
 Object.defineProperty(exports, 'FollowComponent', {
   enumerable: true,
@@ -5902,7 +5939,7 @@ Object.defineProperty(exports, 'FollowComponent', {
   }
 });
 
-var _RotationComponent = __webpack_require__(49);
+var _RotationComponent = __webpack_require__(50);
 
 Object.defineProperty(exports, 'RotationComponent', {
   enumerable: true,
@@ -5911,7 +5948,7 @@ Object.defineProperty(exports, 'RotationComponent', {
   }
 });
 
-var _RotateToHeadingComponent = __webpack_require__(48);
+var _RotateToHeadingComponent = __webpack_require__(49);
 
 Object.defineProperty(exports, 'RotateToHeadingComponent', {
   enumerable: true,
@@ -5920,7 +5957,7 @@ Object.defineProperty(exports, 'RotateToHeadingComponent', {
   }
 });
 
-var _TrackRotationComponent = __webpack_require__(54);
+var _TrackRotationComponent = __webpack_require__(55);
 
 Object.defineProperty(exports, 'TrackRotationComponent', {
   enumerable: true,
@@ -5929,7 +5966,7 @@ Object.defineProperty(exports, 'TrackRotationComponent', {
   }
 });
 
-var _RandomPositionComponent = __webpack_require__(46);
+var _RandomPositionComponent = __webpack_require__(47);
 
 Object.defineProperty(exports, 'RandomPositionComponent', {
   enumerable: true,
@@ -5938,7 +5975,7 @@ Object.defineProperty(exports, 'RandomPositionComponent', {
   }
 });
 
-var _RandomVelocityComponent = __webpack_require__(47);
+var _RandomVelocityComponent = __webpack_require__(48);
 
 Object.defineProperty(exports, 'RandomVelocityComponent', {
   enumerable: true,
@@ -5947,7 +5984,7 @@ Object.defineProperty(exports, 'RandomVelocityComponent', {
   }
 });
 
-var _RandomImpulseComponent = __webpack_require__(45);
+var _RandomImpulseComponent = __webpack_require__(46);
 
 Object.defineProperty(exports, 'RandomImpulseComponent', {
   enumerable: true,
@@ -5965,7 +6002,7 @@ Object.defineProperty(exports, 'FlockingComponent', {
   }
 });
 
-var _SwitchComponent = __webpack_require__(52);
+var _SwitchComponent = __webpack_require__(53);
 
 Object.defineProperty(exports, 'SwitchComponent', {
   enumerable: true,
@@ -5974,7 +6011,7 @@ Object.defineProperty(exports, 'SwitchComponent', {
   }
 });
 
-var _PositionInterpolatorComponent = __webpack_require__(44);
+var _PositionInterpolatorComponent = __webpack_require__(45);
 
 Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   enumerable: true,
@@ -5983,7 +6020,7 @@ Object.defineProperty(exports, 'PositionInterpolatorComponent', {
   }
 });
 
-var _SmoothPositionComponent = __webpack_require__(50);
+var _SmoothPositionComponent = __webpack_require__(51);
 
 Object.defineProperty(exports, 'SmoothPositionComponent', {
   enumerable: true,
@@ -5992,7 +6029,7 @@ Object.defineProperty(exports, 'SmoothPositionComponent', {
   }
 });
 
-var _SmoothRotationComponent = __webpack_require__(51);
+var _SmoothRotationComponent = __webpack_require__(52);
 
 Object.defineProperty(exports, 'SmoothRotationComponent', {
   enumerable: true,
@@ -6004,7 +6041,7 @@ Object.defineProperty(exports, 'SmoothRotationComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6014,7 +6051,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CollisionSystem = __webpack_require__(55);
+var _CollisionSystem = __webpack_require__(56);
 
 Object.defineProperty(exports, 'CollisionSystem', {
   enumerable: true,
@@ -6041,7 +6078,7 @@ Object.defineProperty(exports, 'BounceComponent', {
   }
 });
 
-var _BackgroundCollisionSystem = __webpack_require__(65);
+var _BackgroundCollisionSystem = __webpack_require__(66);
 
 Object.defineProperty(exports, 'BackgroundCollisionSystem', {
   enumerable: true,
@@ -6071,7 +6108,7 @@ Object.defineProperty(exports, 'SolidComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6081,7 +6118,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _DebugDrawBoundsComponent = __webpack_require__(56);
+var _DebugDrawBoundsComponent = __webpack_require__(57);
 
 Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   enumerable: true,
@@ -6090,7 +6127,7 @@ Object.defineProperty(exports, 'DebugDrawBoundsComponent', {
   }
 });
 
-var _DebugDrawPathComponent = __webpack_require__(57);
+var _DebugDrawPathComponent = __webpack_require__(58);
 
 Object.defineProperty(exports, 'DebugDrawPathComponent', {
   enumerable: true,
@@ -6099,7 +6136,7 @@ Object.defineProperty(exports, 'DebugDrawPathComponent', {
   }
 });
 
-var _DebugDrawSurfacesComponent = __webpack_require__(58);
+var _DebugDrawSurfacesComponent = __webpack_require__(59);
 
 Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   enumerable: true,
@@ -6108,7 +6145,7 @@ Object.defineProperty(exports, 'DebugDrawSurfacesComponent', {
   }
 });
 
-var _DebugFlockingComponent = __webpack_require__(59);
+var _DebugFlockingComponent = __webpack_require__(60);
 
 Object.defineProperty(exports, 'DebugFlockingComponent', {
   enumerable: true,
@@ -6117,7 +6154,7 @@ Object.defineProperty(exports, 'DebugFlockingComponent', {
   }
 });
 
-var _PositionRenderComponent = __webpack_require__(60);
+var _PositionRenderComponent = __webpack_require__(61);
 
 Object.defineProperty(exports, 'PositionRenderComponent', {
   enumerable: true,
@@ -6129,7 +6166,7 @@ Object.defineProperty(exports, 'PositionRenderComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6169,7 +6206,7 @@ Object.defineProperty(exports, 'MoveToClickComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6224,7 +6261,7 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _PolyShapeRenderComponent = __webpack_require__(61);
+var _PolyShapeRenderComponent = __webpack_require__(62);
 
 Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   enumerable: true,
@@ -6233,22 +6270,55 @@ Object.defineProperty(exports, 'PolyShapeRenderComponent', {
   }
 });
 
-var _sprite = __webpack_require__(66);
+var _TileRenderComponent = __webpack_require__(70);
 
-Object.keys(_sprite).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _sprite[key];
-    }
-  });
+Object.defineProperty(exports, 'TileRenderComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_TileRenderComponent).default;
+  }
+});
+
+var _SpriteRenderComponent = __webpack_require__(69);
+
+Object.defineProperty(exports, 'SpriteRenderComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_SpriteRenderComponent).default;
+  }
+});
+
+var _SpriteAnimationComponent = __webpack_require__(68);
+
+Object.defineProperty(exports, 'SpriteAnimationComponent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_SpriteAnimationComponent).default;
+  }
+});
+
+var _Sprite = __webpack_require__(67);
+
+Object.defineProperty(exports, 'Sprite', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_Sprite).default;
+  }
+});
+
+var _Texture = __webpack_require__(27);
+
+Object.defineProperty(exports, 'Texture', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_Texture).default;
+  }
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6288,7 +6358,7 @@ Object.defineProperty(exports, 'WorldWrapComponent', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6329,7 +6399,7 @@ exports.default = AudioSystem;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6339,6 +6409,7 @@ var CameraSystem_1 = __webpack_require__(19);
 var CanvasRenderSystem_1 = __webpack_require__(8);
 var WorldSystem_1 = __webpack_require__(9);
 var InputSystem_1 = __webpack_require__(7);
+var Texture_1 = __webpack_require__(27);
 var util_1 = __webpack_require__(10);
 var State;
 (function (State) {
@@ -6490,22 +6561,7 @@ var Game = (function () {
         var _this = this;
         this._toLoad += texturePaths.length;
         return texturePaths.map(function (path) {
-            var texture = {
-                image: new Image(),
-                width: 0,
-                height: 0,
-                loaded: false
-            };
-            texture.image.onload = function () {
-                texture.width = texture.image.width;
-                texture.height = texture.image.height;
-                texture.loaded = true;
-                _this._resourceLoaded(texture);
-            };
-            texture.image.onerror = function () {
-                throw new Error("Failed to load a texture: " + path);
-            };
-            texture.image.src = path;
+            var texture = new Texture_1.default(path, function (tex) { return _this._resourceLoaded(tex); });
             _this.textures.push(texture);
             return texture;
         });
@@ -6733,7 +6789,7 @@ util_1.applyMixin(Game, util_1.Events);
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6779,7 +6835,7 @@ var BoundsAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = BoundsAnimationComponent;
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6825,7 +6881,7 @@ var ColorAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = ColorAnimationComponent;
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6871,7 +6927,7 @@ var PositionAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = PositionAnimationComponent;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6939,7 +6995,7 @@ var RotationAnimationComponent = function (_PropertyAnimationCom) {
 exports.default = RotationAnimationComponent;
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7002,7 +7058,7 @@ var FollowComponent = function (_GameComponent) {
 exports.default = FollowComponent;
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7056,7 +7112,7 @@ var MoveComponent = function (_GameComponent) {
 exports.default = MoveComponent;
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7120,7 +7176,7 @@ var PhysicsComponent = function (_GameComponent) {
 exports.default = PhysicsComponent;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7177,7 +7233,7 @@ var PointGravityComponent = function (_GameComponent) {
 exports.default = PointGravityComponent;
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7283,7 +7339,7 @@ var PositionInterpolatorComponent = function (_GameComponent) {
 exports.default = PositionInterpolatorComponent;
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7345,7 +7401,7 @@ var RandomImpulseComponent = function (_GameComponent) {
 exports.default = RandomImpulseComponent;
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7407,7 +7463,7 @@ var RandomPositionComponent = function (_GameComponent) {
 exports.default = RandomPositionComponent;
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7464,7 +7520,7 @@ var RandomVelocityComponent = function (_GameComponent) {
 exports.default = RandomVelocityComponent;
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7510,7 +7566,7 @@ var RotateToHeadingComponent = function (_GameComponent) {
 exports.default = RotateToHeadingComponent;
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7560,7 +7616,7 @@ var RotationComponent = function (_GameComponent) {
 exports.default = RotationComponent;
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7624,7 +7680,7 @@ var SmoothPositionComponent = function (_GameComponent) {
 exports.default = SmoothPositionComponent;
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7682,7 +7738,7 @@ var SmoothRotationComponent = function (_GameComponent) {
 exports.default = SmoothRotationComponent;
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7846,7 +7902,7 @@ var SwitchComponent = function (_GameComponent) {
 exports.default = SwitchComponent;
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7909,7 +7965,7 @@ var TerminalVelocityComponent = function (_GameComponent) {
 exports.default = TerminalVelocityComponent;
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7968,7 +8024,7 @@ var TrackRotationComponent = function (_GameComponent) {
 exports.default = TrackRotationComponent;
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8078,7 +8134,7 @@ var CollisionSystem = function (_GameObject) {
 exports.default = CollisionSystem;
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8142,7 +8198,7 @@ var DebugDrawBoundsComponent = function (_GameComponent) {
 exports.default = DebugDrawBoundsComponent;
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8266,7 +8322,7 @@ var DebugDrawPathComponent = function (_GameComponent) {
 exports.default = DebugDrawPathComponent;
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8350,7 +8406,7 @@ var DebugDrawSurfacesComponent = function (_GameComponent) {
 exports.default = DebugDrawSurfacesComponent;
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8419,7 +8475,7 @@ var DebugFlockingComponent = function (_GameComponent) {
 exports.default = DebugFlockingComponent;
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8493,7 +8549,7 @@ var PositionRenderComponent = function (_GameComponent) {
 exports.default = PositionRenderComponent;
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8509,7 +8565,7 @@ var _GameComponent2 = __webpack_require__(0);
 
 var _GameComponent3 = _interopRequireDefault(_GameComponent2);
 
-var _mat = __webpack_require__(63);
+var _mat = __webpack_require__(64);
 
 var _mat2 = _interopRequireDefault(_mat);
 
@@ -8763,7 +8819,7 @@ PolyShapeRenderingComponent.createSphere = function (renderSystem, latitudeBands
 };
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -9205,7 +9261,7 @@ module.exports = mat2;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -9957,7 +10013,7 @@ module.exports = mat3;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9990,7 +10046,7 @@ exports.default = GravityComponent;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10057,7 +10113,67 @@ exports.default = BackgroundCollisionSystem;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Sprite = (function () {
+    function Sprite(texture) {
+        var _this = this;
+        /** X-offset of sprite in spritesheet */
+        this.x = 0;
+        /** Y-offset of sprite in spritesheet */
+        this.y = 0;
+        /** width - width of sprite */
+        this.w = 0;
+        /** height - height of sprite */
+        this.h = 0;
+        /** ox - origin x-offset, so sprite can be visually centred on parent's position */
+        this.ox = 0;
+        /** oy - origin y-offset, so sprite can be visually centred on parent's position */
+        this.oy = 0;
+        this.t = texture;
+        texture.load().then(function (tex) {
+            _this.w = tex.width;
+            _this.h = tex.height;
+            _this.ox = tex.width / 2;
+            _this.oy = tex.height / 2;
+        });
+    }
+    /**
+     * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
+     * @param {object} sprite - The sprite template.
+     * @param {number} rows - Number of rows in the sprite sheet.
+     * @param {number} cols - Number of columns in the sprite sheet.
+     * @return {Sprite[]}
+     */
+    Sprite.generateSpriteSheet = function (sprite, rows, cols) {
+        var out = [], i, j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                out.push({
+                    t: sprite.t,
+                    x: j * sprite.w,
+                    y: i * sprite.h,
+                    w: sprite.w,
+                    h: sprite.h,
+                    ox: sprite.ox,
+                    oy: sprite.oy,
+                    d: sprite.d
+                });
+            }
+        }
+        return out;
+    };
+    return Sprite;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Sprite;
+
+
+/***/ }),
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10068,75 +10184,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var GameComponent_1 = __webpack_require__(0);
-/**
- * Component for rendering backgrounds for example.
- * @extends {GameComponent}
- * @param {RenderSystem} renderSystem - Where to draw.
- * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
- * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
- * @memberof Sprite
- */
-var TileComponent = (function (_super) {
-    __extends(TileComponent, _super);
-    function TileComponent(renderSystem, texture, bounds) {
-        var _this = _super.call(this) || this;
-        _this.renderSystem = renderSystem;
-        _this.texture = texture;
-        _this.bounds = bounds;
-        return _this;
-    }
-    TileComponent.prototype.update = function (parent, delta) {
-        var renderSystem = this.renderSystem, texture = this.texture, bounds = this.bounds, dx = texture.width, dy = texture.height, startX = parent.position[0] % dx, startY = parent.position[1] % dy, x, y = bounds[1], // + startY - dy,
-        width = bounds[2], height = bounds[3], render = function (texture, x, y) {
-            return function (context) {
-                context.drawImage(texture.image, x, y);
-            };
-        };
-        for (; y < height + dy; y += dy) {
-            for (x = bounds[0] + startX - dx; x < width + dx; x += dx) {
-                renderSystem.push(render(texture, x, y));
-            }
-        }
-    };
-    return TileComponent;
-}(GameComponent_1.default));
-exports.TileComponent = TileComponent;
-/**
- * Component renders a sprite for a parent object.
- *
- * Component can either contain its own sprite or use one provided on the parent.
- * In the case where both component and parent have sprites, the one on the parent
- * is prefered.
- * @extends {GameComponent}
- * @param {RenderSystem} renderSystem - Target renderer
- * @param {number} layer - optional layer to render this sprite on to.
- * @param {Sprite} sprite - Sprite object
- * @memberof Sprite
- */
-var SpriteRenderingComponent = (function (_super) {
-    __extends(SpriteRenderingComponent, _super);
-    function SpriteRenderingComponent(renderSystem, layer, sprite) {
-        var _this = _super.call(this) || this;
-        _this.renderSystem = renderSystem;
-        _this.layer = layer;
-        _this.sprite = sprite;
-        return _this;
-    }
-    SpriteRenderingComponent.prototype.update = function (parent, delta) {
-        _super.prototype.update.call(this, delta);
-        var sprite = this.sprite || parent.sprite, image = sprite && sprite.t.image;
-        if (sprite) {
-            this.renderSystem.push(function (context) {
-                var x = parent.position[0], y = parent.position[1], w = sprite.w, h = sprite.h;
-                context.translate(x, y);
-                context.rotate(parent.rotation);
-                context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
-            }, this.layer);
-        }
-    };
-    return SpriteRenderingComponent;
-}(GameComponent_1.default));
-exports.SpriteRenderingComponent = SpriteRenderingComponent;
 /**
  * Animate through a sequence of sprites.
  * @extends {GameComponent}
@@ -10198,42 +10245,112 @@ var SpriteAnimationComponent = (function (_super) {
     };
     return SpriteAnimationComponent;
 }(GameComponent_1.default));
-exports.SpriteAnimationComponent = SpriteAnimationComponent;
-var Sprite = (function () {
-    function Sprite() {
-    }
-    /**
-     * Convenience method to generate a set of sprite objects based on a template and a spritesheet.
-     * @param {object} sprite - The sprite template.
-     * @param {number} rows - Number of rows in the sprite sheet.
-     * @param {number} cols - Number of columns in the sprite sheet.
-     * @return {Sprite[]}
-     */
-    Sprite.generateSpriteSheet = function (sprite, rows, cols) {
-        var out = [], i, j;
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                out.push({
-                    t: sprite.t,
-                    x: j * sprite.w,
-                    y: i * sprite.h,
-                    w: sprite.w,
-                    h: sprite.h,
-                    ox: sprite.ox,
-                    oy: sprite.oy,
-                    d: sprite.d
-                });
-            }
-        }
-        return out;
-    };
-    return Sprite;
-}());
-exports.Sprite = Sprite;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = SpriteAnimationComponent;
 
 
 /***/ }),
-/* 67 */
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+/**
+ * Component renders a sprite for a parent object.
+ *
+ * Component can either contain its own sprite or use one provided on the parent.
+ * In the case where both component and parent have sprites, the one on the parent
+ * is prefered.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Target renderer
+ * @param {number} layer - optional layer to render this sprite on to.
+ * @param {Sprite} sprite - Sprite object
+ * @memberof Sprite
+ */
+var SpriteRenderComponent = (function (_super) {
+    __extends(SpriteRenderComponent, _super);
+    function SpriteRenderComponent(renderSystem, sprite, layer) {
+        if (layer === void 0) { layer = 1; }
+        var _this = _super.call(this) || this;
+        _this.renderSystem = renderSystem;
+        _this.layer = layer;
+        _this.sprite = sprite;
+        return _this;
+    }
+    SpriteRenderComponent.prototype.update = function (parent, delta) {
+        _super.prototype.update.call(this, delta);
+        var sprite = this.sprite || parent.sprite, image = sprite && sprite.t.image;
+        if (sprite) {
+            this.renderSystem.push(function (context) {
+                var x = parent.position[0], y = parent.position[1], w = sprite.w, h = sprite.h;
+                context.translate(x, y);
+                context.rotate(parent.rotation);
+                context.drawImage(image, sprite.x, sprite.y, w, h, -sprite.ox, -sprite.oy, w, h);
+            }, this.layer);
+        }
+    };
+    return SpriteRenderComponent;
+}(GameComponent_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = SpriteRenderComponent;
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GameComponent_1 = __webpack_require__(0);
+/**
+ * Component for rendering backgrounds for example.
+ * @extends {GameComponent}
+ * @param {RenderSystem} renderSystem - Where to draw.
+ * @param {object} texture - A texture object i.e {image: new Image(), width: 0, height: 0}
+ * @param {array} bounds - How far and wide to render the images. Guaranteed to cover bounds.
+ * @memberof Sprite
+ */
+var TileRenderComponent = (function (_super) {
+    __extends(TileRenderComponent, _super);
+    function TileRenderComponent(renderSystem, texture, bounds) {
+        var _this = _super.call(this) || this;
+        _this.renderSystem = renderSystem;
+        _this.texture = texture;
+        _this.bounds = bounds;
+        return _this;
+    }
+    TileRenderComponent.prototype.update = function (parent, delta) {
+        var renderSystem = this.renderSystem, texture = this.texture, bounds = this.bounds, dx = texture.width, dy = texture.height, startX = parent.position[0] % dx, startY = parent.position[1] % dy, x, y = bounds[1], // + startY - dy,
+        width = bounds[2], height = bounds[3], render = function (texture, x, y) {
+            return function (context) {
+                context.drawImage(texture.image, x, y);
+            };
+        };
+        for (; y < height + dy; y += dy) {
+            for (x = bounds[0] + startX - dx; x < width + dx; x += dx) {
+                renderSystem.push(render(texture, x, y));
+            }
+        }
+    };
+    return TileRenderComponent;
+}(GameComponent_1.default));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = TileRenderComponent;
+
+
+/***/ }),
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10307,7 +10424,7 @@ Object.defineProperty(exports, 'InputSystem', {
   }
 });
 
-var _AudioSystem = __webpack_require__(34);
+var _AudioSystem = __webpack_require__(35);
 
 Object.defineProperty(exports, 'AudioSystem', {
   enumerable: true,
@@ -10316,7 +10433,7 @@ Object.defineProperty(exports, 'AudioSystem', {
   }
 });
 
-var _Game = __webpack_require__(35);
+var _Game = __webpack_require__(36);
 
 Object.defineProperty(exports, 'Game', {
   enumerable: true,
@@ -10334,11 +10451,11 @@ Object.defineProperty(exports, 'WebGLRenderSystem', {
   }
 });
 
-var _basic = __webpack_require__(28);
+var _basic = __webpack_require__(29);
 
 var basic = _interopRequireWildcard(_basic);
 
-var _animation = __webpack_require__(27);
+var _animation = __webpack_require__(28);
 
 var animation = _interopRequireWildcard(_animation);
 
@@ -10346,7 +10463,7 @@ var _Easing = __webpack_require__(6);
 
 var easing = _interopRequireWildcard(_Easing);
 
-var _world = __webpack_require__(33);
+var _world = __webpack_require__(34);
 
 var world = _interopRequireWildcard(_world);
 
@@ -10358,7 +10475,7 @@ var _WorldWrapComponent = __webpack_require__(24);
 
 var _WorldWrapComponent2 = _interopRequireDefault(_WorldWrapComponent);
 
-var _input = __webpack_require__(31);
+var _input = __webpack_require__(32);
 
 var input = _interopRequireWildcard(_input);
 
@@ -10370,7 +10487,7 @@ var _MoveToClickComponent = __webpack_require__(22);
 
 var _MoveToClickComponent2 = _interopRequireDefault(_MoveToClickComponent);
 
-var _collision = __webpack_require__(29);
+var _collision = __webpack_require__(30);
 
 var collision = _interopRequireWildcard(_collision);
 
@@ -10390,7 +10507,7 @@ var _SolidComponent = __webpack_require__(13);
 
 var _SolidComponent2 = _interopRequireDefault(_SolidComponent);
 
-var _render = __webpack_require__(32);
+var _render = __webpack_require__(33);
 
 var render = _interopRequireWildcard(_render);
 
@@ -10406,7 +10523,7 @@ var _TextRenderComponent = __webpack_require__(17);
 
 var _TextRenderComponent2 = _interopRequireDefault(_TextRenderComponent);
 
-var _debug = __webpack_require__(30);
+var _debug = __webpack_require__(31);
 
 var debug = _interopRequireWildcard(_debug);
 

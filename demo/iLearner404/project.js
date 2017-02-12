@@ -140,7 +140,7 @@
 		skySprite = textures[5];
 	skyObject.setVelocity(gameSpeed / 16,0);
 	skyObject.addComponent(moveComponent);
-	skyObject.addComponent(new IGE.Render.TileComponent(renderSystem, skySprite, worldBounds));
+	skyObject.addComponent(new IGE.Render.TileRenderComponent(renderSystem, skySprite, worldBounds));
 
 	gameRoot.addObject(skyObject);
 
@@ -150,7 +150,7 @@
 		treeSprite = textures[4];
 	treeObject.setVelocity(gameSpeed / 4,0);
 	treeObject.addComponent(moveComponent);
-	treeObject.addComponent(new IGE.Render.TileComponent(renderSystem, treeSprite, treeBounds));
+	treeObject.addComponent(new IGE.Render.TileRenderComponent(renderSystem, treeSprite, treeBounds));
 
 	gameRoot.addObject(treeObject);
 
@@ -159,7 +159,7 @@
 		grassSprite = textures[1];
 	tileObject.setVelocity(gameSpeed,0);
 	tileObject.addComponent(moveComponent);
-	tileObject.addComponent(new IGE.Render.TileComponent(renderSystem, grassSprite, groundBounds));
+	tileObject.addComponent(new IGE.Render.TileRenderComponent(renderSystem, grassSprite, groundBounds));
 
 	gameRoot.addObject(tileObject);
 
@@ -192,7 +192,7 @@
 		worldBounceComponent.cFriction = 0.9;
 		playerObject.addComponent(worldBounceComponent);
 		playerObject.addComponent(new IGE.Render.SpriteAnimationComponent(66));
-		playerObject.addComponent(new IGE.Render.SpriteRenderingComponent(renderSystem));
+		playerObject.addComponent(new IGE.Render.SpriteRenderComponent(renderSystem));
 		playerObject.addComponent(new GEC.CollisionComponent(collisionSystem, false, true));
 		playerObject.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
 		playerObject.on("attackedBy", (attack, vulnerable) => {
@@ -224,7 +224,7 @@
 		crate.sprite = {t: textures[2],x:0,y:0,w:64,h:64,ox:32,oy:32 };
 		crate.bounds = [-24,-24,24,24];
 		crate.addComponent(moveComponent);
-		crate.addComponent(new IGE.Render.SpriteRenderingComponent(renderSystem));
+		crate.addComponent(new IGE.Render.SpriteRenderComponent(renderSystem));
 		crate.addComponent(KillCratesComponent);
 		crate.addComponent(attackComponent);
 		crate.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
