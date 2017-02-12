@@ -5,6 +5,7 @@ import CameraSystem from '../CameraSystem';
 import CanvasRenderSystem from '../render/CanvasRenderSystem';
 import WorldSystem from '../world/WorldSystem';
 import InputSystem from '../input/InputSystem';
+import Texture from '../render/Texture';
 import { Events, applyMixin } from '../util';
 
 enum State {
@@ -203,22 +204,7 @@ export default class Game implements Events {
         this._toLoad += texturePaths.length;
 
         return texturePaths.map(path => {
-            const texture: Texture = {
-                image: new Image(),
-                width: 0,
-                height: 0,
-                loaded: false
-            };
-            texture.image.onload = () => {
-                texture.width = texture.image.width;
-                texture.height = texture.image.height;
-                texture.loaded = true;
-                this._resourceLoaded(texture);
-            };
-            texture.image.onerror = function(){
-                throw new Error("Failed to load a texture: " + path);
-            };
-            texture.image.src = path;
+            const texture = new Texture(path, tex => this._resourceLoaded(tex));
             this.textures.push(texture);
             return texture;
         });
