@@ -7,16 +7,25 @@ export default class SmoothPositionComponent extends GameComponent {
     constructor () {
         super();
         this.speed = 0.01;
+        this.lastPosition = vec3.create();
     }
 
     update (parent, delta) {
         super.update(this, delta);
 
-        const position = parent.position;
         const target = this.position;
         const speed = this.speed;
 
-        vec3.subtract(diff, target, position);
-        vec3.scaleAndAdd(parent.position, position, diff, delta * speed);
+        // If the object isn't where we left it then that's the new target
+        if (!vec3.equals(this.lastPosition, parent.position)) {
+            vec3.copy(target, parent.position);
+        }
+
+        if (!vec3.equals(this.lastPosition, target)) {
+            vec3.subtract(diff, target, this.lastPosition);
+            vec3.scaleAndAdd(parent.position, this.lastPosition, diff, delta * speed);
+
+            vec3.copy(this.lastPosition, parent.position);
+        }
     }
 }

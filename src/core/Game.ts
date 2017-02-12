@@ -79,6 +79,8 @@ export default class Game implements Events {
     /** Tracks what level the game is running. Don't change this directly use {@link Game#setLevel} instead. */
     level = 0;
 
+    originCentric = false;
+
     /** Number of resources currently pending. */
     private _toLoad = 0;
 
@@ -115,7 +117,7 @@ export default class Game implements Events {
     on: (type: string, callback) => void;
     fire: (type: string, ...params) => void;
 
-    constructor ({canvas, width, height, score, lives, level, autosize} = {
+    constructor ({canvas, width, height, score, lives, level, autosize, originCentric} = {
         canvas: null,
         width: 0,
         height: 0,
@@ -123,6 +125,7 @@ export default class Game implements Events {
         lives: 0,
         level: 0,
         autosize: false,
+        originCentric: false,
     }) {
 
         /**
@@ -154,6 +157,8 @@ export default class Game implements Events {
         this.lives = lives;
 
         this.level = level;
+
+        this.originCentric = originCentric;
 
         if(autosize) {
             this.setAutosize(true);
@@ -269,7 +274,10 @@ export default class Game implements Events {
     getDefaultCamera () {
         if (!this.cameraSystem) {
             this.cameraSystem = new CameraSystem();
-            this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+
+            if (!this.originCentric) {
+                this.cameraSystem.setPosition(this.width / 2, this.height / 2);
+            }
 
             this._initialiseGeneralObjects();
             this.root.addObject(this.cameraSystem);
@@ -314,6 +322,14 @@ export default class Game implements Events {
      */
     getDefaultWorld (paddingX = 0, paddingY = paddingX) {
         const bounds = [-paddingX, -paddingY, this.width + paddingX, this.height + paddingY];
+        if (this.originCentric) {
+            const halfWidth = this.width / 2;
+            const halfHeight = this.height / 2;
+            bounds[0] -= halfWidth;
+            bounds[1] -= halfHeight;
+            bounds[2] -= halfWidth;
+            bounds[3] -= halfHeight;
+        }
         if (!this.worldSystem) {
             this.worldSystem = new WorldSystem(bounds);
 

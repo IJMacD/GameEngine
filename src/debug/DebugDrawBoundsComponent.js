@@ -19,6 +19,8 @@ export default class DebugDrawBoundsComponent extends GameComponent {
 		if(bounds){
 			this.renderSystem.push(ctx => {
 				ctx.translate(parent.position[0], parent.position[1]);
+				// Don't rotate yet because collision components don't take rotation into account
+				// ctx.rotate(parent.rotation);
 				ctx.beginPath();
 				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
 				ctx.strokeStyle = "#000";

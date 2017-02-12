@@ -87,7 +87,7 @@ export default class BackgroundCollisionComponent extends GameComponent {
 				}
 			}
 		}
-		vec2.copy(parent.position, lastPosition);
+		vec2.copy(lastPosition, parent.position);
 	}
 }
 

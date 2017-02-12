@@ -72,6 +72,13 @@ export default class GameObject implements Events {
     }
 
     /**
+     * Add an array of components all at once
+     */
+    addComponents (components: GameComponent[]) {
+        components.forEach(c => this.addComponent(c));
+    }
+
+    /**
      * Remove a particular {@link GameComponent} which had previously been added
      * to this object.
      * @param {GameComponent} component - The component to be removed from this object
@@ -85,7 +92,7 @@ export default class GameObject implements Events {
     removeComponentByName (name: string){
         for(var i = 0; i < this.components.length; i++){
             const c = this.components[i];
-            if(c.name == name || c.constructor.name == name)
+            if(c.name == name || (<any>c).constructor.name == name)
                 this._toBeRemoved.push(c);
         }
         return this;

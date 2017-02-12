@@ -7,7 +7,7 @@ import vec3 from 'gl-matrix/src/gl-matrix/vec3';
  * @param {number} width
  * @param {number} height
  */
-class CameraSystem extends GameObject {
+export default class CameraSystem extends GameObject {
 
 	pruneList: GameObjectManager[] = [];
 	suspendedObjects: GameObject[] = [];
@@ -71,5 +71,3 @@ class CameraSystem extends GameObject {
 		*/
 	// }
 }
-
-export default CameraSystem;
