@@ -1,5 +1,7 @@
 const config = require('./webpack.config.js');
 
+config.entry = ['babel-polyfill', config.entry];
+
 // Reset module rules
 config.module.rules = [
   {
@@ -7,7 +9,8 @@ config.module.rules = [
     loader: 'ts-loader',
     options: {
       compilerOptions: {
-        target: "es5"
+        target: "es5",
+        lib: ["es2015.promise", "es5", "dom"]
       }
     }
   },
