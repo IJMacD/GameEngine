@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import * as IGE from '../../../src/game-engine';
+import * as IGE from '../../../dist/ijmacd-game-engine';
 
 const MAX_VELOCITY = 0.1;
+const MAX_ROTATION = 0.01;
 
 export default class Game extends Component {
 
@@ -23,6 +24,7 @@ export default class Game extends Component {
 
       ballBag.objects.forEach(object => {
         object.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
+        object.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
       });
 
       game.addObject(clickMarker);
@@ -32,6 +34,7 @@ export default class Game extends Component {
 
       ballBag.objects.forEach(object => {
         object.removeComponentByName("DebugDrawBoundsComponent");
+        object.removeComponentByName("PositionRenderComponent");
       });
 
       game.root.objects[0].removeObject(clickMarker);
@@ -66,7 +69,7 @@ export default class Game extends Component {
     });
 
     componentHelper(prevProps.rotation, this.props.rotation, object => {
-      object.addComponent(new IGE.Components.RotationComponent(Math.random() * 0.01 - 0.005));
+      object.addComponent(new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
     }, object => {
       object.removeComponentByName("RotationComponent");
     });
@@ -249,8 +252,11 @@ function ballFactory (options) {
     ball.addComponent(new IGE.Components.WorldBounceComponent(worldSystem));
   }
 
+  if (options.background)
+    ball.addComponent(new IGE.Components.BackgroundCollisionComponent(collisionSystem));
+
   if (options.rotation)
-    ball.addComponent(new IGE.Components.RotationComponent(0.001));
+    ball.addComponent(new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
 
   ball.addComponent(new IGE.Components.ColorAnimationComponent(color, color2, 3000));
 
@@ -263,8 +269,10 @@ function ballFactory (options) {
     ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
   }
 
-  if (options.debug)
+  if (options.debug) {
     ball.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
+    ball.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
+  }
 
   return ball;
 }

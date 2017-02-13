@@ -4,19 +4,14 @@ module.exports = {
     filename: 'bundle.js'
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts']
+    extensions: ['.js', '.jsx']
   },
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        exclude: [/node_modules/],
-      },
-      {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        exclude: [/node_modules/],
+        exclude: /node_modules/,
       }
     ]
   }
