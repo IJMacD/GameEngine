@@ -116,6 +116,8 @@ function componentHelper (oldValue, newValue, positiveAction, negativeAction) {
 
 let game;
 let ballBag;
+let inputSystem;
+let cameraSystem;
 let worldSystem;
 let collisionSystem;
 let renderSystem;
@@ -133,8 +135,8 @@ function init (canvas, component) {
 
   const options = component.props;
 
-  const cameraSystem = game.getDefaultCamera();
-  // cameraSystem.setPosition(0, 0);
+  inputSystem = game.getDefaultInput();
+  cameraSystem = game.getDefaultCamera();
   renderSystem = game.getDefaultRenderer();
   worldSystem = game.getDefaultWorld(50);
   worldSystem.originalBounds = [...worldSystem.bounds];
@@ -273,6 +275,12 @@ function ballFactory (options) {
     ball.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
     ball.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
   }
+
+  ball.addComponent(new IGE.Components.ClickComponent(inputSystem));
+
+  ball.on("click", () => {
+    ballBag.removeObject(ball);
+  });
 
   return ball;
 }

@@ -9626,6 +9626,8 @@ function componentHelper(oldValue, newValue, positiveAction, negativeAction) {
 
 let game;
 let ballBag;
+let inputSystem;
+let cameraSystem;
 let worldSystem;
 let collisionSystem;
 let renderSystem;
@@ -9643,8 +9645,8 @@ function init(canvas, component) {
 
   const options = component.props;
 
-  const cameraSystem = game.getDefaultCamera();
-  // cameraSystem.setPosition(0, 0);
+  inputSystem = game.getDefaultInput();
+  cameraSystem = game.getDefaultCamera();
   renderSystem = game.getDefaultRenderer();
   worldSystem = game.getDefaultWorld(50);
   worldSystem.originalBounds = [...worldSystem.bounds];
@@ -9777,6 +9779,12 @@ function ballFactory(options) {
     ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem));
     ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(renderSystem));
   }
+
+  ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem));
+
+  ball.on("click", () => {
+    ballBag.removeObject(ball);
+  });
 
   return ball;
 }
@@ -13377,6 +13385,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             var bounds = parent.bounds;
 
                             if (bounds[0] + pos[0] < click[0] && bounds[1] + pos[1] < click[1] && bounds[2] + pos[0] > click[0] && bounds[3] + pos[1] > click[1]) {
+                                parent.fire('click', parent);
                                 this.fire('click', parent);
                             }
                         }
