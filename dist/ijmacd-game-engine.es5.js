@@ -2759,7 +2759,7 @@ var ClickComponent = function (_GameComponent) {
         var bounds = parent.bounds;
 
         if (bounds[0] + pos[0] < click[0] && bounds[1] + pos[1] < click[1] && bounds[2] + pos[0] > click[0] && bounds[3] + pos[1] > click[1]) {
-          this.fire('click', parent);
+          parent.fire('click', parent);
         }
       }
     }

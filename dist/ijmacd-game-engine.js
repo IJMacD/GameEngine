@@ -3030,7 +3030,6 @@ class ClickComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts_
         && bounds[2] + pos[0] > click[0]
         && bounds[3] + pos[1] > click[1]) {
           parent.fire('click', parent);
-          this.fire('click', parent);
       }
     }
   }
