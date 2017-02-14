@@ -9459,13 +9459,27 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     this.state = {
       ballCount: 10,
       gravity: false,
+      gravityConstant: 0.0003,
       falling: false,
       debug: false,
       wrap: false,
       background: false,
       square: false,
       rotation: false,
-      bounds: true
+      bounds: true,
+      components: [
+      // "Gravity",
+      "TerminalVelocity", "Move", "WorldWrap",
+      // "WorldBounce",
+      // "BackgroundCollision",
+      // "Rotation",
+      "ColorAnimation",
+      // "BoundsAnimation",
+      // "RectangleRender",
+      "DotRender",
+      // "DebugDrawBounds",
+      // "PositionRender",
+      "Click"]
     };
   }
 
@@ -9526,61 +9540,30 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   doImperitiveStuff(prevProps = {}) {
     game.setScore(this.props.ballCount);
 
+    __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent.GRAVITATIONAL_CONSTANT = this.props.gravityConstant;
+
     if (!prevProps.debug && this.props.debug) {
       worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem));
       collisionSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawSurfacesComponent(renderSystem));
-
-      ballBag.objects.forEach(object => {
-        object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem));
-        object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(renderSystem));
-      });
 
       game.addObject(clickMarker);
     } else if (prevProps.debug && !this.props.debug) {
       worldSystem.removeComponentByName("DebugDrawBoundsComponent");
       collisionSystem.removeComponentByName("DebugDrawSurfacesComponent");
 
-      ballBag.objects.forEach(object => {
-        object.removeComponentByName("DebugDrawBoundsComponent");
-        object.removeComponentByName("PositionRenderComponent");
-      });
-
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    componentHelper(prevProps.gravity, this.props.gravity, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent());
-    }, object => {
-      object.removeComponentByName("GravityComponent");
-    });
+    if (prevProps.components != this.props.components) {
+      ballBag.objects.forEach(object => {
+        // object.removeAllComponents();
+        object.components.length = 0;
 
-    componentHelper(prevProps.wrap, this.props.wrap, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldWrapComponent(worldSystem));
-      object.removeComponentByName("WorldBounceComponent");
-    }, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem));
-      object.removeComponentByName("WorldWrapComponent");
-    });
-
-    componentHelper(prevProps.background, this.props.background, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem));
-    }, object => {
-      object.removeComponentByName("BackgroundCollisionComponent");
-    });
-
-    componentHelper(prevProps.square, this.props.square, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem));
-      object.removeComponentByName("DotRenderComponent");
-    }, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem));
-      object.removeComponentByName("RectangleRenderComponent");
-    });
-
-    componentHelper(prevProps.rotation, this.props.rotation, object => {
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
-    }, object => {
-      object.removeComponentByName("RotationComponent");
-    });
+        this.props.components.forEach(name => {
+          object.addComponent(availableComponents[name](object));
+        });
+      });
+    }
 
     if (!prevProps.bounds && this.props.bounds) {
       const bounds = worldSystem.originalBounds;
@@ -9589,14 +9572,6 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     } else if (prevProps.bounds && !this.props.bounds) {
       worldSystem.removeComponentByName("BoundsAnimationComponent");
     }
-
-    componentHelper(prevProps.bounds, this.props.bounds, object => {
-      const bounds = object.originalBounds;
-      const bounds2 = [bounds[1], bounds[0], bounds[3], bounds[2]];
-      object.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(bounds, bounds2, 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
-    }, object => {
-      object.removeComponentByName("BoundsAnimationComponent");
-    });
   }
 
   render() {
@@ -9616,14 +9591,6 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 /* harmony export (immutable) */ __webpack_exports__["a"] = Game;
 
 
-function componentHelper(oldValue, newValue, positiveAction, negativeAction) {
-  if (!oldValue && newValue) {
-    ballBag.objects.forEach(positiveAction);
-  } else if (oldValue && !newValue) {
-    ballBag.objects.forEach(negativeAction);
-  }
-}
-
 let game;
 let ballBag;
 let inputSystem;
@@ -9632,6 +9599,23 @@ let worldSystem;
 let collisionSystem;
 let renderSystem;
 let clickMarker;
+
+let availableComponents = {
+  Gravity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent(),
+  TerminalVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].TerminalVelocityComponent(MAX_VELOCITY),
+  Move: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].MoveComponent(),
+  WorldWrap: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldWrapComponent(worldSystem),
+  WorldBounce: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem),
+  BackgroundCollision: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem),
+  Rotation: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
+  ColorAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(object.color, object.color2, 3000),
+  BoundsAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(object.bounds, object.bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth),
+  RectangleRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem),
+  DotRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem),
+  DebugDrawBounds: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem),
+  PositionRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(renderSystem),
+  Click: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem)
+};
 
 function init(canvas, component) {
   game = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Game"]({
@@ -9699,8 +9683,9 @@ function init(canvas, component) {
 
   collisionSystem = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Collision"].BackgroundCollisionSystem();
   collisionSystem.addSurface([-game.width * 0.25, game.height / 2 - 100, 0, 0, game.width * 0.25, game.height / 2 - 100]);
-  collisionSystem.addSurface([-game.width * 0.5, game.height * 0.25, -game.width * 0.25, game.height * 0.5]);
-  collisionSystem.addSurface([game.width * 0.25, game.height * 0.5, game.width * 0.5, game.height * 0.25]);
+  collisionSystem.addSurface([-game.width, game.height * 0.5 - 50, game.width, game.height * 0.5 - 50]);
+  // collisionSystem.addSurface([-game.width * 0.5, game.height * 0.25, -game.width * 0.25, game.height * 0.5]);
+  // collisionSystem.addSurface([game.width * 0.25, game.height * 0.5, game.width * 0.5, game.height * 0.25]);
 
   game.root.addObjectAt(collisionSystem, 1);
 
@@ -9740,47 +9725,15 @@ function ballFactory(options) {
   const ry = Math.random() * 20 + 20;
   ball.setBounds(-rx, -ry, rx, ry);
   ball.originalBounds = [...ball.bounds];
-  const bounds2 = [-ry, -rx, ry, rx];
+  ball.bounds2 = [-ry, -rx, ry, rx];
   const r = Math.random() * 255;
   const g = Math.random() * 255;
   const b = Math.random() * 255;
   const r1 = Math.random() * 255;
   const g1 = Math.random() * 255;
   const b1 = Math.random() * 255;
-  const color = `rgba(${r | 0},${g | 0},${b | 0},1)`;
-  const color2 = `rgba(${r1 | 0},${g1 | 0},${b1 | 0},0.5)`;
-
-  if (options.gravity) ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent());
-
-  ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].TerminalVelocityComponent(MAX_VELOCITY));
-  ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].MoveComponent());
-
-  if (options.wrap) {
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldWrapComponent(worldSystem));
-  } else {
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem));
-  }
-
-  if (options.background) ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem));
-
-  if (options.rotation) ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
-
-  ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(color, color2, 3000));
-
-  if (options.bounds) ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(ball.bounds, bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth));
-
-  if (options.square) {
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem, color));
-  } else {
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem, color));
-  }
-
-  if (options.debug) {
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem));
-    ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(renderSystem));
-  }
-
-  ball.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem));
+  ball.color = `rgba(${r | 0},${g | 0},${b | 0},1)`;
+  ball.color2 = `rgba(${r1 | 0},${g1 | 0},${b1 | 0},0.5)`;
 
   ball.on("click", () => {
     ballBag.removeObject(ball);
@@ -9821,6 +9774,9 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   }
   handleChange(e, prop) {
     this.props.modifyState({ [prop]: e.target.checked });
+  }
+  handleGravityChange(e) {
+    this.props.modifyState({ gravityConstant: e.target.value });
   }
 
   render() {
@@ -9873,7 +9829,9 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
           'label',
           null,
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.gravity, onChange: e => this.handleChange(e, "gravity") }),
-          'Gravity'
+          'Gravity ',
+          ' ',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.gravityConstant, onChange: e => this.handleGravityChange(e) })
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -9924,6 +9882,20 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
           null,
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
           'Animate Bounds'
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        'Ball Components:',
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'ul',
+          null,
+          this.props.components.map((name, i) => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'li',
+            { key: i },
+            name
+          ))
         )
       )
     );
@@ -13073,7 +13045,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             "use strict";
             /* harmony import */
-            var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__ = __webpack_require__(0);
+            var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
 
             /**
              * When parent goes outside of world bounds wrap to the opposite wall.
@@ -13096,38 +13068,52 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 _createClass(WorldWrapComponent, [{
                     key: 'update',
                     value: function update(parent, delta) {
-                        var ax = this.worldSystem.bounds[0];
-                        var ay = this.worldSystem.bounds[1];
-                        var bx = this.worldSystem.bounds[2];
-                        var by = this.worldSystem.bounds[3];
-                        var az = this.worldSystem.bounds[4];
-                        var bz = this.worldSystem.bounds[5];
-                        if (parent.position[0] < ax && parent.velocity[0] < 0) {
-                            parent.position[0] = bx;
-                            this.fire("wrap", parent);
-                        } else if (parent.position[0] > bx && parent.velocity[0] > 0) {
-                            parent.position[0] = ax;
-                            this.fire("wrap", parent);
+                        var worldBounds = this.worldSystem.bounds;
+                        var parentBounds = parent.bounds;
+                        var ax1 = worldBounds[0];
+                        var ay1 = worldBounds[1];
+                        var ax2 = worldBounds[2];
+                        var ay2 = worldBounds[3];
+                        var az1 = worldBounds[4];
+                        var az2 = worldBounds[5];
+                        var px = parent.position[0];
+                        var py = parent.position[1];
+                        var pz = parent.position[2];
+                        var vx = parent.velocity[0];
+                        var vy = parent.velocity[1];
+                        var vz = parent.velocity[2];
+                        var bx1 = parentBounds ? ax1 - parentBounds[2] : ax1;
+                        var bx2 = parentBounds ? ax2 - parentBounds[0] : ax1;
+                        var by1 = parentBounds ? ay1 - parentBounds[3] : ay1;
+                        var by2 = parentBounds ? ay2 - parentBounds[1] : ay1;
+                        var bz1 = parentBounds ? az1 - parentBounds[5] : az1;
+                        var bz2 = parentBounds ? az2 - parentBounds[4] : az1;
+                        if (px < bx1 && vx < 0) {
+                            parent.position[0] = bx2;
+                            parent.fire("wrap", parent); // [-1,0,0]
+                        } else if (px > bx2 && vx > 0) {
+                            parent.position[0] = bx1;
+                            parent.fire("wrap", parent); // [1,0,0]
                         }
-                        if (parent.position[1] < ay && parent.velocity[1] < 0) {
-                            parent.position[1] = by;
-                            this.fire("wrap", parent);
-                        } else if (parent.position[1] > by && parent.velocity[1] > 0) {
-                            parent.position[1] = ay;
-                            this.fire("wrap", parent);
+                        if (py < by1 && vy < 0) {
+                            parent.position[1] = by2;
+                            parent.fire("wrap", parent); // [0,-1,0]
+                        } else if (py > by2 && vy > 0) {
+                            parent.position[1] = by1;
+                            parent.fire("wrap", parent); // [0,1,0]
                         }
-                        if (parent.position[2] < az && parent.velocity[2] < 0) {
-                            parent.position[2] = bz;
-                            this.fire("wrap", parent);
-                        } else if (parent.position[2] > bz && parent.velocity[2] > 0) {
-                            parent.position[2] = az;
-                            this.fire("wrap", parent);
+                        if (pz < bz1 && vz < 0) {
+                            parent.position[2] = bz2;
+                            parent.fire("wrap", parent); // [0,0,-1]
+                        } else if (pz > bz2 && vz > 0) {
+                            parent.position[2] = bz1;
+                            parent.fire("wrap", parent); // [0,0,1]
                         }
                     }
                 }]);
 
                 return WorldWrapComponent;
-            }(__WEBPACK_IMPORTED_MODULE_0__core_GameComponent_ts__["a" /* default */]);
+            }(__WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]);
             /* harmony default export */
 
             __webpack_exports__["a"] = WorldWrapComponent;
@@ -13386,7 +13372,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                             if (bounds[0] + pos[0] < click[0] && bounds[1] + pos[1] < click[1] && bounds[2] + pos[0] > click[0] && bounds[3] + pos[1] > click[1]) {
                                 parent.fire('click', parent);
-                                this.fire('click', parent);
                             }
                         }
                     }

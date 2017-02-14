@@ -10,6 +10,7 @@ export default class App extends Component {
     this.state = {
       ballCount: 10,
       gravity: false,
+      gravityConstant: 0.0003,
       falling: false,
       debug: false,
       wrap: false,
@@ -17,6 +18,22 @@ export default class App extends Component {
       square: false,
       rotation: false,
       bounds: true,
+      components: [
+        // "Gravity",
+        "TerminalVelocity",
+        "Move",
+        "WorldWrap",
+        // "WorldBounce",
+        // "BackgroundCollision",
+        // "Rotation",
+        "ColorAnimation",
+        // "BoundsAnimation",
+        // "RectangleRender",
+        "DotRender",
+        // "DebugDrawBounds",
+        // "PositionRender",
+        "Click",
+      ],
     };
   }
 

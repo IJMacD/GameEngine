@@ -18,61 +18,30 @@ export default class Game extends Component {
   doImperitiveStuff (prevProps={}) {
     game.setScore(this.props.ballCount);
 
+    IGE.Components.GravityComponent.GRAVITATIONAL_CONSTANT = this.props.gravityConstant;
+
     if (!prevProps.debug && this.props.debug) {
       worldSystem.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
       collisionSystem.addComponent(new IGE.Debug.DebugDrawSurfacesComponent(renderSystem));
-
-      ballBag.objects.forEach(object => {
-        object.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
-        object.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
-      });
 
       game.addObject(clickMarker);
     } else if (prevProps.debug && !this.props.debug) {
       worldSystem.removeComponentByName("DebugDrawBoundsComponent");
       collisionSystem.removeComponentByName("DebugDrawSurfacesComponent");
 
-      ballBag.objects.forEach(object => {
-        object.removeComponentByName("DebugDrawBoundsComponent");
-        object.removeComponentByName("PositionRenderComponent");
-      });
-
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    componentHelper(prevProps.gravity, this.props.gravity, object => {
-      object.addComponent(new IGE.Components.GravityComponent());
-    }, object => {
-      object.removeComponentByName("GravityComponent");
-    });
+    if (prevProps.components != this.props.components) {
+      ballBag.objects.forEach(object => {
+        // object.removeAllComponents();
+        object.components.length = 0;
 
-    componentHelper(prevProps.wrap, this.props.wrap, object => {
-      object.addComponent(new IGE.Components.WorldWrapComponent(worldSystem));
-      object.removeComponentByName("WorldBounceComponent");
-    }, object => {
-      object.addComponent(new IGE.Components.WorldBounceComponent(worldSystem));
-      object.removeComponentByName("WorldWrapComponent");
-    });
-
-    componentHelper(prevProps.background, this.props.background, object => {
-      object.addComponent(new IGE.Components.BackgroundCollisionComponent(collisionSystem));
-    }, object => {
-      object.removeComponentByName("BackgroundCollisionComponent");
-    });
-
-    componentHelper(prevProps.square, this.props.square, object => {
-      object.addComponent(new IGE.Components.RectangleRenderComponent(renderSystem));
-      object.removeComponentByName("DotRenderComponent");
-    }, object => {
-      object.addComponent(new IGE.Components.DotRenderComponent(renderSystem));
-      object.removeComponentByName("RectangleRenderComponent");
-    });
-
-    componentHelper(prevProps.rotation, this.props.rotation, object => {
-      object.addComponent(new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
-    }, object => {
-      object.removeComponentByName("RotationComponent");
-    });
+        this.props.components.forEach(name => {
+          object.addComponent(availableComponents[name](object));
+        });
+      });
+    }
 
     if (!prevProps.bounds && this.props.bounds) {
       const bounds = worldSystem.originalBounds;
@@ -82,13 +51,6 @@ export default class Game extends Component {
       worldSystem.removeComponentByName("BoundsAnimationComponent");
     }
 
-    componentHelper(prevProps.bounds, this.props.bounds, object => {
-      const bounds = object.originalBounds;
-      const bounds2 = [bounds[1], bounds[0], bounds[3], bounds[2]];
-      object.addComponent(new IGE.Components.BoundsAnimationComponent(bounds, bounds2, 5000, IGE.Easing.Linear));
-    }, object => {
-      object.removeComponentByName("BoundsAnimationComponent");
-    });
   }
 
   render () {
@@ -106,14 +68,6 @@ export default class Game extends Component {
   }
 }
 
-function componentHelper (oldValue, newValue, positiveAction, negativeAction) {
-  if (!oldValue && newValue) {
-    ballBag.objects.forEach(positiveAction);
-  } else if (oldValue && !newValue) {
-    ballBag.objects.forEach(negativeAction);
-  }
-}
-
 let game;
 let ballBag;
 let inputSystem;
@@ -122,6 +76,23 @@ let worldSystem;
 let collisionSystem;
 let renderSystem;
 let clickMarker;
+
+let availableComponents = {
+  Gravity: () => new IGE.Components.GravityComponent(),
+  TerminalVelocity: () => new IGE.Components.TerminalVelocityComponent(MAX_VELOCITY),
+  Move: () => new IGE.Components.MoveComponent(),
+  WorldWrap: () => new IGE.Components.WorldWrapComponent(worldSystem),
+  WorldBounce: () => new IGE.Components.WorldBounceComponent(worldSystem),
+  BackgroundCollision: () => new IGE.Components.BackgroundCollisionComponent(collisionSystem),
+  Rotation: () => new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
+  ColorAnimation: object => new IGE.Components.ColorAnimationComponent(object.color, object.color2, 3000),
+  BoundsAnimation: object => new IGE.Components.BoundsAnimationComponent(object.bounds, object.bounds2, 2000, IGE.Easing.Smooth),
+  RectangleRender: () => new IGE.Components.RectangleRenderComponent(renderSystem),
+  DotRender: () => new IGE.Components.DotRenderComponent(renderSystem),
+  DebugDrawBounds: () => new IGE.Debug.DebugDrawBoundsComponent(renderSystem),
+  PositionRender: () => new IGE.Debug.PositionRenderComponent(renderSystem),
+  Click: () => new IGE.Components.ClickComponent(inputSystem)
+}
 
 function init (canvas, component) {
   game = new IGE.Game({
@@ -190,8 +161,9 @@ function init (canvas, component) {
 
   collisionSystem = new IGE.Collision.BackgroundCollisionSystem();
   collisionSystem.addSurface([-game.width * 0.25, game.height / 2 - 100, 0, 0, game.width * 0.25, game.height / 2 - 100]);
-  collisionSystem.addSurface([-game.width * 0.5, game.height * 0.25, -game.width * 0.25, game.height * 0.5]);
-  collisionSystem.addSurface([game.width * 0.25, game.height * 0.5, game.width * 0.5, game.height * 0.25]);
+  collisionSystem.addSurface([-game.width, game.height * 0.5 - 50, game.width, game.height * 0.5 - 50]);
+  // collisionSystem.addSurface([-game.width * 0.5, game.height * 0.25, -game.width * 0.25, game.height * 0.5]);
+  // collisionSystem.addSurface([game.width * 0.25, game.height * 0.5, game.width * 0.5, game.height * 0.25]);
 
   game.root.addObjectAt(collisionSystem, 1);
 
@@ -232,51 +204,15 @@ function ballFactory (options) {
   const ry = Math.random() * 20 + 20;
   ball.setBounds(-rx, -ry, rx, ry);
   ball.originalBounds = [...ball.bounds];
-  const bounds2 = [-ry, -rx, ry, rx];
+  ball.bounds2 = [-ry, -rx, ry, rx];
   const r = Math.random() * 255;
   const g = Math.random() * 255;
   const b = Math.random() * 255;
   const r1 = Math.random() * 255;
   const g1 = Math.random() * 255;
   const b1 = Math.random() * 255;
-  const color = `rgba(${r|0},${g|0},${b|0},1)`;
-  const color2 = `rgba(${r1|0},${g1|0},${b1|0},0.5)`;
-
-  if (options.gravity)
-    ball.addComponent(new IGE.Components.GravityComponent());
-
-  ball.addComponent(new IGE.Components.TerminalVelocityComponent(MAX_VELOCITY));
-  ball.addComponent(new IGE.Components.MoveComponent());
-
-  if (options.wrap) {
-    ball.addComponent(new IGE.Components.WorldWrapComponent(worldSystem));
-  } else {
-    ball.addComponent(new IGE.Components.WorldBounceComponent(worldSystem));
-  }
-
-  if (options.background)
-    ball.addComponent(new IGE.Components.BackgroundCollisionComponent(collisionSystem));
-
-  if (options.rotation)
-    ball.addComponent(new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION));
-
-  ball.addComponent(new IGE.Components.ColorAnimationComponent(color, color2, 3000));
-
-  if (options.bounds)
-    ball.addComponent(new IGE.Components.BoundsAnimationComponent(ball.bounds, bounds2, 2000, IGE.Easing.Smooth));
-
-  if (options.square) {
-    ball.addComponent(new IGE.Components.RectangleRenderComponent(renderSystem, color));
-  } else {
-    ball.addComponent(new IGE.Components.DotRenderComponent(renderSystem, color));
-  }
-
-  if (options.debug) {
-    ball.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
-    ball.addComponent(new IGE.Debug.PositionRenderComponent(renderSystem));
-  }
-
-  ball.addComponent(new IGE.Components.ClickComponent(inputSystem));
+  ball.color = `rgba(${r|0},${g|0},${b|0},1)`;
+  ball.color2 = `rgba(${r1|0},${g1|0},${b1|0},0.5)`;
 
   ball.on("click", () => {
     ballBag.removeObject(ball);

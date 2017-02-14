@@ -13,6 +13,9 @@ export default class Sidebar extends Component {
   handleChange (e, prop) {
     this.props.modifyState({[prop]: e.target.checked});
   }
+  handleGravityChange (e) {
+    this.props.modifyState({gravityConstant: e.target.value});
+  }
 
   render () {
     return (
@@ -29,7 +32,8 @@ export default class Sidebar extends Component {
         </label></p>
         <p><label>
           <input type="checkbox" checked={this.props.gravity} onChange={e => this.handleChange(e, "gravity")} />
-          Gravity
+          Gravity { ' ' }
+          <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} />
         </label></p>
         <p><label>
           <input type="checkbox" checked={this.props.wrap} onChange={e => this.handleChange(e, "wrap")} />
@@ -51,6 +55,14 @@ export default class Sidebar extends Component {
           <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
           Animate Bounds
         </label></p>
+        <p>
+          Ball Components:
+          <ul>
+            {
+              this.props.components.map((name, i) => <li key={i}>{ name }</li>)
+            }
+          </ul>
+        </p>
       </div>
     );
   }
