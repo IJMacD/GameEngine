@@ -9458,28 +9458,11 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 
     this.state = {
       ballCount: 10,
-      gravity: false,
       gravityConstant: 0.0003,
-      falling: false,
       debug: false,
-      wrap: false,
-      background: false,
-      square: false,
-      rotation: false,
       bounds: true,
-      components: [
-      // "Gravity",
-      "TerminalVelocity", "Move", "WorldWrap",
-      // "WorldBounce",
-      // "BackgroundCollision",
-      // "Rotation",
-      "ColorAnimation",
-      // "BoundsAnimation",
-      // "RectangleRender",
-      "DotRender",
-      // "DebugDrawBounds",
-      // "PositionRender",
-      "Click"]
+      availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click"],
+      components: ["TerminalVelocity", "Move", "WorldBounce", "DotRender", "Click"]
     };
   }
 
@@ -9529,7 +9512,7 @@ const MAX_ROTATION = 0.01;
 class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 
   componentDidMount() {
-    init(this.canvas, this);
+    init(this.canvas, this.props);
     this.doImperitiveStuff();
   }
 
@@ -9541,6 +9524,14 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     game.setScore(this.props.ballCount);
 
     __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent.GRAVITATIONAL_CONSTANT = this.props.gravityConstant;
+
+    if (ballBag.objects.length > this.props.ballCount) {
+      ballBag.objects.length = Math.max(this.props.ballCount, 0);
+    } else {
+      while (ballBag.objects.length < this.props.ballCount) {
+        addBall(ballBag, this.props);
+      }
+    }
 
     if (!prevProps.debug && this.props.debug) {
       worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem));
@@ -9554,20 +9545,15 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (prevProps.components != this.props.components) {
+    if (!deepEqual(prevProps.components, this.props.components)) {
       ballBag.objects.forEach(object => {
-        // object.removeAllComponents();
-        object.components.length = 0;
-
-        this.props.components.forEach(name => {
-          object.addComponent(availableComponents[name](object));
-        });
+        setComponents(object, this.props.components);
       });
     }
 
     if (!prevProps.bounds && this.props.bounds) {
       const bounds = worldSystem.originalBounds;
-      const bounds2 = bounds.map(x => x * 0.8);
+      const bounds2 = bounds.map(x => x * 0.6);
       worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(bounds, bounds2, 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
     } else if (prevProps.bounds && !this.props.bounds) {
       worldSystem.removeComponentByName("BoundsAnimationComponent");
@@ -9608,16 +9594,17 @@ let availableComponents = {
   WorldBounce: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem),
   BackgroundCollision: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem),
   Rotation: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
-  ColorAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(object.color, object.color2, 3000),
-  BoundsAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(object.bounds, object.bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth),
+  ColorAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(object.color1, object.color2, 3000),
+  BoundsAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth),
   RectangleRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem),
   DotRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem),
   DebugDrawBounds: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem),
-  PositionRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(renderSystem),
+  DebugPosition: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugPositionComponent(renderSystem),
+  DebugVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugVelocityComponent(renderSystem),
   Click: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem)
 };
 
-function init(canvas, component) {
+function init(canvas, options) {
   game = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Game"]({
     canvas,
     width: canvas.offsetWidth,
@@ -9627,15 +9614,13 @@ function init(canvas, component) {
     originCentric: true
   });
 
-  const options = component.props;
-
   inputSystem = game.getDefaultInput();
   cameraSystem = game.getDefaultCamera();
   renderSystem = game.getDefaultRenderer();
-  worldSystem = game.getDefaultWorld(50);
+  worldSystem = game.getDefaultWorld();
   worldSystem.originalBounds = [...worldSystem.bounds];
 
-  if (options.bounds) worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.8), 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
+  if (options.bounds) worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
 
   // ScoreRenderComponent
   game.root.addComponent((parent, delta) => {
@@ -9675,7 +9660,7 @@ function init(canvas, component) {
   clickMarker = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["GameObject"]();
   clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].MoveToClickComponent(game.getDefaultInput()));
   clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].SmoothPositionComponent());
-  clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].PositionRenderComponent(game.getDefaultRenderer()));
+  clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugPositionComponent(game.getDefaultRenderer()));
 
   if (options.debug) {
     game.addObject(clickMarker);
@@ -9701,16 +9686,6 @@ function init(canvas, component) {
   game.addObject(ballBag);
 
   game.start();
-
-  game.on("score", score => {
-    if (ballBag.objects.length > score) {
-      ballBag.objects.length = Math.max(score, 0);
-    } else {
-      while (ballBag.objects.length < score) {
-        addBall(ballBag, component.props);
-      }
-    }
-  });
 }
 
 function addBall(ballBag, options) {
@@ -9724,7 +9699,7 @@ function ballFactory(options) {
   const rx = Math.random() * 20 + 20;
   const ry = Math.random() * 20 + 20;
   ball.setBounds(-rx, -ry, rx, ry);
-  ball.originalBounds = [...ball.bounds];
+  ball.bounds1 = [...ball.bounds];
   ball.bounds2 = [-ry, -rx, ry, rx];
   const r = Math.random() * 255;
   const g = Math.random() * 255;
@@ -9732,14 +9707,26 @@ function ballFactory(options) {
   const r1 = Math.random() * 255;
   const g1 = Math.random() * 255;
   const b1 = Math.random() * 255;
-  ball.color = `rgba(${r | 0},${g | 0},${b | 0},1)`;
-  ball.color2 = `rgba(${r1 | 0},${g1 | 0},${b1 | 0},0.5)`;
+  ball.color = `rgba(${r | 0},${g | 0},${b | 0},0.8)`;
+  ball.color1 = ball.color;
+  ball.color2 = `rgba(${r1 | 0},${g1 | 0},${b1 | 0},0.8)`;
+
+  setComponents(ball, options.components);
 
   ball.on("click", () => {
     ballBag.removeObject(ball);
   });
 
   return ball;
+}
+
+function setComponents(object, components) {
+  // object.removeAllComponents();
+  object.components.length = 0;
+
+  components.forEach(name => {
+    object.addComponent(availableComponents[name](object));
+  });
 }
 
 function setRandomPosition(object, world) {
@@ -9751,6 +9738,18 @@ function setRandomPosition(object, world) {
   const x = Math.random() * width + minX;
   const y = Math.random() * height + minY;
   object.setPosition(x, y);
+}
+
+function deepEqual(a, b) {
+  if (!a || !b) return false;
+
+  if (a.length != b.length) return false;
+
+  for (let i = 0, l = a.length; i < l; i++) {
+    if (a[i] != b[i]) return false;
+  }
+
+  return true;
 }
 
 /***/ }),
@@ -9777,6 +9776,13 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   }
   handleGravityChange(e) {
     this.props.modifyState({ gravityConstant: e.target.value });
+  }
+  flipComponent(name) {
+    const components = this.props.components;
+    const isSelected = components.includes(name);
+    this.props.modifyState({
+      components: isSelected ? components.filter(x => x != name) : [...components, name]
+    });
   }
 
   render() {
@@ -9828,74 +9834,46 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'label',
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.gravity, onChange: e => this.handleChange(e, "gravity") }),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
+          'World Bounds Animation'
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'label',
+          null,
           'Gravity ',
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.gravityConstant, onChange: e => this.handleGravityChange(e) })
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        'div',
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
+          'p',
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.wrap, onChange: e => this.handleChange(e, "wrap") }),
-          'Wrap'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.background, onChange: e => this.handleChange(e, "background") }),
-          'Background Collision'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.square, onChange: e => this.handleChange(e, "square") }),
-          'Square Render'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.rotation, onChange: e => this.handleChange(e, "rotation") }),
-          'Rotation:'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
-          'Animate Bounds'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        'Ball Components:',
+          'Ball Components:'
+        ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'ul',
           null,
-          this.props.components.map((name, i) => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'li',
-            { key: i },
-            name
-          ))
+          this.props.availableComponents.map((name, i) => {
+            const selected = this.props.components.includes(name);
+            const style = {
+              color: selected ? '' : 'lightgray',
+              textDecoration: selected ? '' : 'line-through',
+              cursor: 'pointer'
+            };
+
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'li',
+              { key: i, style: style, onClick: () => this.flipComponent(name) },
+              name
+            );
+          })
         )
       )
     );
@@ -12471,7 +12449,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }
             var hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
             var hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
-            var rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
+            var rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),\s*(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),\s*(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,\s*(0(?:.\d+)|1(?:.0)?))?\)/;
             function parseColor(str) {
                 var match = str.match(hexColor) || str.match(hexColorShort);
                 if (match) {
@@ -16591,9 +16569,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             /* harmony reexport (binding) */__webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function () {
                 return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"];
             });
-            /* harmony import */var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(68);
-            /* harmony reexport (binding) */__webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function () {
-                return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"];
+            /* harmony import */var __WEBPACK_IMPORTED_MODULE_4__DebugPositionComponent__ = __webpack_require__(72);
+            /* harmony reexport (binding) */__webpack_require__.d(__webpack_exports__, "DebugPositionComponent", function () {
+                return __WEBPACK_IMPORTED_MODULE_4__DebugPositionComponent__["a"];
+            });
+            /* harmony import */var __WEBPACK_IMPORTED_MODULE_5__DebugVelocityComponent__ = __webpack_require__(73);
+            /* harmony reexport (binding) */__webpack_require__.d(__webpack_exports__, "DebugVelocityComponent", function () {
+                return __WEBPACK_IMPORTED_MODULE_5__DebugVelocityComponent__["a"];
             });
 
             // export { default as DebugDrawDataComponent } from './DebugDrawDataComponent';
@@ -19703,66 +19685,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             __webpack_exports__["a"] = DebugFlockingComponent;
 
             /***/
-        },
+        },,
         /* 68 */
-        /***/function (module, __webpack_exports__, __webpack_require__) {
-
-            "use strict";
-            /* harmony import */
-            var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-            var PositionRenderComponent = function (_WEBPACK_IMPORTED_MO50) {
-                _inherits(PositionRenderComponent, _WEBPACK_IMPORTED_MO50);
-
-                function PositionRenderComponent(renderSystem) {
-                    var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "10px sans-serif";
-                    var color = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
-
-                    _classCallCheck(this, PositionRenderComponent);
-
-                    var _this63 = _possibleConstructorReturn(this, (PositionRenderComponent.__proto__ || Object.getPrototypeOf(PositionRenderComponent)).call(this));
-
-                    _this63.renderSystem = renderSystem;
-                    _this63.font = font;
-                    _this63.color = color;
-                    // Font should start with an integer we can use as a size for the crosshairs
-                    _this63.size = parseInt(font, 10);
-                    return _this63;
-                }
-
-                _createClass(PositionRenderComponent, [{
-                    key: 'update',
-                    value: function update(parent, delta) {
-                        var _this64 = this;
-
-                        var p = parent.position;
-                        var size = this.size;
-
-                        this.renderSystem.push(function (ctx) {
-                            ctx.translate(p[0], p[1]);
-                            ctx.strokeStyle = "#888";
-                            ctx.lineWidth = 2;
-                            ctx.beginPath();
-                            ctx.moveTo(-size, 0);
-                            ctx.lineTo(size, 0);
-                            ctx.moveTo(0, -size);
-                            ctx.lineTo(0, size);
-                            ctx.stroke();
-                            ctx.fillStyle = _this64.color;
-                            ctx.font = _this64.font;
-                            ctx.fillText((p[0] | 0) + ', ' + (p[1] | 0), size / 2, -size / 2);
-                        });
-                    }
-                }]);
-
-                return PositionRenderComponent;
-            }(__WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]);
-            /* harmony export (immutable) */
-
-            __webpack_exports__["a"] = PositionRenderComponent;
-
-            /***/
-        },
         /* 69 */
         /***/function (module, __webpack_exports__, __webpack_require__) {
 
@@ -19774,41 +19698,41 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             /* harmony import */var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
             /* harmony import */var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
 
-            var PolyShapeRenderingComponent = function (_WEBPACK_IMPORTED_MO51) {
-                _inherits(PolyShapeRenderingComponent, _WEBPACK_IMPORTED_MO51);
+            var PolyShapeRenderingComponent = function (_WEBPACK_IMPORTED_MO50) {
+                _inherits(PolyShapeRenderingComponent, _WEBPACK_IMPORTED_MO50);
 
                 function PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices) {
                     _classCallCheck(this, PolyShapeRenderingComponent);
 
-                    var _this65 = _possibleConstructorReturn(this, (PolyShapeRenderingComponent.__proto__ || Object.getPrototypeOf(PolyShapeRenderingComponent)).call(this));
+                    var _this63 = _possibleConstructorReturn(this, (PolyShapeRenderingComponent.__proto__ || Object.getPrototypeOf(PolyShapeRenderingComponent)).call(this));
 
                     var gl = renderSystem.context;
-                    _this65.renderSystem = renderSystem;
+                    _this63.renderSystem = renderSystem;
 
-                    _this65.vertexBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this65.vertexBuffer);
+                    _this63.vertexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.vertexBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-                    _this65.vertexBuffer.itemSize = 3;
-                    _this65.vertexBuffer.numItems = Math.floor(vertices.length / _this65.vertexBuffer.itemSize);
+                    _this63.vertexBuffer.itemSize = 3;
+                    _this63.vertexBuffer.numItems = Math.floor(vertices.length / _this63.vertexBuffer.itemSize);
 
-                    _this65.textureBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this65.textureBuffer);
+                    _this63.textureBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.textureBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-                    _this65.textureBuffer.itemSize = 2;
-                    _this65.textureBuffer.numItems = Math.floor(textureCoords.length / _this65.textureBuffer.itemSize);
+                    _this63.textureBuffer.itemSize = 2;
+                    _this63.textureBuffer.numItems = Math.floor(textureCoords.length / _this63.textureBuffer.itemSize);
 
-                    _this65.vertexNormalBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this65.vertexNormalBuffer);
+                    _this63.vertexNormalBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.vertexNormalBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-                    _this65.vertexNormalBuffer.itemSize = 3;
-                    _this65.vertexNormalBuffer.numItems = Math.floor(vertexNormals.length / _this65.vertexNormalBuffer.itemSize);
+                    _this63.vertexNormalBuffer.itemSize = 3;
+                    _this63.vertexNormalBuffer.numItems = Math.floor(vertexNormals.length / _this63.vertexNormalBuffer.itemSize);
 
-                    _this65.vertexIndexBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this65.vertexIndexBuffer);
+                    _this63.vertexIndexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this63.vertexIndexBuffer);
                     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), gl.STATIC_DRAW);
-                    _this65.vertexIndexBuffer.itemSize = 1;
-                    _this65.vertexIndexBuffer.numItems = vertexIndices.length;
-                    return _this65;
+                    _this63.vertexIndexBuffer.itemSize = 1;
+                    _this63.vertexIndexBuffer.numItems = vertexIndices.length;
+                    return _this63;
                 }
 
                 _createClass(PolyShapeRenderingComponent, [{
@@ -20024,26 +19948,26 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             /* harmony import */var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__ = __webpack_require__(24);
             /* harmony import */var __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4__);
 
-            var WebGLRenderSystem = function (_WEBPACK_IMPORTED_MO52) {
-                _inherits(WebGLRenderSystem, _WEBPACK_IMPORTED_MO52);
+            var WebGLRenderSystem = function (_WEBPACK_IMPORTED_MO51) {
+                _inherits(WebGLRenderSystem, _WEBPACK_IMPORTED_MO51);
 
                 function WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram) {
                     _classCallCheck(this, WebGLRenderSystem);
 
-                    var _this66 = _possibleConstructorReturn(this, (WebGLRenderSystem.__proto__ || Object.getPrototypeOf(WebGLRenderSystem)).call(this));
+                    var _this64 = _possibleConstructorReturn(this, (WebGLRenderSystem.__proto__ || Object.getPrototypeOf(WebGLRenderSystem)).call(this));
 
-                    _this66.context = context;
-                    _this66.canvasWidth = canvasWidth;
-                    _this66.canvasHeight = canvasHeight;
-                    _this66.cameraSystem = cameraSystem;
-                    _this66.shaderProgram = shaderProgram;
-                    _this66.mvMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
-                    _this66.pMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
-                    _this66.renderQueue = [];
-                    _this66.spareVector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    _this66.ambientLight = 0.3;
-                    _this66.pointLighting = 1.4;
-                    return _this66;
+                    _this64.context = context;
+                    _this64.canvasWidth = canvasWidth;
+                    _this64.canvasHeight = canvasHeight;
+                    _this64.cameraSystem = cameraSystem;
+                    _this64.shaderProgram = shaderProgram;
+                    _this64.mvMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
+                    _this64.pMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
+                    _this64.renderQueue = [];
+                    _this64.spareVector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    _this64.ambientLight = 0.3;
+                    _this64.pointLighting = 1.4;
+                    return _this64;
                 }
 
                 _createClass(WebGLRenderSystem, [{
@@ -20236,6 +20160,125 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             // Export debug
 
+
+            /***/
+        },
+        /* 72 */
+        /***/function (module, __webpack_exports__, __webpack_require__) {
+
+            "use strict";
+            /* harmony import */
+            var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+            var DebugPositionComponent = function (_WEBPACK_IMPORTED_MO52) {
+                _inherits(DebugPositionComponent, _WEBPACK_IMPORTED_MO52);
+
+                function DebugPositionComponent(renderSystem) {
+                    var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "10px sans-serif";
+                    var color = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
+
+                    _classCallCheck(this, DebugPositionComponent);
+
+                    var _this65 = _possibleConstructorReturn(this, (DebugPositionComponent.__proto__ || Object.getPrototypeOf(DebugPositionComponent)).call(this));
+
+                    _this65.renderSystem = renderSystem;
+                    _this65.font = font;
+                    _this65.color = color;
+                    // Font should start with an integer we can use as a size for the crosshairs
+                    _this65.size = parseInt(font, 10);
+                    return _this65;
+                }
+
+                _createClass(DebugPositionComponent, [{
+                    key: 'update',
+                    value: function update(parent, delta) {
+                        var _this66 = this;
+
+                        var p = parent.position;
+                        var size = this.size;
+
+                        this.renderSystem.push(function (ctx) {
+                            ctx.translate(p[0], p[1]);
+                            ctx.strokeStyle = "#888";
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.moveTo(-size, 0);
+                            ctx.lineTo(size, 0);
+                            ctx.moveTo(0, -size);
+                            ctx.lineTo(0, size);
+                            ctx.stroke();
+                            ctx.fillStyle = _this66.color;
+                            ctx.font = _this66.font;
+                            ctx.fillText((p[0] | 0) + ', ' + (p[1] | 0), size / 2, -size / 2);
+                        });
+                    }
+                }]);
+
+                return DebugPositionComponent;
+            }(__WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]);
+            /* harmony export (immutable) */
+
+            __webpack_exports__["a"] = DebugPositionComponent;
+
+            /***/
+        },
+        /* 73 */
+        /***/function (module, __webpack_exports__, __webpack_require__) {
+
+            "use strict";
+            /* harmony import */
+            var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+            var DebugVelocityComponent = function (_WEBPACK_IMPORTED_MO53) {
+                _inherits(DebugVelocityComponent, _WEBPACK_IMPORTED_MO53);
+
+                function DebugVelocityComponent(renderSystem) {
+                    var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "10px sans-serif";
+                    var color = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#080";
+
+                    _classCallCheck(this, DebugVelocityComponent);
+
+                    var _this67 = _possibleConstructorReturn(this, (DebugVelocityComponent.__proto__ || Object.getPrototypeOf(DebugVelocityComponent)).call(this));
+
+                    _this67.renderSystem = renderSystem;
+                    _this67.font = font;
+                    _this67.color = color;
+                    // Font should start with an integer we can use as a size for the crosshairs
+                    _this67.size = parseInt(font, 10);
+                    return _this67;
+                }
+
+                _createClass(DebugVelocityComponent, [{
+                    key: 'update',
+                    value: function update(parent, delta) {
+                        var _this68 = this;
+
+                        var p = parent.position;
+                        var v = parent.velocity;
+                        var size = this.size;
+
+                        this.renderSystem.push(function (ctx) {
+                            ctx.translate(p[0], p[1]);
+                            ctx.strokeStyle = "#888";
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.moveTo(-size, 0);
+                            ctx.lineTo(size, 0);
+                            ctx.moveTo(0, -size);
+                            ctx.lineTo(0, size);
+                            ctx.stroke();
+                            ctx.fillStyle = _this68.color;
+                            ctx.font = _this68.font;
+                            ctx.fillText(v[0].toFixed(3) + ', ' + v[1].toFixed(3), size / 2, size);
+                        });
+                    }
+                }]);
+
+                return DebugVelocityComponent;
+            }(__WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */]);
+            /* harmony export (immutable) */
+
+            __webpack_exports__["a"] = DebugVelocityComponent;
 
             /***/
         }])

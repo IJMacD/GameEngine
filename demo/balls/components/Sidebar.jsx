@@ -16,6 +16,13 @@ export default class Sidebar extends Component {
   handleGravityChange (e) {
     this.props.modifyState({gravityConstant: e.target.value});
   }
+  flipComponent (name) {
+    const components = this.props.components;
+    const isSelected = components.includes(name);
+    this.props.modifyState({
+      components: isSelected ? components.filter(x => x != name) : [...components, name]
+    });
+  }
 
   render () {
     return (
@@ -31,38 +38,30 @@ export default class Sidebar extends Component {
           Debug
         </label></p>
         <p><label>
-          <input type="checkbox" checked={this.props.gravity} onChange={e => this.handleChange(e, "gravity")} />
+          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
+          World Bounds Animation
+        </label></p>
+        <p><label>
           Gravity { ' ' }
           <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} />
         </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.wrap} onChange={e => this.handleChange(e, "wrap")} />
-          Wrap
-        </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.background} onChange={e => this.handleChange(e, "background")} />
-          Background Collision
-        </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.square} onChange={e => this.handleChange(e, "square")} />
-          Square Render
-        </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.rotation} onChange={e => this.handleChange(e, "rotation")} />
-          Rotation:
-        </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
-          Animate Bounds
-        </label></p>
-        <p>
-          Ball Components:
+        <div>
+          <p>Ball Components:</p>
           <ul>
             {
-              this.props.components.map((name, i) => <li key={i}>{ name }</li>)
+              this.props.availableComponents.map((name, i) => {
+                const selected = this.props.components.includes(name);
+                const style = {
+                  color: selected ? '' : 'lightgray',
+                  textDecoration: selected ? '' : 'line-through',
+                  cursor: 'pointer',
+                };
+
+                return <li key={i} style={style} onClick={() => this.flipComponent(name)}>{ name }</li>
+              })
             }
           </ul>
-        </p>
+        </div>
       </div>
     );
   }

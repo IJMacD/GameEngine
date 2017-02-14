@@ -7,7 +7,7 @@ const MAX_ROTATION = 0.01;
 export default class Game extends Component {
 
   componentDidMount () {
-    init(this.canvas, this);
+    init(this.canvas, this.props);
     this.doImperitiveStuff();
   }
 
@@ -19,6 +19,15 @@ export default class Game extends Component {
     game.setScore(this.props.ballCount);
 
     IGE.Components.GravityComponent.GRAVITATIONAL_CONSTANT = this.props.gravityConstant;
+
+    if(ballBag.objects.length > this.props.ballCount) {
+      ballBag.objects.length = Math.max(this.props.ballCount, 0);
+    }
+    else {
+      while(ballBag.objects.length < this.props.ballCount) {
+        addBall(ballBag, this.props);
+      }
+    }
 
     if (!prevProps.debug && this.props.debug) {
       worldSystem.addComponent(new IGE.Debug.DebugDrawBoundsComponent(renderSystem));
@@ -32,20 +41,15 @@ export default class Game extends Component {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (prevProps.components != this.props.components) {
+    if (!deepEqual(prevProps.components, this.props.components)) {
       ballBag.objects.forEach(object => {
-        // object.removeAllComponents();
-        object.components.length = 0;
-
-        this.props.components.forEach(name => {
-          object.addComponent(availableComponents[name](object));
-        });
+        setComponents(object, this.props.components);
       });
     }
 
     if (!prevProps.bounds && this.props.bounds) {
       const bounds = worldSystem.originalBounds;
-      const bounds2 = bounds.map(x => x * 0.8);
+      const bounds2 = bounds.map(x => x * 0.6);
       worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(bounds, bounds2, 5000, IGE.Easing.Linear));
     } else if (prevProps.bounds && !this.props.bounds) {
       worldSystem.removeComponentByName("BoundsAnimationComponent");
@@ -85,16 +89,17 @@ let availableComponents = {
   WorldBounce: () => new IGE.Components.WorldBounceComponent(worldSystem),
   BackgroundCollision: () => new IGE.Components.BackgroundCollisionComponent(collisionSystem),
   Rotation: () => new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
-  ColorAnimation: object => new IGE.Components.ColorAnimationComponent(object.color, object.color2, 3000),
-  BoundsAnimation: object => new IGE.Components.BoundsAnimationComponent(object.bounds, object.bounds2, 2000, IGE.Easing.Smooth),
+  ColorAnimation: object => new IGE.Components.ColorAnimationComponent(object.color1, object.color2, 3000),
+  BoundsAnimation: object => new IGE.Components.BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, IGE.Easing.Smooth),
   RectangleRender: () => new IGE.Components.RectangleRenderComponent(renderSystem),
   DotRender: () => new IGE.Components.DotRenderComponent(renderSystem),
   DebugDrawBounds: () => new IGE.Debug.DebugDrawBoundsComponent(renderSystem),
-  PositionRender: () => new IGE.Debug.PositionRenderComponent(renderSystem),
-  Click: () => new IGE.Components.ClickComponent(inputSystem)
+  DebugPosition: () => new IGE.Debug.DebugPositionComponent(renderSystem),
+  DebugVelocity: () => new IGE.Debug.DebugVelocityComponent(renderSystem),
+  Click: () => new IGE.Components.ClickComponent(inputSystem),
 }
 
-function init (canvas, component) {
+function init (canvas, options) {
   game = new IGE.Game({
     canvas,
     width: canvas.offsetWidth,
@@ -104,16 +109,14 @@ function init (canvas, component) {
     originCentric: true,
   });
 
-  const options = component.props;
-
   inputSystem = game.getDefaultInput();
   cameraSystem = game.getDefaultCamera();
   renderSystem = game.getDefaultRenderer();
-  worldSystem = game.getDefaultWorld(50);
+  worldSystem = game.getDefaultWorld();
   worldSystem.originalBounds = [...worldSystem.bounds];
 
   if (options.bounds)
-    worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.8), 5000, IGE.Easing.Linear));
+    worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, IGE.Easing.Linear));
 
   // ScoreRenderComponent
   game.root.addComponent((parent, delta) => {
@@ -153,7 +156,7 @@ function init (canvas, component) {
   clickMarker = new IGE.GameObject();
   clickMarker.addComponent(new IGE.Components.MoveToClickComponent(game.getDefaultInput()));
   clickMarker.addComponent(new IGE.Components.SmoothPositionComponent());
-  clickMarker.addComponent(new IGE.Debug.PositionRenderComponent(game.getDefaultRenderer()));
+  clickMarker.addComponent(new IGE.Debug.DebugPositionComponent(game.getDefaultRenderer()));
 
   if (options.debug) {
     game.addObject(clickMarker);
@@ -179,17 +182,6 @@ function init (canvas, component) {
   game.addObject(ballBag);
 
   game.start();
-
-  game.on("score", score => {
-    if(ballBag.objects.length > score) {
-      ballBag.objects.length = Math.max(score, 0);
-    }
-    else {
-      while(ballBag.objects.length < score) {
-        addBall(ballBag, component.props);
-      }
-    }
-  });
 }
 
 function addBall(ballBag, options) {
@@ -203,7 +195,7 @@ function ballFactory (options) {
   const rx = Math.random() * 20 + 20;
   const ry = Math.random() * 20 + 20;
   ball.setBounds(-rx, -ry, rx, ry);
-  ball.originalBounds = [...ball.bounds];
+  ball.bounds1 = [...ball.bounds];
   ball.bounds2 = [-ry, -rx, ry, rx];
   const r = Math.random() * 255;
   const g = Math.random() * 255;
@@ -211,14 +203,26 @@ function ballFactory (options) {
   const r1 = Math.random() * 255;
   const g1 = Math.random() * 255;
   const b1 = Math.random() * 255;
-  ball.color = `rgba(${r|0},${g|0},${b|0},1)`;
-  ball.color2 = `rgba(${r1|0},${g1|0},${b1|0},0.5)`;
+  ball.color = `rgba(${r|0},${g|0},${b|0},0.8)`;
+  ball.color1 = ball.color;
+  ball.color2 = `rgba(${r1|0},${g1|0},${b1|0},0.8)`;
+
+  setComponents(ball, options.components);
 
   ball.on("click", () => {
     ballBag.removeObject(ball);
   });
 
   return ball;
+}
+
+function setComponents (object, components) {
+  // object.removeAllComponents();
+  object.components.length = 0;
+
+  components.forEach(name => {
+    object.addComponent(availableComponents[name](object));
+  });
 }
 
 function setRandomPosition(object, world) {
@@ -230,4 +234,19 @@ function setRandomPosition(object, world) {
   const x = Math.random() * width + minX;
   const y = Math.random() * height + minY;
   object.setPosition(x, y);
+}
+
+function deepEqual(a, b) {
+  if (!a || !b)
+    return false;
+
+  if (a.length != b.length)
+    return false;
+
+  for (let i = 0, l = a.length; i < l; i++) {
+    if (a[i] != b[i])
+      return false;
+  }
+
+  return true;
 }
