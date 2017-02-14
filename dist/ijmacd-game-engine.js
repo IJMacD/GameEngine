@@ -2311,7 +2311,7 @@ function DampedOscillation (n) {
 }
 const hexColor = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 const hexColorShort = /#([0-9a-f])([0-9a-f])([0-9a-f])/i;
-const rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,(0(?:.\d+)|1(?:.0)?))?\)/;
+const rgbRegex = /rgba?\((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),\s*(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),\s*(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])(?:,\s*(0(?:.\d+)|1(?:.0)?))?\)/;
 function parseColor(str) {
     let match = str.match(hexColor) || str.match(hexColorShort);
     if (match) {
@@ -5994,13 +5994,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugDrawSurfacesComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__DebugDrawSurfacesComponent__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__ = __webpack_require__(67);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugFlockingComponent", function() { return __WEBPACK_IMPORTED_MODULE_3__DebugFlockingComponent__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__ = __webpack_require__(68);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "PositionRenderComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__PositionRenderComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__DebugPositionComponent__ = __webpack_require__(72);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugPositionComponent", function() { return __WEBPACK_IMPORTED_MODULE_4__DebugPositionComponent__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DebugVelocityComponent__ = __webpack_require__(73);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DebugVelocityComponent", function() { return __WEBPACK_IMPORTED_MODULE_5__DebugVelocityComponent__["a"]; });
 
 
 // export { default as DebugDrawDataComponent } from './DebugDrawDataComponent';
 
 // export { default as DebugDrawGraphComponent } from './DebugDrawGraphComponent';
+
+
 
 
 
@@ -8586,47 +8590,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
 
 
 /***/ }),
-/* 68 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
-
-
-class PositionRenderComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
-  constructor (renderSystem, font = "10px sans-serif", color = "#000") {
-    super();
-    this.renderSystem = renderSystem;
-    this.font = font;
-    this.color = color;
-    // Font should start with an integer we can use as a size for the crosshairs
-    this.size = parseInt(font, 10);
-  }
-  update (parent, delta) {
-    const p = parent.position;
-    const size = this.size;
-
-    this.renderSystem.push(ctx => {
-      ctx.translate(p[0], p[1]);
-      ctx.strokeStyle = "#888";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-size, 0);
-      ctx.lineTo(size, 0);
-      ctx.moveTo(0, -size);
-      ctx.lineTo(0, size);
-      ctx.stroke();
-      ctx.fillStyle = this.color;
-      ctx.font = this.font;
-      ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
-    });
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PositionRenderComponent;
-
-
-
-/***/ }),
+/* 68 */,
 /* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9126,6 +9090,89 @@ Components['TextRenderComponent'] = __WEBPACK_IMPORTED_MODULE_26__render_TextRen
 
 // Export debug
 
+
+
+
+/***/ }),
+/* 72 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class DebugPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+  constructor (renderSystem, font = "10px sans-serif", color = "#000") {
+    super();
+    this.renderSystem = renderSystem;
+    this.font = font;
+    this.color = color;
+    // Font should start with an integer we can use as a size for the crosshairs
+    this.size = parseInt(font, 10);
+  }
+  update (parent, delta) {
+    const p = parent.position;
+    const size = this.size;
+
+    this.renderSystem.push(ctx => {
+      ctx.translate(p[0], p[1]);
+      ctx.strokeStyle = "#888";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-size, 0);
+      ctx.lineTo(size, 0);
+      ctx.moveTo(0, -size);
+      ctx.lineTo(0, size);
+      ctx.stroke();
+      ctx.fillStyle = this.color;
+      ctx.font = this.font;
+      ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
+    });
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = DebugPositionComponent;
+
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__ = __webpack_require__(0);
+
+
+class DebugVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameComponent__["a" /* default */] {
+  constructor (renderSystem, font = "10px sans-serif", color = "#080") {
+    super();
+    this.renderSystem = renderSystem;
+    this.font = font;
+    this.color = color;
+    // Font should start with an integer we can use as a size for the crosshairs
+    this.size = parseInt(font, 10);
+  }
+  update (parent, delta) {
+    const p = parent.position;
+    const v = parent.velocity;
+    const size = this.size;
+
+    this.renderSystem.push(ctx => {
+      ctx.translate(p[0], p[1]);
+      ctx.strokeStyle = "#888";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-size, 0);
+      ctx.lineTo(size, 0);
+      ctx.moveTo(0, -size);
+      ctx.lineTo(0, size);
+      ctx.stroke();
+      ctx.fillStyle = this.color;
+      ctx.font = this.font;
+      ctx.fillText(`${v[0].toFixed(3)}, ${v[1].toFixed(3)}`, size/2, size);
+    });
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = DebugVelocityComponent;
 
 
 
