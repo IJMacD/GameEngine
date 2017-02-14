@@ -1,7 +1,7 @@
 import GameComponent from '../core/GameComponent';
 
-export default class PositionRenderComponent extends GameComponent {
-  constructor (renderSystem, font = "10px sans-serif", color = "#000") {
+export default class DebugVelocityComponent extends GameComponent {
+  constructor (renderSystem, font = "10px sans-serif", color = "#080") {
     super();
     this.renderSystem = renderSystem;
     this.font = font;
@@ -11,6 +11,7 @@ export default class PositionRenderComponent extends GameComponent {
   }
   update (parent, delta) {
     const p = parent.position;
+    const v = parent.velocity;
     const size = this.size;
 
     this.renderSystem.push(ctx => {
@@ -25,7 +26,7 @@ export default class PositionRenderComponent extends GameComponent {
       ctx.stroke();
       ctx.fillStyle = this.color;
       ctx.font = this.font;
-      ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
+      ctx.fillText(`${v[0].toFixed(3)}, ${v[1].toFixed(3)}`, size/2, size);
     });
   }
 }

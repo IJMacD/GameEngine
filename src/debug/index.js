@@ -10,4 +10,6 @@ export { default as DebugDrawSurfacesComponent } from './DebugDrawSurfacesCompon
 
 export { default as DebugFlockingComponent } from './DebugFlockingComponent';
 
-export { default as PositionRenderComponent } from './PositionRenderComponent';
+export { default as DebugPositionComponent } from './DebugPositionComponent';
+
+export { default as DebugVelocityComponent } from './DebugVelocityComponent';
