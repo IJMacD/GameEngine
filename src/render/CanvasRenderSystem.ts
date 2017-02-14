@@ -16,12 +16,12 @@ class CanvasRenderSystem extends GameObject {
 	canvas: HTMLCanvasElement;
 	camera: CameraSystem;
 
-	renderQueue = [];
+	renderQueue: ((ctx: CanvasRenderingContext2D) => void)[][] = [];
 
 	/** Should the renderer clear the screen before drawing a frame or just overdraw. */
 	clearScreen = true;
 
-	constructor (context, cameraSystem) {
+	constructor (context: CanvasRenderingContext2D, cameraSystem: CameraSystem) {
 		super();
 
 		this.context = context;
@@ -39,14 +39,14 @@ class CanvasRenderSystem extends GameObject {
 	 * @param {CanvasRenderable} renderable - Function which will receive drawing context
 	 * @param {number} layer - Layer to add this drawable to. Default: 1
 	 */
-	push (renderable, layer: number = 1) {
+	push (renderable: (context: CanvasRenderingContext2D) => void, layer: number = 1) {
 		if(!this.renderQueue[layer]) {
 			this.renderQueue[layer] = [];
 		}
 		this.renderQueue[layer].push(renderable);
 	}
 
-	update (delta) {
+	update (delta: number) {
 		if(this.clearScreen){
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 		}
@@ -109,7 +109,7 @@ class CanvasRenderSystem extends GameObject {
 
 export default CanvasRenderSystem;
 
-function _renderQueue (renderSystem, layer) {
+function _renderQueue (renderSystem: CanvasRenderSystem, layer) {
 	const { context, renderQueue } = renderSystem;
 	const queue = renderQueue[layer];
 	if(queue){
