@@ -106,6 +106,13 @@ export default class GameObject implements Events {
         return this;
     }
 
+    removeAllComponents () {
+        // Is this better than just:
+        //     this.components.length = 0;
+        this.components.forEach(c => this._toBeRemoved.push(c));
+        return this;
+    }
+
     /**
      * <p>Protective method to set position of the object in world-units.
      *

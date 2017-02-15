@@ -10963,6 +10963,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         }
                         return this;
                     }
+                }, {
+                    key: 'removeAllComponents',
+                    value: function removeAllComponents() {
+                        var _this3 = this;
+
+                        // Is this better than just:
+                        //     this.components.length = 0;
+                        this.components.forEach(function (c) {
+                            return _this3._toBeRemoved.push(c);
+                        });
+                        return this;
+                    }
                     /**
                      * <p>Protective method to set position of the object in world-units.
                      *
@@ -11234,7 +11246,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, PropertyAnimationComponent);
 
-                    var _this3 = _possibleConstructorReturn(this, (PropertyAnimationComponent.__proto__ || Object.getPrototypeOf(PropertyAnimationComponent)).call(this));
+                    var _this4 = _possibleConstructorReturn(this, (PropertyAnimationComponent.__proto__ || Object.getPrototypeOf(PropertyAnimationComponent)).call(this));
 
                     if (!Array.isArray(start)) {
                         start = [start];
@@ -11245,17 +11257,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     start.length = 4;
                     end.length = 4;
 
-                    _this3.outputter = outputter;
-                    _this3.start = start;
-                    _this3.end = end;
-                    _this3.duration = duration;
-                    _this3.easing = easing;
-                    _this3.loop = loop;
+                    _this4.outputter = outputter;
+                    _this4.start = start;
+                    _this4.end = end;
+                    _this4.duration = duration;
+                    _this4.easing = easing;
+                    _this4.loop = loop;
 
-                    _this3.elapsed = 0;
-                    _this3.direction = 1;
-                    _this3.out = Array(4);
-                    return _this3;
+                    _this4.elapsed = 0;
+                    _this4.direction = 1;
+                    _this4.out = Array(4);
+                    return _this4;
                 }
 
                 _createClass(PropertyAnimationComponent, [{
@@ -11943,22 +11955,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function InputSystem(screen, keyboard, cameraSystem) {
                     _classCallCheck(this, InputSystem);
 
-                    var _this4 = _possibleConstructorReturn(this, (InputSystem.__proto__ || Object.getPrototypeOf(InputSystem)).call(this));
+                    var _this5 = _possibleConstructorReturn(this, (InputSystem.__proto__ || Object.getPrototypeOf(InputSystem)).call(this));
 
-                    _this4._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.fromValues(NaN, NaN);
+                    _this5._nextClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.fromValues(NaN, NaN);
                     /** If {@link InputSystem#hasClick} is true, this property contains the world co-ordinates of the click. */
-                    _this4.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
+                    _this5.lastClick = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.create();
                     /** Boolean to indicate if a click has been registered during the last frame. */
-                    _this4.hasClick = false;
-                    _this4._nextKey = null;
+                    _this5.hasClick = false;
+                    _this5._nextKey = null;
                     /** The most recent key press if one occured during the previous frame. */
-                    _this4.lastKey = null;
-                    _this4.screen = screen;
-                    _this4.keyboard = keyboard;
-                    _this4.camera = cameraSystem;
-                    _this4.initScreen();
-                    _this4.initKeyboard();
-                    return _this4;
+                    _this5.lastKey = null;
+                    _this5.screen = screen;
+                    _this5.keyboard = keyboard;
+                    _this5.camera = cameraSystem;
+                    _this5.initScreen();
+                    _this5.initKeyboard();
+                    return _this5;
                 }
 
                 _createClass(InputSystem, [{
@@ -12031,16 +12043,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: 'initScreen',
                     value: function initScreen() {
-                        var _this5 = this;
+                        var _this6 = this;
 
                         if (!this.screen) return;
                         TouchClick(this.screen, function (e) {
-                            var offsetLeft = _this5.screen.offsetLeft,
-                                offsetTop = _this5.screen.offsetTop,
+                            var offsetLeft = _this6.screen.offsetLeft,
+                                offsetTop = _this6.screen.offsetTop,
                                 touch = e.touches && e.touches[0],
                                 x = (touch ? touch.pageX : e.pageX) - offsetLeft,
                                 y = (touch ? touch.pageY : e.pageY) - offsetTop;
-                            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(_this5._nextClick, _this5.screenToWorld(x, y));
+                            __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec2___default.a.copy(_this6._nextClick, _this6.screenToWorld(x, y));
                         });
                     }
                     /**
@@ -12053,11 +12065,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: 'initKeyboard',
                     value: function initKeyboard() {
-                        var _this6 = this;
+                        var _this7 = this;
 
                         if (!this.keyboard) return;
                         this.keyboard.addEventListener("keydown", function (e) {
-                            _this6._nextKey = e.which;
+                            _this7._nextKey = e.which;
                         });
                     }
                 }, {
@@ -12141,15 +12153,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function CanvasRenderSystem(context, cameraSystem) {
                     _classCallCheck(this, CanvasRenderSystem);
 
-                    var _this7 = _possibleConstructorReturn(this, (CanvasRenderSystem.__proto__ || Object.getPrototypeOf(CanvasRenderSystem)).call(this));
+                    var _this8 = _possibleConstructorReturn(this, (CanvasRenderSystem.__proto__ || Object.getPrototypeOf(CanvasRenderSystem)).call(this));
 
-                    _this7.renderQueue = [];
+                    _this8.renderQueue = [];
                     /** Should the renderer clear the screen before drawing a frame or just overdraw. */
-                    _this7.clearScreen = true;
-                    _this7.context = context;
-                    _this7.canvas = context && context.canvas;
-                    _this7.camera = cameraSystem;
-                    return _this7;
+                    _this8.clearScreen = true;
+                    _this8.context = context;
+                    _this8.canvas = context && context.canvas;
+                    _this8.camera = cameraSystem;
+                    return _this8;
                 }
                 /**
                  * @callback CanvasRenderable
@@ -12273,10 +12285,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function WorldSystem(bounds) {
                     _classCallCheck(this, WorldSystem);
 
-                    var _this8 = _possibleConstructorReturn(this, (WorldSystem.__proto__ || Object.getPrototypeOf(WorldSystem)).call(this));
+                    var _this9 = _possibleConstructorReturn(this, (WorldSystem.__proto__ || Object.getPrototypeOf(WorldSystem)).call(this));
 
-                    _this8.bounds = bounds;
-                    return _this8;
+                    _this9.bounds = bounds;
+                    return _this9;
                 }
 
                 return WorldSystem;
@@ -12481,7 +12493,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: 'fire',
                     value: function fire(event) {
-                        var _this9 = this;
+                        var _this10 = this;
 
                         for (var _len2 = arguments.length, params = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
                             params[_key2 - 1] = arguments[_key2];
@@ -12490,7 +12502,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         var callbacks = this._events[event];
                         if (callbacks && callbacks.length) {
                             callbacks.forEach(function (callback) {
-                                callback.apply(_this9, params);
+                                callback.apply(_this10, params);
                             });
                         }
                     }
@@ -12529,14 +12541,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function CameraSystem() {
                     _classCallCheck(this, CameraSystem);
 
-                    var _this10 = _possibleConstructorReturn(this, (CameraSystem.__proto__ || Object.getPrototypeOf(CameraSystem)).apply(this, arguments));
+                    var _this11 = _possibleConstructorReturn(this, (CameraSystem.__proto__ || Object.getPrototypeOf(CameraSystem)).apply(this, arguments));
 
-                    _this10.pruneList = [];
-                    _this10.suspendedObjects = [];
-                    _this10.skewX = 0;
-                    _this10.skeyY = 0;
-                    _this10.scaleX = 1;
-                    _this10.scaleY = 1;
+                    _this11.pruneList = [];
+                    _this11.suspendedObjects = [];
+                    _this11.skewX = 0;
+                    _this11.skeyY = 0;
+                    _this11.scaleX = 1;
+                    _this11.scaleY = 1;
                     // getTransformMatrix () {
                     // 	// var m = new Matrix(this.shearMatrix);
                     // 	// m.multiplyBy(this.scaleMatrix);
@@ -12573,7 +12585,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                     */
                     // }
-                    return _this10;
+                    return _this11;
                 }
                 /**
                  * Set the scale to render at
@@ -12636,13 +12648,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function BackgroundCollisionComponent(backgroundSystem, collisionBounds) {
                     _classCallCheck(this, BackgroundCollisionComponent);
 
-                    var _this11 = _possibleConstructorReturn(this, (BackgroundCollisionComponent.__proto__ || Object.getPrototypeOf(BackgroundCollisionComponent)).call(this));
+                    var _this12 = _possibleConstructorReturn(this, (BackgroundCollisionComponent.__proto__ || Object.getPrototypeOf(BackgroundCollisionComponent)).call(this));
 
-                    _this11.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
-                    _this11.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
-                    _this11.background = backgroundSystem;
-                    _this11.bounds = collisionBounds;
-                    return _this11;
+                    _this12.coefficientFriction = BackgroundCollisionComponent.COEFFICIENT_FRICTION;
+                    _this12.coefficientRestitution = BackgroundCollisionComponent.COEFFICIENT_RESTITUTION;
+                    _this12.background = backgroundSystem;
+                    _this12.bounds = collisionBounds;
+                    return _this12;
                 }
 
                 _createClass(BackgroundCollisionComponent, [{
@@ -12730,11 +12742,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function GameObjectManager() {
                     _classCallCheck(this, GameObjectManager);
 
-                    var _this12 = _possibleConstructorReturn(this, (GameObjectManager.__proto__ || Object.getPrototypeOf(GameObjectManager)).apply(this, arguments));
+                    var _this13 = _possibleConstructorReturn(this, (GameObjectManager.__proto__ || Object.getPrototypeOf(GameObjectManager)).apply(this, arguments));
 
-                    _this12.objects = [];
-                    _this12._objectsToBeRemoved = [];
-                    return _this12;
+                    _this13.objects = [];
+                    _this13._objectsToBeRemoved = [];
+                    return _this13;
                 }
                 /**
                  * Add an object to be updated as children of this manager. Children are given a
@@ -12878,10 +12890,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function MoveToClickComponent(input) {
                     _classCallCheck(this, MoveToClickComponent);
 
-                    var _this13 = _possibleConstructorReturn(this, (MoveToClickComponent.__proto__ || Object.getPrototypeOf(MoveToClickComponent)).call(this));
+                    var _this14 = _possibleConstructorReturn(this, (MoveToClickComponent.__proto__ || Object.getPrototypeOf(MoveToClickComponent)).call(this));
 
-                    _this13.input = input;
-                    return _this13;
+                    _this14.input = input;
+                    return _this14;
                 }
 
                 _createClass(MoveToClickComponent, [{
@@ -12927,15 +12939,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, WorldBounceComponent);
 
-                    var _this14 = _possibleConstructorReturn(this, (WorldBounceComponent.__proto__ || Object.getPrototypeOf(WorldBounceComponent)).call(this));
+                    var _this15 = _possibleConstructorReturn(this, (WorldBounceComponent.__proto__ || Object.getPrototypeOf(WorldBounceComponent)).call(this));
 
-                    _this14.cRestitution = 1;
-                    _this14.cFriction = 1;
-                    _this14.worldSystem = worldSystem;
-                    _this14.ax = width / 2;
-                    _this14.ay = height / 2;
-                    _this14.az = thickness / 2;
-                    return _this14;
+                    _this15.cRestitution = 1;
+                    _this15.cFriction = 1;
+                    _this15.worldSystem = worldSystem;
+                    _this15.ax = width / 2;
+                    _this15.ay = height / 2;
+                    _this15.az = thickness / 2;
+                    return _this15;
                 }
 
                 _createClass(WorldBounceComponent, [{
@@ -13037,10 +13049,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function WorldWrapComponent(worldSystem) {
                     _classCallCheck(this, WorldWrapComponent);
 
-                    var _this15 = _possibleConstructorReturn(this, (WorldWrapComponent.__proto__ || Object.getPrototypeOf(WorldWrapComponent)).call(this));
+                    var _this16 = _possibleConstructorReturn(this, (WorldWrapComponent.__proto__ || Object.getPrototypeOf(WorldWrapComponent)).call(this));
 
-                    _this15.worldSystem = worldSystem;
-                    return _this15;
+                    _this16.worldSystem = worldSystem;
+                    return _this16;
                 }
 
                 _createClass(WorldWrapComponent, [{
@@ -13133,16 +13145,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     _classCallCheck(this, BounceComponent);
 
                     /** Coefficient of restitution. */
-                    var _this16 = _possibleConstructorReturn(this, (BounceComponent.__proto__ || Object.getPrototypeOf(BounceComponent)).call(this));
+                    var _this17 = _possibleConstructorReturn(this, (BounceComponent.__proto__ || Object.getPrototypeOf(BounceComponent)).call(this));
 
-                    _this16.cRestitution = 0.9;
-                    return _this16;
+                    _this17.cRestitution = 0.9;
+                    return _this17;
                 }
 
                 _createClass(BounceComponent, [{
                     key: 'init',
                     value: function init(parent) {
-                        var _this17 = this;
+                        var _this18 = this;
 
                         parent.on("attack", function (other) {
 
@@ -13182,7 +13194,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                 if (vn > 0) return;
 
                                 // collision impulse
-                                var i = -(1 + _this17.cRestitution) * vn / (im1 + im2);
+                                var i = -(1 + _this18.cRestitution) * vn / (im1 + im2);
                                 __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.scale(sCBVimpulse, sCBVmtdNorm, i);
 
                                 // change in momentum
@@ -13225,12 +13237,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function CollisionComponent(collisionSystem, attack, vulnerable) {
                     _classCallCheck(this, CollisionComponent);
 
-                    var _this18 = _possibleConstructorReturn(this, (CollisionComponent.__proto__ || Object.getPrototypeOf(CollisionComponent)).call(this));
+                    var _this19 = _possibleConstructorReturn(this, (CollisionComponent.__proto__ || Object.getPrototypeOf(CollisionComponent)).call(this));
 
-                    _this18.collisionSystem = collisionSystem;
-                    _this18.attack = attack;
-                    _this18.vulnerable = vulnerable;
-                    return _this18;
+                    _this19.collisionSystem = collisionSystem;
+                    _this19.attack = attack;
+                    _this19.vulnerable = vulnerable;
+                    return _this19;
                 }
 
                 _createClass(CollisionComponent, [{
@@ -13274,11 +13286,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function SolidComponent(backgroundSystem, lineSegments) {
                     _classCallCheck(this, SolidComponent);
 
-                    var _this19 = _possibleConstructorReturn(this, (SolidComponent.__proto__ || Object.getPrototypeOf(SolidComponent)).call(this));
+                    var _this20 = _possibleConstructorReturn(this, (SolidComponent.__proto__ || Object.getPrototypeOf(SolidComponent)).call(this));
 
-                    _this19.backgroundSystem = backgroundSystem;
-                    _this19.segments = lineSegments;
-                    return _this19;
+                    _this20.backgroundSystem = backgroundSystem;
+                    _this20.segments = lineSegments;
+                    return _this20;
                 }
 
                 _createClass(SolidComponent, [{
@@ -13334,10 +13346,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function ClickComponent(inputSystem) {
                     _classCallCheck(this, ClickComponent);
 
-                    var _this20 = _possibleConstructorReturn(this, (ClickComponent.__proto__ || Object.getPrototypeOf(ClickComponent)).call(this));
+                    var _this21 = _possibleConstructorReturn(this, (ClickComponent.__proto__ || Object.getPrototypeOf(ClickComponent)).call(this));
 
-                    _this20.inputSystem = inputSystem;
-                    return _this20;
+                    _this21.inputSystem = inputSystem;
+                    return _this21;
                 }
 
                 _createClass(ClickComponent, [{
@@ -13378,11 +13390,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, DotRenderComponent);
 
-                    var _this21 = _possibleConstructorReturn(this, (DotRenderComponent.__proto__ || Object.getPrototypeOf(DotRenderComponent)).call(this));
+                    var _this22 = _possibleConstructorReturn(this, (DotRenderComponent.__proto__ || Object.getPrototypeOf(DotRenderComponent)).call(this));
 
-                    _this21.renderSystem = renderSystem;
-                    _this21.color = color;
-                    return _this21;
+                    _this22.renderSystem = renderSystem;
+                    _this22.color = color;
+                    return _this22;
                 }
 
                 _createClass(DotRenderComponent, [{
@@ -13429,11 +13441,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, RectangleRenderComponent);
 
-                    var _this22 = _possibleConstructorReturn(this, (RectangleRenderComponent.__proto__ || Object.getPrototypeOf(RectangleRenderComponent)).call(this));
+                    var _this23 = _possibleConstructorReturn(this, (RectangleRenderComponent.__proto__ || Object.getPrototypeOf(RectangleRenderComponent)).call(this));
 
-                    _this22.renderSystem = renderSystem;
-                    _this22.color = color;
-                    return _this22;
+                    _this23.renderSystem = renderSystem;
+                    _this23.color = color;
+                    return _this23;
                 }
 
                 _createClass(RectangleRenderComponent, [{
@@ -13480,27 +13492,27 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, TextRenderComponent);
 
-                    var _this23 = _possibleConstructorReturn(this, (TextRenderComponent.__proto__ || Object.getPrototypeOf(TextRenderComponent)).call(this));
+                    var _this24 = _possibleConstructorReturn(this, (TextRenderComponent.__proto__ || Object.getPrototypeOf(TextRenderComponent)).call(this));
 
-                    _this23.renderSystem = renderSystem;
-                    _this23.text = text;
-                    _this23.font = font;
-                    _this23.color = color;
-                    _this23.setPosition(x, y);
-                    return _this23;
+                    _this24.renderSystem = renderSystem;
+                    _this24.text = text;
+                    _this24.font = font;
+                    _this24.color = color;
+                    _this24.setPosition(x, y);
+                    return _this24;
                 }
 
                 _createClass(TextRenderComponent, [{
                     key: 'update',
                     value: function update(parent, delta) {
-                        var _this24 = this;
+                        var _this25 = this;
 
                         this.renderSystem.push(function (ctx) {
                             ctx.translate(parent.position[0], parent.position[1]);
-                            ctx.translate(_this24.position[0], _this24.position[1]);
-                            ctx.fillStyle = _this24.color;
-                            ctx.font = _this24.font;
-                            ctx.fillText(_this24.text, 0, 0);
+                            ctx.translate(_this25.position[0], _this25.position[1]);
+                            ctx.fillStyle = _this25.color;
+                            ctx.font = _this25.font;
+                            ctx.fillText(_this25.text, 0, 0);
                         });
                     }
                 }]);
@@ -15769,10 +15781,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function FlockingComponent(flock) {
                     _classCallCheck(this, FlockingComponent);
 
-                    var _this25 = _possibleConstructorReturn(this, (FlockingComponent.__proto__ || Object.getPrototypeOf(FlockingComponent)).call(this));
+                    var _this26 = _possibleConstructorReturn(this, (FlockingComponent.__proto__ || Object.getPrototypeOf(FlockingComponent)).call(this));
 
-                    _this25.flock = flock;
-                    return _this25;
+                    _this26.flock = flock;
+                    return _this26;
                 }
 
                 _createClass(FlockingComponent, [{
@@ -15840,7 +15852,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             var Texture = function () {
                 function Texture(path, onLoad) {
-                    var _this26 = this;
+                    var _this27 = this;
 
                     _classCallCheck(this, Texture);
 
@@ -15849,17 +15861,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     this.height = 0;
                     this.loaded = false;
                     this.loadPromise = new Promise(function (resolve, reject) {
-                        _this26.image.onload = function () {
-                            _this26.width = _this26.image.width;
-                            _this26.height = _this26.image.height;
-                            _this26.loaded = true;
-                            if (onLoad) onLoad(_this26);
-                            resolve(_this26);
+                        _this27.image.onload = function () {
+                            _this27.width = _this27.image.width;
+                            _this27.height = _this27.image.height;
+                            _this27.loaded = true;
+                            if (onLoad) onLoad(_this27);
+                            resolve(_this27);
                         };
-                        _this26.image.onerror = function () {
+                        _this27.image.onerror = function () {
                             throw new Error("Failed to load a texture: " + path);
                         };
-                        _this26.image.src = path;
+                        _this27.image.src = path;
                     });
                 }
 
@@ -15973,7 +15985,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             var Game = function () {
                 function Game() {
-                    var _this28 = this;
+                    var _this29 = this;
 
                     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
                         canvas: null,
@@ -16021,18 +16033,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     this._loaded = 0;
                     this._generalObjects = null;
                     this._autosizeCallback = function () {
-                        if (!_this28.canvas) return;
-                        var width = _this28.canvas.offsetWidth;
-                        var height = _this28.canvas.offsetHeight;
-                        _this28.setSize(width, height);
+                        if (!_this29.canvas) return;
+                        var width = _this29.canvas.offsetWidth;
+                        var height = _this29.canvas.offsetHeight;
+                        _this29.setSize(width, height);
                         // Keep Camera centred
-                        if (_this28.cameraSystem) {
-                            _this28.cameraSystem.setPosition(width / 2, height / 2);
+                        if (_this29.cameraSystem) {
+                            _this29.cameraSystem.setPosition(width / 2, height / 2);
                         }
                         // Update bounds of the world
                         // WARN: Does not retain previous world 'padding'
-                        if (_this28.worldSystem) {
-                            _this28.worldSystem.setBounds(0, 0, width, height);
+                        if (_this29.worldSystem) {
+                            _this29.worldSystem.setBounds(0, 0, width, height);
                         }
                     };
                     /**
@@ -16113,14 +16125,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: 'loadTextures',
                     value: function loadTextures(texturePaths) {
-                        var _this29 = this;
+                        var _this30 = this;
 
                         this._toLoad += texturePaths.length;
                         return texturePaths.map(function (path) {
                             var texture = new __WEBPACK_IMPORTED_MODULE_5__render_Texture__["a" /* default */](path, function (tex) {
-                                return _this29._resourceLoaded(tex);
+                                return _this30._resourceLoaded(tex);
                             });
-                            _this29.textures.push(texture);
+                            _this30.textures.push(texture);
                             return texture;
                         });
                     }
@@ -16135,7 +16147,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: 'loadAudio',
                     value: function loadAudio(audioPaths) {
-                        var _this30 = this;
+                        var _this31 = this;
 
                         this._toLoad += audioPaths.length;
                         return audioPaths.map(function (path) {
@@ -16148,14 +16160,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                 if (!sound.loaded) {
                                     sound.length = sound.audio.duration;
                                     sound.loaded = true;
-                                    _this30._resourceLoaded(sound);
+                                    _this31._resourceLoaded(sound);
                                 }
                             });
                             sound.audio.onerror = function () {
                                 throw new Error("Failed to load a sound: " + path);
                             };
                             sound.audio.src = path;
-                            _this30.sounds.push(sound);
+                            _this31.sounds.push(sound);
                             return sound;
                         });
                     }
@@ -16353,21 +16365,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }, {
                     key: '_loop',
                     value: function _loop() {
-                        var _this31 = this;
+                        var _this32 = this;
 
                         var loop = function loop(time) {
-                            if (time && _this31.time == time) {
+                            if (time && _this32.time == time) {
                                 console.log("Multiple calls: " + time);
                                 return;
                             }
-                            _this31.time = time;
-                            _this31.frame++;
+                            _this32.time = time;
+                            _this32.frame++;
                             try {
-                                _this31.root.update(Math.min(time - _this31._lastTime, 100));
-                                if (_this31.state == State.STATE_PLAYING) {
+                                _this32.root.update(Math.min(time - _this32._lastTime, 100));
+                                if (_this32.state == State.STATE_PLAYING) {
                                     _raf(loop);
                                 }
-                                _this31._lastTime = time;
+                                _this32._lastTime = time;
                             } catch (e) {
                                 if (window.console) {
                                     console.error(e.stack || e);
@@ -18011,11 +18023,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function BackgroundCollisionSystem() {
                     _classCallCheck(this, BackgroundCollisionSystem);
 
-                    var _this33 = _possibleConstructorReturn(this, (BackgroundCollisionSystem.__proto__ || Object.getPrototypeOf(BackgroundCollisionSystem)).apply(this, arguments));
+                    var _this34 = _possibleConstructorReturn(this, (BackgroundCollisionSystem.__proto__ || Object.getPrototypeOf(BackgroundCollisionSystem)).apply(this, arguments));
 
-                    _this33.surfaces = [];
-                    _this33.temporarySurfaces = [];
-                    return _this33;
+                    _this34.surfaces = [];
+                    _this34.temporarySurfaces = [];
+                    return _this34;
                 }
                 /**
                  * Add permanent surface. Surfaces are all polylines.
@@ -18087,7 +18099,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             var Sprite = function () {
                 function Sprite(texture) {
-                    var _this34 = this;
+                    var _this35 = this;
 
                     _classCallCheck(this, Sprite);
 
@@ -18105,10 +18117,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     this.oy = 0;
                     this.t = texture;
                     texture.load().then(function (tex) {
-                        _this34.w = tex.width;
-                        _this34.h = tex.height;
-                        _this34.ox = tex.width / 2;
-                        _this34.oy = tex.height / 2;
+                        _this35.w = tex.width;
+                        _this35.h = tex.height;
+                        _this35.ox = tex.width / 2;
+                        _this35.oy = tex.height / 2;
                     });
                 }
                 /**
@@ -18173,13 +18185,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function SpriteAnimationComponent(duration, sprites) {
                     _classCallCheck(this, SpriteAnimationComponent);
 
-                    var _this35 = _possibleConstructorReturn(this, (SpriteAnimationComponent.__proto__ || Object.getPrototypeOf(SpriteAnimationComponent)).call(this));
+                    var _this36 = _possibleConstructorReturn(this, (SpriteAnimationComponent.__proto__ || Object.getPrototypeOf(SpriteAnimationComponent)).call(this));
 
-                    _this35.duration = duration;
-                    _this35.spriteIndex = 0;
-                    _this35.playing = true;
-                    _this35.sprites = sprites;
-                    return _this35;
+                    _this36.duration = duration;
+                    _this36.spriteIndex = 0;
+                    _this36.playing = true;
+                    _this36.sprites = sprites;
+                    return _this36;
                 }
 
                 _createClass(SpriteAnimationComponent, [{
@@ -18277,12 +18289,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, SpriteRenderComponent);
 
-                    var _this36 = _possibleConstructorReturn(this, (SpriteRenderComponent.__proto__ || Object.getPrototypeOf(SpriteRenderComponent)).call(this));
+                    var _this37 = _possibleConstructorReturn(this, (SpriteRenderComponent.__proto__ || Object.getPrototypeOf(SpriteRenderComponent)).call(this));
 
-                    _this36.renderSystem = renderSystem;
-                    _this36.layer = layer;
-                    _this36.sprite = sprite;
-                    return _this36;
+                    _this37.renderSystem = renderSystem;
+                    _this37.layer = layer;
+                    _this37.sprite = sprite;
+                    return _this37;
                 }
 
                 _createClass(SpriteRenderComponent, [{
@@ -18335,12 +18347,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function TileRenderComponent(renderSystem, texture, bounds) {
                     _classCallCheck(this, TileRenderComponent);
 
-                    var _this37 = _possibleConstructorReturn(this, (TileRenderComponent.__proto__ || Object.getPrototypeOf(TileRenderComponent)).call(this));
+                    var _this38 = _possibleConstructorReturn(this, (TileRenderComponent.__proto__ || Object.getPrototypeOf(TileRenderComponent)).call(this));
 
-                    _this37.renderSystem = renderSystem;
-                    _this37.texture = texture;
-                    _this37.bounds = bounds;
-                    return _this37;
+                    _this38.renderSystem = renderSystem;
+                    _this38.texture = texture;
+                    _this38.bounds = bounds;
+                    return _this38;
                 }
 
                 _createClass(TileRenderComponent, [{
@@ -18545,10 +18557,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function FollowComponent(object) {
                     _classCallCheck(this, FollowComponent);
 
-                    var _this42 = _possibleConstructorReturn(this, (FollowComponent.__proto__ || Object.getPrototypeOf(FollowComponent)).call(this));
+                    var _this43 = _possibleConstructorReturn(this, (FollowComponent.__proto__ || Object.getPrototypeOf(FollowComponent)).call(this));
 
-                    _this42.target = object;
-                    return _this42;
+                    _this43.target = object;
+                    return _this43;
                 }
 
                 _createClass(FollowComponent, [{
@@ -18672,11 +18684,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function PointGravityComponent(target) {
                     _classCallCheck(this, PointGravityComponent);
 
-                    var _this45 = _possibleConstructorReturn(this, (PointGravityComponent.__proto__ || Object.getPrototypeOf(PointGravityComponent)).call(this));
+                    var _this46 = _possibleConstructorReturn(this, (PointGravityComponent.__proto__ || Object.getPrototypeOf(PointGravityComponent)).call(this));
 
-                    _this45.target = target;
-                    _this45.vector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    return _this45;
+                    _this46.target = target;
+                    _this46.vector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    return _this46;
                 }
 
                 _createClass(PointGravityComponent, [{
@@ -18718,16 +18730,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function PositionInterpolatorComponent(duration, easing) {
                     _classCallCheck(this, PositionInterpolatorComponent);
 
-                    var _this46 = _possibleConstructorReturn(this, (PositionInterpolatorComponent.__proto__ || Object.getPrototypeOf(PositionInterpolatorComponent)).call(this));
+                    var _this47 = _possibleConstructorReturn(this, (PositionInterpolatorComponent.__proto__ || Object.getPrototypeOf(PositionInterpolatorComponent)).call(this));
 
-                    _this46.duration = duration;
-                    _this46.easing = easing || __WEBPACK_IMPORTED_MODULE_2__Easing__["Linear"];
-                    _this46.elapsed = 0;
-                    _this46.running = false;
-                    _this46.starting = false;
-                    _this46.start = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    _this46.position = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    return _this46;
+                    _this47.duration = duration;
+                    _this47.easing = easing || __WEBPACK_IMPORTED_MODULE_2__Easing__["Linear"];
+                    _this47.elapsed = 0;
+                    _this47.running = false;
+                    _this47.starting = false;
+                    _this47.start = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    _this47.position = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    return _this47;
                 }
 
                 _createClass(PositionInterpolatorComponent, [{
@@ -18798,11 +18810,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, RandomImpulseComponent);
 
-                    var _this47 = _possibleConstructorReturn(this, (RandomImpulseComponent.__proto__ || Object.getPrototypeOf(RandomImpulseComponent)).call(this));
+                    var _this48 = _possibleConstructorReturn(this, (RandomImpulseComponent.__proto__ || Object.getPrototypeOf(RandomImpulseComponent)).call(this));
 
-                    _this47.probability = probability;
-                    _this47.maximumImpulse = maximumImpulse;
-                    return _this47;
+                    _this48.probability = probability;
+                    _this48.maximumImpulse = maximumImpulse;
+                    return _this48;
                 }
 
                 _createClass(RandomImpulseComponent, [{
@@ -18842,11 +18854,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, RandomPositionComponent);
 
-                    var _this48 = _possibleConstructorReturn(this, (RandomPositionComponent.__proto__ || Object.getPrototypeOf(RandomPositionComponent)).call(this));
+                    var _this49 = _possibleConstructorReturn(this, (RandomPositionComponent.__proto__ || Object.getPrototypeOf(RandomPositionComponent)).call(this));
 
-                    _this48.world = world;
-                    _this48.probability = probability;
-                    return _this48;
+                    _this49.world = world;
+                    _this49.probability = probability;
+                    return _this49;
                 }
 
                 _createClass(RandomPositionComponent, [{
@@ -18888,11 +18900,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, RandomVelocityComponent);
 
-                    var _this49 = _possibleConstructorReturn(this, (RandomVelocityComponent.__proto__ || Object.getPrototypeOf(RandomVelocityComponent)).call(this));
+                    var _this50 = _possibleConstructorReturn(this, (RandomVelocityComponent.__proto__ || Object.getPrototypeOf(RandomVelocityComponent)).call(this));
 
-                    _this49.probability = probability;
-                    _this49.maximumVelocity = maximumVelocity;
-                    return _this49;
+                    _this50.probability = probability;
+                    _this50.maximumVelocity = maximumVelocity;
+                    return _this50;
                 }
 
                 _createClass(RandomVelocityComponent, [{
@@ -18954,10 +18966,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function RotationComponent(dth) {
                     _classCallCheck(this, RotationComponent);
 
-                    var _this51 = _possibleConstructorReturn(this, (RotationComponent.__proto__ || Object.getPrototypeOf(RotationComponent)).call(this));
+                    var _this52 = _possibleConstructorReturn(this, (RotationComponent.__proto__ || Object.getPrototypeOf(RotationComponent)).call(this));
 
-                    _this51.rotationSpeed = dth;
-                    return _this51;
+                    _this52.rotationSpeed = dth;
+                    return _this52;
                 }
 
                 _createClass(RotationComponent, [{
@@ -18993,11 +19005,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function SmoothPositionComponent() {
                     _classCallCheck(this, SmoothPositionComponent);
 
-                    var _this52 = _possibleConstructorReturn(this, (SmoothPositionComponent.__proto__ || Object.getPrototypeOf(SmoothPositionComponent)).call(this));
+                    var _this53 = _possibleConstructorReturn(this, (SmoothPositionComponent.__proto__ || Object.getPrototypeOf(SmoothPositionComponent)).call(this));
 
-                    _this52.speed = 0.01;
-                    _this52.lastPosition = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    return _this52;
+                    _this53.speed = 0.01;
+                    _this53.lastPosition = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    return _this53;
                 }
 
                 _createClass(SmoothPositionComponent, [{
@@ -19096,20 +19108,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function SwitchComponent(switchObject, switchProperty) {
                     _classCallCheck(this, SwitchComponent);
 
-                    var _this54 = _possibleConstructorReturn(this, (SwitchComponent.__proto__ || Object.getPrototypeOf(SwitchComponent)).call(this));
+                    var _this55 = _possibleConstructorReturn(this, (SwitchComponent.__proto__ || Object.getPrototypeOf(SwitchComponent)).call(this));
 
-                    _this54.positiveComponents = [];
-                    _this54.negativeComponents = [];
+                    _this55.positiveComponents = [];
+                    _this55.negativeComponents = [];
 
                     /**
                       * The switch for whether the positive components are active or the negative ones. Default: true
                       * @type {boolean}
                       */
-                    _this54.active = true;
+                    _this55.active = true;
 
-                    _this54.object = switchObject;
-                    _this54.prop = switchProperty;
-                    return _this54;
+                    _this55.object = switchObject;
+                    _this55.prop = switchProperty;
+                    return _this55;
                 }
 
                 /**
@@ -19242,10 +19254,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function TerminalVelocityComponent(velocity) {
                     _classCallCheck(this, TerminalVelocityComponent);
 
-                    var _this55 = _possibleConstructorReturn(this, (TerminalVelocityComponent.__proto__ || Object.getPrototypeOf(TerminalVelocityComponent)).call(this));
+                    var _this56 = _possibleConstructorReturn(this, (TerminalVelocityComponent.__proto__ || Object.getPrototypeOf(TerminalVelocityComponent)).call(this));
 
-                    _this55.velocityMagnitude = velocity;
-                    return _this55;
+                    _this56.velocityMagnitude = velocity;
+                    return _this56;
                 }
 
                 _createClass(TerminalVelocityComponent, [{
@@ -19290,10 +19302,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function TrackRotationComponent(object) {
                     _classCallCheck(this, TrackRotationComponent);
 
-                    var _this56 = _possibleConstructorReturn(this, (TrackRotationComponent.__proto__ || Object.getPrototypeOf(TrackRotationComponent)).call(this));
+                    var _this57 = _possibleConstructorReturn(this, (TrackRotationComponent.__proto__ || Object.getPrototypeOf(TrackRotationComponent)).call(this));
 
-                    _this56.target = object;
-                    return _this56;
+                    _this57.target = object;
+                    return _this57;
                 }
 
                 _createClass(TrackRotationComponent, [{
@@ -19334,11 +19346,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function CollisionSystem() {
                     _classCallCheck(this, CollisionSystem);
 
-                    var _this57 = _possibleConstructorReturn(this, (CollisionSystem.__proto__ || Object.getPrototypeOf(CollisionSystem)).call(this));
+                    var _this58 = _possibleConstructorReturn(this, (CollisionSystem.__proto__ || Object.getPrototypeOf(CollisionSystem)).call(this));
 
-                    _this57.attackObjects = [];
-                    _this57.vulnerableObjects = [];
-                    return _this57;
+                    _this58.attackObjects = [];
+                    _this58.vulnerableObjects = [];
+                    return _this58;
                 }
 
                 /**
@@ -19428,10 +19440,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function DebugDrawBoundsComponent(renderSystem) {
                     _classCallCheck(this, DebugDrawBoundsComponent);
 
-                    var _this58 = _possibleConstructorReturn(this, (DebugDrawBoundsComponent.__proto__ || Object.getPrototypeOf(DebugDrawBoundsComponent)).call(this));
+                    var _this59 = _possibleConstructorReturn(this, (DebugDrawBoundsComponent.__proto__ || Object.getPrototypeOf(DebugDrawBoundsComponent)).call(this));
 
-                    _this58.renderSystem = renderSystem;
-                    return _this58;
+                    _this59.renderSystem = renderSystem;
+                    return _this59;
                 }
 
                 _createClass(DebugDrawBoundsComponent, [{
@@ -19485,22 +19497,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function DebugDrawPathComponent(renderSystem) {
                     _classCallCheck(this, DebugDrawPathComponent);
 
-                    var _this59 = _possibleConstructorReturn(this, (DebugDrawPathComponent.__proto__ || Object.getPrototypeOf(DebugDrawPathComponent)).call(this));
+                    var _this60 = _possibleConstructorReturn(this, (DebugDrawPathComponent.__proto__ || Object.getPrototypeOf(DebugDrawPathComponent)).call(this));
 
-                    _this59.path = [];
-                    _this59.currIndex = 0;
-                    _this59.lastVx = 0;
-                    _this59.lastVy = 0;
-                    _this59.renderSystem = renderSystem;
+                    _this60.path = [];
+                    _this60.currIndex = 0;
+                    _this60.lastVx = 0;
+                    _this60.lastVy = 0;
+                    _this60.renderSystem = renderSystem;
 
-                    _this59.path.length = PATH_SIZE;
-                    return _this59;
+                    _this60.path.length = PATH_SIZE;
+                    return _this60;
                 }
 
                 _createClass(DebugDrawPathComponent, [{
                     key: 'update',
                     value: function update(parent, delta) {
-                        var _this60 = this;
+                        var _this61 = this;
 
                         var px = parent.position[0],
                             py = parent.position[1],
@@ -19527,15 +19539,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         this.renderSystem.push(function (ctx) {
                             ctx.beginPath();
 
-                            ctx.moveTo(p[_this60.currIndex], p[_this60.currIndex + 1]);
+                            ctx.moveTo(p[_this61.currIndex], p[_this61.currIndex + 1]);
 
                             for (var i = 2; i < PATH_SIZE; i += 2) {
-                                var index = (_this60.currIndex + i) % PATH_SIZE;
+                                var index = (_this61.currIndex + i) % PATH_SIZE;
                                 if (p[index]) {
                                     ctx.lineTo(p[index], p[index + 1]);
                                 } else {
                                     i += 2;
-                                    index = (_this60.currIndex + i) % PATH_SIZE;
+                                    index = (_this61.currIndex + i) % PATH_SIZE;
                                     ctx.moveTo(p[index], p[index + 1]);
                                 }
                             }
@@ -19585,11 +19597,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function DebugDrawSurfacesComponent(renderSystem, colour) {
                     _classCallCheck(this, DebugDrawSurfacesComponent);
 
-                    var _this61 = _possibleConstructorReturn(this, (DebugDrawSurfacesComponent.__proto__ || Object.getPrototypeOf(DebugDrawSurfacesComponent)).call(this));
+                    var _this62 = _possibleConstructorReturn(this, (DebugDrawSurfacesComponent.__proto__ || Object.getPrototypeOf(DebugDrawSurfacesComponent)).call(this));
 
-                    _this61.renderSystem = renderSystem;
-                    _this61.colour = colour || "#000";
-                    return _this61;
+                    _this62.renderSystem = renderSystem;
+                    _this62.colour = colour || "#000";
+                    return _this62;
                 }
 
                 _createClass(DebugDrawSurfacesComponent, [{
@@ -19655,10 +19667,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function DebugFlockingComponent(renderSystem) {
                     _classCallCheck(this, DebugFlockingComponent);
 
-                    var _this62 = _possibleConstructorReturn(this, (DebugFlockingComponent.__proto__ || Object.getPrototypeOf(DebugFlockingComponent)).call(this));
+                    var _this63 = _possibleConstructorReturn(this, (DebugFlockingComponent.__proto__ || Object.getPrototypeOf(DebugFlockingComponent)).call(this));
 
-                    _this62.renderSystem = renderSystem;
-                    return _this62;
+                    _this63.renderSystem = renderSystem;
+                    return _this63;
                 }
 
                 _createClass(DebugFlockingComponent, [{
@@ -19704,35 +19716,35 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function PolyShapeRenderingComponent(renderSystem, vertices, textureCoords, vertexNormals, vertexIndices) {
                     _classCallCheck(this, PolyShapeRenderingComponent);
 
-                    var _this63 = _possibleConstructorReturn(this, (PolyShapeRenderingComponent.__proto__ || Object.getPrototypeOf(PolyShapeRenderingComponent)).call(this));
+                    var _this64 = _possibleConstructorReturn(this, (PolyShapeRenderingComponent.__proto__ || Object.getPrototypeOf(PolyShapeRenderingComponent)).call(this));
 
                     var gl = renderSystem.context;
-                    _this63.renderSystem = renderSystem;
+                    _this64.renderSystem = renderSystem;
 
-                    _this63.vertexBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.vertexBuffer);
+                    _this64.vertexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this64.vertexBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-                    _this63.vertexBuffer.itemSize = 3;
-                    _this63.vertexBuffer.numItems = Math.floor(vertices.length / _this63.vertexBuffer.itemSize);
+                    _this64.vertexBuffer.itemSize = 3;
+                    _this64.vertexBuffer.numItems = Math.floor(vertices.length / _this64.vertexBuffer.itemSize);
 
-                    _this63.textureBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.textureBuffer);
+                    _this64.textureBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this64.textureBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-                    _this63.textureBuffer.itemSize = 2;
-                    _this63.textureBuffer.numItems = Math.floor(textureCoords.length / _this63.textureBuffer.itemSize);
+                    _this64.textureBuffer.itemSize = 2;
+                    _this64.textureBuffer.numItems = Math.floor(textureCoords.length / _this64.textureBuffer.itemSize);
 
-                    _this63.vertexNormalBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, _this63.vertexNormalBuffer);
+                    _this64.vertexNormalBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, _this64.vertexNormalBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-                    _this63.vertexNormalBuffer.itemSize = 3;
-                    _this63.vertexNormalBuffer.numItems = Math.floor(vertexNormals.length / _this63.vertexNormalBuffer.itemSize);
+                    _this64.vertexNormalBuffer.itemSize = 3;
+                    _this64.vertexNormalBuffer.numItems = Math.floor(vertexNormals.length / _this64.vertexNormalBuffer.itemSize);
 
-                    _this63.vertexIndexBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this63.vertexIndexBuffer);
+                    _this64.vertexIndexBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this64.vertexIndexBuffer);
                     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), gl.STATIC_DRAW);
-                    _this63.vertexIndexBuffer.itemSize = 1;
-                    _this63.vertexIndexBuffer.numItems = vertexIndices.length;
-                    return _this63;
+                    _this64.vertexIndexBuffer.itemSize = 1;
+                    _this64.vertexIndexBuffer.numItems = vertexIndices.length;
+                    return _this64;
                 }
 
                 _createClass(PolyShapeRenderingComponent, [{
@@ -19954,20 +19966,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 function WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram) {
                     _classCallCheck(this, WebGLRenderSystem);
 
-                    var _this64 = _possibleConstructorReturn(this, (WebGLRenderSystem.__proto__ || Object.getPrototypeOf(WebGLRenderSystem)).call(this));
+                    var _this65 = _possibleConstructorReturn(this, (WebGLRenderSystem.__proto__ || Object.getPrototypeOf(WebGLRenderSystem)).call(this));
 
-                    _this64.context = context;
-                    _this64.canvasWidth = canvasWidth;
-                    _this64.canvasHeight = canvasHeight;
-                    _this64.cameraSystem = cameraSystem;
-                    _this64.shaderProgram = shaderProgram;
-                    _this64.mvMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
-                    _this64.pMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
-                    _this64.renderQueue = [];
-                    _this64.spareVector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
-                    _this64.ambientLight = 0.3;
-                    _this64.pointLighting = 1.4;
-                    return _this64;
+                    _this65.context = context;
+                    _this65.canvasWidth = canvasWidth;
+                    _this65.canvasHeight = canvasHeight;
+                    _this65.cameraSystem = cameraSystem;
+                    _this65.shaderProgram = shaderProgram;
+                    _this65.mvMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
+                    _this65.pMatrix = __WEBPACK_IMPORTED_MODULE_2_gl_matrix_src_gl_matrix_mat4___default.a.create();
+                    _this65.renderQueue = [];
+                    _this65.spareVector = __WEBPACK_IMPORTED_MODULE_1_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    _this65.ambientLight = 0.3;
+                    _this65.pointLighting = 1.4;
+                    return _this65;
                 }
 
                 _createClass(WebGLRenderSystem, [{
@@ -20179,20 +20191,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, DebugPositionComponent);
 
-                    var _this65 = _possibleConstructorReturn(this, (DebugPositionComponent.__proto__ || Object.getPrototypeOf(DebugPositionComponent)).call(this));
+                    var _this66 = _possibleConstructorReturn(this, (DebugPositionComponent.__proto__ || Object.getPrototypeOf(DebugPositionComponent)).call(this));
 
-                    _this65.renderSystem = renderSystem;
-                    _this65.font = font;
-                    _this65.color = color;
+                    _this66.renderSystem = renderSystem;
+                    _this66.font = font;
+                    _this66.color = color;
                     // Font should start with an integer we can use as a size for the crosshairs
-                    _this65.size = parseInt(font, 10);
-                    return _this65;
+                    _this66.size = parseInt(font, 10);
+                    return _this66;
                 }
 
                 _createClass(DebugPositionComponent, [{
                     key: 'update',
                     value: function update(parent, delta) {
-                        var _this66 = this;
+                        var _this67 = this;
 
                         var p = parent.position;
                         var size = this.size;
@@ -20207,8 +20219,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             ctx.moveTo(0, -size);
                             ctx.lineTo(0, size);
                             ctx.stroke();
-                            ctx.fillStyle = _this66.color;
-                            ctx.font = _this66.font;
+                            ctx.fillStyle = _this67.color;
+                            ctx.font = _this67.font;
                             ctx.fillText((p[0] | 0) + ', ' + (p[1] | 0), size / 2, -size / 2);
                         });
                     }
@@ -20238,20 +20250,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     _classCallCheck(this, DebugVelocityComponent);
 
-                    var _this67 = _possibleConstructorReturn(this, (DebugVelocityComponent.__proto__ || Object.getPrototypeOf(DebugVelocityComponent)).call(this));
+                    var _this68 = _possibleConstructorReturn(this, (DebugVelocityComponent.__proto__ || Object.getPrototypeOf(DebugVelocityComponent)).call(this));
 
-                    _this67.renderSystem = renderSystem;
-                    _this67.font = font;
-                    _this67.color = color;
+                    _this68.renderSystem = renderSystem;
+                    _this68.font = font;
+                    _this68.color = color;
                     // Font should start with an integer we can use as a size for the crosshairs
-                    _this67.size = parseInt(font, 10);
-                    return _this67;
+                    _this68.size = parseInt(font, 10);
+                    return _this68;
                 }
 
                 _createClass(DebugVelocityComponent, [{
                     key: 'update',
                     value: function update(parent, delta) {
-                        var _this68 = this;
+                        var _this69 = this;
 
                         var p = parent.position;
                         var v = parent.velocity;
@@ -20267,8 +20279,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             ctx.moveTo(0, -size);
                             ctx.lineTo(0, size);
                             ctx.stroke();
-                            ctx.fillStyle = _this68.color;
-                            ctx.font = _this68.font;
+                            ctx.fillStyle = _this69.color;
+                            ctx.font = _this69.font;
                             ctx.fillText(v[0].toFixed(3) + ', ' + v[1].toFixed(3), size / 2, size);
                         });
                     }

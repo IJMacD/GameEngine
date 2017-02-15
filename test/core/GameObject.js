@@ -57,6 +57,34 @@ describe('GameObject', function() {
       assert.equal(go.components.length, 2);
     });
 
+    it('should be able to add a pure component', function() {
+      go.addComponent((update, delta) => delta);
+      assert.equal(go.components.length, 3);
+    });
+
+  });
+
+  describe('#addComponents()', function() {
+    const go = new GameObject();
+    class TestComponent extends GameComponent {
+      constructor () { super(); this.initialised = false; }
+      init (parent) {
+        this.initialised = parent === go;
+      }
+    }
+    const gc = new TestComponent();
+    const gc2 = new TestComponent();
+
+    go.addComponents([gc, gc2]);
+
+    it('should add multiple components', function() {
+      assert.equal(go.components.length, 2);
+    });
+
+    it('should initialise components with parent', function() {
+      assert(gc.initialised && gc2.initialised);
+    });
+
   });
 
   describe('#removeComponent()', function() {
@@ -147,6 +175,26 @@ describe('GameObject', function() {
       go.removeComponentByTest(test);
       go.update();
       assert.equal(go.components.length, 1);
+    });
+
+  });
+
+  describe('#removeAllComponents()', function() {
+    const go = new GameObject();
+    const gc = new GameComponent();
+    const gc2 = new GameComponent();
+
+    go.addComponent(gc);
+    go.addComponent(gc2);
+    go.removeAllComponents();
+
+    it('shouldn\'t remove components immedietly', function() {
+      assert.equal(go.components.length, 2);
+    });
+
+    it('should remove component after update', function() {
+      go.update();
+      assert.equal(go.components.length, 0);
     });
 
   });
@@ -243,6 +291,13 @@ describe('GameObject', function() {
     go.update(50);
 
     it('should update component', function() {
+      assert(updated);
+    });
+
+    it('should update pure component', function() {
+      let updated = false;
+      go.addComponent((parent, delta) => {updated = true});
+      go.update();
       assert(updated);
     });
   });
