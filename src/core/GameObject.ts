@@ -210,7 +210,14 @@ export default class GameObject implements Events {
             for(i=0;i<l;i++){
                 if(this.components[i] == this._toBeRemoved[j]){
                     arrayRemoveItem.call(this.components, i);
-                    break;
+                    /* We used to just break here but there's a case where
+                     * the exact same instance of a component has been added
+                     * multiple times to the same object. This method should
+                     * remove all references to to it.
+                     * So drop i and l back down one then continue the loop.
+                     */
+                    i--;
+                    l--;
                 }
             }
         }

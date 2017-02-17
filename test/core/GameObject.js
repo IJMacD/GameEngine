@@ -112,6 +112,14 @@ describe('GameObject', function() {
       assert.equal(go.components.length, 1);
     });
 
+    it('should remove all instances of the component', function() {
+      go.addComponent(gc);
+      go.addComponent(gc);
+      go.removeComponent(gc)
+      go.update();
+      assert.equal(go.components.length, 1);
+    });
+
   });
 
   describe('#removeComponentByName()', function() {
@@ -140,9 +148,17 @@ describe('GameObject', function() {
       assert.equal(go.components.length, 0);
     });
 
-    it('should only remove one component', function() {
+    it('should only remove named component', function() {
       go.addComponent(gc);  // CustomTestComponent
       go.addComponent(gc2); // TestComponent
+      go.removeComponentByName("CustomTestComponent");
+      go.update();
+      assert.equal(go.components.length, 1);
+    });
+
+    it('should remove all instances of the component', function() {
+      go.addComponent(gc);
+      go.addComponent(gc);
       go.removeComponentByName("CustomTestComponent");
       go.update();
       assert.equal(go.components.length, 1);
