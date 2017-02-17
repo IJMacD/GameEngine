@@ -12,6 +12,7 @@ export default class App extends Component {
       gravityConstant: 0.0003,
       debug: false,
       bounds: true,
+      boundsDuration: 5000,
       availableComponents: [
         "Gravity",
         "TerminalVelocity",

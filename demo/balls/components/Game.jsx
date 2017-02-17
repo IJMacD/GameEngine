@@ -48,13 +48,12 @@ export default class Game extends Component {
     }
 
     if (!prevProps.bounds && this.props.bounds) {
-      const bounds = worldSystem.originalBounds;
-      const bounds2 = bounds.map(x => x * 0.6);
-      worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(bounds, bounds2, 5000, IGE.Easing.Linear));
+      worldSystem.addComponent(boundsAnimation);
     } else if (prevProps.bounds && !this.props.bounds) {
-      worldSystem.removeComponentByName("BoundsAnimationComponent");
+      worldSystem.removeComponent(boundsAnimation);
     }
 
+    boundsAnimation.duration = this.props.boundsDuration || 5000;
   }
 
   render () {
@@ -80,6 +79,7 @@ let worldSystem;
 let collisionSystem;
 let renderSystem;
 let clickMarker;
+let boundsAnimation;
 
 let availableComponents = {
   Gravity: () => new IGE.Components.GravityComponent(),
@@ -105,7 +105,7 @@ function init (canvas, options) {
     width: canvas.offsetWidth,
     height: canvas.offsetHeight,
     autosize: true,
-    score: 10,
+    score: options.ballCount,
     originCentric: true,
   });
 
@@ -114,9 +114,7 @@ function init (canvas, options) {
   renderSystem = game.getDefaultRenderer();
   worldSystem = game.getDefaultWorld();
   worldSystem.originalBounds = [...worldSystem.bounds];
-
-  if (options.bounds)
-    worldSystem.addComponent(new IGE.Components.BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, IGE.Easing.Linear));
+  boundsAnimation = new IGE.Components.BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, IGE.Easing.Linear);
 
   // ScoreRenderComponent
   game.root.addComponent((parent, delta) => {
@@ -158,10 +156,6 @@ function init (canvas, options) {
   clickMarker.addComponent(new IGE.Components.SmoothPositionComponent());
   clickMarker.addComponent(new IGE.Debug.DebugPositionComponent(game.getDefaultRenderer()));
 
-  if (options.debug) {
-    game.addObject(clickMarker);
-  }
-
   collisionSystem = new IGE.Collision.BackgroundCollisionSystem();
   collisionSystem.addSurface([-game.width * 0.25, game.height / 2 - 100, 0, 0, game.width * 0.25, game.height / 2 - 100]);
   collisionSystem.addSurface([-game.width, game.height * 0.5 - 50, game.width, game.height * 0.5 - 50]);
@@ -174,10 +168,6 @@ function init (canvas, options) {
   IGE.Components.BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.95;
 
   ballBag = new IGE.GameObjectManager();
-
-  for(let i = 0; i < game.score; i++) {
-    addBall(ballBag, options);
-  }
 
   game.addObject(ballBag);
 

@@ -9461,6 +9461,7 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       gravityConstant: 0.0003,
       debug: false,
       bounds: true,
+      boundsDuration: 5000,
       availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click"],
       components: ["TerminalVelocity", "Move", "WorldBounce", "DotRender", "Click"]
     };
@@ -9552,12 +9553,12 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     }
 
     if (!prevProps.bounds && this.props.bounds) {
-      const bounds = worldSystem.originalBounds;
-      const bounds2 = bounds.map(x => x * 0.6);
-      worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(bounds, bounds2, 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
+      worldSystem.addComponent(boundsAnimation);
     } else if (prevProps.bounds && !this.props.bounds) {
-      worldSystem.removeComponentByName("BoundsAnimationComponent");
+      worldSystem.removeComponent(boundsAnimation);
     }
+
+    boundsAnimation.duration = this.props.boundsDuration || 5000;
   }
 
   render() {
@@ -9585,6 +9586,7 @@ let worldSystem;
 let collisionSystem;
 let renderSystem;
 let clickMarker;
+let boundsAnimation;
 
 let availableComponents = {
   Gravity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent(),
@@ -9610,7 +9612,7 @@ function init(canvas, options) {
     width: canvas.offsetWidth,
     height: canvas.offsetHeight,
     autosize: true,
-    score: 10,
+    score: options.ballCount,
     originCentric: true
   });
 
@@ -9619,8 +9621,7 @@ function init(canvas, options) {
   renderSystem = game.getDefaultRenderer();
   worldSystem = game.getDefaultWorld();
   worldSystem.originalBounds = [...worldSystem.bounds];
-
-  if (options.bounds) worldSystem.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear));
+  boundsAnimation = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(worldSystem.bounds, worldSystem.bounds.map(x => x * 0.6), 5000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Linear);
 
   // ScoreRenderComponent
   game.root.addComponent((parent, delta) => {
@@ -9662,10 +9663,6 @@ function init(canvas, options) {
   clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].SmoothPositionComponent());
   clickMarker.addComponent(new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugPositionComponent(game.getDefaultRenderer()));
 
-  if (options.debug) {
-    game.addObject(clickMarker);
-  }
-
   collisionSystem = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Collision"].BackgroundCollisionSystem();
   collisionSystem.addSurface([-game.width * 0.25, game.height / 2 - 100, 0, 0, game.width * 0.25, game.height / 2 - 100]);
   collisionSystem.addSurface([-game.width, game.height * 0.5 - 50, game.width, game.height * 0.5 - 50]);
@@ -9678,10 +9675,6 @@ function init(canvas, options) {
   __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent.COEFFICIENT_RESTITUTION = 0.95;
 
   ballBag = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["GameObjectManager"]();
-
-  for (let i = 0; i < game.score; i++) {
-    addBall(ballBag, options);
-  }
 
   game.addObject(ballBag);
 
@@ -9777,6 +9770,9 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   handleGravityChange(e) {
     this.props.modifyState({ gravityConstant: e.target.value });
   }
+  handleBoundsChange(e) {
+    this.props.modifyState({ boundsDuration: e.target.value });
+  }
   flipComponent(name) {
     const components = this.props.components;
     const isSelected = components.includes(name);
@@ -9795,13 +9791,18 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         'Settings'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h2',
+        null,
+        'Balls'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'p',
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'label',
           null,
-          'Balls: ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { value: this.props.ballCount, onChange: e => this.handleBallChange(e) }),
+          'Count: ',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { value: this.props.ballCount, onChange: e => this.handleBallChange(e), size: 6 }),
           ' ',
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -9824,29 +9825,9 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'label',
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.debug, onChange: e => this.handleChange(e, "debug") }),
-          'Debug'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
-          'World Bounds Animation'
-        )
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
-          null,
-          'Gravity ',
+          'Gravity: ',
           ' ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.gravityConstant, onChange: e => this.handleGravityChange(e) })
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.gravityConstant, onChange: e => this.handleGravityChange(e), size: 6 })
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -9855,7 +9836,7 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'p',
           null,
-          'Ball Components:'
+          'Components:'
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'ul',
@@ -9874,6 +9855,33 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
               name
             );
           })
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h2',
+        null,
+        'World'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'label',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.debug, onChange: e => this.handleChange(e, "debug") }),
+          'Debug Bounds'
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'label',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
+          'Animate Bounds ',
+          ' ',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.boundsDuration, onChange: e => this.handleBoundsChange(e), size: 6 })
         )
       )
     );
@@ -11099,7 +11107,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             for (i = 0; i < l; i++) {
                                 if (this.components[i] == this._toBeRemoved[j]) {
                                     arrayRemoveItem.call(this.components, i);
-                                    break;
+                                    /* We used to just break here but there's a case where
+                                     * the exact same instance of a component has been added
+                                     * multiple times to the same object. This method should
+                                     * remove all references to to it.
+                                     * So drop i and l back down one then continue the loop.
+                                     */
+                                    i--;
+                                    l--;
                                 }
                             }
                         }

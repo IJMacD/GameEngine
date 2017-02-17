@@ -16,6 +16,9 @@ export default class Sidebar extends Component {
   handleGravityChange (e) {
     this.props.modifyState({gravityConstant: e.target.value});
   }
+  handleBoundsChange (e) {
+    this.props.modifyState({boundsDuration: e.target.value});
+  }
   flipComponent (name) {
     const components = this.props.components;
     const isSelected = components.includes(name);
@@ -28,25 +31,18 @@ export default class Sidebar extends Component {
     return (
       <div>
         <h1>Settings</h1>
+        <h2>Balls</h2>
         <p><label>
-          Balls: <input value={this.props.ballCount} onChange={e => this.handleBallChange(e)} /> { ' ' }
+          Count: <input value={this.props.ballCount} onChange={e => this.handleBallChange(e)} size={6} /> { ' ' }
           <button onClick={() => this.increaseBalls()}>+</button> { ' ' }
           <button onClick={() => this.decreaseBalls()}>-</button>
         </label></p>
         <p><label>
-          <input type="checkbox" checked={this.props.debug} onChange={e => this.handleChange(e, "debug")} />
-          Debug
-        </label></p>
-        <p><label>
-          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
-          World Bounds Animation
-        </label></p>
-        <p><label>
-          Gravity { ' ' }
-          <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} />
+          Gravity: { ' ' }
+          <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} size={6} />
         </label></p>
         <div>
-          <p>Ball Components:</p>
+          <p>Components:</p>
           <ul>
             {
               this.props.availableComponents.map((name, i) => {
@@ -62,6 +58,16 @@ export default class Sidebar extends Component {
             }
           </ul>
         </div>
+        <h2>World</h2>
+        <p><label>
+          <input type="checkbox" checked={this.props.debug} onChange={e => this.handleChange(e, "debug")} />
+          Debug Bounds
+        </label></p>
+        <p><label>
+          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
+          Animate Bounds { ' ' }
+          <input type="text" value={this.props.boundsDuration} onChange={e => this.handleBoundsChange(e)} size={6} />
+        </label></p>
       </div>
     );
   }
