@@ -29,8 +29,22 @@ export default class Sidebar extends Component {
       components: isSelected ? components.filter(x => x != name) : [...components, name]
     });
   }
+  swapComponents (index1, index2) {
+    const components = this.props.components.slice();
+    const count = components.length;
+    if (index1 >= 0 && index2 >= 0 && index1 < count && index2 < count) {
+      const swap = components[index1];
+      components[index1] = components[index2];
+      components[index2] = swap;
+    }
+    this.props.modifyState({components});
+  }
 
   render () {
+    const available = this.props.availableComponents;
+    const selected = this.props.components;
+    const unselected = arraySubtract(available, selected);
+
     return (
       <div style={{overflowY: "auto"}}>
         <h1>Settings</h1>
@@ -42,27 +56,36 @@ export default class Sidebar extends Component {
         </label></p>
         <p><label>
           Gravity: { ' ' }
-          <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} size={6} />
+          <input
+            type="text"
+            value={this.props.gravityConstant}
+            onChange={e => this.handleGravityChange(e)}
+            size={6}
+            disabled={!selected.includes("Gravity")} />
         </label></p>
         <p>
-          <input type="button" value="Impulse" onClick={e => this.handleImpulse()} />
+          Physics: { ' ' }
+          <input
+            type="button"
+            value="Impulse"
+            onClick={e => this.handleImpulse()}
+            disabled={!selected.includes("Physics")}
+          />
         </p>
         <div>
           <p>Components:</p>
-          <ul>
-            {
-              this.props.availableComponents.map((name, i) => {
-                const selected = this.props.components.includes(name);
-                const style = {
-                  color: selected ? '' : 'lightgray',
-                  textDecoration: selected ? '' : 'line-through',
-                  cursor: 'pointer',
-                };
-
-                return <li key={i} style={style} onClick={() => this.flipComponent(name)}>{ name }</li>
-              })
-            }
-          </ul>
+          <ComponentList
+            components={selected}
+            areSelected={true}
+            componentClick={n => this.flipComponent(n)}
+            componentUp={i => this.swapComponents(i, i-1)}
+            componentDown={i => this.swapComponents(i, i+1)}
+          />
+          <ComponentList
+            components={unselected}
+            areSelected={false}
+            componentClick={n => this.flipComponent(n)}
+          />
         </div>
         <h2>World</h2>
         <p><label>
@@ -77,4 +100,52 @@ export default class Sidebar extends Component {
       </div>
     );
   }
+}
+
+function arraySubtract (minuend, subtrahend) {
+  return minuend.filter(x => !subtrahend.includes(x));
+}
+
+function ComponentList (props) {
+  const { components, areSelected, componentClick, componentUp, componentDown } = props;
+  const listStyle = {
+    listStyle: 'none',
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: '10pt',
+  };
+  const count = components.length;
+  return (
+    <ul style={listStyle}>
+      {
+        components.map((name, i) => {
+          const style = {
+            color: areSelected ? '' : '#999',
+            cursor: 'pointer',
+          };
+
+          return (
+            <li
+              key={name}
+              style={style}
+              onClick={() => componentClick(name)}
+            >
+              { name }
+              <div style={{float: "right", display: areSelected ? "" : "none"}}>
+                <span
+                  style={{visibility: i==0 ? 'hidden' : ''}}
+                  onClick={e => { e.stopPropagation(); componentUp(i)}}
+                >Up</span>
+                { ' ' }
+                <span
+                  style={{visibility: i==(count-1) ? 'hidden' : ''}}
+                  onClick={e => { e.stopPropagation(); componentDown(i)}}
+                >Down</span>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
+  );
 }
