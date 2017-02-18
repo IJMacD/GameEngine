@@ -78,9 +78,9 @@ export default class Game extends Component {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (!deepEqual(prevProps.enabledComponents, this.props.enabledComponents)) {
+    if (!deepEqual(prevProps.components, this.props.components)) {
       ballBag.objects.forEach(object => {
-        setComponents(object, this.props.enabledComponents);
+        setComponents(object, this.props.components);
       });
     }
 

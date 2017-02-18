@@ -39,7 +39,7 @@ export default class App extends Component {
         "DotRender",
         "Click",
       ],
-      enabledComponents: [
+      selectedComponents: [
         "TerminalVelocity",
         "Move",
         "WorldWrap",

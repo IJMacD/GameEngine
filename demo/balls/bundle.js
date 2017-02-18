@@ -9464,7 +9464,7 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       boundsDuration: 5000,
       availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click", "VelocityColor", "Physics"],
       components: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"],
-      enabledComponents: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
+      selectedComponents: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
     };
   }
 
@@ -9584,9 +9584,9 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (!deepEqual(prevProps.enabledComponents, this.props.enabledComponents)) {
+    if (!deepEqual(prevProps.components, this.props.components)) {
       ballBag.objects.forEach(object => {
-        setComponents(object, this.props.enabledComponents);
+        setComponents(object, this.props.components);
       });
     }
 
@@ -9806,35 +9806,37 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   }
   flipComponent(name) {
     const components = this.props.components;
-    const enabled = this.props.enabledComponents;
-    const isSelected = components.includes(name);
+    const selected = this.props.selectedComponents;
+    const isSelected = selected.includes(name);
     this.props.modifyState({
       components: isSelected ? components.filter(x => x != name) : [...components, name],
-      enabledComponents: isSelected ? enabled.filter(x => x != name) : [...enabled, name]
+      selectedComponents: isSelected ? selected.filter(x => x != name) : [...selected, name]
     });
   }
   swapComponents(index1, index2) {
-    const components = this.props.components.slice();
-    const count = components.length;
+    const selected = this.props.selectedComponents.slice();
+    const count = selected.length;
     if (index1 >= 0 && index2 >= 0 && index1 < count && index2 < count) {
-      const swap = components[index1];
-      components[index1] = components[index2];
-      components[index2] = swap;
+      const swap = selected[index1];
+      selected[index1] = selected[index2];
+      selected[index2] = swap;
     }
-    this.props.modifyState({ components });
+    // Rebuild enabled component list to reflect new ordering
+    const components = selected.filter(n => this.props.components.includes(n));
+    this.props.modifyState({ selectedComponents: selected, components });
   }
   enableComponent(name) {
-    const components = this.props.enabledComponents;
+    const components = this.props.components;
     const isEnabled = components.includes(name);
     this.props.modifyState({
-      enabledComponents: isEnabled ? components.filter(x => x != name) : [...components, name]
+      components: isEnabled ? components.filter(x => x != name) : [...components, name]
     });
   }
 
   render() {
     const available = this.props.availableComponents;
-    const selected = this.props.components;
-    const enabled = this.props.enabledComponents;
+    const selected = this.props.selectedComponents;
+    const enabled = this.props.components;
     const unselected = arraySubtract(available, selected);
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
