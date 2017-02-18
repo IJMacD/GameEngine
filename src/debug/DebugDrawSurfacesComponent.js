@@ -20,7 +20,7 @@ export default class DebugDrawSurfacesComponent extends GameComponent {
             m = s.length,
             i, c, l;
         for(; j<m; j++){
-            this.renderSystem.strokePath(s[j], parent.colour || this.colour);
+            this.renderSystem.strokePath(s[j], parent.colour || this.colour, this.renderSystem.DEBUG_LAYER);
         }
 
         // Draw Normals
@@ -38,7 +38,7 @@ export default class DebugDrawSurfacesComponent extends GameComponent {
                     my = y1 + dy * 0.5,
                     nx = dy / Math.sqrt(dy * dy + dx * dx),
                     ny = -dx / Math.sqrt(dy * dy + dx * dx);
-                this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f');
+                this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f', this.renderSystem.DEBUG_LAYER);
             }
         }
     }

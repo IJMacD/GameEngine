@@ -26,6 +26,6 @@ export default class DebugPositionComponent extends GameComponent {
       ctx.fillStyle = this.color;
       ctx.font = this.font;
       ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
-    });
+    }, this.renderSystem.DEBUG_LAYER);
   }
 }

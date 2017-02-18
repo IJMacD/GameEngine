@@ -2088,6 +2088,8 @@ function OffTouchClick(sel) {
 class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__["a" /* default */] {
     constructor(context, cameraSystem) {
         super();
+        this.DEBUG_LAYER = 10;
+        this.STATIC_LAYER = -1;
         this.renderQueue = [];
         /** Should the renderer clear the screen before drawing a frame or just overdraw. */
         this.clearScreen = true;
@@ -2125,11 +2127,11 @@ class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__[
         }
         this.context.translate(-p[0], -p[1]);
         for (i = 0, l = this.renderQueue.length; i < l; i++) {
-            _renderQueue(this, i);
+            this._renderQueue(i);
         }
         this.context.restore();
         // Special case layer renders on top independant of camera
-        _renderQueue(this, -1);
+        this._renderQueue(this.STATIC_LAYER);
     }
     drawPath(context, path) {
         var i = 2, l = path.length;
@@ -2152,20 +2154,21 @@ class CanvasRenderSystem extends __WEBPACK_IMPORTED_MODULE_0__core_GameObject__[
             context.stroke();
         }, layer);
     }
-}
-/* harmony default export */ __webpack_exports__["a"] = CanvasRenderSystem;
-function _renderQueue(renderSystem, layer) {
-    const { context, renderQueue } = renderSystem;
-    const queue = renderQueue[layer];
-    if (queue) {
-        for (let j = 0, n = queue.length; j < n; j++) {
-            context.save();
-            queue[j].call(renderSystem, context);
-            context.restore();
+    _renderQueue(layer) {
+        const { context, renderQueue } = this;
+        const queue = renderQueue[layer];
+        if (queue) {
+            for (let j = 0, n = queue.length; j < n; j++) {
+                context.save();
+                queue[j].call(this, context);
+                context.restore();
+            }
+            queue.length = 0;
         }
-        queue.length = 0;
     }
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = CanvasRenderSystem;
+
 
 
 /***/ }),
@@ -8403,7 +8406,7 @@ class DebugDrawBoundsComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCom
 				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
 				ctx.strokeStyle = "#000";
 				ctx.stroke();
-			});
+			}, this.renderSystem.DEBUG_LAYER);
 		}
 	}
 }
@@ -8488,15 +8491,15 @@ class DebugDrawPathComponent extends __WEBPACK_IMPORTED_MODULE_1__core_GameCompo
 
             ctx.strokeStyle = "#CCC";
             ctx.stroke();
-        });
+        }, this.renderSystem.DEBUG_LAYER);
 
         this.currIndex = (this.currIndex + 2) % PATH_SIZE;
 
         // Draw Velocity
-        this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
+        this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)", this.renderSystem.DEBUG_LAYER);
 
         // Draw Acceleration
-        this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
+        this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)", this.renderSystem.DEBUG_LAYER);
         this.lastVx = vx;
         this.lastVy = vy;
     }
@@ -8533,7 +8536,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
             m = s.length,
             i, c, l;
         for(; j<m; j++){
-            this.renderSystem.strokePath(s[j], parent.colour || this.colour);
+            this.renderSystem.strokePath(s[j], parent.colour || this.colour, this.renderSystem.DEBUG_LAYER);
         }
 
         // Draw Normals
@@ -8551,7 +8554,7 @@ class DebugDrawSurfacesComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameC
                     my = y1 + dy * 0.5,
                     nx = dy / Math.sqrt(dy * dy + dx * dx),
                     ny = -dx / Math.sqrt(dy * dy + dx * dx);
-                this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f');
+                this.renderSystem.strokePath([mx,my,mx+nx*30,my+ny*30],'#08f', this.renderSystem.DEBUG_LAYER);
             }
         }
     }
@@ -8595,7 +8598,7 @@ class DebugFlockingComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
             ctx.arc(0, 0, __WEBPACK_IMPORTED_MODULE_1__basic_FlockingComponent__["a" /* default */].SEPARATION_RADIUS, 0, Math.PI * 2, false);
             ctx.strokeStyle = "#800";
             ctx.stroke();
-        });
+        }, this.renderSystem.DEBUG_LAYER);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = DebugFlockingComponent;
@@ -9140,7 +9143,7 @@ class DebugPositionComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
       ctx.fillStyle = this.color;
       ctx.font = this.font;
       ctx.fillText(`${p[0]|0}, ${p[1]|0}`, size/2, -size/2);
-    });
+    }, this.renderSystem.DEBUG_LAYER);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = DebugPositionComponent;
@@ -9182,7 +9185,7 @@ class DebugVelocityComponent extends __WEBPACK_IMPORTED_MODULE_0__core_GameCompo
       ctx.fillStyle = this.color;
       ctx.font = this.font;
       ctx.fillText(`${v[0].toFixed(3)}, ${v[1].toFixed(3)}`, size/2, size);
-    });
+    }, this.renderSystem.DEBUG_LAYER);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = DebugVelocityComponent;

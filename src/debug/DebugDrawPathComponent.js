@@ -66,15 +66,15 @@ export default class DebugDrawPathComponent extends GameComponent {
 
             ctx.strokeStyle = "#CCC";
             ctx.stroke();
-        });
+        }, this.renderSystem.DEBUG_LAYER);
 
         this.currIndex = (this.currIndex + 2) % PATH_SIZE;
 
         // Draw Velocity
-        this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)",0);
+        this.renderSystem.strokePath([px, py, px+vx*100, py+vy*100], "rgba(0,128,255,0.7)", this.renderSystem.DEBUG_LAYER);
 
         // Draw Acceleration
-        this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)",0);
+        this.renderSystem.strokePath([px, py, px+ax*4e5, py+ay*4e5], "rgba(0,255,0,0.7)", this.renderSystem.DEBUG_LAYER);
         this.lastVx = vx;
         this.lastVy = vy;
     }

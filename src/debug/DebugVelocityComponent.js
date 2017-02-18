@@ -27,6 +27,6 @@ export default class DebugVelocityComponent extends GameComponent {
       ctx.fillStyle = this.color;
       ctx.font = this.font;
       ctx.fillText(`${v[0].toFixed(3)}, ${v[1].toFixed(3)}`, size/2, size);
-    });
+    }, this.renderSystem.DEBUG_LAYER);
   }
 }

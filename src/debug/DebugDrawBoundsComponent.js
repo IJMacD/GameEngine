@@ -25,7 +25,7 @@ export default class DebugDrawBoundsComponent extends GameComponent {
 				ctx.rect(parent.bounds[0], parent.bounds[1], parent.bounds[2] - parent.bounds[0], parent.bounds[3] - parent.bounds[1]);
 				ctx.strokeStyle = "#000";
 				ctx.stroke();
-			});
+			}, this.renderSystem.DEBUG_LAYER);
 		}
 	}
 }

@@ -26,6 +26,6 @@ export default class DebugFlockingComponent extends GameComponent {
             ctx.arc(0, 0, FlockingComponent.SEPARATION_RADIUS, 0, Math.PI * 2, false);
             ctx.strokeStyle = "#800";
             ctx.stroke();
-        });
+        }, this.renderSystem.DEBUG_LAYER);
     }
 }

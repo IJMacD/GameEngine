@@ -10,7 +10,10 @@ import CameraSystem from '../CameraSystem';
  * @param {CanvasRenderingContext2D} context - A 2d context from the target canvas. Call <code>canvas.getContext('2d')</code>
  * @param {CameraSystem} cameraSystem - Viewport from which to render from. All drawing calls will be made realtive to the camera position.
  */
-class CanvasRenderSystem extends GameObject {
+export default class CanvasRenderSystem extends GameObject {
+
+	DEBUG_LAYER = 10;
+	STATIC_LAYER = -1;
 
 	context: CanvasRenderingContext2D;
 	canvas: HTMLCanvasElement;
@@ -73,16 +76,16 @@ class CanvasRenderSystem extends GameObject {
 		this.context.translate(-p[0],-p[1]);
 
 		for(i = 0, l = this.renderQueue.length; i < l; i++){
-			_renderQueue(this, i);
+			this._renderQueue(i);
 		}
 
 		this.context.restore();
 
 		// Special case layer renders on top independant of camera
-		_renderQueue(this, -1);
+		this._renderQueue(this.STATIC_LAYER);
 	}
 
-	drawPath (context, path){
+	drawPath (context: CanvasRenderingContext2D, path: number[]){
 		var i = 2,
 				l = path.length;
 		context.beginPath();
@@ -105,19 +108,17 @@ class CanvasRenderSystem extends GameObject {
 			context.stroke();
 		}, layer);
 	}
-}
 
-export default CanvasRenderSystem;
-
-function _renderQueue (renderSystem: CanvasRenderSystem, layer) {
-	const { context, renderQueue } = renderSystem;
-	const queue = renderQueue[layer];
-	if(queue){
-		for(let j = 0, n = queue.length; j < n; j++){
-			context.save();
-			queue[j].call(renderSystem, context);
-			context.restore();
+	private _renderQueue (layer: number) {
+		const { context, renderQueue } = this;
+		const queue = renderQueue[layer];
+		if(queue){
+			for(let j = 0, n = queue.length; j < n; j++){
+				context.save();
+				queue[j].call(this, context);
+				context.restore();
+			}
+			queue.length = 0;
 		}
-		queue.length = 0;
 	}
 }
