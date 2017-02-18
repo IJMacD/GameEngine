@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 export default class Sidebar extends Component {
-  handleBallChange (event) {
-    this.props.modifyState({ballCount: parseInt(event.target.value)||0});
+  handleIntChange (event, prop) {
+    this.props.modifyState({[prop]: parseInt(event.target.value)||0});
   }
   increaseBalls () {
     this.props.modifyState({ballCount: this.props.ballCount + 1});
@@ -10,14 +10,11 @@ export default class Sidebar extends Component {
   decreaseBalls () {
     this.props.modifyState({ballCount: this.props.ballCount - 1});
   }
-  handleChange (e, prop) {
+  handleCheckChange (e, prop) {
     this.props.modifyState({[prop]: e.target.checked});
   }
-  handleGravityChange (e) {
-    this.props.modifyState({gravityConstant: e.target.value});
-  }
-  handleBoundsChange (e) {
-    this.props.modifyState({boundsDuration: e.target.value});
+  handleFloatChange (e, prop) {
+    this.props.modifyState({[prop]:  parseFloat(e.target.value) || 0});
   }
   handleImpulse () {
     this.props.modifyState({impulseTime: Date.now()});
@@ -62,7 +59,7 @@ export default class Sidebar extends Component {
         <h1>Settings</h1>
         <h2>Balls</h2>
         <p><label>
-          Count: <input value={this.props.ballCount} onChange={e => this.handleBallChange(e)} size={6} /> { ' ' }
+          Count: <input value={this.props.ballCount} onChange={e => this.handleIntChange("ballCount", e)} size={6} /> { ' ' }
           <button onClick={() => this.increaseBalls()}>+</button> { ' ' }
           <button onClick={() => this.decreaseBalls()}>-</button>
         </label></p>
@@ -71,7 +68,7 @@ export default class Sidebar extends Component {
           <input
             type="text"
             value={this.props.gravityConstant}
-            onChange={e => this.handleGravityChange(e)}
+            onChange={e => this.handleFloatChange(e, "gravityConstant")}
             size={6}
             disabled={!selected.includes("Gravity")} />
         </label></p>
@@ -103,13 +100,23 @@ export default class Sidebar extends Component {
         </div>
         <h2>World</h2>
         <p><label>
-          <input type="checkbox" checked={this.props.debug} onChange={e => this.handleChange(e, "debug")} />
+          <input type="checkbox" checked={this.props.debug} onChange={e => this.handleCheckChange(e, "debug")} />
           Debug Bounds
         </label></p>
         <p><label>
-          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleChange(e, "bounds")} />
+          <input type="checkbox" checked={this.props.bounds} onChange={e => this.handleCheckChange(e, "bounds")} />
           Animate Bounds { ' ' }
-          <input type="text" value={this.props.boundsDuration} onChange={e => this.handleBoundsChange(e)} size={6} />
+          <input type="text" value={this.props.boundsDuration} onChange={e => this.handleIntChange(e, "boundsDuration")} size={6} />
+        </label></p>
+        <h2>Camera</h2>
+        <p><label>
+          Scale: { ' ' }
+          <input type="text" value={this.props.cameraScale} onChange={e => this.handleFloatChange(e, "cameraScale")} size={6} />
+        </label></p>
+        <p><label>
+          Position: { ' ' }
+          (<input type="text" value={this.props.cameraPositionX} onChange={e => this.handleIntChange(e, "cameraPositionX")} size={6} />,
+          <input type="text" value={this.props.cameraPositionY} onChange={e => this.handleIntChange(e, "cameraPositionY")} size={6} />)
         </label></p>
       </div>
     );

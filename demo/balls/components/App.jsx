@@ -13,6 +13,9 @@ export default class App extends Component {
       debug: false,
       bounds: false,
       boundsDuration: 5000,
+      cameraScale: 1,
+      cameraPositionX: 0,
+      cameraPositionY: 0,
       availableComponents: [
         "Gravity",
         "TerminalVelocity",

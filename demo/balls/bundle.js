@@ -9462,6 +9462,9 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       debug: false,
       bounds: false,
       boundsDuration: 5000,
+      cameraScale: 1,
+      cameraPositionX: 0,
+      cameraPositionY: 0,
       availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click", "VelocityColor", "Physics"],
       components: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"],
       selectedComponents: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
@@ -9597,6 +9600,9 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     }
 
     boundsAnimation.duration = this.props.boundsDuration || 5000;
+
+    cameraSystem.setScale(this.props.cameraScale);
+    cameraSystem.setPosition(this.props.cameraPositionX, this.props.cameraPositionY);
   }
 
   render() {
@@ -9783,8 +9789,8 @@ function deepEqual(a, b) {
 
 
 class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
-  handleBallChange(event) {
-    this.props.modifyState({ ballCount: parseInt(event.target.value) || 0 });
+  handleIntChange(event, prop) {
+    this.props.modifyState({ [prop]: parseInt(event.target.value) || 0 });
   }
   increaseBalls() {
     this.props.modifyState({ ballCount: this.props.ballCount + 1 });
@@ -9792,14 +9798,11 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   decreaseBalls() {
     this.props.modifyState({ ballCount: this.props.ballCount - 1 });
   }
-  handleChange(e, prop) {
+  handleCheckChange(e, prop) {
     this.props.modifyState({ [prop]: e.target.checked });
   }
-  handleGravityChange(e) {
-    this.props.modifyState({ gravityConstant: e.target.value });
-  }
-  handleBoundsChange(e) {
-    this.props.modifyState({ boundsDuration: e.target.value });
+  handleFloatChange(e, prop) {
+    this.props.modifyState({ [prop]: parseFloat(e.target.value) || 0 });
   }
   handleImpulse() {
     this.props.modifyState({ impulseTime: Date.now() });
@@ -9840,77 +9843,77 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     const unselected = arraySubtract(available, selected);
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'div',
+      "div",
       { style: { overflowY: "auto", padding: 20 } },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'h1',
+        "h1",
         null,
-        'Settings'
+        "Settings"
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'h2',
+        "h2",
         null,
-        'Balls'
+        "Balls"
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        "p",
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
+          "label",
           null,
-          'Count: ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { value: this.props.ballCount, onChange: e => this.handleBallChange(e), size: 6 }),
-          ' ',
+          "Count: ",
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { value: this.props.ballCount, onChange: e => this.handleIntChange("ballCount", e), size: 6 }),
+          " ",
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
+            "button",
             { onClick: () => this.increaseBalls() },
-            '+'
+            "+"
           ),
-          ' ',
+          " ",
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'button',
+            "button",
             { onClick: () => this.decreaseBalls() },
-            '-'
+            "-"
           )
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        "p",
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
+          "label",
           null,
-          'Gravity: ',
+          "Gravity: ",
           ' ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-            type: 'text',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", {
+            type: "text",
             value: this.props.gravityConstant,
-            onChange: e => this.handleGravityChange(e),
+            onChange: e => this.handleFloatChange(e, "gravityConstant"),
             size: 6,
             disabled: !selected.includes("Gravity") })
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        "p",
         null,
-        'Physics: ',
+        "Physics: ",
         ' ',
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-          type: 'button',
-          value: 'Impulse',
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", {
+          type: "button",
+          value: "Impulse",
           onClick: e => this.handleImpulse(),
           disabled: !selected.includes("Physics")
         })
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'div',
+        "div",
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'p',
+          "p",
           null,
-          'Components:'
+          "Components:"
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(ComponentList, {
           components: selected,
@@ -9928,30 +9931,61 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         })
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'h2',
+        "h2",
         null,
-        'World'
+        "World"
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        "p",
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
+          "label",
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.debug, onChange: e => this.handleChange(e, "debug") }),
-          'Debug Bounds'
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.props.debug, onChange: e => this.handleCheckChange(e, "debug") }),
+          "Debug Bounds"
         )
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'p',
+        "p",
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'label',
+          "label",
           null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', checked: this.props.bounds, onChange: e => this.handleChange(e, "bounds") }),
-          'Animate Bounds ',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.props.bounds, onChange: e => this.handleCheckChange(e, "bounds") }),
+          "Animate Bounds ",
           ' ',
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.boundsDuration, onChange: e => this.handleBoundsChange(e), size: 6 })
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", value: this.props.boundsDuration, onChange: e => this.handleIntChange(e, "boundsDuration"), size: 6 })
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "h2",
+        null,
+        "Camera"
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "p",
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "label",
+          null,
+          "Scale: ",
+          ' ',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", value: this.props.cameraScale, onChange: e => this.handleFloatChange(e, "cameraScale"), size: 6 })
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "p",
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "label",
+          null,
+          "Position: ",
+          ' ',
+          "(",
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", value: this.props.cameraPositionX, onChange: e => this.handleIntChange(e, "cameraPositionX"), size: 6 }),
+          ",",
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", value: this.props.cameraPositionY, onChange: e => this.handleIntChange(e, "cameraPositionY"), size: 6 }),
+          ")"
         )
       )
     );
@@ -9983,7 +10017,7 @@ function ComponentList(props) {
   const count = components.length;
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-    'ul',
+    "ul",
     { style: listStyle },
     components.map((name, i) => {
       const style = {
@@ -9992,14 +10026,14 @@ function ComponentList(props) {
       };
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'li',
+        "li",
         {
           key: name,
           style: style,
           onClick: () => componentClick(name)
         },
-        areSelected && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-          type: 'checkbox',
+        areSelected && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", {
+          type: "checkbox",
           checked: enabledComponents.includes(name),
           onChange: () => {
             componentEnable(name);
@@ -10010,28 +10044,28 @@ function ComponentList(props) {
         }),
         name,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'div',
+          "div",
           { style: { float: "right", display: areSelected ? "" : "none" } },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'span',
+            "span",
             {
               style: { visibility: i == 0 ? 'hidden' : '' },
               onClick: e => {
                 e.stopPropagation();componentUp(i);
               }
             },
-            'Up'
+            "Up"
           ),
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'span',
+            "span",
             {
               style: { visibility: i == count - 1 ? 'hidden' : '' },
               onClick: e => {
                 e.stopPropagation();componentDown(i);
               }
             },
-            'Down'
+            "Down"
           )
         )
       );

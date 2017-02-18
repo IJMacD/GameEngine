@@ -91,6 +91,9 @@ export default class Game extends Component {
     }
 
     boundsAnimation.duration = this.props.boundsDuration || 5000;
+
+    cameraSystem.setScale(this.props.cameraScale);
+    cameraSystem.setPosition(this.props.cameraPositionX, this.props.cameraPositionY);
   }
 
   render () {
