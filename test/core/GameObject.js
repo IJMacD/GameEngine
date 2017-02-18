@@ -18,6 +18,10 @@ describe('GameObject', function() {
       assert(go.velocity && go.velocity.length == 3);
     });
 
+    it('should have impulse property', function() {
+      assert(go.impulse && go.impulse.length == 3);
+    });
+
     it('should have rotation property', function() {
       assert(go.rotation !== undefined);
     });

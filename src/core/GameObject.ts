@@ -16,6 +16,9 @@ export default class GameObject implements Events {
     /** Velocity of this object moving through the world. */
     velocity: vec3 = vec3.create();
 
+    /** Impulse to be applied to this object by the phisics component. */
+    impulse: vec3 = vec3.create();
+
     /** Current rotation of this object. */
     rotation = 0;
 

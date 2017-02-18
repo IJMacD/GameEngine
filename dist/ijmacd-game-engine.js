@@ -933,6 +933,8 @@ class GameObject {
         this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
         /** Velocity of this object moving through the world. */
         this.velocity = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
+        /** Impulse to be applied to this object by the phisics component. */
+        this.impulse = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
         /** Current rotation of this object. */
         this.rotation = 0;
         /** 3D rotations require a rotation axis */
