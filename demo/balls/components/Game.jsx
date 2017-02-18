@@ -71,6 +71,25 @@ export default class Game extends Component {
   }
 }
 
+class VelocityColorComponent extends IGE.GameComponent {
+  update(parent, delta) {
+    const v = parent.velocity;
+    if (v[0] < 0) {
+      if(v[1] < 0) {
+        parent.color = "#800";
+      } else {
+        parent.color = "#8f0";
+      }
+    } else {
+      if(v[1] < 0) {
+        parent.color = "#f80";
+      } else {
+        parent.color = "#ff0";
+      }
+    }
+  }
+}
+
 let game;
 let ballBag;
 let inputSystem;
@@ -97,6 +116,7 @@ let availableComponents = {
   DebugPosition: () => new IGE.Debug.DebugPositionComponent(renderSystem),
   DebugVelocity: () => new IGE.Debug.DebugVelocityComponent(renderSystem),
   Click: () => new IGE.Components.ClickComponent(inputSystem),
+  VelocityColor: () => new VelocityColorComponent(),
 }
 
 function init (canvas, options) {

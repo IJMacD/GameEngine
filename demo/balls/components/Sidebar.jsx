@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 export default class Sidebar extends Component {
   handleBallChange (event) {
-    this.props.modifyState({ballCount: parseInt(event.target.value)});
+    this.props.modifyState({ballCount: parseInt(event.target.value)||0});
   }
   increaseBalls () {
     this.props.modifyState({ballCount: this.props.ballCount + 1});

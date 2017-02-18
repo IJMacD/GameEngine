@@ -29,6 +29,7 @@ export default class App extends Component {
         "DebugPosition",
         "DebugVelocity",
         "Click",
+        "VelocityColor",
       ],
       components: [
         "TerminalVelocity",
