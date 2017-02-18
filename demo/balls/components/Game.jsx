@@ -4,6 +4,36 @@ import * as IGE from '../../../dist/ijmacd-game-engine';
 const MAX_VELOCITY = 0.1;
 const MAX_ROTATION = 0.01;
 
+let game;
+let ballBag;
+let inputSystem;
+let cameraSystem;
+let worldSystem;
+let collisionSystem;
+let renderSystem;
+let clickMarker;
+let boundsAnimation;
+
+let availableComponents = {
+  Gravity: () => new IGE.Components.GravityComponent(),
+  TerminalVelocity: () => new IGE.Components.TerminalVelocityComponent(MAX_VELOCITY),
+  Move: () => new IGE.Components.MoveComponent(),
+  WorldWrap: () => new IGE.Components.WorldWrapComponent(worldSystem),
+  WorldBounce: () => new IGE.Components.WorldBounceComponent(worldSystem),
+  BackgroundCollision: () => new IGE.Components.BackgroundCollisionComponent(collisionSystem),
+  Rotation: () => new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
+  ColorAnimation: object => new IGE.Components.ColorAnimationComponent(object.color1, object.color2, 3000),
+  BoundsAnimation: object => new IGE.Components.BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, IGE.Easing.Smooth),
+  RectangleRender: () => new IGE.Components.RectangleRenderComponent(renderSystem),
+  DotRender: () => new IGE.Components.DotRenderComponent(renderSystem),
+  DebugDrawBounds: () => new IGE.Debug.DebugDrawBoundsComponent(renderSystem),
+  DebugPosition: () => new IGE.Debug.DebugPositionComponent(renderSystem),
+  DebugVelocity: () => new IGE.Debug.DebugVelocityComponent(renderSystem),
+  Click: () => new IGE.Components.ClickComponent(inputSystem),
+  VelocityColor: () => new VelocityColorComponent(),
+  Physics: () => new IGE.Components.PhysicsComponent(),
+};
+
 export default class Game extends Component {
 
   componentDidMount () {
@@ -27,6 +57,13 @@ export default class Game extends Component {
       while(ballBag.objects.length < this.props.ballCount) {
         addBall(ballBag, this.props);
       }
+    }
+
+    if(this.props.impulseTime != prevProps.impulseTime) {
+      ballBag.objects.forEach(object => {
+        object.impulse[0] = (Math.random() - 0.5) * MAX_VELOCITY;
+        object.impulse[1] = (Math.random() - 0.5) * MAX_VELOCITY;
+      });
     }
 
     if (!prevProps.debug && this.props.debug) {
@@ -88,35 +125,6 @@ class VelocityColorComponent extends IGE.GameComponent {
       }
     }
   }
-}
-
-let game;
-let ballBag;
-let inputSystem;
-let cameraSystem;
-let worldSystem;
-let collisionSystem;
-let renderSystem;
-let clickMarker;
-let boundsAnimation;
-
-let availableComponents = {
-  Gravity: () => new IGE.Components.GravityComponent(),
-  TerminalVelocity: () => new IGE.Components.TerminalVelocityComponent(MAX_VELOCITY),
-  Move: () => new IGE.Components.MoveComponent(),
-  WorldWrap: () => new IGE.Components.WorldWrapComponent(worldSystem),
-  WorldBounce: () => new IGE.Components.WorldBounceComponent(worldSystem),
-  BackgroundCollision: () => new IGE.Components.BackgroundCollisionComponent(collisionSystem),
-  Rotation: () => new IGE.Components.RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
-  ColorAnimation: object => new IGE.Components.ColorAnimationComponent(object.color1, object.color2, 3000),
-  BoundsAnimation: object => new IGE.Components.BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, IGE.Easing.Smooth),
-  RectangleRender: () => new IGE.Components.RectangleRenderComponent(renderSystem),
-  DotRender: () => new IGE.Components.DotRenderComponent(renderSystem),
-  DebugDrawBounds: () => new IGE.Debug.DebugDrawBoundsComponent(renderSystem),
-  DebugPosition: () => new IGE.Debug.DebugPositionComponent(renderSystem),
-  DebugVelocity: () => new IGE.Debug.DebugVelocityComponent(renderSystem),
-  Click: () => new IGE.Components.ClickComponent(inputSystem),
-  VelocityColor: () => new VelocityColorComponent(),
 }
 
 function init (canvas, options) {
@@ -231,7 +239,9 @@ function setComponents (object, components) {
   object.components.length = 0;
 
   components.forEach(name => {
-    object.addComponent(availableComponents[name](object));
+    const factory = availableComponents[name];
+    if (factory)
+      object.addComponent(factory(object));
   });
 }
 

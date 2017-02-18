@@ -9460,10 +9460,10 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       ballCount: 10,
       gravityConstant: 0.0003,
       debug: false,
-      bounds: true,
+      bounds: false,
       boundsDuration: 5000,
-      availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click", "VelocityColor"],
-      components: ["TerminalVelocity", "Move", "WorldBounce", "DotRender", "Click"]
+      availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click", "VelocityColor", "Physics"],
+      components: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
     };
   }
 
@@ -9510,6 +9510,36 @@ module.exports = __webpack_require__(112);
 const MAX_VELOCITY = 0.1;
 const MAX_ROTATION = 0.01;
 
+let game;
+let ballBag;
+let inputSystem;
+let cameraSystem;
+let worldSystem;
+let collisionSystem;
+let renderSystem;
+let clickMarker;
+let boundsAnimation;
+
+let availableComponents = {
+  Gravity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent(),
+  TerminalVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].TerminalVelocityComponent(MAX_VELOCITY),
+  Move: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].MoveComponent(),
+  WorldWrap: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldWrapComponent(worldSystem),
+  WorldBounce: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem),
+  BackgroundCollision: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem),
+  Rotation: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
+  ColorAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(object.color1, object.color2, 3000),
+  BoundsAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth),
+  RectangleRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem),
+  DotRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem),
+  DebugDrawBounds: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem),
+  DebugPosition: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugPositionComponent(renderSystem),
+  DebugVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugVelocityComponent(renderSystem),
+  Click: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem),
+  VelocityColor: () => new VelocityColorComponent(),
+  Physics: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].PhysicsComponent()
+};
+
 class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 
   componentDidMount() {
@@ -9532,6 +9562,13 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       while (ballBag.objects.length < this.props.ballCount) {
         addBall(ballBag, this.props);
       }
+    }
+
+    if (this.props.impulseTime != prevProps.impulseTime) {
+      ballBag.objects.forEach(object => {
+        object.impulse[0] = (Math.random() - 0.5) * MAX_VELOCITY;
+        object.impulse[1] = (Math.random() - 0.5) * MAX_VELOCITY;
+      });
     }
 
     if (!prevProps.debug && this.props.debug) {
@@ -9596,35 +9633,6 @@ class VelocityColorComponent extends __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_ga
     }
   }
 }
-
-let game;
-let ballBag;
-let inputSystem;
-let cameraSystem;
-let worldSystem;
-let collisionSystem;
-let renderSystem;
-let clickMarker;
-let boundsAnimation;
-
-let availableComponents = {
-  Gravity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].GravityComponent(),
-  TerminalVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].TerminalVelocityComponent(MAX_VELOCITY),
-  Move: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].MoveComponent(),
-  WorldWrap: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldWrapComponent(worldSystem),
-  WorldBounce: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].WorldBounceComponent(worldSystem),
-  BackgroundCollision: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BackgroundCollisionComponent(collisionSystem),
-  Rotation: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RotationComponent((Math.random() - 0.5) * MAX_ROTATION),
-  ColorAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ColorAnimationComponent(object.color1, object.color2, 3000),
-  BoundsAnimation: object => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].BoundsAnimationComponent(object.bounds1, object.bounds2, 2000, __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Easing"].Smooth),
-  RectangleRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].RectangleRenderComponent(renderSystem),
-  DotRender: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].DotRenderComponent(renderSystem),
-  DebugDrawBounds: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugDrawBoundsComponent(renderSystem),
-  DebugPosition: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugPositionComponent(renderSystem),
-  DebugVelocity: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Debug"].DebugVelocityComponent(renderSystem),
-  Click: () => new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Components"].ClickComponent(inputSystem),
-  VelocityColor: () => new VelocityColorComponent()
-};
 
 function init(canvas, options) {
   game = new __WEBPACK_IMPORTED_MODULE_1__dist_ijmacd_game_engine__["Game"]({
@@ -9738,7 +9746,8 @@ function setComponents(object, components) {
   object.components.length = 0;
 
   components.forEach(name => {
-    object.addComponent(availableComponents[name](object));
+    const factory = availableComponents[name];
+    if (factory) object.addComponent(factory(object));
   });
 }
 
@@ -9793,6 +9802,9 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   handleBoundsChange(e) {
     this.props.modifyState({ boundsDuration: e.target.value });
   }
+  handleImpulse() {
+    this.props.modifyState({ impulseTime: Date.now() });
+  }
   flipComponent(name) {
     const components = this.props.components;
     const isSelected = components.includes(name);
@@ -9804,7 +9816,7 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   render() {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      null,
+      { style: { overflowY: "auto" } },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h1',
         null,
@@ -9849,6 +9861,11 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
           ' ',
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', value: this.props.gravityConstant, onChange: e => this.handleGravityChange(e), size: 6 })
         )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'button', value: 'Impulse', onClick: e => this.handleImpulse() })
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
@@ -10918,6 +10935,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
                     /** Velocity of this object moving through the world. */
                     this.velocity = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
+                    /** Impulse to be applied to this object by the phisics component. */
+                    this.impulse = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_vec3___default.a.create();
                     /** Current rotation of this object. */
                     this.rotation = 0;
                     /** 3D rotations require a rotation axis */

@@ -19,6 +19,9 @@ export default class Sidebar extends Component {
   handleBoundsChange (e) {
     this.props.modifyState({boundsDuration: e.target.value});
   }
+  handleImpulse () {
+    this.props.modifyState({impulseTime: Date.now()});
+  }
   flipComponent (name) {
     const components = this.props.components;
     const isSelected = components.includes(name);
@@ -29,7 +32,7 @@ export default class Sidebar extends Component {
 
   render () {
     return (
-      <div>
+      <div style={{overflowY: "auto"}}>
         <h1>Settings</h1>
         <h2>Balls</h2>
         <p><label>
@@ -41,6 +44,9 @@ export default class Sidebar extends Component {
           Gravity: { ' ' }
           <input type="text" value={this.props.gravityConstant} onChange={e => this.handleGravityChange(e)} size={6} />
         </label></p>
+        <p>
+          <input type="button" value="Impulse" onClick={e => this.handleImpulse()} />
+        </p>
         <div>
           <p>Components:</p>
           <ul>

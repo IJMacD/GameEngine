@@ -11,7 +11,7 @@ export default class App extends Component {
       ballCount: 10,
       gravityConstant: 0.0003,
       debug: false,
-      bounds: true,
+      bounds: false,
       boundsDuration: 5000,
       availableComponents: [
         "Gravity",
@@ -30,11 +30,12 @@ export default class App extends Component {
         "DebugVelocity",
         "Click",
         "VelocityColor",
+        "Physics",
       ],
       components: [
         "TerminalVelocity",
         "Move",
-        "WorldBounce",
+        "WorldWrap",
         "DotRender",
         "Click",
       ],
