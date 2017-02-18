@@ -78,9 +78,9 @@ export default class Game extends Component {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (!deepEqual(prevProps.components, this.props.components)) {
+    if (!deepEqual(prevProps.enabledComponents, this.props.enabledComponents)) {
       ballBag.objects.forEach(object => {
-        setComponents(object, this.props.components);
+        setComponents(object, this.props.enabledComponents);
       });
     }
 
@@ -224,8 +224,6 @@ function ballFactory (options) {
   ball.color = `rgba(${r|0},${g|0},${b|0},0.8)`;
   ball.color1 = ball.color;
   ball.color2 = `rgba(${r1|0},${g1|0},${b1|0},0.8)`;
-
-  setComponents(ball, options.components);
 
   ball.on("click", () => {
     ballBag.removeObject(ball);

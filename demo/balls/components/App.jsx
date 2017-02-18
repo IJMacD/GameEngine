@@ -39,6 +39,13 @@ export default class App extends Component {
         "DotRender",
         "Click",
       ],
+      enabledComponents: [
+        "TerminalVelocity",
+        "Move",
+        "WorldWrap",
+        "DotRender",
+        "Click",
+      ],
     };
   }
 

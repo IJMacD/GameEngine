@@ -24,9 +24,11 @@ export default class Sidebar extends Component {
   }
   flipComponent (name) {
     const components = this.props.components;
+    const enabled = this.props.enabledComponents;
     const isSelected = components.includes(name);
     this.props.modifyState({
-      components: isSelected ? components.filter(x => x != name) : [...components, name]
+      components: isSelected ? components.filter(x => x != name) : [...components, name],
+      enabledComponents: isSelected ? enabled.filter(x => x != name) : [...enabled, name],
     });
   }
   swapComponents (index1, index2) {
@@ -39,14 +41,22 @@ export default class Sidebar extends Component {
     }
     this.props.modifyState({components});
   }
+  enableComponent (name) {
+    const components = this.props.enabledComponents;
+    const isEnabled = components.includes(name);
+    this.props.modifyState({
+      enabledComponents: isEnabled ? components.filter(x => x != name) : [...components, name]
+    });
+  }
 
   render () {
     const available = this.props.availableComponents;
     const selected = this.props.components;
+    const enabled = this.props.enabledComponents;
     const unselected = arraySubtract(available, selected);
 
     return (
-      <div style={{overflowY: "auto"}}>
+      <div style={{overflowY: "auto", padding: 20}}>
         <h1>Settings</h1>
         <h2>Balls</h2>
         <p><label>
@@ -76,10 +86,12 @@ export default class Sidebar extends Component {
           <p>Components:</p>
           <ComponentList
             components={selected}
+            enabledComponents={enabled}
             areSelected={true}
             componentClick={n => this.flipComponent(n)}
             componentUp={i => this.swapComponents(i, i-1)}
             componentDown={i => this.swapComponents(i, i+1)}
+            componentEnable={n => this.enableComponent(n)}
           />
           <ComponentList
             components={unselected}
@@ -107,7 +119,15 @@ function arraySubtract (minuend, subtrahend) {
 }
 
 function ComponentList (props) {
-  const { components, areSelected, componentClick, componentUp, componentDown } = props;
+  const {
+    components,
+    enabledComponents = [],
+    areSelected,
+    componentClick,
+    componentUp,
+    componentDown,
+    componentEnable,
+  } = props;
   const listStyle = {
     listStyle: 'none',
     paddingLeft: 10,
@@ -115,6 +135,7 @@ function ComponentList (props) {
     fontSize: '10pt',
   };
   const count = components.length;
+
   return (
     <ul style={listStyle}>
       {
@@ -130,6 +151,14 @@ function ComponentList (props) {
               style={style}
               onClick={() => componentClick(name)}
             >
+              { areSelected &&
+                <input
+                  type="checkbox"
+                  checked={enabledComponents.includes(name)}
+                  onChange={() => { componentEnable(name)}}
+                  onClick={e => { e.stopPropagation(); }}
+                />
+              }
               { name }
               <div style={{float: "right", display: areSelected ? "" : "none"}}>
                 <span

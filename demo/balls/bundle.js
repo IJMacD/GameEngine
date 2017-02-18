@@ -9463,7 +9463,8 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       bounds: false,
       boundsDuration: 5000,
       availableComponents: ["Gravity", "TerminalVelocity", "Move", "WorldWrap", "WorldBounce", "BackgroundCollision", "Rotation", "ColorAnimation", "BoundsAnimation", "RectangleRender", "DotRender", "DebugDrawBounds", "DebugPosition", "DebugVelocity", "Click", "VelocityColor", "Physics"],
-      components: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
+      components: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"],
+      enabledComponents: ["TerminalVelocity", "Move", "WorldWrap", "DotRender", "Click"]
     };
   }
 
@@ -9583,9 +9584,9 @@ class Game extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       game.root.objects[0].removeObject(clickMarker);
     }
 
-    if (!deepEqual(prevProps.components, this.props.components)) {
+    if (!deepEqual(prevProps.enabledComponents, this.props.enabledComponents)) {
       ballBag.objects.forEach(object => {
-        setComponents(object, this.props.components);
+        setComponents(object, this.props.enabledComponents);
       });
     }
 
@@ -9732,8 +9733,6 @@ function ballFactory(options) {
   ball.color1 = ball.color;
   ball.color2 = `rgba(${r1 | 0},${g1 | 0},${b1 | 0},0.8)`;
 
-  setComponents(ball, options.components);
-
   ball.on("click", () => {
     ballBag.removeObject(ball);
   });
@@ -9807,9 +9806,11 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   }
   flipComponent(name) {
     const components = this.props.components;
+    const enabled = this.props.enabledComponents;
     const isSelected = components.includes(name);
     this.props.modifyState({
-      components: isSelected ? components.filter(x => x != name) : [...components, name]
+      components: isSelected ? components.filter(x => x != name) : [...components, name],
+      enabledComponents: isSelected ? enabled.filter(x => x != name) : [...enabled, name]
     });
   }
   swapComponents(index1, index2) {
@@ -9822,15 +9823,23 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     }
     this.props.modifyState({ components });
   }
+  enableComponent(name) {
+    const components = this.props.enabledComponents;
+    const isEnabled = components.includes(name);
+    this.props.modifyState({
+      enabledComponents: isEnabled ? components.filter(x => x != name) : [...components, name]
+    });
+  }
 
   render() {
     const available = this.props.availableComponents;
     const selected = this.props.components;
+    const enabled = this.props.enabledComponents;
     const unselected = arraySubtract(available, selected);
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      { style: { overflowY: "auto" } },
+      { style: { overflowY: "auto", padding: 20 } },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h1',
         null,
@@ -9903,10 +9912,12 @@ class Sidebar extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(ComponentList, {
           components: selected,
+          enabledComponents: enabled,
           areSelected: true,
           componentClick: n => this.flipComponent(n),
           componentUp: i => this.swapComponents(i, i - 1),
-          componentDown: i => this.swapComponents(i, i + 1)
+          componentDown: i => this.swapComponents(i, i + 1),
+          componentEnable: n => this.enableComponent(n)
         }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(ComponentList, {
           components: unselected,
@@ -9952,7 +9963,15 @@ function arraySubtract(minuend, subtrahend) {
 }
 
 function ComponentList(props) {
-  const { components, areSelected, componentClick, componentUp, componentDown } = props;
+  const {
+    components,
+    enabledComponents = [],
+    areSelected,
+    componentClick,
+    componentUp,
+    componentDown,
+    componentEnable
+  } = props;
   const listStyle = {
     listStyle: 'none',
     paddingLeft: 10,
@@ -9960,6 +9979,7 @@ function ComponentList(props) {
     fontSize: '10pt'
   };
   const count = components.length;
+
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'ul',
     { style: listStyle },
@@ -9976,6 +9996,16 @@ function ComponentList(props) {
           style: style,
           onClick: () => componentClick(name)
         },
+        areSelected && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
+          type: 'checkbox',
+          checked: enabledComponents.includes(name),
+          onChange: () => {
+            componentEnable(name);
+          },
+          onClick: e => {
+            e.stopPropagation();
+          }
+        }),
         name,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
