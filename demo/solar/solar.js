@@ -36,7 +36,6 @@
         cameraDistance,
         cameraDistance2 = 0.1,
         lastTime = 0,
-        debugBtn = document.getElementById('debug-btn'),
         DEBUG = false;
 
     function initCanvas(){
@@ -179,7 +178,6 @@
 
     function toggleDebug(){
         DEBUG = !DEBUG;
-        debugBtn.classList.toggle("active", DEBUG);
         if(DEBUG){
             gameRoot.addObject(renderSystem2);
             canvas2.style.display = "block";
@@ -190,9 +188,6 @@
         }
     }
 
-    document.getElementById('fullscr-btn').addEventListener("click", goFullscreen);
-
-    debugBtn.addEventListener("click", toggleDebug);
     var mousedown,
         cameraPosition = [0,-100,cameraDistance],
         cameraAngleStart,
@@ -327,9 +322,9 @@
 	}
 
     cameraSystem = new IGE.CameraSystem(canvasWidth, canvasHeight);
-    renderSystem = new IGE.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
+    renderSystem = new IGE.Render.WebGLRenderSystem(context, canvasWidth, canvasHeight, cameraSystem, shaderProgram);
     cameraSystem2 = new IGE.CameraSystem(canvas2Width, canvas2Height);
-    renderSystem2 = new IGE.CanvasRenderSystem(context2, cameraSystem2);
+    renderSystem2 = new IGE.Render.CanvasRenderSystem(context2, cameraSystem2);
     cameraSystem.setScale(1.0);
     cameraDistance = 800;
     cameraSystem.setPosition(0,-100,cameraDistance);
