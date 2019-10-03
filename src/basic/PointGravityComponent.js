@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import * as vec3 from 'gl-matrix/src/gl-matrix/vec3';
 
 export default class PointGravityComponent extends GameComponent {
     constructor (target) {

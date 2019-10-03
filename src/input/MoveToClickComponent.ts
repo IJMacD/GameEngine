@@ -1,5 +1,5 @@
 import GameComponent from '../core/GameComponent';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import * as vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import InputSystem from './InputSystem';
 
 export default class MoveToClickComponent extends GameComponent {

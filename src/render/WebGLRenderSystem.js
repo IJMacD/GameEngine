@@ -1,6 +1,6 @@
 import GameObject from '../core/GameObject';
-import vec3 from 'gl-matrix/src/gl-matrix/vec3';
-import mat4 from 'gl-matrix/src/gl-matrix/mat4';
+import * as vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 export default class WebGLRenderSystem extends GameObject {
   constructor (context, canvasWidth, canvasHeight, cameraSystem, shaderProgram) {

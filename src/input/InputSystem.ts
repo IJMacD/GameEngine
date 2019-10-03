@@ -1,7 +1,7 @@
 import GameObject from '../core/GameObject';
 import CameraSystem from '../CameraSystem';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
-import mat2 from 'gl-matrix/src/gl-matrix/mat2';
+import * as vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import * as mat2 from 'gl-matrix/src/gl-matrix/mat2';
 
 // Create some spare vectors for use in screenToWorld method
 const v = vec2.create();

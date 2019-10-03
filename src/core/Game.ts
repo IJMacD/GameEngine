@@ -117,16 +117,7 @@ export default class Game implements Events {
     on: (type: string, callback) => void;
     fire: (type: string, ...params) => void;
 
-    constructor ({canvas, width, height, score, lives, level, autosize, originCentric} = {
-        canvas: null,
-        width: 0,
-        height: 0,
-        score: 0,
-        lives: 0,
-        level: 0,
-        autosize: false,
-        originCentric: false,
-    }) {
+    constructor ({canvas, width=0, height=0, score=0, lives=0, level=0, autosize=false, originCentric=true}) {
 
         /**
          * Canvas this game will render to.
@@ -420,6 +411,7 @@ export default class Game implements Events {
                 window.removeEventListener("resize", this._autosizeCallback);
             }
         }
+        this._autosizeCallback();
     }
 
     private _loop() {
@@ -468,17 +460,6 @@ export default class Game implements Events {
 }
 
 applyMixin(Game, Events);
-
-export interface Texture {
-    /** HTML <code>&ltimage></code> Element */
-    image: HTMLImageElement;
-    /** Natural width of image */
-    width: number;
-    /** Natural height of image */
-    height: number;
-    /** If image has loaded width and height properties should be available. */
-    loaded: boolean;
-}
 
 export interface AudioTexture {
     /** HTML <code>&lt;audio></code> element */

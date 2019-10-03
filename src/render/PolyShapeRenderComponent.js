@@ -1,6 +1,6 @@
 import GameComponent from '../core/GameComponent';
-import mat3 from 'gl-matrix/src/gl-matrix/mat3';
-import mat4 from 'gl-matrix/src/gl-matrix/mat4';
+import * as mat3 from 'gl-matrix/src/gl-matrix/mat3';
+import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 export default class PolyShapeRenderingComponent extends GameComponent {
     constructor (renderSystem, vertices, textureCoords, vertexNormals, vertexIndices) {

@@ -1,4 +1,4 @@
-import GameComponent from '../core/GameComponent.ts';
+import GameComponent from '../core/GameComponent';
 import WorldSystem from './WorldSystem';
 
 /**

@@ -36,11 +36,11 @@ class WorldWrapComponent extends GameComponent {
 		const vz = parent.velocity[2];
 
 		const bx1 = parentBounds ? ax1 - parentBounds[2] : ax1;
-		const bx2 = parentBounds ? ax2 - parentBounds[0] : ax1;
+		const bx2 = parentBounds ? ax2 - parentBounds[0] : ax2;
 		const by1 = parentBounds ? ay1 - parentBounds[3] : ay1;
-		const by2 = parentBounds ? ay2 - parentBounds[1] : ay1;
+		const by2 = parentBounds ? ay2 - parentBounds[1] : ay2;
 		const bz1 = parentBounds ? az1 - parentBounds[5] : az1;
-		const bz2 = parentBounds ? az2 - parentBounds[4] : az1;
+		const bz2 = parentBounds ? az2 - parentBounds[4] : az2;
 
 		if(px < bx1 && vx < 0){
 			parent.position[0] = bx2;
